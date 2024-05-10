@@ -1,0 +1,76 @@
+
+ADVICE ON REACT PROJECT FOLDER STRUCTURE:
+
+When it comes to React projects, having a clean and scalable directory structure is crucial for long-term maintenance and
+development efficiency. Since you're planning to use routing and have multiple components, let's go through some widely
+accepted best practices for your project structure inside the `src` folder.
+
+### **Recommended Folder Structure**
+
+Here's a typical way to structure your project for clarity and scalability:
+
+```
+/src
+|-- /assets
+|   |-- /images
+|   |-- /styles
+|-- /components
+|   |-- /common
+|   |-- /layout
+|-- /pages
+|   |-- /Home
+|   |   |-- /components
+|   |   |-- Home.tsx
+|   |-- /About
+|   |   |-- /components
+|   |   |-- About.tsx
+|   |-- /Contact
+|   |   |-- /components
+|   |   |-- Contact.tsx
+|-- /services
+|-- /utils
+|-- /hooks
+|-- /types
+|-- App.tsx
+|-- main.tsx
+|-- routes.tsx
+```
+
+### **Folder Details and Best Practices**
+
+- **`/assets`**: This directory will store static files like images and styles. Keeping them separate from your logical
+code helps in managing them better.
+
+- **`/components`**: General components that are used across various pages should be stored here. It’s a good practice to
+further organize this directory into subdirectories like `/common` for very widely used components (like buttons and inputs)
+and `/layout` for layout components (like headers and footers).
+
+- **`/pages`**: Each page of your application should have its own directory within the `/pages` folder. It’s a common
+practice to name these directories after the pages themselves (e.g., Home, About, Contact).
+
+    - **Subfolder `/components`**: For components that are specifically used within a particular page and not reused
+    elsewhere, create a subfolder inside the page folder. This keeps page-specific components organized and easy to
+    manage as your application grows.
+
+- **`/services`**: For handling external interactions like API calls. Keeping them in one place makes your components
+cleaner and your services more reusable.
+
+- **`/utils`**: Utility functions that are used across the application.
+
+- **`/hooks`**: Custom hooks for your application to encapsulate and reuse stateful logic.
+
+- **`/types`**: TypeScript types, interfaces, or enums that are used globally across your application.
+
+- **`routes.tsx`**: Centralizing your routing in one file makes it easier to manage. It uses components from `/pages` to render based on the route.
+
+### **Additional Tips**
+
+- **Modularity**: Keep your components small, focused, and reusable where possible.
+- **Naming Conventions**: Use consistent and clear naming conventions. For TypeScript files,
+use `.tsx` if they contain JSX code; otherwise, use `.ts`.
+- **Lazy Loading**: Consider using React's lazy loading for pages to improve load times, especially
+if the app size grows.
+
+This structure provides a solid foundation as your application scales up, while also keeping it organized and
+maintainable. Always tailor the structure based on the specific needs and complexity of your project.
+Would you like to delve into any specific part or need a different aspect of the project structure explained?
