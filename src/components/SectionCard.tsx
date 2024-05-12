@@ -3,7 +3,7 @@
 import {Card, CardHeader, CardBody, Heading, Icon} from "@chakra-ui/react";
 import {IconType} from "react-icons";
 
-import '@fontsource-variable/comfortaa'
+
 
 import {NavLink} from "react-router-dom";
 
