@@ -30,7 +30,7 @@ export default function Seguimiento(){
             
             <SimpleGrid columns={[1,1,2,3,4]} gap={'0.5em'} >
                 <SectionCard to={'/producto'} name={'Codificar Producto'} icon={PiDownloadDuotone} />
-                <SectionCard to={'/seguimiento'} name={'Seguimiento'} icon={AiOutlineAudit} />
+                <SectionCard to={'/seguimiento'} name={'Crear Orden de Produccion'} icon={AiOutlineAudit} />
                 <SectionCard to={'/seguimiento'} name={'Stock'} icon={BsDatabaseCheck} />
                 <SectionCard to={'/seguimiento'} name={'Alertas'} icon={MdOutlineSdCardAlert} />
                 <SectionCard to={'/seguimiento'} name={'Analitica'} icon={IoMdAnalytics} />

@@ -29,22 +29,20 @@ function TextField({label, left_elem}:TextFieldProps){
 }
 
 interface NumFieldProps{
-    left_elem: number
-    label:string
+    label:string,
 }
 
-function NumField({label, left_elem}:NumFieldProps){
+function NumField({label}:NumFieldProps){
     return(
         <>
-        <InputGroup p={'0.5em'} >
+        <HStack p={'0.5em'}>
             <Text>{label}</Text>
-            <InputLeftElement color={'gray.300'}>
-                {left_elem}
-            </InputLeftElement>
-            <NumberInput>
-                <NumberInputField/>
-            </NumberInput>
-        </InputGroup>
+            <InputGroup >
+                <NumberInput>
+                    <NumberInputField/>
+                </NumberInput>
+            </InputGroup>
+        </HStack>
         </>
     )
     
