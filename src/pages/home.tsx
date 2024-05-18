@@ -14,7 +14,7 @@ import '@fontsource-variable/comfortaa'
 
 export default function Home(){
     return(
-        <Container maxW={'90wv'}>
+        <Container maxW={'container.xl'}>
             <Flex pb={'0.2em'} direction={'row'} mb={'1em'} borderBottom={'0.04em solid'}>
                 <Spacer flex={1}/>
                 <Heading flex={2} as={'h2'} size={'xl'} fontFamily={'Comfortaa Variable'}>Panel</Heading>

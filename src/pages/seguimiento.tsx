@@ -19,10 +19,9 @@ import {IoMdAnalytics} from "react-icons/io";
 
 import SectionCard from "../components/SectionCard.tsx";
 
-export default function Seguimiento(){
+function Seguimiento(){
     return(
         <>
-        {/*<Container>*/}
         <Heading> Seguimiento </Heading>
         <NavLink to={'/'}>
             <Button>Atras</Button>
@@ -35,8 +34,8 @@ export default function Seguimiento(){
                 <SectionCard to={'/seguimiento'} name={'Alertas'} icon={MdOutlineSdCardAlert} />
                 <SectionCard to={'/seguimiento'} name={'Analitica'} icon={IoMdAnalytics} />
             </SimpleGrid>
-            
-{/*//        </Container>*/}
         </>
     );
 }
+
+export default Seguimiento;
