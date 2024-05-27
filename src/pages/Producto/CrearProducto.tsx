@@ -2,6 +2,8 @@
 import {useState} from 'react'
 import MyHeader from '../../components/MyHeader.tsx'
 
+import {serverParams} from '../../api/params.tsx'
+
 import axios from 'axios'
 
 import {
@@ -47,7 +49,9 @@ function CrearProducto(){
     const strs_bcod = {cod:'Codificar', mod:'Modificar'}
     const bcod_colors = {cod:'teal', mod:'orange'}
 
+    // @ts-ignore
     const [bcod_color, setBcodColor] = useState(bcod_colors.cod)
+    // @ts-ignore
     const [bcod_text, setBcodText] = useState(strs_bcod.cod)
 
     const [descripcion, setDescripcion] = useState('');
@@ -76,7 +80,8 @@ function CrearProducto(){
         };
 
         try {
-            const response = await axios.post('http://localhost:8080/productos/save', producto);
+            console.log(serverParams.getProductoEndPoint_save());
+            const response = await axios.post(serverParams.getProductoEndPoint_save(), producto);
             console.log('Product saved successfully:', response.data);
 
             toast({
@@ -101,7 +106,8 @@ function CrearProducto(){
     const getProductosTodos = async () => {
             try {
                 const response =
-                    await axios.get('http://localhost:8080/productos/getall');
+                    await axios.get(serverParams.getProductoEndPoint_getall());
+                console.log(serverParams.getProductoEndPoint_getall());
                 setListaProductos(response.data.content);
             } catch (error) {
                 console.error('Error en getAll', error);
@@ -116,7 +122,7 @@ function CrearProducto(){
             <Tabs isFitted gap={'1em'} variant="line">
                 <TabList>
                     <Tab sx={my_style_tab}>Crear Materia Prima</Tab>
-                    <Tab sx={my_style_tab}>Crear Terminado/Semiterminado</Tab>
+                    <Tab sx={my_style_tab} onClick={getProductosTodos}>Crear Terminado/Semiterminado</Tab>
 
                 </TabList>
                 
