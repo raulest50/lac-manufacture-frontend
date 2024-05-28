@@ -7,13 +7,14 @@ import {serverParams} from '../../api/params.tsx'
 import axios from 'axios'
 
 import {
-    Container, SimpleGrid, GridItem, HStack, Box, VStack, Stack,
+    Container, SimpleGrid, GridItem, HStack, Box, VStack, Stack, Flex,
     Tab, TabList, Tabs, TabPanels, TabPanel,
     Button, useToast,
     FormControl, FormLabel, Input,
     Textarea, Heading, Text,
     List, ListItem,
-    Card, CardBody, CardHeader
+    Card, CardBody, CardHeader,
+    Select,
 } from '@chakra-ui/react'
 
 const my_style_tab={
@@ -46,6 +47,9 @@ const cardItem_style = {
 
 function CrearProducto(){
 
+    const opts_ptype = {materiaPrima: 'Materia Prima', semiTerminado:'Semi Terminado', Terminado:'Terminado'};
+    const units = {KG:'KG', L:'L'};
+
     const strs_bcod = {cod:'Codificar', mod:'Modificar'}
     const bcod_colors = {cod:'teal', mod:'orange'}
 
@@ -57,6 +61,7 @@ function CrearProducto(){
     const [descripcion, setDescripcion] = useState('');
     const [costo, setCosto] = useState('');
     const [observaciones, setObservaciones] = useState('');
+    const [unidad, setUnidad] = useState(units.KG);
 
     const [listaProductos, setListaProductos] = useState([])
 
@@ -76,7 +81,7 @@ function CrearProducto(){
             nombre:descripcion,
             costo:costo,
             notas:observaciones,
-            tipo:'Materia Prima',
+            tipo:opts_ptype.materiaPrima,
         };
 
         try {
@@ -117,7 +122,7 @@ function CrearProducto(){
 
     return(
         
-        <Container minW={'container.lg'} w={'full'} h={'full'}>
+        <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
             <MyHeader title={'Codificar Producto'}/>
             <Tabs isFitted gap={'1em'} variant="line">
                 <TabList>
@@ -164,6 +169,23 @@ function CrearProducto(){
                                     </FormControl>
                                 </GridItem>
 
+                                <GridItem colSpan={1}>
+                                    <Flex w={'full'} direction={'row'} align={'flex-end'} justify={'space-around'} gap={4}>
+                                        <Select flex={"1"} defaultValue={units.KG}
+                                                value={unidad}
+                                                onChange={(e) => setUnidad(e.target.value)}
+                                        >
+                                            <option value={units.KG}>{units.KG}</option>
+                                            <option value={units.L}>{units.L}</option>
+                                        </Select>
+                                        <FormControl flex={"4"}>
+                                            <FormLabel>Cantidad por Unidad</FormLabel>
+                                            <Input
+                                                variant={'filled'}/>
+                                        </FormControl>
+                                    </Flex>
+                                </GridItem>
+
                             </SimpleGrid>
                         </VStack>
                         <Button m={5} colorScheme={bcod_color} onClick={saveMateriaPrimSubmit}>{bcod_text}</Button>
@@ -177,8 +199,8 @@ function CrearProducto(){
                             {/*panel izquierdo*/}
                             <VStack w={'full'} h={'full'}>
                                 <Heading p={2} bg={'green.200'} size={'md'}>Productos Existentes</Heading>
-                                <Box w={'full'} h={'full'} bg={'green.200'}>
-                                    <List spacing={0}>
+                                <Box w={'full'} h={'full'}>
+                                    <List spacing={'0.5em'}>
                                         {listaProductos.map((item:MiItem) => (
                                             <ListItem key={item.id}>
                                                 <Box>
@@ -210,6 +232,10 @@ function CrearProducto(){
                             {/*panel derecho*/}
                             <VStack w={'full'} h={'full'}>
                                 <FormControl>
+                                    <Select defaultValue={opts_ptype.semiTerminado}>
+                                        <option value={opts_ptype.semiTerminado}>{opts_ptype.semiTerminado}</option>
+                                        <option value={opts_ptype.Terminado}>{opts_ptype.Terminado}</option>
+                                    </Select>
                                     <FormLabel>Descripcion</FormLabel>
                                     <Input sx={input_style}></Input>
                                 </FormControl>

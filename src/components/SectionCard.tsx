@@ -31,11 +31,11 @@ function SectionCard({name, icon, to}:SectionCardProps){
     return(
         
         <NavLink to={to}>
-            <Card sx={my_sc_style}>
-                <CardHeader borderBottom='0.1em solid'>
+            <Card h={'full'} sx={my_sc_style}>
+                <CardHeader h={'40%'} borderBottom='0.1em solid' alignContent={'center'}>
                     <Heading as={'h2'} size={'sm'} fontFamily={'Comfortaa Variable'} >{name}</Heading>
                 </CardHeader>
-                <CardBody>
+                <CardBody >
                     <Icon boxSize={'4em'} as={icon} />
                 </CardBody>
             </Card>
