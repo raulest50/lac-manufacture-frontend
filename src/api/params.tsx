@@ -3,7 +3,7 @@
 class serverParams{
     
     static ip:string = "149.50.134.203";
-    static domain_name:string ="http://vps-4126991-x.dattaweb.com";
+    static domain_name:string ="https://lac-manufacture-backend.onrender.com";
     static spring_port:string ="8080";
     static productos_api:string = "productos";
     static endPoint_getall:string = "getall";
