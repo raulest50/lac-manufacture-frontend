@@ -3,7 +3,8 @@
 class serverParams{
     
     //static ip:string = "149.50.134.203";
-    static domain_name:string ="https://lac-manufacture-backend.onrender.com";
+    //static domain_name:string ="https://lac-manufacture-backend.onrender.com"; // FOR PRODUCTION
+    static domain_name:string ="http://localhost:8080"; // FOR DEVELOPMENT
     //static spring_port:string ="8080";
     static productos_api:string = "productos";
     static endPoint_getall:string = "getall";
@@ -11,11 +12,13 @@ class serverParams{
     
     static getProductoEndPoint_getall(): string{
         //return `${serverParams.domain_name}:${serverParams.spring_port}/${serverParams.productos_api}/${serverParams.endPoint_getall}`;
+        console.log(`${serverParams.domain_name}/${serverParams.productos_api}/${serverParams.endPoint_getall}`)
         return `${serverParams.domain_name}/${serverParams.productos_api}/${serverParams.endPoint_getall}`;
     }
     
     static getProductoEndPoint_save(): string{
         //return `${serverParams.domain_name}:${serverParams.spring_port}/${serverParams.productos_api}/${serverParams.endPoint_save}`;
+        console.log(`${serverParams.domain_name}/${serverParams.productos_api}/${serverParams.endPoint_save}`)
         return `${serverParams.domain_name}/${serverParams.productos_api}/${serverParams.endPoint_save}`;
     }
         

@@ -7,7 +7,7 @@ import {serverParams} from '../../api/params.tsx'
 import axios from 'axios'
 
 import {
-    Container, SimpleGrid, GridItem, HStack, Box, VStack, Stack, Flex,
+    Container, SimpleGrid, GridItem, HStack, Box, VStack, Flex,
     Tab, TabList, Tabs, TabPanels, TabPanel,
     Button, useToast,
     FormControl, FormLabel, Input,
@@ -58,7 +58,7 @@ const cardItem_style = {
 function CrearProducto(){
 
     const opts_ptype = {materiaPrima: 'Materia Prima', semiTerminado:'Semi Terminado', Terminado:'Terminado'};
-    const units = {KG:'KG', L:'L'};
+    const units = {KG:'KG', L:'L', U:'U'};
 
     const strs_bcod = {cod:'Codificar', mod:'Modificar'}
     const bcod_colors = {cod:'teal', mod:'orange'}
@@ -72,6 +72,7 @@ function CrearProducto(){
     const [costo, setCosto] = useState('');
     const [observaciones, setObservaciones] = useState('');
     const [unidad, setUnidad] = useState(units.KG);
+    const [cant_x_unidad, setCant_x_unidad] = useState(0);
 
     const [listaProductos, setListaProductos] = useState([])
 
@@ -92,6 +93,8 @@ function CrearProducto(){
             costo:costo,
             notas:observaciones,
             tipo:opts_ptype.materiaPrima,
+            unit_type:unidad,
+            cant_x_unidad:cant_x_unidad,
         };
 
         try {
@@ -187,10 +190,13 @@ function CrearProducto(){
                                         >
                                             <option value={units.KG}>{units.KG}</option>
                                             <option value={units.L}>{units.L}</option>
+                                            <option value={units.U}>{units.U}</option>
                                         </Select>
                                         <FormControl flex={"4"}>
                                             <FormLabel>Cantidad por Unidad</FormLabel>
                                             <Input
+                                                value={cant_x_unidad}
+                                                onChange={(e) => setCant_x_unidad(Number(e.target.value))}
                                                 variant={'filled'}/>
                                         </FormControl>
                                     </Flex>
