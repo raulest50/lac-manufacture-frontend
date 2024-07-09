@@ -14,8 +14,15 @@ import {
     Textarea, Heading, Text,
     List, ListItem,
     Card, CardBody, CardHeader,
-    Select,
+    Select, Icon,
 } from '@chakra-ui/react'
+
+import { IoCubeSharp } from "react-icons/io5";
+import { FaCubes } from "react-icons/fa";
+
+// Supports weights 100-900
+import '@fontsource-variable/league-spartan';
+import '@fontsource/anton';
 
 const my_style_tab={
     borderRadius:0,
@@ -36,10 +43,13 @@ const input_style = {
 }
 
 const cardItem_style = {
-    borderRadius:0,
+    borderRadius:'0',
     ':hover':{
         bg:'teal.200',
     },
+    borderLeft: "0.7em solid",
+    borderColor: "blue.200",
+
 
 }
 
@@ -204,18 +214,23 @@ function CrearProducto(){
                                         {listaProductos.map((item:MiItem) => (
                                             <ListItem key={item.id}>
                                                 <Box>
-                                                    <Card sx={cardItem_style}>
-                                                        <CardHeader p={1}>
-                                                            <Heading size={'sm'}> Nombre: {item.nombre} - Id: {item.id} </Heading>
+                                                    <Card sx={cardItem_style} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
+                                                        <CardHeader p={1} >
+                                                            <HStack justifyContent={'space-evenly'} >
+                                                                <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> {item.nombre} </Heading>
+                                                                <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Id: {item.id} </Heading>
+                                                            </HStack>
                                                         </CardHeader>
                                                         <CardBody p={1}>
-                                                            <Stack>
-                                                                <HStack justifyContent={'space-evenly'}>
+                                                            <HStack p={'1em'}>
+                                                                <Icon boxSize={'3em'} mr={'1em'} as={item.tipo === 'Materia Prima' ? IoCubeSharp : FaCubes}/>
+                                                                <VStack justifyContent={'space-evenly'} alignItems={'start'} pl={'1em'}>
                                                                     <Text>Costo: {item.costo}</Text>
                                                                     <Text>Tipo: {item.tipo}</Text>
-                                                                </HStack>
-                                                                <Text>Fecha Creacion: {new Date(item.fechaCreacion).toLocaleString()}</Text>
-                                                            </Stack>
+                                                                    <Text>Fecha Creacion: {new Date(item.fechaCreacion).toLocaleString()}</Text>
+                                                                </VStack>
+
+                                                            </HStack>
                                                         </CardBody>
                                                     </Card>
                                                 </Box>

@@ -16,6 +16,8 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fontsource-variable/comfortaa": "^5.0.20",
+    "@fontsource-variable/league-spartan": "^5.0.20",
+    "@fontsource/anton": "^5.0.20",
     "axios": "^1.6.8",
     "framer-motion": "^11.1.9",
     "json-server": "^1.0.0-alpha.23",
