@@ -55,51 +55,49 @@ const cardItem_style = {
 
 
 
+import {TIPOS_PRODUCTOS, UNIDADES} from "../../models/producto.tsx";
+
 function CrearProducto(){
 
-    const opts_ptype = {materiaPrima: 'Materia Prima', semiTerminado:'Semi Terminado', Terminado:'Terminado'};
-    const units = {KG:'KG', L:'L', U:'U'};
+    //const strs_bcod = {cod:'Codificar', mod:'Modificar'}
+    //const bcod_colors = {cod:'teal', mod:'orange'}
 
-    const strs_bcod = {cod:'Codificar', mod:'Modificar'}
-    const bcod_colors = {cod:'teal', mod:'orange'}
+    //const [bcod_color, setBcodColor] = useState(bcod_colors.cod)
+    //const [bcod_text, setBcodText] = useState(strs_bcod.cod)
 
-    // @ts-ignore
-    const [bcod_color, setBcodColor] = useState(bcod_colors.cod)
-    // @ts-ignore
-    const [bcod_text, setBcodText] = useState(strs_bcod.cod)
-
-    const [descripcion, setDescripcion] = useState('');
+    const [nombre, setNombre] = useState('');
     const [costo, setCosto] = useState('');
     const [observaciones, setObservaciones] = useState('');
-    const [unidad, setUnidad] = useState(units.KG);
-    const [cant_x_unidad, setCant_x_unidad] = useState(0);
+    const [tipo_unidad, setTipo_unidad] = useState(UNIDADES.KG);
+    const [cantidad_unidad, setCantidad_unidad] = useState(0);
+    //const [tipo_producto, setTipo_producto] = useState(TIPOS_PRODUCTOS.semiTerminado)
 
     const [listaProductos, setListaProductos] = useState([])
 
     type MiItem = {
         id: number;
         nombre: string;
-        notas: string;
+        observaciones: string;
         costo: number;
-        tipo: string;
+        tipo_producto: string;
         fechaCreacion: string;
     };
 
     const toast = useToast()
 
     const saveMateriaPrimSubmit = async () => {
-        const producto = {
-            nombre:descripcion,
+        const materia_prima = {
+            nombre:nombre,
+            observaciones:observaciones,
             costo:costo,
-            notas:observaciones,
-            tipo:opts_ptype.materiaPrima,
-            unit_type:unidad,
-            cant_x_unidad:cant_x_unidad,
+            tipo_unidad:tipo_unidad,
+            cantidad_unidad:cantidad_unidad,
+            tipo_producto:TIPOS_PRODUCTOS.materiaPrima
         };
 
         try {
             console.log(serverParams.getProductoEndPoint_save());
-            const response = await axios.post(serverParams.getProductoEndPoint_save(), producto);
+            const response = await axios.post(serverParams.getProductoEndPoint_save(), materia_prima);
             console.log('Product saved successfully:', response.data);
 
             toast({
@@ -155,8 +153,8 @@ function CrearProducto(){
                                     <FormControl>
                                         <FormLabel>Descripcion</FormLabel>
                                         <Input
-                                            value={descripcion}
-                                            onChange={(e) => setDescripcion(e.target.value)}
+                                            value={nombre}
+                                            onChange={(e) => setNombre(e.target.value)}
                                             sx={input_style}/>
                                     </FormControl>
                                 </GridItem>
@@ -184,19 +182,19 @@ function CrearProducto(){
 
                                 <GridItem colSpan={1}>
                                     <Flex w={'full'} direction={'row'} align={'flex-end'} justify={'space-around'} gap={4}>
-                                        <Select flex={"1"} defaultValue={units.KG}
-                                                value={unidad}
-                                                onChange={(e) => setUnidad(e.target.value)}
+                                        <Select flex={"1"} defaultValue={UNIDADES.KG}
+                                                value={tipo_unidad}
+                                                onChange={(e) => setTipo_unidad(e.target.value)}
                                         >
-                                            <option value={units.KG}>{units.KG}</option>
-                                            <option value={units.L}>{units.L}</option>
-                                            <option value={units.U}>{units.U}</option>
+                                            <option value={UNIDADES.KG}>{UNIDADES.KG}</option>
+                                            <option value={UNIDADES.L}>{UNIDADES.L}</option>
+                                            <option value={UNIDADES.U}>{UNIDADES.U}</option>
                                         </Select>
                                         <FormControl flex={"4"}>
                                             <FormLabel>Cantidad por Unidad</FormLabel>
                                             <Input
-                                                value={cant_x_unidad}
-                                                onChange={(e) => setCant_x_unidad(Number(e.target.value))}
+                                                value={cantidad_unidad}
+                                                onChange={(e) => setCantidad_unidad(Number(e.target.value))}
                                                 variant={'filled'}/>
                                         </FormControl>
                                     </Flex>
@@ -204,7 +202,7 @@ function CrearProducto(){
 
                             </SimpleGrid>
                         </VStack>
-                        <Button m={5} colorScheme={bcod_color} onClick={saveMateriaPrimSubmit}>{bcod_text}</Button>
+                        <Button m={5} colorScheme={'teal'} onClick={saveMateriaPrimSubmit}>{"Codificar"}</Button>
                     </TabPanel>
 
 
@@ -229,10 +227,10 @@ function CrearProducto(){
                                                         </CardHeader>
                                                         <CardBody p={1}>
                                                             <HStack p={'1em'}>
-                                                                <Icon boxSize={'3em'} mr={'1em'} as={item.tipo === 'Materia Prima' ? IoCubeSharp : FaCubes}/>
+                                                                <Icon boxSize={'3em'} mr={'1em'} as={item.tipo_producto === 'Materia Prima' ? IoCubeSharp : FaCubes}/>
                                                                 <VStack justifyContent={'space-evenly'} alignItems={'start'} pl={'1em'}>
                                                                     <Text>Costo: {item.costo}</Text>
-                                                                    <Text>Tipo: {item.tipo}</Text>
+                                                                    <Text>Tipo: {item.tipo_producto}</Text>
                                                                     <Text>Fecha Creacion: {new Date(item.fechaCreacion).toLocaleString()}</Text>
                                                                 </VStack>
 
@@ -253,9 +251,9 @@ function CrearProducto(){
                             {/*panel derecho*/}
                             <VStack w={'full'} h={'full'}>
                                 <FormControl>
-                                    <Select defaultValue={opts_ptype.semiTerminado}>
-                                        <option value={opts_ptype.semiTerminado}>{opts_ptype.semiTerminado}</option>
-                                        <option value={opts_ptype.Terminado}>{opts_ptype.Terminado}</option>
+                                    <Select defaultValue={TIPOS_PRODUCTOS.semiTerminado}>
+                                        <option value={1}>{TIPOS_PRODUCTOS.semiTerminado}</option>
+                                        <option value={2}>{TIPOS_PRODUCTOS.Terminado}</option>
                                     </Select>
                                     <FormLabel>Descripcion</FormLabel>
                                     <Input sx={input_style}></Input>

@@ -5,9 +5,11 @@ import {PiDownloadDuotone} from "react-icons/pi";
 import { GiCardPickup } from "react-icons/gi";
 import {BsDatabaseCheck} from "react-icons/bs";
 import {AiOutlineAudit} from "react-icons/ai";
-import {MdOutlineSdCardAlert} from "react-icons/md";
-import {IoMdAnalytics} from "react-icons/io";
-import { AiOutlineMonitor } from "react-icons/ai";
+//import {MdOutlineSdCardAlert} from "react-icons/md";
+//import {IoMdAnalytics} from "react-icons/io";
+//import { AiOutlineMonitor } from "react-icons/ai";
+import { RiFilterFill } from "react-icons/ri";
+import { FaFireBurner } from "react-icons/fa6";
 
 import '@fontsource-variable/comfortaa'
 
@@ -22,13 +24,14 @@ export default function Home(){
                 <Button flex={1} size={'lg'} colorScheme={'green'} variant={'ghost'} > Cerrar Sesion </Button>
             </Flex>
             <SimpleGrid columns={[1,1,2,3,4]} gap={'0.5em'} rowGap={'1.5em'} >
-                <SectionCard to={'/producto'} name={'Codificar Producto'} icon={PiDownloadDuotone} />
-                <SectionCard to={'/produccion'} name={'Iniciar Produccion'} icon={AiOutlineAudit} />
-                <SectionCard to={'/seguimiento'} name={'Seguimiento'} icon={AiOutlineMonitor} />
-                <SectionCard to={'/picking'} name={'Picking'} icon={GiCardPickup} />
+                <SectionCard to={'/producto'} name={'Codificar Productos'} icon={PiDownloadDuotone} />
+                <SectionCard to={'/produccion'} name={'Produccion'} icon={AiOutlineAudit} />
                 <SectionCard to={'/stock'} name={'Stock'} icon={BsDatabaseCheck} />
-                <SectionCard to={'/alertas'} name={'Alertas'} icon={MdOutlineSdCardAlert} />
-                <SectionCard to={'/analitica'} name={'Analitica'} icon={IoMdAnalytics} />
+                <SectionCard to={'/zona_bodega_1'} name={'Zona Bodega 1'} icon={GiCardPickup} />
+                <SectionCard to={'/zona_bodega_2'} name={'Zona Llenado 2'} icon={RiFilterFill} />
+                <SectionCard to={'/zona_bodega_3'} name={'Zona Marmitas 3'} icon={FaFireBurner} />
+
+
                 
             </SimpleGrid>
         </Container>
