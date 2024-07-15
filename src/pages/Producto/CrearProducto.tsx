@@ -63,6 +63,15 @@ import {TIPOS_PRODUCTOS, UNIDADES} from "../../models/producto.tsx";
 
 function CrearProducto(){
 
+    type MiItem = {
+        producto_id: number;
+        nombre: string;
+        observaciones: string;
+        costo: number;
+        tipo_unidades: string;
+        fechaCreacion: string;
+    };
+
     //const strs_bcod = {cod:'Codificar', mod:'Modificar'}
     //const bcod_colors = {cod:'teal', mod:'orange'}
 
@@ -78,20 +87,21 @@ function CrearProducto(){
     const TIPO_BUSQUEDA = {NOMBRE:"NOMBRE", ID:"ID"}
 
     const [busqueda, setBusqueda] = useState('');
+
+    // true: se muestra la lista de materias primas | false: se muestra la lista de semiterminados
     const [busqueda_tipo_mp, setBusqueda_tipo_mp] = useState(true)
+
+    // para definir si se busca por ID o por NOMBRE
     const [busqueda_param, setBusqueda_param] = useState(TIPO_BUSQUEDA.NOMBRE)
+
     //const [tipo_producto, setTipo_producto] = useState(TIPOS_PRODUCTOS.semiTerminado)
+    //const [listaProductos, setListaProductos] = useState([])
 
-    const [listaProductos, setListaProductos] = useState([])
+    const [listaMP, setListaMP] = useState([])
+    const [listaSemi, setListaSemi] = useState([])
 
-    type MiItem = {
-        producto_id: number;
-        nombre: string;
-        observaciones: string;
-        costo: number;
-        tipo_unidades: string;
-        fechaCreacion: string;
-    };
+    const [listaSelected, setListaSelected] = useState<MiItem[]>([])
+
 
     const toast = useToast()
 
@@ -142,16 +152,69 @@ function CrearProducto(){
         }
     };
 
-    const getProductosTodos = async () => {
-            try {
-                const response =
-                    await axios.get(serverParams.getProductoEndPoint_getall());
-                console.log(serverParams.getProductoEndPoint_getall());
-                setListaProductos(response.data.content);
-            } catch (error) {
-                console.error('Error en getAll', error);
+    // hace un getRequest para traer la lista de MateriasPrimas
+    const SearchMprimas = async () => {
+        try {
+            const response =
+                await axios.get(serverParams.getMateriaPrimaEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
+            //console.log(serverParams.getProductoEndPoint_getall());
+            setListaMP(response.data.content);
+        } catch (error) {
+            console.error('Error en getAll', error);
+        }
+    };
+
+    // hace un getRequest para traer la lista de semiTerminados
+    const SearchSemi = async () => {
+        try {
+            const response =
+                await axios.get(serverParams.getSemiTerminadoEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
+            //console.log(serverParams.getProductoEndPoint_getall());
+            setListaSemi(response.data.content);
+        } catch (error) {
+            console.error('Error en getAll', error);
+        }
+    };
+
+    // carga las 2 listas, las de materias primas y la de semiterminado
+    const get_Semi_and_MP = async () => {
+        try {
+            // Await the search functions
+            await SearchMprimas();
+            await SearchSemi();
+            // Any additional logic after both searches are completed
+            //console.log('Both searches completed');
+        } catch (error) {
+            console.error('Error in get_Semi_and_MP', error);
+        }
+    };
+
+    // deacuerdo al toggle button se selecciona que lisat va en la bandeja, mprimas o semiterminado.
+    const getListaProductos = () => {
+        if(busqueda_tipo_mp) return listaMP;
+        else return listaSemi;
+    };
+
+    const onKeyPress_InputBuscar = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+          //console.log('Enter key pressed', inputValue);
+          get_Semi_and_MP();
+        }
+    };
+
+    const onItemClick = (item:MiItem) => {
+        setListaSelected((prevSelected) => {
+            const isItemSelected = prevSelected.some((selectedItem) => selectedItem.producto_id === item.producto_id);
+
+            if (isItemSelected) {
+                // Item is already in the list, remove it
+                return prevSelected.filter((selectedItem) => selectedItem.producto_id !== item.producto_id);
+            } else {
+                // Item is not in the list, add it
+                return [...prevSelected, item];
             }
-        };
+        });
+    };
 
 
     return(
@@ -161,8 +224,7 @@ function CrearProducto(){
             <Tabs isFitted gap={'1em'} variant="line">
                 <TabList>
                     <Tab sx={my_style_tab}>Crear Materia Prima</Tab>
-                    <Tab sx={my_style_tab} onClick={getProductosTodos}>Crear Terminado/Semiterminado</Tab>
-
+                    <Tab sx={my_style_tab}>Crear Terminado/Semiterminado</Tab>
                 </TabList>
                 
                 <TabPanels>
@@ -243,7 +305,7 @@ function CrearProducto(){
                                 <HStack w={'full'} h={'full'}>
                                     <Heading p={2} bg={'green.200'} size={'md'}>Bandeja de Seleccion</Heading>
                                     <Button
-                                        onClick={getProductosTodos}
+                                        onClick={get_Semi_and_MP}
                                         colorScheme={'teal'}>Cargar Productos</Button>
                                 </HStack>
                                 <HStack w={'full'} alignItems={"center"}>
@@ -252,6 +314,7 @@ function CrearProducto(){
                                         <Input
                                             value={busqueda}
                                             onChange={(e) => setBusqueda(e.target.value)}
+                                            onKeyDown={(e) => onKeyPress_InputBuscar(e)}
                                             sx={input_style}/>
                                     </FormControl>
                                     <IconButton
@@ -273,8 +336,8 @@ function CrearProducto(){
                                 </HStack>
                                 <Box w={'full'} >
                                     <List spacing={'0.5em'}>
-                                        {listaProductos.map((item:MiItem) => (
-                                            <ListItem key={item.producto_id}>
+                                        {getListaProductos().map((item:MiItem) => (
+                                            <ListItem key={item.producto_id} onClick={() => onItemClick(item)}>
                                                 <Box>
                                                     <Card sx={cardItem_style} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
                                                         <CardHeader p={1} >
@@ -291,7 +354,6 @@ function CrearProducto(){
                                                                     <Text>Tipo: {item.tipo_unidades}</Text>
                                                                     <Text>Fecha Creacion: {new Date(item.fechaCreacion).toLocaleString()}</Text>
                                                                 </VStack>
-
                                                             </HStack>
                                                         </CardBody>
                                                     </Card>
@@ -313,9 +375,37 @@ function CrearProducto(){
                                     <FormLabel>Descripcion</FormLabel>
                                     <Input sx={input_style}></Input>
                                 </FormControl>
+
+                                <Box w={'full'} h={'full'}>
+                                    <List spacing={'0.5em'}>
+                                        {listaSelected.map((item:MiItem) => (
+                                            <ListItem key={item.producto_id}>
+                                                <Box>
+                                                    <Card sx={cardItem_style} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
+                                                        <CardHeader p={1} >
+                                                            <HStack justifyContent={'space-evenly'} >
+                                                                <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> {item.nombre} </Heading>
+                                                                <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Id: {item.producto_id} </Heading>
+                                                            </HStack>
+                                                        </CardHeader>
+                                                        <CardBody p={1}>
+                                                            <HStack p={'1em'}>
+                                                                <Icon boxSize={'3em'} mr={'1em'} as={get_UnitsIcon(item.tipo_unidades)}/>
+                                                                <VStack justifyContent={'space-evenly'} alignItems={'start'} pl={'1em'}>
+                                                                    <Text>Costo: {item.costo}</Text>
+                                                                    <Text>Tipo: {item.tipo_unidades}</Text>
+                                                                    <Text>Fecha Creacion: {new Date(item.fechaCreacion).toLocaleString()}</Text>
+                                                                </VStack>
+                                                            </HStack>
+                                                        </CardBody>
+                                                    </Card>
+                                                </Box>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Box>
+
                             </VStack>
-
-
                         </HStack>
                     </TabPanel>
                 </TabPanels>
