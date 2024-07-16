@@ -46,15 +46,22 @@ const input_style = {
     borderRadius:0,
 }
 
-const cardItem_style = {
+const cardItem_style_sel_tray = {
     borderRadius:'0',
     ':hover':{
         bg:'teal.200',
     },
     borderLeft: "0.7em solid",
     borderColor: "blue.200",
+}
 
-
+const cardItem_style_rcta = {
+    borderRadius:'0',
+    ':hover':{
+        bg:'teal.200',
+    },
+    borderLeft: "0.7em solid",
+    borderColor: "green.200",
 }
 
 
@@ -65,12 +72,26 @@ function CrearProducto(){
 
     type MiItem = {
         producto_id: number;
+        tipo_producto:string;
         nombre: string;
         observaciones: string;
         costo: number;
         tipo_unidades: string;
         fechaCreacion: string;
         cantidad_requerida:string;
+    };
+
+    type Insumo = {
+        cantidad_requerida: string;
+        producto: {
+            producto_id: number;
+            tipo_producto: string;
+            nombre: string;
+            observaciones: string;
+            costo: number;
+            tipo_unidades: string;
+            fechaCreacion: string;
+        };
     };
 
     //const strs_bcod = {cod:'Codificar', mod:'Modificar'}
@@ -93,7 +114,7 @@ function CrearProducto(){
     const [tipo_unidad_st, setTipo_unidad_st] = useState(UNIDADES.KG);
     const [cantidad_unidad_st, setCantidad_unidad_st] = useState('');
     const [seccion_responsable_st, setSeccionResponsable_st] = useState('');
-    const [tipo_producto_st, setTipoProducto_st] = useState('')
+    const [tipo_producto_st, setTipoProducto_st] = useState(TIPOS_PRODUCTOS.semiTerminado)
 
     const TIPO_BUSQUEDA = {NOMBRE:"NOMBRE", ID:"ID"}
 
@@ -164,6 +185,20 @@ function CrearProducto(){
     };
 
     const saveSemi_or_Termi_Submit = async () => {
+
+        const insumos: Insumo[] = listaSelected.map(item => ({
+            cantidad_requerida: item.cantidad_requerida,
+            producto: {
+                producto_id: item.producto_id,
+                tipo_producto: item.tipo_producto,
+                nombre: item.nombre,
+                observaciones: item.observaciones,
+                costo: item.costo,
+                tipo_unidades: item.tipo_unidades,
+                fechaCreacion: item.fechaCreacion
+            }
+        }));
+
         const semi_or_termi = {
             nombre:nombre_st,
             observaciones:observaciones_st,
@@ -172,7 +207,7 @@ function CrearProducto(){
             cantidad_unidad:cantidad_unidad_st,
             tipo_producto:tipo_producto_st,
             seccion_responsable:seccion_responsable_st,
-            insumos:listaSelected,
+            insumos:insumos,
             status:tipo_producto_st == TIPOS_PRODUCTOS.semiTerminado ? null : 0
         };
 
@@ -207,7 +242,11 @@ function CrearProducto(){
             const response =
                 await axios.get(serverParams.getMateriaPrimaEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
             //console.log(serverParams.getProductoEndPoint_getall());
-            setListaMP(response.data.content);
+            const updatedListaMP = response.data.content.map((item: MiItem) => ({
+                ...item,
+                tipo_producto: 'M'
+            }));
+            setListaMP(updatedListaMP);
         } catch (error) {
             console.error('Error en getAll', error);
         }
@@ -219,7 +258,11 @@ function CrearProducto(){
             const response =
                 await axios.get(serverParams.getSemiTerminadoEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
             //console.log(serverParams.getProductoEndPoint_getall());
-            setListaSemi(response.data.content);
+            const updatedListaSemi = response.data.content.map((item: MiItem) => ({
+                ...item,
+                tipo_producto: 'S'
+            }));
+            setListaSemi(updatedListaSemi);
         } catch (error) {
             console.error('Error en getAll', error);
         }
@@ -394,7 +437,7 @@ function CrearProducto(){
                                         {getListaProductos().map((item:MiItem) => (
                                             <ListItem key={item.producto_id} onClick={() => onItemClick(item)}>
                                                 <Box>
-                                                    <Card sx={cardItem_style} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
+                                                    <Card sx={cardItem_style_sel_tray} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
                                                         <CardHeader p={1} >
                                                             <HStack justifyContent={'space-evenly'} >
                                                                 <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> {item.nombre} </Heading>
@@ -486,7 +529,7 @@ function CrearProducto(){
                                         {listaSelected.map((item:MiItem) => (
                                             <ListItem key={item.producto_id}>
                                                 <Box>
-                                                    <Card sx={cardItem_style} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
+                                                    <Card sx={cardItem_style_rcta} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
                                                         <CardHeader p={1} >
                                                             <HStack justifyContent={'space-evenly'} >
                                                                 <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> {item.nombre} </Heading>

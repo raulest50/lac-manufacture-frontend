@@ -9,7 +9,7 @@ const SECCION = {
     BODEGA: {nombre:"Bodega", id:1},
     LLENADO: {nombre:"Envasar", id:2},
     ETIQUETAS: {nombre:"Quema Etiquetas", id:3},
-    MARMITAS: {nombre:"Quema Etiquetas", id:4},
+    MARMITAS: {nombre:"Marmitas", id:4},
 };
 
 export {TIPOS_PRODUCTOS, UNIDADES, SECCION}
