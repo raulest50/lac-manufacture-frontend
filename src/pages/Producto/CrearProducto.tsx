@@ -59,7 +59,7 @@ const cardItem_style = {
 
 
 
-import {TIPOS_PRODUCTOS, UNIDADES} from "../../models/producto.tsx";
+import {TIPOS_PRODUCTOS, UNIDADES, SECCION} from "../../models/producto.tsx";
 
 function CrearProducto(){
 
@@ -70,6 +70,7 @@ function CrearProducto(){
         costo: number;
         tipo_unidades: string;
         fechaCreacion: string;
+        cantidad_requerida:string;
     };
 
     //const strs_bcod = {cod:'Codificar', mod:'Modificar'}
@@ -78,11 +79,21 @@ function CrearProducto(){
     //const [bcod_color, setBcodColor] = useState(bcod_colors.cod)
     //const [bcod_text, setBcodText] = useState(strs_bcod.cod)
 
+    // states para codificar materia prima
     const [nombre, setNombre] = useState('');
     const [costo, setCosto] = useState('');
     const [observaciones, setObservaciones] = useState('');
     const [tipo_unidad, setTipo_unidad] = useState(UNIDADES.KG);
     const [cantidad_unidad, setCantidad_unidad] = useState('');
+
+    // states para codificar semiterminado o terminado
+    const [nombre_st, setNombre_st] = useState('');
+    const [costo_st, setCosto_st] = useState('');
+    const [observaciones_st, setObservaciones_st] = useState('');
+    const [tipo_unidad_st, setTipo_unidad_st] = useState(UNIDADES.KG);
+    const [cantidad_unidad_st, setCantidad_unidad_st] = useState('');
+    const [seccion_responsable_st, setSeccionResponsable_st] = useState('');
+    const [tipo_producto_st, setTipoProducto_st] = useState('')
 
     const TIPO_BUSQUEDA = {NOMBRE:"NOMBRE", ID:"ID"}
 
@@ -123,7 +134,7 @@ function CrearProducto(){
             nombre:nombre,
             observaciones:observaciones,
             costo:costo,
-            tipo_unidad:tipo_unidad,
+            tipo_unidades:tipo_unidad,
             cantidad_unidad:cantidad_unidad,
             tipo_producto:TIPOS_PRODUCTOS.materiaPrima
         };
@@ -149,6 +160,44 @@ function CrearProducto(){
             duration: 9000,
             isClosable: true,
             })
+        }
+    };
+
+    const saveSemi_or_Termi_Submit = async () => {
+        const semi_or_termi = {
+            nombre:nombre_st,
+            observaciones:observaciones_st,
+            costo:costo_st,
+            tipo_unidades:tipo_unidad_st,
+            cantidad_unidad:cantidad_unidad_st,
+            tipo_producto:tipo_producto_st,
+            seccion_responsable:seccion_responsable_st,
+            insumos:listaSelected,
+            status:tipo_producto_st == TIPOS_PRODUCTOS.semiTerminado ? null : 0
+        };
+
+        try {
+            console.log(serverParams.getProductoEndPoint_save());
+            const response = await axios.post(serverParams.getProductoEndPoint_save(), semi_or_termi);
+            console.log('Product saved successfully:', response.data);
+
+            toast({
+            title: 'Materia Prima Creada',
+            description: `"Creacion exitosa  id:${response.data}, time:${response.data.fechaCreacion}"`,
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            })
+        } catch (error) {
+            console.error('Error saving product:', error);
+            toast({
+            title: 'Ha ocurrido un error',
+            description: `" ha ocurrido un error"`,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+            })
+            console.log('json object',semi_or_termi)
         }
     };
 
@@ -202,6 +251,7 @@ function CrearProducto(){
         }
     };
 
+    // pasa un item desde ka bandeja de seleecion(izquierda) a la bandeja de receta (badeja derecha)
     const onItemClick = (item:MiItem) => {
         setListaSelected((prevSelected) => {
             const isItemSelected = prevSelected.some((selectedItem) => selectedItem.producto_id === item.producto_id);
@@ -216,9 +266,17 @@ function CrearProducto(){
         });
     };
 
+    // para manejar correctamente el estdo de cantidad_requeridad de cada item.
+    const handleCantidadChange = (producto_id: number, newCantidad: string) => {
+        setListaSelected((prevSelected) =>
+            prevSelected.map((item) =>
+                item.producto_id === producto_id ? { ...item, cantidad_requerida: newCantidad } : item
+            )
+        );
+    };
+
 
     return(
-        
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
             <MyHeader title={'Codificar Producto'}/>
             <Tabs isFitted gap={'1em'} variant="line">
@@ -278,13 +336,8 @@ function CrearProducto(){
                                         <FormControl flex={"4"}>
                                             <FormLabel>Cantidad por Unidad</FormLabel>
                                             <Input
-                                                //inputMode={"decimal"}
-                                                //pattern={"[0-9]*[.]?[0-9]*"}
                                                 value={cantidad_unidad}
-                                                onChange={(e) => {
-                                                        setCantidad_unidad(e.target.value)
-                                                    }
-                                                }
+                                                onChange={(e) => setCantidad_unidad(e.target.value)}
                                                 variant={'filled'}/>
                                         </FormControl>
                                     </Flex>
@@ -298,15 +351,17 @@ function CrearProducto(){
 
                     {/*panel codificar terminado o semiterminado*/}
                     <TabPanel>
-                        <HStack p={0} m={0} w={'full'} h={'full'}>
+                        <Flex direction={'row'} p={0} m={0} w={'full'} h={'full'}>
 
                             {/*panel izquierdo*/}
-                            <VStack w={'full'} >
+                            <VStack w={'full'} h={'full'} p={'1em'}>
                                 <HStack w={'full'} h={'full'}>
-                                    <Heading p={2} bg={'green.200'} size={'md'}>Bandeja de Seleccion</Heading>
+                                    <Heading w={'full'} p={2} bg={'blue.200'} size={'md'}>Bandeja de Seleccion</Heading>
                                     <Button
+                                        display={'none'}
                                         onClick={get_Semi_and_MP}
-                                        colorScheme={'teal'}>Cargar Productos</Button>
+                                        colorScheme={'teal'}>Cargar Productos
+                                    </Button>
                                 </HStack>
                                 <HStack w={'full'} alignItems={"center"}>
                                     <FormControl>
@@ -350,8 +405,8 @@ function CrearProducto(){
                                                             <HStack p={'1em'}>
                                                                 <Icon boxSize={'3em'} mr={'1em'} as={get_UnitsIcon(item.tipo_unidades)}/>
                                                                 <VStack justifyContent={'space-evenly'} alignItems={'start'} pl={'1em'}>
-                                                                    <Text>Costo: {item.costo}</Text>
-                                                                    <Text>Tipo: {item.tipo_unidades}</Text>
+                                                                    <Text>Costo Unitario: {item.costo}</Text>
+                                                                    <Text>Unidad de Medida: {item.tipo_unidades}</Text>
                                                                     <Text>Fecha Creacion: {new Date(item.fechaCreacion).toLocaleString()}</Text>
                                                                 </VStack>
                                                             </HStack>
@@ -366,16 +421,66 @@ function CrearProducto(){
 
 
                             {/*panel derecho*/}
-                            <VStack w={'full'} h={'full'} alignItems="flex-start">
+                            <VStack w={'full'} h={'full'} p={'1em'}>
+                                <Heading w={'full'} p={2} bg={'green.200'} size={'md'}>Receta</Heading>
                                 <FormControl>
-                                    <Select defaultValue={TIPOS_PRODUCTOS.semiTerminado}>
-                                        <option value={1}>{TIPOS_PRODUCTOS.semiTerminado}</option>
-                                        <option value={2}>{TIPOS_PRODUCTOS.Terminado}</option>
+                                    <Flex direction={'row'}>
+                                    <FormLabel>Tipo Producto</FormLabel>
+                                        <Select flex={'3'} defaultValue={TIPOS_PRODUCTOS.semiTerminado}
+                                                value={tipo_producto_st}
+                                                onChange={(e) => setTipoProducto_st(e.target.value)}
+                                        >
+                                            <option value={TIPOS_PRODUCTOS.semiTerminado}>{'Semi Terminado'}</option>
+                                            <option value={TIPOS_PRODUCTOS.Terminado}>{'Terminado'}</option>
+                                        </Select>
+                                    </Flex>
+                                    <FormLabel>Seccion Responsable</FormLabel>
+                                    <Select flex={'1'} defaultValue={UNIDADES.KG}
+                                            value={seccion_responsable_st}
+                                            onChange={(e) => setSeccionResponsable_st(e.target.value)}
+                                    >
+                                        <option value={SECCION.BODEGA.id}>{SECCION.BODEGA.nombre}</option>
+                                        <option value={SECCION.ETIQUETAS.id}>{SECCION.ETIQUETAS.nombre}</option>
+                                        <option value={SECCION.LLENADO.id}>{SECCION.LLENADO.nombre}</option>
+                                        <option value={SECCION.MARMITAS.id}>{SECCION.MARMITAS.nombre}</option>
                                     </Select>
-                                    <FormLabel>Descripcion</FormLabel>
-                                    <Input sx={input_style}></Input>
+                                    <FormLabel>Nombre</FormLabel>
+                                    <Input
+                                        value={nombre_st}
+                                        onChange={(e) => setNombre_st(e.target.value)}
+                                        sx={input_style}/>
                                 </FormControl>
-
+                                <FormControl>
+                                    <Flex>
+                                        <FormLabel>Costo</FormLabel>
+                                        <Input
+                                            flex={'2'}
+                                            value={costo_st}
+                                            onChange={(e) => setCosto_st(e.target.value)}
+                                            sx={input_style}/>
+                                            <FormLabel>Unidades</FormLabel>
+                                            <Select flex={'1'} defaultValue={UNIDADES.KG}
+                                                    value={tipo_unidad_st}
+                                                    onChange={(e) => setTipo_unidad_st(e.target.value)}
+                                            >
+                                                <option value={UNIDADES.KG}>{UNIDADES.KG}</option>
+                                                <option value={UNIDADES.L}>{UNIDADES.L}</option>
+                                                <option value={UNIDADES.U}>{UNIDADES.U}</option>
+                                            </Select>
+                                            <FormLabel flex={'0.5'}>Cantidad por unidad</FormLabel>
+                                            <Input flex={'1'}
+                                                value={cantidad_unidad_st}
+                                                onChange={(e) => setCantidad_unidad_st(e.target.value)}
+                                                sx={input_style}/>
+                                    </Flex>
+                                </FormControl>
+                                <FormControl>
+                                    <FormLabel>Observaciones</FormLabel>
+                                    <Textarea
+                                        value={observaciones_st}
+                                        onChange={(e) => setObservaciones_st(e.target.value)}
+                                        variant={'filled'}/>
+                                </FormControl>
                                 <Box w={'full'} h={'full'}>
                                     <List spacing={'0.5em'}>
                                         {listaSelected.map((item:MiItem) => (
@@ -389,14 +494,21 @@ function CrearProducto(){
                                                             </HStack>
                                                         </CardHeader>
                                                         <CardBody p={1}>
-                                                            <HStack p={'1em'}>
-                                                                <Icon boxSize={'3em'} mr={'1em'} as={get_UnitsIcon(item.tipo_unidades)}/>
-                                                                <VStack justifyContent={'space-evenly'} alignItems={'start'} pl={'1em'}>
-                                                                    <Text>Costo: {item.costo}</Text>
-                                                                    <Text>Tipo: {item.tipo_unidades}</Text>
+                                                            <Flex direction={'row'} p={'1em'}>
+                                                                <Icon flex={'.5'} boxSize={'3em'} mr={'1em'} as={get_UnitsIcon(item.tipo_unidades)}/>
+                                                                <VStack flex={'3'} justifyContent={'space-evenly'} alignItems={'start'} pl={'1em'}>
+                                                                    <Text>Costo Unitario: {item.costo}</Text>
+                                                                    <Text>Unidad de Medida: {item.tipo_unidades}</Text>
                                                                     <Text>Fecha Creacion: {new Date(item.fechaCreacion).toLocaleString()}</Text>
                                                                 </VStack>
-                                                            </HStack>
+                                                                <FormControl flex={'1'}>
+                                                                    <FormLabel>Cantidad Requerida</FormLabel>
+                                                                    <Input
+                                                                        value={item.cantidad_requerida}
+                                                                        onChange={(e) => handleCantidadChange(item.producto_id, e.target.value)}
+                                                                        sx={input_style}/>
+                                                                </FormControl>
+                                                            </Flex>
                                                         </CardBody>
                                                     </Card>
                                                 </Box>
@@ -404,9 +516,17 @@ function CrearProducto(){
                                         ))}
                                     </List>
                                 </Box>
-
+                                <FormControl>
+                                    <Button m={5} colorScheme={'teal'}
+                                            onClick={() =>{
+                                                if( !(listaSelected.length == 0) ){
+                                                    saveSemi_or_Termi_Submit();
+                                                }
+                                            }}
+                                    >{"Codificar Producto"}</Button>
+                                </FormControl>
                             </VStack>
-                        </HStack>
+                        </Flex>
                     </TabPanel>
                 </TabPanels>
             </Tabs>
