@@ -28,16 +28,7 @@ import { GiWeight } from "react-icons/gi";  // KG
 import '@fontsource-variable/league-spartan';
 import '@fontsource/anton';
 
-const my_style_tab={
-    borderRadius:0,
-//    border:0,
-    ':active':{
-        bg:'blue.200',
-    },
-    ':selected':{
-        bg:'blue.200',
-    },
-}
+import {my_style_tab} from "../../styles/styles_general.tsx";
 
 
 const input_style = {

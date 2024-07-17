@@ -2,6 +2,9 @@
 import {Container, Tabs, TabList, Tab, TabPanels, TabPanel} from "@chakra-ui/react";
 import MyHeader from '../components/MyHeader.tsx';
 
+
+import {my_style_tab} from "../styles/styles_general.tsx";
+
 export default function Produccion(){
     return(
         
@@ -10,9 +13,9 @@ export default function Produccion(){
             
             <Tabs>
                 <TabList>
-                    <Tab>Crear Orden Produccion</Tab>
-                    <Tab>Ordenes Activas</Tab>
-                    <Tab>Historial</Tab>
+                    <Tab sx={my_style_tab}>Crear Orden Produccion</Tab>
+                    <Tab sx={my_style_tab}>Ordenes Activas</Tab>
+                    <Tab sx={my_style_tab}>Historial</Tab>
                 </TabList>
                 <TabPanels>
                     <TabPanel>

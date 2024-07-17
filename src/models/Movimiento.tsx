@@ -1,6 +1,6 @@
 
 
-type Movimiento = {
+export type Movimiento = {
     movimiento_id: string;
     cantidad: number;
     producto_id: number;
@@ -9,12 +9,3 @@ type Movimiento = {
     fechaMovimiento:string; // "yyyy-MM-dd'T'HH:mm:ss"
 };
 
-type OrdenProduccion = {
-    
-};
-
-type OrdenSeguimiento = {
-    
-};
-
-export {Movimiento, OrdenProduccion, OrdenSeguimiento}
