@@ -27,9 +27,9 @@ export default function Home(){
                 <SectionCard to={'/producto'} name={'Codificar Productos'} icon={PiDownloadDuotone} />
                 <SectionCard to={'/produccion'} name={'Produccion'} icon={AiOutlineAudit} />
                 <SectionCard to={'/stock'} name={'Stock'} icon={BsDatabaseCheck} />
-                <SectionCard to={'/zona_bodega_1'} name={'Zona Bodega 1'} icon={GiCardPickup} />
-                <SectionCard to={'/zona_bodega_2'} name={'Zona Llenado 2'} icon={RiFilterFill} />
-                <SectionCard to={'/zona_bodega_3'} name={'Zona Marmitas 3'} icon={FaFireBurner} />
+                <SectionCard to={'/bodega_zona1'} name={'Zona Bodega 1'} icon={GiCardPickup} />
+                <SectionCard to={'/envasado_zona2'} name={'Zona Llenado 2'} icon={RiFilterFill} />
+                <SectionCard to={'/marmitas_zona3'} name={'Zona Marmitas 3'} icon={FaFireBurner} />
 
 
                 
