@@ -2,7 +2,7 @@
 import {useState} from 'react'
 import MyHeader from '../../components/MyHeader.tsx'
 
-import {serverParams} from '../../api/params.tsx'
+import {ServerParams} from '../../api/params.tsx'
 
 import axios from 'axios'
 
@@ -57,7 +57,7 @@ const cardItem_style_rcta = {
 
 
 
-import {TIPOS_PRODUCTOS, UNIDADES, SECCION} from "../../models/producto.tsx";
+import {TIPOS_PRODUCTOS, UNIDADES, SECCION} from "../../models/constants.tsx";
 
 function CrearProducto(){
 
@@ -104,7 +104,7 @@ function CrearProducto(){
     const [observaciones_st, setObservaciones_st] = useState('');
     const [tipo_unidad_st, setTipo_unidad_st] = useState(UNIDADES.KG);
     const [cantidad_unidad_st, setCantidad_unidad_st] = useState('');
-    const [seccion_responsable_st, setSeccionResponsable_st] = useState('');
+    const [seccion_responsable_st, setSeccionResponsable_st] = useState(SECCION.BODEGA.id);
     const [tipo_producto_st, setTipoProducto_st] = useState(TIPOS_PRODUCTOS.semiTerminado)
 
     const TIPO_BUSQUEDA = {NOMBRE:"NOMBRE", ID:"ID"}
@@ -152,8 +152,8 @@ function CrearProducto(){
         };
 
         try {
-            console.log(serverParams.getProductoEndPoint_save());
-            const response = await axios.post(serverParams.getProductoEndPoint_save(), materia_prima);
+            console.log(ServerParams.getProductoEndPoint_save());
+            const response = await axios.post(ServerParams.getProductoEndPoint_save(), materia_prima);
             console.log('Product saved successfully:', response.data);
 
             toast({
@@ -203,8 +203,8 @@ function CrearProducto(){
         };
 
         try {
-            console.log(serverParams.getProductoEndPoint_save());
-            const response = await axios.post(serverParams.getProductoEndPoint_save(), semi_or_termi);
+            console.log(ServerParams.getProductoEndPoint_save());
+            const response = await axios.post(ServerParams.getProductoEndPoint_save(), semi_or_termi);
             console.log('Product saved successfully:', response.data);
 
             toast({
@@ -231,7 +231,7 @@ function CrearProducto(){
     const SearchMprimas = async () => {
         try {
             const response =
-                await axios.get(serverParams.getMateriaPrimaEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
+                await axios.get(ServerParams.getMateriaPrimaEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
             //console.log(serverParams.getProductoEndPoint_getall());
             const updatedListaMP = response.data.content.map((item: MiItem) => ({
                 ...item,
@@ -247,7 +247,7 @@ function CrearProducto(){
     const SearchSemi = async () => {
         try {
             const response =
-                await axios.get(serverParams.getSemiTerminadoEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
+                await axios.get(ServerParams.getSemiTerminadoEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
             //console.log(serverParams.getProductoEndPoint_getall());
             const updatedListaSemi = response.data.content.map((item: MiItem) => ({
                 ...item,
@@ -359,7 +359,7 @@ function CrearProducto(){
 
                                 <GridItem colSpan={1}>
                                     <Flex w={'full'} direction={'row'} align={'flex-end'} justify={'space-around'} gap={4}>
-                                        <Select flex={"1"} defaultValue={UNIDADES.KG}
+                                        <Select flex={"1"}
                                                 value={tipo_unidad}
                                                 onChange={(e) => setTipo_unidad(e.target.value)}
                                         >
@@ -415,7 +415,7 @@ function CrearProducto(){
                                         fontSize={{ base: "1.2em", md: "2em", lg: "2.8m", xl:"3.5em" }}  // Responsive font size
                                         size={"lg"}
                                     />
-                                    <Select defaultValue={TIPO_BUSQUEDA.NOMBRE}
+                                    <Select
                                             value={busqueda_param}
                                             onChange={(e) => setBusqueda_param(e.target.value)}
                                     >
@@ -460,7 +460,7 @@ function CrearProducto(){
                                 <FormControl>
                                     <Flex direction={'row'}>
                                     <FormLabel>Tipo Producto</FormLabel>
-                                        <Select flex={'3'} defaultValue={TIPOS_PRODUCTOS.semiTerminado}
+                                        <Select flex={'3'}
                                                 value={tipo_producto_st}
                                                 onChange={(e) => setTipoProducto_st(e.target.value)}
                                         >
@@ -469,9 +469,9 @@ function CrearProducto(){
                                         </Select>
                                     </Flex>
                                     <FormLabel>Seccion Responsable</FormLabel>
-                                    <Select flex={'1'} defaultValue={UNIDADES.KG}
+                                    <Select flex={'1'}
                                             value={seccion_responsable_st}
-                                            onChange={(e) => setSeccionResponsable_st(e.target.value)}
+                                            onChange={(e) => setSeccionResponsable_st(Number(e.target.value))}
                                     >
                                         <option value={SECCION.BODEGA.id}>{SECCION.BODEGA.nombre}</option>
                                         <option value={SECCION.ETIQUETAS.id}>{SECCION.ETIQUETAS.nombre}</option>
@@ -493,7 +493,7 @@ function CrearProducto(){
                                             onChange={(e) => setCosto_st(e.target.value)}
                                             sx={input_style}/>
                                             <FormLabel>Unidades</FormLabel>
-                                            <Select flex={'1'} defaultValue={UNIDADES.KG}
+                                            <Select flex={'1'}
                                                     value={tipo_unidad_st}
                                                     onChange={(e) => setTipo_unidad_st(e.target.value)}
                                             >
