@@ -3,23 +3,40 @@ import {useState} from 'react';
 import { useToast } from '@chakra-ui/react';
 
 import {
-    Container, VStack, HStack, Flex,
+    Container, VStack, HStack, Flex, Box,
     Tabs, TabList, Tab, TabPanels, TabPanel,
     FormControl, FormLabel, Input, Textarea,
-    Button,
+    Button, Heading, Icon,
     Select,
     Text,
-}
-from "@chakra-ui/react";
+} from "@chakra-ui/react";
+
+
+import { IoCubeSharp } from "react-icons/io5";
+import { FaCubes } from "react-icons/fa";
+
+import { MdWaterDrop } from "react-icons/md"; // L
+import { FaHashtag } from "react-icons/fa6"; // U
+import { GiWeight } from "react-icons/gi";  // KG
+
+
 import MyHeader from "../components/MyHeader.tsx";
 import {NavLink} from "react-router-dom";
 
+
+import '@fontsource-variable/league-spartan';
+import '@fontsource/anton';
 import {my_style_tab} from "../styles/styles_general.tsx";
+
 
 import {CAUSAS_MOVIMIENTOS} from "../models/constants.tsx";
 import {SpringRequestHandler} from "../api/SpringRequestHandler.tsx";
 import {Movimiento} from "../models/Movimiento.tsx";
 import {Stock} from "../models/Stock.tsx"
+
+const box_icon_sty = {
+    margin:'1em',
+}
 
 
 function StockPage(){
@@ -29,7 +46,21 @@ function StockPage(){
     const [cantidad, setCantidad] = useState('');
     const [observaciones, setObservaciones] = useState('');
 
+
+    const get_UnitsIcon = (tipo_unidades:string) => {
+        switch (tipo_unidades) {
+            case 'L':
+                return MdWaterDrop;
+            case 'KG':
+                return GiWeight;
+            case 'U':
+                return FaHashtag;
+            default:
+                return FaHashtag;
+        }
+    };
     
+
     const emptyStock: Stock = {
         cantidad_totalizada: 0,
         producto: {
@@ -122,29 +153,47 @@ function StockPage(){
                     </TabPanel>
 
                     <TabPanel>
-                        <VStack>
-                            <FormControl>
-                                <FormLabel>Producto Id</FormLabel>
-                                <Input
-                                    value={pid2totalize}
-                                    onChange={(e) => setPid2Totalize(e.target.value)}
-                                    />
-                            </FormControl>
-                            <FormControl>
-                                <Button m={5} colorScheme={'teal'}
-                                    onClick={() => SpringRequestHandler.getStockByProductoId(Number(pid2totalize), setStockItem)}
-                                >
-                                Calcular Stock</Button>
-                            </FormControl>
+                        <VStack w={'full'} h={'full'}>
+                            <Flex direction={'row'} justifyContent="flex-start" w={'full'}>
+                                <FormControl flex={1}>
+                                    <FormLabel>Producto Id</FormLabel>
+                                    <Input
+                                        value={pid2totalize}
+                                        onChange={(e) => setPid2Totalize(e.target.value)}
+                                        />
+                                </FormControl>
+                                <Button m={5} p={2} colorScheme={'teal'} flex={2}
+                                        onClick={() => SpringRequestHandler.getStockByProductoId(Number(pid2totalize), setStockItem)}
+                                    >
+                                    Calcular Stock</Button>
+                                <Box flex={5}></Box>
+                            </Flex>
                         </VStack>
                         
-                        <VStack>
-                            <HStack>
-                                <Text>{stockItem.producto.producto_id}</Text>
-                            </HStack>
-                            <Text>{stockItem.producto.nombre}</Text>
-                            <Text>{stockItem.cantidad_totalizada}</Text>
-                        </VStack>
+                        <Flex direction={'column'} p={'2em'}>
+                            <Flex direction={'row'} sx={{borderBottom:'0.2em solid', }}>
+                                <Box p={'1em'} sx={box_icon_sty}>
+                                    <Icon boxSize={'3em'} mr={'1em'} as={ stockItem.producto.tipo_producto == "M"? IoCubeSharp : FaCubes}/>
+                                </Box>
+                                <Box  p={'1em'} sx={box_icon_sty}>
+                                    <Heading size={'lg'} fontFamily={'Anton'} as={'h2'}>{stockItem.producto.nombre}</Heading>
+                                </Box>
+                            </Flex>
+                            <Flex p={'1em'} pl={'2em'} pr={'2em'} direction={'row'}>
+                                <HStack p={'1em'}>
+                                    <Text fontFamily={'Anton'} fontSize={'2em'}>Id: </Text>
+                                    <Text fontFamily={'Anton'} fontSize={'2em'} >{stockItem.producto.producto_id}</Text>
+                                    <Text ml={'2em'} fontFamily={'Anton'} fontSize={'2em'} color={stockItem.cantidad_totalizada >= 0 ? 'green.400' : 'red.400'}> Stock: </Text>
+                                    <Text fontFamily={'Anton'} fontSize={'2em'} color={stockItem.cantidad_totalizada >= 0 ? 'green.400' : 'red.400'} >{stockItem.cantidad_totalizada}</Text>
+                                    <Text ml={'2em'} fontFamily={'Anton'} fontSize={'2em'}>Costo: </Text>
+                                    <Text fontFamily={'Anton'} fontSize={'2em'}>{stockItem.producto.costo} $</Text>
+                                    <Text ml={'4em'} fontFamily={'Anton'} fontSize={'2em'}>{stockItem.producto.cantidad_unidad}</Text>
+                                    <Icon ml={'2em'} boxSize={'2em'} as={get_UnitsIcon(stockItem.producto.tipo_unidades)}/>
+                                </HStack>
+                                <Text></Text>
+
+                            </Flex>
+                        </Flex>
 
                     </TabPanel>
 
