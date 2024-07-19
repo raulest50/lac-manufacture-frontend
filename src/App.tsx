@@ -7,7 +7,7 @@ import './App.css'
 import RootLayout from "./pages/RootLayout.tsx";
 import Home from "./pages/Home.tsx"
 import CrearProducto from './pages/Producto/CrearProducto.tsx'
-import Stock from "./pages/Stock.tsx";
+import StockPage from "./pages/StockPage.tsx";
 import Produccion from "./pages/Produccion.tsx";
 
 import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom"
@@ -21,7 +21,7 @@ const router = createBrowserRouter(
       <Route index element={<Home/>} />
       <Route path={"/producto"} element={<CrearProducto/>} />
       <Route path={"/produccion"} element={<Produccion/>} />
-      <Route path={"/stock"} element={<Stock/>} />
+      <Route path={"/stock"} element={<StockPage/>} />
       <Route path={"/bodega_zona1"} element={<BodegaZona1/>} />
       <Route path={"/envasado_zona2"} element={<EnvasadoZona2/>} />
       <Route path={"/marmitas_zona3"} element={<MarmitasZona3/>} />

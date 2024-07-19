@@ -30,8 +30,6 @@ export default function Home(){
                 <SectionCard to={'/bodega_zona1'} name={'Zona Bodega 1'} icon={GiCardPickup} />
                 <SectionCard to={'/envasado_zona2'} name={'Zona Llenado 2'} icon={RiFilterFill} />
                 <SectionCard to={'/marmitas_zona3'} name={'Zona Marmitas 3'} icon={FaFireBurner} />
-
-
                 
             </SimpleGrid>
         </Container>

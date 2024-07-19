@@ -8,6 +8,7 @@ import {
     FormControl, FormLabel, Input, Textarea,
     Button,
     Select,
+    Text,
 }
 from "@chakra-ui/react";
 import MyHeader from "../components/MyHeader.tsx";
@@ -18,14 +19,33 @@ import {my_style_tab} from "../styles/styles_general.tsx";
 import {CAUSAS_MOVIMIENTOS} from "../models/constants.tsx";
 import {SpringRequestHandler} from "../api/SpringRequestHandler.tsx";
 import {Movimiento} from "../models/Movimiento.tsx";
+import {Stock} from "../models/Stock.tsx"
 
 
-function Stock(){
+function StockPage(){
 
     const [producto_id, setProductoId] = useState('');
     const [causa_movimiento, setCausaMovimiento] = useState(CAUSAS_MOVIMIENTOS.COMPRA);
     const [cantidad, setCantidad] = useState('');
     const [observaciones, setObservaciones] = useState('');
+
+    
+    const emptyStock: Stock = {
+        cantidad_totalizada: 0,
+        producto: {
+            producto_id: 0,
+            nombre: '',
+            observaciones: '',
+            costo: 0,
+            fechaCreacion: '',
+            tipo_unidades: '',
+            cantidad_unidad: 0,
+            tipo_producto: ''
+        }
+    };
+
+    const [stockItem, setStockItem] = useState<Stock>(emptyStock);
+    const [pid2totalize, setPid2Totalize] = useState('');
 
     const toast = useToast();
 
@@ -99,10 +119,32 @@ function Stock(){
                                 >Registrar Movimiento</Button>
                             </HStack>
                         </VStack>
-
                     </TabPanel>
 
                     <TabPanel>
+                        <VStack>
+                            <FormControl>
+                                <FormLabel>Producto Id</FormLabel>
+                                <Input
+                                    value={pid2totalize}
+                                    onChange={(e) => setPid2Totalize(e.target.value)}
+                                    />
+                            </FormControl>
+                            <FormControl>
+                                <Button m={5} colorScheme={'teal'}
+                                    onClick={() => SpringRequestHandler.getStockByProductoId(Number(pid2totalize), setStockItem)}
+                                >
+                                Calcular Stock</Button>
+                            </FormControl>
+                        </VStack>
+                        
+                        <VStack>
+                            <HStack>
+                                <Text>{stockItem.producto.producto_id}</Text>
+                            </HStack>
+                            <Text>{stockItem.producto.nombre}</Text>
+                            <Text>{stockItem.cantidad_totalizada}</Text>
+                        </VStack>
 
                     </TabPanel>
 
@@ -113,4 +155,4 @@ function Stock(){
     );
 }
 
-export default Stock;
+export default StockPage;

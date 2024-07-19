@@ -1,9 +1,11 @@
 
 
 import {ServerParams} from "./params.tsx";
-import {Movimiento} from "../models/Movimiento.tsx";
 import {CreateToastFnReturn} from '@chakra-ui/react';
 import axios from 'axios';
+
+import {Movimiento} from "../models/Movimiento.tsx";
+import {Stock} from "../models/Stock.tsx";
 
 
 export class SpringRequestHandler{
@@ -28,6 +30,31 @@ export class SpringRequestHandler{
             duration: 9000,
             isClosable: true,
             })
+        }
+    };
+
+    static getStockByProductoId = async (producto_id:number, setStockItem:(stock: Stock) => void) => {
+        try {
+            const response =
+                await axios.get(ServerParams.getMovStockEndPoint_byId(), {params:{producto_id:producto_id}});
+            //console.log(serverParams.getProductoEndPoint_getall());
+            const data = response.data;
+            const stock:Stock = {
+                cantidad_totalizada: data.stock,
+                producto:{
+                    producto_id:data.producto.producto_id,
+                    nombre:data.producto.nombre,
+                    observaciones:data.producto.observaciones,
+                    costo:data.producto.costo,
+                    fechaCreacion:data.producto.fechaCreacion,
+                    tipo_unidades:data.producto.tipo_unidades,
+                    cantidad_unidad:data.producto.cantidad_unidad,
+                    tipo_producto:data.producto.tipo_producto
+                }
+            }
+            setStockItem(stock);
+        } catch (error) {
+            console.error('Error en getAll', error);
         }
     };
      

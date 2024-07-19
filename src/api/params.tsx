@@ -19,6 +19,7 @@ class ServerParams {
 
     // MOVIMIENTOS
     static movimientos_api:string = "movimientos";
+    static movstock_by_id = "get_stock_by_id";
 
     /**
      * PRODUCTO END POINTS
@@ -49,6 +50,10 @@ class ServerParams {
      */
      static getMovimientoEndPoint_save(): string {
          return `${ServerParams.domain_name}/${ServerParams.movimientos_api}/${ServerParams.endPoint_save}`;
+    }
+
+    static getMovStockEndPoint_byId():string{
+        return `${ServerParams.domain_name}/${ServerParams.movimientos_api}/${ServerParams.movstock_by_id}`;
     }
 
 }

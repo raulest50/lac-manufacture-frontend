@@ -8,5 +8,6 @@ export type Producto = {
     fechaCreacion?:string;
     tipo_unidades:string;
     cantidad_unidad:number;
+    tipo_producto?:string;
 };
 
