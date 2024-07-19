@@ -16,8 +16,8 @@ import {NavLink} from "react-router-dom";
 import {my_style_tab} from "../styles/styles_general.tsx";
 
 import {CAUSAS_MOVIMIENTOS} from "../models/constants.tsx";
-
 import {SpringRequestHandler} from "../api/SpringRequestHandler.tsx";
+import {Movimiento} from "../models/Movimiento.tsx";
 
 
 function Stock(){
@@ -28,6 +28,16 @@ function Stock(){
     const [observaciones, setObservaciones] = useState('');
 
     const toast = useToast();
+
+    const registrarMovimiento = async () => {
+        const movimiento: Movimiento = {
+            cantidad: cantidad,
+            producto_id: id_producto,
+            causa: causa_movimiento,
+            observaciones: observaciones,
+        };
+        await SpringRequestHandler.registrarMovimiento(toast, movimiento);
+    }
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'} >
@@ -81,7 +91,9 @@ function Stock(){
                                 </FormControl>
                             </Flex>
                             <HStack>
-                                <Button colorScheme={'teal'} >Registrar Movimiento</Button>
+                                <Button colorScheme={'teal'}
+                                        onClick={() => registrarMovimiento()}
+                                >Registrar Movimiento</Button>
                             </HStack>
                         </VStack>
 

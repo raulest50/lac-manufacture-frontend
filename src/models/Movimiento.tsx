@@ -1,11 +1,11 @@
 
 
 export type Movimiento = {
-    movimiento_id: string;
-    cantidad: number;
-    producto_id: number;
+    movimiento_id?: string;
+    cantidad: string;
+    producto_id: string;
     causa: string;
     observaciones: string;
-    fechaMovimiento:string; // "yyyy-MM-dd'T'HH:mm:ss"
+    fechaMovimiento?:string; // "yyyy-MM-dd'T'HH:mm:ss"
 };
 
