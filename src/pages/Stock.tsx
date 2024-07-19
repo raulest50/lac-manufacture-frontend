@@ -22,7 +22,7 @@ import {Movimiento} from "../models/Movimiento.tsx";
 
 function Stock(){
 
-    const [id_producto, setIdProducto] = useState('');
+    const [producto_id, setProductoId] = useState('');
     const [causa_movimiento, setCausaMovimiento] = useState(CAUSAS_MOVIMIENTOS.COMPRA);
     const [cantidad, setCantidad] = useState('');
     const [observaciones, setObservaciones] = useState('');
@@ -32,7 +32,10 @@ function Stock(){
     const registrarMovimiento = async () => {
         const movimiento: Movimiento = {
             cantidad: cantidad,
-            producto_id: id_producto,
+            producto: {
+                producto_id:producto_id,
+                tipo_producto:"M"
+            },
             causa: causa_movimiento,
             observaciones: observaciones,
         };
@@ -58,8 +61,8 @@ function Stock(){
                                 <FormControl flex={1} p={'.5em'}>
                                     <FormLabel>id Producto</FormLabel>
                                     <Input
-                                        value={id_producto}
-                                        onChange={(e) => setIdProducto(e.target.value)}
+                                        value={producto_id}
+                                        onChange={(e) => setProductoId(e.target.value)}
                                     />
                                 </FormControl>
                                 <FormControl flex={2} p={'.5em'} >

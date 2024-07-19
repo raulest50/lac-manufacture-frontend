@@ -379,7 +379,7 @@ function CrearProducto(){
 
                             </SimpleGrid>
                         </VStack>
-                        <Button m={5} colorScheme={'teal'} onClick={saveMateriaPrimSubmit}>{"Codificar"}</Button>
+                        <Button m={5} colorScheme={'teal'} onClick={saveMateriaPrimSubmit}>{"Codificar Materia Prima"}</Button>
                     </TabPanel>
 
 
