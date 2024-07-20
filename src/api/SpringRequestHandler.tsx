@@ -57,6 +57,19 @@ export class SpringRequestHandler{
             console.error('Error en getAll', error);
         }
     };
+
+    static getWorkLoadByZona = async () => {
+        try {
+            const response =
+                await axios.get(ServerParams.getMovStockEndPoint_byId(), {params:{}});
+            //console.log(serverParams.getProductoEndPoint_getall());
+            const data = response.data;
+
+
+        } catch (error) {
+            console.error('Error en getAll', error);
+        }
+    }
      
     
 }
