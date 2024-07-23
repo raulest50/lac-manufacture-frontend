@@ -64,13 +64,13 @@ function StockPage(){
     const emptyStock: Stock = {
         cantidad_totalizada: 0,
         producto: {
-            producto_id: 0,
+            productoId: 0,
             nombre: '',
             observaciones: '',
             costo: 0,
             fechaCreacion: '',
-            tipo_unidades: '',
-            cantidad_unidad: 0,
+            tipoUnidades: '',
+            cantidadUnidad: 0,
             tipo_producto: ''
         }
     };
@@ -84,7 +84,7 @@ function StockPage(){
         const movimiento: Movimiento = {
             cantidad: cantidad,
             producto: {
-                producto_id:producto_id,
+                productoId:producto_id,
                 tipo_producto:"M"
             },
             causa: causa_movimiento,
@@ -182,13 +182,13 @@ function StockPage(){
                             <Flex p={'1em'} pl={'2em'} pr={'2em'} direction={'row'}>
                                 <HStack p={'1em'}>
                                     <Text fontFamily={'Anton'} fontSize={'2em'}>Id: </Text>
-                                    <Text fontFamily={'Anton'} fontSize={'2em'} >{stockItem.producto.producto_id}</Text>
+                                    <Text fontFamily={'Anton'} fontSize={'2em'} >{stockItem.producto.productoId}</Text>
                                     <Text ml={'2em'} fontFamily={'Anton'} fontSize={'2em'} color={stockItem.cantidad_totalizada >= 0 ? 'green.400' : 'red.400'}> Stock: </Text>
                                     <Text fontFamily={'Anton'} fontSize={'2em'} color={stockItem.cantidad_totalizada >= 0 ? 'green.400' : 'red.400'} >{stockItem.cantidad_totalizada}</Text>
                                     <Text ml={'2em'} fontFamily={'Anton'} fontSize={'2em'}>Costo: </Text>
                                     <Text fontFamily={'Anton'} fontSize={'2em'}>{stockItem.producto.costo} $</Text>
-                                    <Text ml={'4em'} fontFamily={'Anton'} fontSize={'2em'}>{stockItem.producto.cantidad_unidad}</Text>
-                                    <Icon ml={'2em'} boxSize={'2em'} as={get_UnitsIcon(stockItem.producto.tipo_unidades)}/>
+                                    <Text ml={'4em'} fontFamily={'Anton'} fontSize={'2em'}>{stockItem.producto.cantidadUnidad}</Text>
+                                    <Icon ml={'2em'} boxSize={'2em'} as={get_UnitsIcon(stockItem.producto.tipoUnidades)}/>
                                 </HStack>
                                 <Text></Text>
 
