@@ -62,25 +62,27 @@ import {TIPOS_PRODUCTOS, UNIDADES, SECCION} from "../../models/constants.tsx";
 function CrearProducto(){
 
     type MiItem = {
-        producto_id: number;
+        productoId: number;
         tipo_producto:string;
         nombre: string;
         observaciones: string;
         costo: number;
-        tipo_unidades: string;
+        tipoUnidades: string;
+        cantidadUnidad: string;
         fechaCreacion: string;
-        cantidad_requerida:string;
+        cantidadRequerida:string;
     };
 
     type Insumo = {
-        cantidad_requerida: string;
+        cantidadRequerida: string;
         producto: {
-            producto_id: number;
+            productoId: number;
             tipo_producto: string;
             nombre: string;
             observaciones: string;
             costo: number;
-            tipo_unidades: string;
+            tipoUnidades: string;
+            cantidadUnidad:string;
             fechaCreacion: string;
         };
     };
@@ -146,8 +148,8 @@ function CrearProducto(){
             nombre:nombre,
             observaciones:observaciones,
             costo:costo,
-            tipo_unidades:tipo_unidad,
-            cantidad_unidad:cantidad_unidad,
+            tipoUnidades:tipo_unidad,
+            cantidadUnidad:cantidad_unidad,
             tipo_producto:TIPOS_PRODUCTOS.materiaPrima
         };
 
@@ -178,14 +180,15 @@ function CrearProducto(){
     const saveSemi_or_Termi_Submit = async () => {
 
         const insumos: Insumo[] = listaSelected.map(item => ({
-            cantidad_requerida: item.cantidad_requerida,
+            cantidadRequerida: item.cantidadRequerida,
             producto: {
-                producto_id: item.producto_id,
+                productoId: item.productoId,
                 tipo_producto: item.tipo_producto,
                 nombre: item.nombre,
                 observaciones: item.observaciones,
                 costo: item.costo,
-                tipo_unidades: item.tipo_unidades,
+                tipoUnidades: item.tipoUnidades,
+                cantidadUnidad: item.cantidadUnidad,
                 fechaCreacion: item.fechaCreacion
             }
         }));
@@ -194,10 +197,10 @@ function CrearProducto(){
             nombre:nombre_st,
             observaciones:observaciones_st,
             costo:costo_st,
-            tipo_unidades:tipo_unidad_st,
-            cantidad_unidad:cantidad_unidad_st,
+            tipoUnidades:tipo_unidad_st,
+            cantidadUnidad:cantidad_unidad_st,
             tipo_producto:tipo_producto_st,
-            seccion_responsable:seccion_responsable_st,
+            seccionResponsable:seccion_responsable_st,
             insumos:insumos,
             status:tipo_producto_st == TIPOS_PRODUCTOS.semiTerminado ? null : 0
         };
@@ -288,11 +291,11 @@ function CrearProducto(){
     // pasa un item desde ka bandeja de seleecion(izquierda) a la bandeja de receta (badeja derecha)
     const onItemClick = (item:MiItem) => {
         setListaSelected((prevSelected) => {
-            const isItemSelected = prevSelected.some((selectedItem) => selectedItem.producto_id === item.producto_id);
+            const isItemSelected = prevSelected.some((selectedItem) => selectedItem.productoId === item.productoId);
 
             if (isItemSelected) {
                 // Item is already in the list, remove it
-                return prevSelected.filter((selectedItem) => selectedItem.producto_id !== item.producto_id);
+                return prevSelected.filter((selectedItem) => selectedItem.productoId !== item.productoId);
             } else {
                 // Item is not in the list, add it
                 return [...prevSelected, item];
@@ -304,7 +307,7 @@ function CrearProducto(){
     const handleCantidadChange = (producto_id: number, newCantidad: string) => {
         setListaSelected((prevSelected) =>
             prevSelected.map((item) =>
-                item.producto_id === producto_id ? { ...item, cantidad_requerida: newCantidad } : item
+                item.productoId === producto_id ? { ...item, cantidad_requerida: newCantidad } : item
             )
         );
     };
@@ -426,21 +429,22 @@ function CrearProducto(){
                                 <Box w={'full'} >
                                     <List spacing={'0.5em'}>
                                         {getListaProductos().map((item:MiItem) => (
-                                            <ListItem key={item.producto_id} onClick={() => onItemClick(item)}>
+                                            <ListItem key={item.productoId} onClick={() => onItemClick(item)}>
                                                 <Box>
                                                     <Card sx={cardItem_style_sel_tray} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
                                                         <CardHeader p={1} >
                                                             <HStack justifyContent={'space-evenly'} >
                                                                 <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> {item.nombre} </Heading>
-                                                                <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Id: {item.producto_id} </Heading>
+                                                                <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Id: {item.productoId} </Heading>
                                                             </HStack>
                                                         </CardHeader>
                                                         <CardBody p={1}>
                                                             <HStack p={'1em'}>
-                                                                <Icon boxSize={'3em'} mr={'1em'} as={get_UnitsIcon(item.tipo_unidades)}/>
+                                                                <Icon boxSize={'3em'} mr={'1em'} as={get_UnitsIcon(item.tipoUnidades)}/>
                                                                 <VStack justifyContent={'space-evenly'} alignItems={'start'} pl={'1em'}>
                                                                     <Text>Costo Unitario: {item.costo}</Text>
-                                                                    <Text>Unidad de Medida: {item.tipo_unidades}</Text>
+                                                                    <Text>Unidad de Medida: {item.tipoUnidades}</Text>
+                                                                    <Text>Cantidad x Und: {item.cantidadUnidad}</Text>
                                                                     <Text>Fecha Creacion: {new Date(item.fechaCreacion).toLocaleString()}</Text>
                                                                 </VStack>
                                                             </HStack>
@@ -518,28 +522,29 @@ function CrearProducto(){
                                 <Box w={'full'} h={'full'}>
                                     <List spacing={'0.5em'}>
                                         {listaSelected.map((item:MiItem) => (
-                                            <ListItem key={item.producto_id}>
+                                            <ListItem key={item.productoId}>
                                                 <Box>
                                                     <Card sx={cardItem_style_rcta} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
                                                         <CardHeader p={1} >
                                                             <HStack justifyContent={'space-evenly'} >
                                                                 <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> {item.nombre} </Heading>
-                                                                <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Id: {item.producto_id} </Heading>
+                                                                <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Id: {item.productoId} </Heading>
                                                             </HStack>
                                                         </CardHeader>
                                                         <CardBody p={1}>
                                                             <Flex direction={'row'} p={'1em'}>
-                                                                <Icon flex={'.5'} boxSize={'3em'} mr={'1em'} as={get_UnitsIcon(item.tipo_unidades)}/>
+                                                                <Icon flex={'.5'} boxSize={'3em'} mr={'1em'} as={get_UnitsIcon(item.tipoUnidades)}/>
                                                                 <VStack flex={'3'} justifyContent={'space-evenly'} alignItems={'start'} pl={'1em'}>
                                                                     <Text>Costo Unitario: {item.costo}</Text>
-                                                                    <Text>Unidad de Medida: {item.tipo_unidades}</Text>
+                                                                    <Text>Unidad de Medida: {item.tipoUnidades}</Text>
+                                                                    <Text>Cantidad x Und: {item.cantidadUnidad}</Text>
                                                                     <Text>Fecha Creacion: {new Date(item.fechaCreacion).toLocaleString()}</Text>
                                                                 </VStack>
                                                                 <FormControl flex={'1'}>
                                                                     <FormLabel>Cantidad Requerida</FormLabel>
                                                                     <Input
-                                                                        value={item.cantidad_requerida}
-                                                                        onChange={(e) => handleCantidadChange(item.producto_id, e.target.value)}
+                                                                        value={item.cantidadRequerida}
+                                                                        onChange={(e) => handleCantidadChange(item.productoId, e.target.value)}
                                                                         sx={input_style}/>
                                                                 </FormControl>
                                                             </Flex>

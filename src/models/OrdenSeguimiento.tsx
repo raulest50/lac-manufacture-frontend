@@ -3,9 +3,9 @@
 import { Insumo } from './Insumo';
 
 export type OrdenSeguimiento = {
-    seguimiento_id?: number;
+    seguimientoId?: number;
     insumo: Insumo;
-    seccion_responsable: number;
+    seccionResponsable: number;
     estado: number;
     observaciones: string;
     fechaInicio?: string;

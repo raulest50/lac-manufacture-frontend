@@ -1,10 +1,10 @@
 
 
 export type Movimiento = {
-    movimiento_id?: string;
+    movimientoId?: string;
     cantidad: string;
     producto: {
-        producto_id:string;
+        productoId:string;
         tipo_producto:string;
     };
     causa: string;

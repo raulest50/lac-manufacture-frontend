@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import {Movimiento} from "../models/Movimiento.tsx";
 import {Stock} from "../models/Stock.tsx";
-
+import {Terminado} from "../models/Terminado.tsx";
 
 export class SpringRequestHandler{
     
@@ -42,13 +42,13 @@ export class SpringRequestHandler{
             const stock:Stock = {
                 cantidad_totalizada: data.stock,
                 producto:{
-                    producto_id:data.producto.producto_id,
+                    productoId:data.producto.productoId,
                     nombre:data.producto.nombre,
                     observaciones:data.producto.observaciones,
                     costo:data.producto.costo,
                     fechaCreacion:data.producto.fechaCreacion,
-                    tipo_unidades:data.producto.tipo_unidades,
-                    cantidad_unidad:data.producto.cantidad_unidad,
+                    tipoUnidades:data.producto.tipoUnidades,
+                    cantidadUnidad:data.producto.cantidadUnidad,
                     tipo_producto:data.producto.tipo_producto
                 }
             }
@@ -69,7 +69,25 @@ export class SpringRequestHandler{
         } catch (error) {
             console.error('Error en getAll', error);
         }
-    }
+    };
+
+    static CrearOrdenProduccion = async () => {
+
+    };
+
+    static getOrdenesActivas = async () => {
+
+    };
+
+    static getTerminadosList = async (busqueda:string, tipo_busqueda:string, setListaTerminados:(listaterminados: Terminado[]) => void) => {
+        try {
+            const response =
+                await axios.get(ServerParams.getProductoEndPoint_TerminadosGetAll(), {params:{search:busqueda, tipoBusqueda:tipo_busqueda}});
+            setListaTerminados(response.data.content);
+        } catch (error) {
+            console.error('Error en getAll', error);
+        }
+    };
      
     
 }

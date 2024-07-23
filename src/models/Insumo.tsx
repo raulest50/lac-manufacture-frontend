@@ -2,8 +2,8 @@
 import {Producto} from "./Producto"
 
 export type Insumo = {
-    insumo_id?: number;
+    insumoId?: number;
     producto:Producto;
-    cantidad_requerida: number;
+    cantidadRequerida: number;
 };
 

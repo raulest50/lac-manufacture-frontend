@@ -14,7 +14,7 @@ class ServerParams {
     static endPoint_save:string = "save";
     static endPoint_search_mp = "search_mprima";
     static endPoint_search_semi = "search_semi";
-    static endPoint_search_termi = "search_terminado";
+    static endPoint_getall_termi = "getall_termi";
 
 
     // MOVIMIENTOS
@@ -24,6 +24,11 @@ class ServerParams {
     /**
      * PRODUCTO END POINTS
      */
+
+
+    static getProductoEndPoint_TerminadosGetAll(): string{
+        return `${ServerParams.domain_name}/${ServerParams.productos_api}/${ServerParams.endPoint_getall_termi}`;
+    }
 
     static getProductoEndPoint_getall(): string{
         //return `${serverParams.domain_name}:${serverParams.spring_port}/${serverParams.productos_api}/${serverParams.endPoint_getall}`;
