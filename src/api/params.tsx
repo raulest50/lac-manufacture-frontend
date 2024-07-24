@@ -21,11 +21,17 @@ class ServerParams {
     static movimientos_api:string = "movimientos";
     static movstock_by_id = "get_stock_by_id";
 
+    // ORDENES PRODUCCION
+    static produccion_api = "produccion";
+    static endPoint_get_by_estado = "get_by_estado";
+
+
+    // - - - - - - - - - - - - - - - - - - -
+
+
     /**
-     * PRODUCTO END POINTS
+     * PRODUCTOS END POINTS
      */
-
-
     static getProductoEndPoint_TerminadosGetAll(): string{
         return `${ServerParams.domain_name}/${ServerParams.productos_api}/${ServerParams.endPoint_getall_termi}`;
     }
@@ -50,6 +56,7 @@ class ServerParams {
         return `${ServerParams.domain_name}/${ServerParams.productos_api}/${ServerParams.endPoint_search_semi}`;
     }
 
+
     /**
      * MOVIMIENTOS END POINTS
      */
@@ -59,6 +66,18 @@ class ServerParams {
 
     static getMovStockEndPoint_byId():string{
         return `${ServerParams.domain_name}/${ServerParams.movimientos_api}/${ServerParams.movstock_by_id}`;
+    }
+
+
+    /**
+     * PRODUCCION END POINTS
+     */
+    static getProduccionEndPoint_save(): string{
+        return `${ServerParams.domain_name}/${ServerParams.produccion_api}/${ServerParams.endPoint_save}`;
+    }
+
+    static getProduccionEndPoint_byEstado(): string{
+        return `${ServerParams.domain_name}/${ServerParams.produccion_api}/${ServerParams.endPoint_get_by_estado}`;
     }
 
 }

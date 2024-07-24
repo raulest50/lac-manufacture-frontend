@@ -7,6 +7,8 @@ import axios from 'axios';
 import {Movimiento} from "../models/Movimiento.tsx";
 import {Stock} from "../models/Stock.tsx";
 import {Terminado} from "../models/Terminado.tsx";
+import {OrdenProduccionDTA} from "../models/OrdenProduccionDTA.tsx";
+import {OrdenProduccion} from "../models/OrdenProduccion.tsx";
 
 export class SpringRequestHandler{
     
@@ -22,7 +24,7 @@ export class SpringRequestHandler{
             isClosable: true,
             })
         } catch (error) {
-            console.error('Error saving product:', error);
+            console.error('Error guardando movimiento:', error);
             toast({
             title: 'Ha ocurrido un error',
             description: `" ha ocurrido un error"`,
@@ -71,12 +73,37 @@ export class SpringRequestHandler{
         }
     };
 
-    static CrearOrdenProduccion = async () => {
-
+    static CrearOrdenProduccion = async (toast:CreateToastFnReturn, ordenProduccionDTA:OrdenProduccionDTA) => {
+        try {
+            const response = await axios.post(ServerParams.getProduccionEndPoint_save(), ordenProduccionDTA);
+            console.log('Product saved successfully:', response.data);
+            toast({
+            title: 'Orden de Produccion Creada Exitosamente',
+            description: `"Registro Exitoso  id:${response.data}, time:${response.data.fechaCreacion}"`,
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            })
+        } catch (error) {
+            console.error('Error creando orden:', error);
+            toast({
+            title: 'Ha ocurrido un error',
+            description: `" ha ocurrido un error"`,
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+            })
+        }
     };
 
-    static getOrdenesActivas = async () => {
-
+    static getOrdenesActivas = async ( setListaProdActivas:(lista:OrdenProduccion[]) => void ) => {
+        try {
+            const response =
+                await axios.get(ServerParams.getProduccionEndPoint_byEstado(), {params:{estado:0, }});
+            setListaProdActivas(response.data.content);
+        } catch (error) {
+            console.error('Error en getAll', error);
+        }
     };
 
     static getTerminadosList = async (busqueda:string, tipo_busqueda:string, setListaTerminados:(listaterminados: Terminado[]) => void) => {

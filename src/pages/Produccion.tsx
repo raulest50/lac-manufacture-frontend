@@ -1,10 +1,12 @@
 
 import {useState} from 'react';
+import { useToast } from '@chakra-ui/react';
 
 import {Container, Tabs, TabList, Tab, TabPanels, TabPanel, Box, VStack, HStack,
     Flex, Button, Input, FormControl, FormLabel, Select,
     Textarea, List, ListItem, Icon,
     Card, CardBody, CardHeader, Text, Heading,
+    Accordion, AccordionItem, AccordionButton, AccordionPanel,
 
 } from "@chakra-ui/react";
 
@@ -16,6 +18,8 @@ import {my_style_tab} from "../styles/styles_general.tsx";
 import {SECCION} from "../models/constants.tsx";
 import {Terminado} from "../models/Terminado.tsx";
 import {SpringRequestHandler} from "../api/SpringRequestHandler.tsx";
+import {OrdenProduccionDTA} from "../models/OrdenProduccionDTA.tsx";
+import {OrdenProduccion} from "../models/OrdenProduccion.tsx";
 
 
 const TIPO_BUSQUEDAS = {ID:'ID', NOMBRE:'NOMBRE'};
@@ -24,10 +28,13 @@ const TIPO_BUSQUEDAS = {ID:'ID', NOMBRE:'NOMBRE'};
 // iconos tipo de unidad de medida
 import { MdWaterDrop } from "react-icons/md"; // L
 import { FaHashtag } from "react-icons/fa6"; // U
-import { GiWeight } from "react-icons/gi";  // KG
+import { GiWeight } from "react-icons/gi";
+import {OrdenSeguimiento} from "../models/OrdenSeguimiento.tsx";  // KG
 
 
 export default function Produccion(){
+
+    const toast = useToast();
 
     const [tipo_search_sel, setTipoSearchSel] = useState(TIPO_BUSQUEDAS.NOMBRE);
     const [busqueda, setBusqueda] = useState('');
@@ -35,6 +42,8 @@ export default function Produccion(){
     const [observaciones, setObservaciones] = useState('');
 
     const [listaTerminados, setListaTerminados] = useState<Terminado[]>([]);
+
+    const [listaOrdenesProdActiv, setListaOrdenesProdActive] = useState<OrdenProduccion[]>([]);
 
 
     const emptyTerminado:Terminado ={
@@ -54,7 +63,16 @@ export default function Produccion(){
     const [selectedTerminado, setSelectedTerminado] = useState<Terminado>(emptyTerminado);
 
     const CrearOrdenProduccion = async () => {
+        const ordenProduccionDTA:OrdenProduccionDTA = {
+            terminadoId: selectedTerminado.productoId,
+            seccionResponsable: seccion_responsable_sel,
+            observaciones: observaciones,
+        };
+        SpringRequestHandler.CrearOrdenProduccion(toast, ordenProduccionDTA);
+    }
 
+    const UpdateOrdenesActivas = async () => {
+        SpringRequestHandler.getOrdenesActivas(setListaOrdenesProdActive);
     }
 
     const onKeyPress_InputBuscar = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -92,7 +110,7 @@ export default function Produccion(){
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
-            <MyHeader title={' Iniciar Orden de Produccion'}/>
+            <MyHeader title={'Ordenes De Produccion'}/>
             
             <Tabs>
                 <TabList>
@@ -137,7 +155,7 @@ export default function Produccion(){
                                 </FormControl>
                             </Flex>
                             <FormControl p={'1em'}>
-                                <FormLabel>Observaciones: </FormLabel>
+                                <FormLabel>Observaciones:</FormLabel>
                                 <Textarea
                                     value={observaciones}
                                     onChange={(e) => setObservaciones(e.target.value)}
@@ -189,12 +207,76 @@ export default function Produccion(){
                     </TabPanel>
 
                     <TabPanel>
-
+                        <Flex direction={'column'}>
+                            <Heading>Ordenes de Produccion Pendientes</Heading>
+                            <Flex direction={'row'}>
+                                <FormControl>
+                                    <Button m={5} colorScheme={'teal'}
+                                            onClick={() => UpdateOrdenesActivas()}
+                                    >Actualizar</Button>
+                                </FormControl>
+                            </Flex>
+                            <List spacing={'0.5em'}>
+                                {listaOrdenesProdActiv.map((orden:OrdenProduccion) => (
+                                    <ListItem key={orden.ordenId} >
+                                        <Box>
+                                            <Card fontFamily={'Comfortaa Variable'} p={'0.7em'}
+                                                  sx={{
+                                                      borderRadius:'0',
+                                                      ':hover':{
+                                                          //bg:'teal.200',
+                                                      },
+                                                      borderLeft: "0.7em solid",
+                                                      borderColor: "red.300",
+                                                  }}
+                                            >
+                                                <CardHeader p={1} >
+                                                    <HStack justifyContent={'space-evenly'} >
+                                                        <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Producto: {orden.terminado.nombre} </Heading>
+                                                        <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Orden Id: {orden.terminado.productoId} </Heading>
+                                                    </HStack>
+                                                </CardHeader>
+                                                <CardBody p={1}>
+                                                    <Flex direction={'row'} p={'1em'} h={'full'} w={'full'}>
+                                                        <VStack flex={'3'} justifyContent={'space-evenly'} alignItems={'start'} pl={'1em'}>
+                                                            <Text>Unidad de Medida: {orden.terminado.tipoUnidades}</Text>
+                                                            <Text>Cantidad x Und: {orden.terminado.cantidadUnidad}</Text>
+                                                            <Text>Fecha Creacion Orden: {new Date(orden.fechaInicio).toLocaleString()}</Text>
+                                                            <Accordion allowToggle w={'full'}>
+                                                                <AccordionItem>
+                                                                    <AccordionButton>
+                                                                        <Box as='span' flex='1' textAlign='left'>
+                                                                            Ordenes de Seguimiento
+                                                                          </Box>
+                                                                    </AccordionButton>
+                                                                    <AccordionPanel pb={4}>
+                                                                        <List spacing={'0.5em'}>
+                                                                            {orden.ordenesSeguimiento.map((seg:OrdenSeguimiento) => (
+                                                                                <ListItem key={seg.seguimientoId} >
+                                                                                    <Text> Id: {seg.seguimientoId}</Text>
+                                                                                    <Text>{seg.insumo.producto.nombre}</Text>
+                                                                                    <Text> Tipo Producto {seg.insumo.producto.tipo_producto}</Text>
+                                                                                </ListItem>
+                                                                            ))}
+                                                                        </List>
+                                                                    </AccordionPanel>
+                                                                </AccordionItem>
+                                                            </Accordion>
+                                                        </VStack>
+                                                        <Text>Observaciones : {orden.observaciones} </Text>
+                                                    </Flex>
+                                                </CardBody>
+                                            </Card>
+                                        </Box>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Flex>
                     </TabPanel>
 
                     <TabPanel>
-
                     </TabPanel>
+
                 </TabPanels>
             </Tabs>
 
