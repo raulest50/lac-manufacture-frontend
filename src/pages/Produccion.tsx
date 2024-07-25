@@ -252,11 +252,18 @@ export default function Produccion(){
                                                                     <AccordionPanel pb={4}>
                                                                         <List spacing={'0.5em'}>
                                                                             {orden.ordenesSeguimiento.map((seg:OrdenSeguimiento) => (
-                                                                                <ListItem key={seg.seguimientoId} >
-                                                                                    <Text> Id: {seg.seguimientoId}</Text>
-                                                                                    <Text>{seg.insumo.producto.nombre}</Text>
-                                                                                    <Text> Tipo Producto {seg.insumo.producto.tipo_producto}</Text>
-                                                                                </ListItem>
+                                                                                <Flex direction={'row'}>
+                                                                                    <VStack sx={{
+                                                                                                'borderLeft':'0.7em solid',
+                                                                                                'borderColor': seg.estado==0? 'red.300':'green.200',
+                                                                                            }}>
+                                                                                        <ListItem key={seg.seguimientoId} p={'0.2em'}>
+                                                                                            <Text> Id Orden Seguimiento: {seg.seguimientoId}</Text>
+                                                                                            <Text>{seg.insumo.producto.nombre}</Text>
+                                                                                            <Text> Tipo Producto {seg.insumo.producto.tipo_producto}</Text>
+                                                                                        </ListItem>
+                                                                                    </VStack>
+                                                                                </Flex>
                                                                             ))}
                                                                         </List>
                                                                     </AccordionPanel>
