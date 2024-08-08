@@ -24,6 +24,8 @@ class ServerParams {
     // ORDENES PRODUCCION
     static produccion_api = "produccion";
     static endPoint_get_by_estado = "get_by_estado";
+    static endPoint_get_by_zona = "get_workload";
+    static endPoint_Update_OrdSeg_Estado = "update_oseg_estado";
 
 
     // - - - - - - - - - - - - - - - - - - -
@@ -78,6 +80,14 @@ class ServerParams {
 
     static getProduccionEndPoint_byEstado(): string{
         return `${ServerParams.domain_name}/${ServerParams.produccion_api}/${ServerParams.endPoint_get_by_estado}`;
+    }
+
+    static getWorkload_by_zona(): string{
+        return `${ServerParams.domain_name}/${ServerParams.produccion_api}/${ServerParams.endPoint_get_by_zona}`;
+    }
+
+    static getProduccionEndPoint_Update_OrdSeg_Estado(): string{
+        return `${ServerParams.domain_name}/${ServerParams.produccion_api}/${ServerParams.endPoint_Update_OrdSeg_Estado}`;
     }
 
 }

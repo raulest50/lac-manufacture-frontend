@@ -9,6 +9,7 @@ import {Stock} from "../models/Stock.tsx";
 import {Terminado} from "../models/Terminado.tsx";
 import {OrdenProduccionDTA} from "../models/OrdenProduccionDTA.tsx";
 import {OrdenProduccion} from "../models/OrdenProduccion.tsx";
+import {OrdenSeguimiento} from "../models/OrdenSeguimiento.tsx";
 
 export class SpringRequestHandler{
     
@@ -60,13 +61,22 @@ export class SpringRequestHandler{
         }
     };
 
-    static getWorkLoadByZona = async () => {
+    static getWorkLoadByZona = async (zonaId:number, setListaOrdenesSeg:(listaOrdenesSeg: OrdenSeguimiento[]) => void) => {
         try {
             const response =
-                await axios.get(ServerParams.getMovStockEndPoint_byId(), {params:{}});
-            //console.log(serverParams.getProductoEndPoint_getall());
+                await axios.get(ServerParams.getWorkload_by_zona(), {params:{zonaId:zonaId}});
             const data = response.data;
+            const listaOrdenesSeg = data.content.map((item: any) => ({
+                seguimientoId: item.seguimientoId,
+                insumo: item.insumo,
+                seccionResponsable: item.seccionResponsable,
+                estado: item.estado,
+                observaciones: item.observaciones,
+                fechaInicio: item.fechaInicio,
+                fechaFinalizacion: item.fechaFinalizacion
+            }));
 
+            setListaOrdenesSeg(listaOrdenesSeg)
 
         } catch (error) {
             console.error('Error en getAll', error);
@@ -115,6 +125,16 @@ export class SpringRequestHandler{
             console.error('Error en getAll', error);
         }
     };
+
+
+    static UpdateOrdenSeguimientoEstado = async (ordenSegId:number, estado:number) => {
+        try {
+            const response =
+                await axios.get(ServerParams.getProduccionEndPoint_Update_OrdSeg_Estado(), {params:{seguimientoId:ordenSegId, estado:estado}});
+            return response.data.content;
+        } catch (error) {
+            console.error('Error en getAll', error);
+        }
+    };
      
-    
 }
