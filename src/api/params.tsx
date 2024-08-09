@@ -1,11 +1,6 @@
 
 
 class ServerParams {
-    
-    //static ip:string = "149.50.134.203";
-    //static domain_name:string ="https://lac-manufacture-backend.onrender.com"; // FOR PRODUCTION
-    static domain_name:string ="http://localhost:8080"; // FOR DEVELOPMENT
-    //static spring_port:string ="8080";
 
     // PRODUCTOS
     static productos_api:string = "productos";
@@ -31,31 +26,44 @@ class ServerParams {
     // - - - - - - - - - - - - - - - - - - -
 
 
+
+    // Method to return the correct domain name
+    static getDomain(): string {
+        console.log(window.location.hostname);
+        // Check if running on localhost
+        if (window.location.hostname === "localhost") {
+            return "http://localhost:8080"
+        } else {
+            return "ttps://lac-manufacture-backend.onrender.com";
+        }
+    }
+
+
     /**
      * PRODUCTOS END POINTS
      */
     static getProductoEndPoint_TerminadosGetAll(): string{
-        return `${ServerParams.domain_name}/${ServerParams.productos_api}/${ServerParams.endPoint_getall_termi}`;
+        return `${ServerParams.getDomain()}/${ServerParams.productos_api}/${ServerParams.endPoint_getall_termi}`;
     }
 
     static getProductoEndPoint_getall(): string{
-        //return `${serverParams.domain_name}:${serverParams.spring_port}/${serverParams.productos_api}/${serverParams.endPoint_getall}`;
-        //console.log(`${serverParams.domain_name}/${serverParams.productos_api}/${serverParams.endPoint_getall}`)
-        return `${ServerParams.domain_name}/${ServerParams.productos_api}/${ServerParams.endPoint_getall}`;
+        //return `${serverParams.getDomain()}:${serverParams.spring_port}/${serverParams.productos_api}/${serverParams.endPoint_getall}`;
+        //console.log(`${serverParams.getDomain()}/${serverParams.productos_api}/${serverParams.endPoint_getall}`)
+        return `${ServerParams.getDomain()}/${ServerParams.productos_api}/${ServerParams.endPoint_getall}`;
     }
     
     static getProductoEndPoint_save(): string{
-        //return `${serverParams.domain_name}:${serverParams.spring_port}/${serverParams.productos_api}/${serverParams.endPoint_save}`;
-        //console.log(`${serverParams.domain_name}/${serverParams.productos_api}/${serverParams.endPoint_save}`)
-        return `${ServerParams.domain_name}/${ServerParams.productos_api}/${ServerParams.endPoint_save}`;
+        //return `${serverParams.getDomain()}:${serverParams.spring_port}/${serverParams.productos_api}/${serverParams.endPoint_save}`;
+        //console.log(`${serverParams.getDomain()}/${serverParams.productos_api}/${serverParams.endPoint_save}`)
+        return `${ServerParams.getDomain()}/${ServerParams.productos_api}/${ServerParams.endPoint_save}`;
     }
 
     static getMateriaPrimaEndPoint_search(): string{
-        return `${ServerParams.domain_name}/${ServerParams.productos_api}/${ServerParams.endPoint_search_mp}`;
+        return `${ServerParams.getDomain()}/${ServerParams.productos_api}/${ServerParams.endPoint_search_mp}`;
     }
 
     static getSemiTerminadoEndPoint_search(): string{
-        return `${ServerParams.domain_name}/${ServerParams.productos_api}/${ServerParams.endPoint_search_semi}`;
+        return `${ServerParams.getDomain()}/${ServerParams.productos_api}/${ServerParams.endPoint_search_semi}`;
     }
 
 
@@ -63,11 +71,11 @@ class ServerParams {
      * MOVIMIENTOS END POINTS
      */
      static getMovimientoEndPoint_save(): string {
-         return `${ServerParams.domain_name}/${ServerParams.movimientos_api}/${ServerParams.endPoint_save}`;
+         return `${ServerParams.getDomain()}/${ServerParams.movimientos_api}/${ServerParams.endPoint_save}`;
     }
 
     static getMovStockEndPoint_byId():string{
-        return `${ServerParams.domain_name}/${ServerParams.movimientos_api}/${ServerParams.movstock_by_id}`;
+        return `${ServerParams.getDomain()}/${ServerParams.movimientos_api}/${ServerParams.movstock_by_id}`;
     }
 
 
@@ -75,19 +83,19 @@ class ServerParams {
      * PRODUCCION END POINTS
      */
     static getProduccionEndPoint_save(): string{
-        return `${ServerParams.domain_name}/${ServerParams.produccion_api}/${ServerParams.endPoint_save}`;
+        return `${ServerParams.getDomain()}/${ServerParams.produccion_api}/${ServerParams.endPoint_save}`;
     }
 
     static getProduccionEndPoint_byEstado(): string{
-        return `${ServerParams.domain_name}/${ServerParams.produccion_api}/${ServerParams.endPoint_get_by_estado}`;
+        return `${ServerParams.getDomain()}/${ServerParams.produccion_api}/${ServerParams.endPoint_get_by_estado}`;
     }
 
     static getWorkload_by_zona(): string{
-        return `${ServerParams.domain_name}/${ServerParams.produccion_api}/${ServerParams.endPoint_get_by_zona}`;
+        return `${ServerParams.getDomain()}/${ServerParams.produccion_api}/${ServerParams.endPoint_get_by_zona}`;
     }
 
     static getProduccionEndPoint_Update_OrdSeg_Estado(): string{
-        return `${ServerParams.domain_name}/${ServerParams.produccion_api}/${ServerParams.endPoint_Update_OrdSeg_Estado}`;
+        return `${ServerParams.getDomain()}/${ServerParams.produccion_api}/${ServerParams.endPoint_Update_OrdSeg_Estado}`;
     }
 
 }
