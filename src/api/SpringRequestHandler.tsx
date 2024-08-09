@@ -10,6 +10,7 @@ import {Terminado} from "../models/Terminado.tsx";
 import {OrdenProduccionDTA} from "../models/OrdenProduccionDTA.tsx";
 import {OrdenProduccion} from "../models/OrdenProduccion.tsx";
 import {OrdenSeguimiento} from "../models/OrdenSeguimiento.tsx";
+import {Producto} from "../models/Producto.tsx";
 
 export class SpringRequestHandler{
     
@@ -132,6 +133,20 @@ export class SpringRequestHandler{
             const response =
                 await axios.get(ServerParams.getProduccionEndPoint_Update_OrdSeg_Estado(), {params:{seguimientoId:ordenSegId, estado:estado}});
             return response.data.content;
+        } catch (error) {
+            console.error('Error en getAll', error);
+        }
+    };
+
+
+    static FetchAllProducts = async ( setListaProductos:(listaProductos:Producto[]) => void ) => {
+        try {
+            const response = await axios.get(ServerParams.getProductoEndPoint_getall(), {params:{}});
+            const listaProductos = response.data.content.map((item: Producto) => ({
+                ...item,
+                tipo_producto: 'M'
+            }));
+            setListaProductos(listaProductos);
         } catch (error) {
             console.error('Error en getAll', error);
         }

@@ -233,7 +233,8 @@ export default function Produccion(){
                                                 <CardHeader p={1} >
                                                     <HStack justifyContent={'space-evenly'} >
                                                         <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Producto: {orden.terminado.nombre} </Heading>
-                                                        <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Orden Id: {orden.terminado.productoId} </Heading>
+                                                        <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Producto Id: {orden.terminado.productoId} </Heading>
+                                                        <Heading size={'sm'} fontFamily={'Anton'} fontSize={'1.2em'}> Orden Id: {orden.ordenId} </Heading>
                                                     </HStack>
                                                 </CardHeader>
                                                 <CardBody p={1}>

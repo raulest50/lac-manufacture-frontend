@@ -21,6 +21,7 @@ import { GiWeight } from "react-icons/gi";  // KG
 
 
 import MyHeader from "../components/MyHeader.tsx";
+import ProductoSimplePicker from "../components/ProductoSimplePicker.tsx"
 import {NavLink} from "react-router-dom";
 
 
@@ -32,7 +33,8 @@ import {my_style_tab} from "../styles/styles_general.tsx";
 import {CAUSAS_MOVIMIENTOS} from "../models/constants.tsx";
 import {SpringRequestHandler} from "../api/SpringRequestHandler.tsx";
 import {Movimiento} from "../models/Movimiento.tsx";
-import {Stock} from "../models/Stock.tsx"
+import {Stock} from "../models/Stock.tsx";
+import {Producto} from "../models/Producto.tsx";
 
 const box_icon_sty = {
     margin:'1em',
@@ -92,6 +94,11 @@ function StockPage(){
         };
         await SpringRequestHandler.registrarMovimiento(toast, movimiento);
     }
+
+    const onClickItemProductoPicker = (p:Producto) => {
+        setPid2Totalize(String(p.productoId!));
+        SpringRequestHandler.getStockByProductoId(Number(pid2totalize), setStockItem)
+    };
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'} >
@@ -162,11 +169,13 @@ function StockPage(){
                                         onChange={(e) => setPid2Totalize(e.target.value)}
                                         />
                                 </FormControl>
-                                <Button m={5} p={2} colorScheme={'teal'} flex={2}
+                                <Button m={5} p={2} colorScheme={'teal'} flex={1}
                                         onClick={() => SpringRequestHandler.getStockByProductoId(Number(pid2totalize), setStockItem)}
                                     >
                                     Calcular Stock</Button>
-                                <Box flex={5}></Box>
+                                <HStack flex={5}>
+                                    <ProductoSimplePicker onClickProducto={onClickItemProductoPicker}/>
+                                </HStack>
                             </Flex>
                         </VStack>
                         
