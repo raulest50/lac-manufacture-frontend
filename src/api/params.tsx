@@ -34,7 +34,7 @@ class ServerParams {
         if (window.location.hostname === "localhost") {
             return "http://localhost:8080"
         } else {
-            return "ttps://lac-manufacture-backend.onrender.com";
+            return "https://lac-manufacture-backend.onrender.com";
         }
     }
 
