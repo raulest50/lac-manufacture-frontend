@@ -102,33 +102,36 @@ function CrearProducto(){
 
     // states para codificar semiterminado o terminado
     const [nombre_st, setNombre_st] = useState('');
-    const [costo_st, setCosto_st] = useState('');
+    const [costoFinal, setCostoFinal] = useState('');
     const [observaciones_st, setObservaciones_st] = useState('');
     const [tipo_unidad_st, setTipo_unidad_st] = useState(UNIDADES.KG);
     const [cantidad_unidad_st, setCantidad_unidad_st] = useState('');
     const [seccion_responsable_st, setSeccionResponsable_st] = useState(SECCION.BODEGA.id);
     const [tipo_producto_st, setTipoProducto_st] = useState(TIPOS_PRODUCTOS.semiTerminado)
 
-    const TIPO_BUSQUEDA = {NOMBRE:"NOMBRE", ID:"ID"}
+    const TIPO_BUSQUEDA = {NOMBRE:"NOMBRE", ID:"ID"};
 
     const [busqueda, setBusqueda] = useState('');
 
     // true: se muestra la lista de materias primas | false: se muestra la lista de semiterminados
-    const [busqueda_tipo_mp, setBusqueda_tipo_mp] = useState(true)
+    const [busqueda_tipo_mp, setBusqueda_tipo_mp] = useState(true);
 
     // para definir si se busca por ID o por NOMBRE
-    const [busqueda_param, setBusqueda_param] = useState(TIPO_BUSQUEDA.NOMBRE)
+    const [busqueda_param, setBusqueda_param] = useState(TIPO_BUSQUEDA.NOMBRE);
 
     //const [tipo_producto, setTipo_producto] = useState(TIPOS_PRODUCTOS.semiTerminado)
     //const [listaProductos, setListaProductos] = useState([])
 
-    const [listaMP, setListaMP] = useState([])
-    const [listaSemi, setListaSemi] = useState([])
+    const [listaMP, setListaMP] = useState([]);
+    const [listaSemi, setListaSemi] = useState([]);
 
-    const [listaSelected, setListaSelected] = useState<MiItem[]>([])
+    const [costoBase, setCostoBase] = useState(0);
+
+    const [listaSelected, setListaSelected] = useState<MiItem[]>([]);
 
 
-    const toast = useToast()
+    const toast = useToast();
+
 
     const get_UnitsIcon = (tipo_unidades:string) => {
         switch (tipo_unidades) {
@@ -196,7 +199,8 @@ function CrearProducto(){
         const semi_or_termi = {
             nombre:nombre_st,
             observaciones:observaciones_st,
-            costo:costo_st,
+            costo:costoBase,
+            costoFinal:costoFinal,
             tipoUnidades:tipo_unidad_st,
             cantidadUnidad:cantidad_unidad_st,
             tipo_producto:tipo_producto_st,
@@ -288,19 +292,22 @@ function CrearProducto(){
         }
     };
 
-    // pasa un item desde ka bandeja de seleecion(izquierda) a la bandeja de receta (badeja derecha)
+    // pasa un item desde la bandeja de seleecion(izquierda) a la bandeja de receta (badeja derecha)
     const onItemClick = (item:MiItem) => {
         setListaSelected((prevSelected) => {
             const isItemSelected = prevSelected.some((selectedItem) => selectedItem.productoId === item.productoId);
 
             if (isItemSelected) {
                 // Item is already in the list, remove it
+                setCostoBase(costoBase - item.costo)
                 return prevSelected.filter((selectedItem) => selectedItem.productoId !== item.productoId);
             } else {
                 // Item is not in the list, add it
+                setCostoBase(costoBase + item.costo)
                 return [...prevSelected, item];
             }
         });
+        //setCostoBase(listaSelected.reduce((sum, item) => sum + item.costo, 0));
     };
 
     // para manejar correctamente el estdo de cantidad_requeridad de cada item.
@@ -488,13 +495,14 @@ function CrearProducto(){
                                         onChange={(e) => setNombre_st(e.target.value)}
                                         sx={input_style}/>
                                 </FormControl>
+                                <Text>Costo Base: { costoBase } </Text>
                                 <FormControl>
                                     <Flex>
-                                        <FormLabel>Costo</FormLabel>
+                                        <FormLabel>CostoFinal</FormLabel>
                                         <Input
                                             flex={'2'}
-                                            value={costo_st}
-                                            onChange={(e) => setCosto_st(e.target.value)}
+                                            value={costoFinal}
+                                            onChange={(e) => setCostoFinal(e.target.value)}
                                             sx={input_style}/>
                                             <FormLabel>Unidades</FormLabel>
                                             <Select flex={'1'}
@@ -558,7 +566,7 @@ function CrearProducto(){
                                 <FormControl>
                                     <Button m={5} colorScheme={'teal'}
                                             onClick={() =>{
-                                                if( !(listaSelected.length == 0) ){
+                                                if( !(listaSelected.length == 0) && Number(costoFinal) >= costoBase ){
                                                     saveSemi_or_Termi_Submit();
                                                 }
                                             }}

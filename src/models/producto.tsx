@@ -5,6 +5,7 @@ export type Producto = {
     nombre:string;
     observaciones:string;
     costo:number;
+    costoFinal?:number;
     fechaCreacion?:string;
     tipoUnidades:string;
     cantidadUnidad:number;
