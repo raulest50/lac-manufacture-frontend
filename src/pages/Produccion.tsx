@@ -29,7 +29,7 @@ const TIPO_BUSQUEDAS = {ID:'ID', NOMBRE:'NOMBRE'};
 import { MdWaterDrop } from "react-icons/md"; // L
 import { FaHashtag } from "react-icons/fa6"; // U
 import { GiWeight } from "react-icons/gi";
-import {OrdenSeguimiento} from "../models/OrdenSeguimiento.tsx";  // KG
+import { OrdenSeguimiento } from "../models/OrdenSeguimiento.tsx";  // KG
 
 
 export default function Produccion(){

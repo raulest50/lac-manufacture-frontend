@@ -311,12 +311,14 @@ function CrearProducto(){
     };
 
     // para manejar correctamente el estdo de cantidad_requeridad de cada item.
-    const handleCantidadChange = (producto_id: number, newCantidad: string) => {
+    const handleCantidadChange = async (producto_id: number, newCantidad: string) => {
         setListaSelected((prevSelected) =>
             prevSelected.map((item) =>
                 item.productoId === producto_id ? { ...item, cantidad_requerida: newCantidad } : item
             )
         );
+        console.log("HANDLE CANTIDAD CHANGE")
+        console.log(listaSelected)
     };
 
 
@@ -563,15 +565,25 @@ function CrearProducto(){
                                         ))}
                                     </List>
                                 </Box>
-                                <FormControl>
-                                    <Button m={5} colorScheme={'teal'}
-                                            onClick={() =>{
-                                                if( !(listaSelected.length == 0) && Number(costoFinal) >= costoBase ){
-                                                    saveSemi_or_Termi_Submit();
-                                                }
-                                            }}
-                                    >{"Codificar Producto"}</Button>
-                                </FormControl>
+                                <HStack>
+                                    <FormControl>
+                                        <Button m={5} colorScheme={'teal'}
+                                                onClick={() =>{
+                                                    if( !(listaSelected.length == 0) && Number(costoFinal) >= costoBase ){
+                                                        saveSemi_or_Termi_Submit();
+                                                    }
+                                                }}
+                                        >{"Codificar Producto"}</Button>
+                                    </FormControl>
+                                    <FormControl>
+                                        <Button m={5} colorScheme={'orange'}
+                                                onClick={() =>{
+                                                    setListaSelected([]);
+                                                    setCostoBase(0);
+                                                }}
+                                        >{"Limpiar Lista"}</Button>
+                                    </FormControl>
+                                </HStack>
                             </VStack>
                         </Flex>
                     </TabPanel>
