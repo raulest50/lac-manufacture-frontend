@@ -31,6 +31,9 @@ import '@fontsource/anton';
 import {my_style_tab} from "../../styles/styles_general.tsx";
 
 
+import {MiItem, Insumo, MateriaPrima, CrearProductoHelper} from "./CrearProductoHelper.tsx";
+
+
 const input_style = {
     bg:'gray.200',
     variant:'filled',
@@ -60,32 +63,6 @@ const cardItem_style_rcta = {
 import {TIPOS_PRODUCTOS, UNIDADES, SECCION} from "../../models/constants.tsx";
 
 function CrearProducto(){
-
-    type MiItem = {
-        productoId: number;
-        tipo_producto:string;
-        nombre: string;
-        observaciones: string;
-        costo: number;
-        tipoUnidades: string;
-        cantidadUnidad: string;
-        fechaCreacion: string;
-        cantidadRequerida:string;
-    };
-
-    type Insumo = {
-        cantidadRequerida: string;
-        producto: {
-            productoId: number;
-            tipo_producto: string;
-            nombre: string;
-            observaciones: string;
-            costo: number;
-            tipoUnidades: string;
-            cantidadUnidad:string;
-            fechaCreacion: string;
-        };
-    };
 
     //const strs_bcod = {cod:'Codificar', mod:'Modificar'}
     //const bcod_colors = {cod:'teal', mod:'orange'}
@@ -133,6 +110,14 @@ function CrearProducto(){
     const toast = useToast();
 
 
+    const clearMP_Cod_Fields = () => {
+        setNombre('');
+        setCosto('');
+        setObservaciones('');
+        setCantidad_unidad('');
+    };
+
+
     const get_UnitsIcon = (tipo_unidades:string) => {
         switch (tipo_unidades) {
             case 'L':
@@ -147,37 +132,15 @@ function CrearProducto(){
     };
 
     const saveMateriaPrimSubmit = async () => {
-        const materia_prima = {
+        const materiaPrima:MateriaPrima = {
             nombre:nombre,
             observaciones:observaciones,
             costo:costo,
             tipoUnidades:tipo_unidad,
             cantidadUnidad:cantidad_unidad,
             tipo_producto:TIPOS_PRODUCTOS.materiaPrima
-        };
-
-        try {
-            console.log(ServerParams.getProductoEndPoint_save());
-            const response = await axios.post(ServerParams.getProductoEndPoint_save(), materia_prima);
-            console.log('Product saved successfully:', response.data);
-
-            toast({
-            title: 'Materia Prima Creada',
-            description: `"Creacion exitosa  id:${response.data}, time:${response.data.fechaCreacion}"`,
-            status: 'success',
-            duration: 9000,
-            isClosable: true,
-            })
-        } catch (error) {
-            console.error('Error saving product:', error);
-            toast({
-            title: 'Ha ocurrido un error',
-            description: `" ha ocurrido un error"`,
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-            })
         }
+        await CrearProductoHelper.CodificarMateriaPrima(materiaPrima, toast);
     };
 
     const saveSemi_or_Termi_Submit = async () => {
@@ -196,7 +159,7 @@ function CrearProducto(){
             }
         }));
 
-        const semi_or_termi = {
+        const semiTermi = {
             nombre:nombre_st,
             observaciones:observaciones_st,
             costo:costoBase,
@@ -209,29 +172,8 @@ function CrearProducto(){
             status:tipo_producto_st == TIPOS_PRODUCTOS.semiTerminado ? null : 0
         };
 
-        try {
-            console.log(ServerParams.getProductoEndPoint_save());
-            const response = await axios.post(ServerParams.getProductoEndPoint_save(), semi_or_termi);
-            console.log('Product saved successfully:', response.data);
+        await CrearProductoHelper.CodificarSemiTermi(semiTermi, toast);
 
-            toast({
-            title: 'Materia Prima Creada',
-            description: `"Creacion exitosa  id:${response.data}, time:${response.data.fechaCreacion}"`,
-            status: 'success',
-            duration: 9000,
-            isClosable: true,
-            })
-        } catch (error) {
-            console.error('Error saving product:', error);
-            toast({
-            title: 'Ha ocurrido un error',
-            description: `" ha ocurrido un error"`,
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-            })
-            console.log('json object',semi_or_termi)
-        }
     };
 
     // hace un getRequest para traer la lista de MateriasPrimas
@@ -392,6 +334,7 @@ function CrearProducto(){
                             </SimpleGrid>
                         </VStack>
                         <Button m={5} colorScheme={'teal'} onClick={saveMateriaPrimSubmit}>{"Codificar Materia Prima"}</Button>
+                        <Button m={5} colorScheme={'orange'} onClick={clearMP_Cod_Fields}>{"Borrar Campos"}</Button>
                     </TabPanel>
 
 
