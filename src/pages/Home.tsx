@@ -11,6 +11,10 @@ import {AiOutlineAudit} from "react-icons/ai";
 import { RiFilterFill } from "react-icons/ri";
 import { FaFireBurner } from "react-icons/fa6";
 
+import { FaIndustry } from "react-icons/fa";
+import { IoPerson } from "react-icons/io5";
+import { GiSellCard } from "react-icons/gi";
+
 import '@fontsource-variable/comfortaa'
 
 
@@ -30,6 +34,9 @@ export default function Home(){
                 <SectionCard to={'/bodega_zona1'} name={'Zona Bodega 1'} icon={GiCardPickup} />
                 <SectionCard to={'/envasado_zona2'} name={'Zona Llenado 2'} icon={RiFilterFill} />
                 <SectionCard to={'/marmitas_zona3'} name={'Zona Marmitas 3'} icon={FaFireBurner} />
+                <SectionCard to={'/clientes'} name={'Clientes'} icon={IoPerson} />
+                <SectionCard to={'/proveedores'} name={'Proveedores'} icon={FaIndustry} />
+                <SectionCard to={'/ventas'} name={'Ventas'} icon={GiSellCard} />
                 
             </SimpleGrid>
         </Container>

@@ -245,6 +245,7 @@ function CrearProducto(){
                 return prevSelected.filter((selectedItem) => selectedItem.productoId !== item.productoId);
             } else {
                 // Item is not in the list, add it
+                item.cantidadRequerida="";
                 setCostoBase(costoBase + item.costo)
                 return [...prevSelected, item];
             }
@@ -253,12 +254,10 @@ function CrearProducto(){
     };
 
     // para manejar correctamente el estdo de cantidad_requeridad de cada item.
-    const handleCantidadChange = async (producto_id: number, newCantidad: string) => {
-        setListaSelected((prevSelected) =>
-            prevSelected.map((item) =>
-                item.productoId === producto_id ? { ...item, cantidad_requerida: newCantidad } : item
-            )
-        );
+    const handleCantidadChange = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        const listaS = [...listaSelected];
+        listaS[index].cantidadRequerida = e.target.value;
+        setListaSelected(listaS);
         console.log("HANDLE CANTIDAD CHANGE")
         console.log(listaSelected)
     };
@@ -474,8 +473,8 @@ function CrearProducto(){
                                 </FormControl>
                                 <Box w={'full'} h={'full'}>
                                     <List spacing={'0.5em'}>
-                                        {listaSelected.map((item:MiItem) => (
-                                            <ListItem key={item.productoId}>
+                                        {listaSelected.map((item:MiItem, index) => (
+                                            <ListItem key={index}>
                                                 <Box>
                                                     <Card sx={cardItem_style_rcta} fontFamily={'Comfortaa Variable'} p={'0.7em'}>
                                                         <CardHeader p={1} >
@@ -497,7 +496,7 @@ function CrearProducto(){
                                                                     <FormLabel>Cantidad Requerida</FormLabel>
                                                                     <Input
                                                                         value={item.cantidadRequerida}
-                                                                        onChange={(e) => handleCantidadChange(item.productoId, e.target.value)}
+                                                                        onChange={(e) => handleCantidadChange(e, index)}
                                                                         sx={input_style}/>
                                                                 </FormControl>
                                                             </Flex>
