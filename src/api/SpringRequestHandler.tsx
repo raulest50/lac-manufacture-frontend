@@ -84,6 +84,29 @@ export class SpringRequestHandler{
         }
     };
 
+    static getOrdenesProdByZona = async (zonaId:number, setListaOrdenesProd:(listaOrdenesProd: OrdenProduccion[]) => void) => {
+        try {
+            const response =
+                await axios.get(ServerParams.getOrdenesProd_by_zona(), {params:{zonaId:zonaId}});
+            const data = response.data;
+            const listaOrdenesProd = data.content.map((item: any) => ({
+                ordenId: item.ordenId,
+                terminado: item.terminado,
+                seccionResponsable: item.seccionResponsable,
+                ordenesSeguimiento: item.ordenesSeguimiento,
+                estadoOrden: item.estadoOrden,
+                observaciones: item.observaciones,
+                fechaInicio: item.fechaInicio,
+                fechaFinal: item.fechaFinal
+            }));
+
+            setListaOrdenesProd(listaOrdenesProd);
+
+        } catch (error) {
+            console.error('Error en getAll', error);
+        }
+    };
+
     static CrearOrdenProduccion = async (toast:CreateToastFnReturn, ordenProduccionDTA:OrdenProduccionDTA) => {
         try {
             const response = await axios.post(ServerParams.getProduccionEndPoint_save(), ordenProduccionDTA);

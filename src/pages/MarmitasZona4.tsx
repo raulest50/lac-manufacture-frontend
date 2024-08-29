@@ -9,7 +9,7 @@ import WorkLoadList from "../components/WorkLoadList.tsx";
 
 
 
-function MarmitasZona3(){
+function MarmitasZona4(){
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
             <MyHeader title={'Seccion: Marmitas 3er Piso'} />
@@ -19,4 +19,4 @@ function MarmitasZona3(){
     );
 }
 
-export default MarmitasZona3;
+export default MarmitasZona4;

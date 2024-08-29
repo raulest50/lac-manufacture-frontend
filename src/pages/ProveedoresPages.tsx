@@ -15,7 +15,7 @@ function ProveedoresPage(){
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
-            <MyHeader title={'Clientes'} />
+            <MyHeader title={'Proveedores'} />
 
         </Container>
     );

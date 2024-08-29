@@ -13,7 +13,7 @@ import Produccion from "./pages/Produccion.tsx";
 import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom"
 import BodegaZona1 from "./pages/BodegaZona1.tsx";
 import EnvasadoZona2 from "./pages/EnvasadoZona2.tsx";
-import MarmitasZona3 from "./pages/MarmitasZona3.tsx";
+import MarmitasZona4 from "./pages/MarmitasZona4.tsx";
 
 import ClientesPage from "./pages/ClientesPage.tsx";
 import ProveedoresPage from "./pages/ProveedoresPages.tsx";
@@ -28,7 +28,7 @@ const router = createBrowserRouter(
       <Route path={"/stock"} element={<StockPage/>} />
       <Route path={"/bodega_zona1"} element={<BodegaZona1/>} />
       <Route path={"/envasado_zona2"} element={<EnvasadoZona2/>} />
-      <Route path={"/marmitas_zona3"} element={<MarmitasZona3/>} />
+      <Route path={"/marmitas_zona3"} element={<MarmitasZona4/>} />
       <Route path={"/clientes"} element={<ClientesPage/>} />
       <Route path={"/proveedores"} element={<ProveedoresPage/>} />
       <Route path={"/ventas"} element={<VentasPage/>} />

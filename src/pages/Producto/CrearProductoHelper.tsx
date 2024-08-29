@@ -90,7 +90,7 @@ export class CrearProductoHelper {
                 console.log('Product saved successfully:', response.data);
     
                 toast({
-                title: 'Materia Prima Creada',
+                title: 'Terminado/Semiterminado Creado',
                 description: `"Creacion exitosa  id:${response.data}, time:${response.data.fechaCreacion}"`,
                 status: 'success',
                 duration: 9000,
