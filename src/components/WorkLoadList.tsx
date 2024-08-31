@@ -3,7 +3,7 @@
 import {useState} from 'react';
 
 import {
-    Flex, Box,
+    Flex, Box, HStack,
     ListItem, List,
     Button, Text,
     Card, CardHeader, CardBody, CardFooter,
@@ -67,18 +67,18 @@ function WorkLoadList({zonaId, }:WorkLoadListProps){
                 {listaOrdenesSeg.map((ordenSeg:OrdenSeguimiento, index) => (
                     <ListItem key={index} onClick={() => onOrdenSegClick(ordenSeg)}>
                         <Card>
-                            <CardHeader>
-                                <Flex direction={'row'} gap={'1em'}>
-                                    <Text fontSize={"xl"} >ID Orden Seguimiento: {ordenSeg.seguimientoId}  </Text>
-                                    <Text fontSize={"xl"}>{ordenSeg.insumo.producto.tipo_producto == 'M' ? "Materia Prima" : "Semiterminado"} : {ordenSeg.insumo.producto.nombre}  </Text>
+                            <CardHeader sx={{bgColor:'blue.200'}}>
+                                <Flex direction={'row'} gap={'1em'} justifyContent={"center"} >
+                                    <Text as={'b'} flex={2} fontSize={"xl"}>{ordenSeg.insumo.producto.tipo_producto == 'M' ? "Materia Prima" : "Semiterminado"} : {ordenSeg.insumo.producto.nombre}  </Text>
+                                    <Text flex={1} fontSize={"lg"} >ID Orden Seguimiento: {ordenSeg.seguimientoId}  </Text>
                                 </Flex>
                             </CardHeader>
 
-                            <CardBody>
+                            <CardBody sx={{bgColor:'blue.50'}}>
                                 <Flex direction={'row'} gap={'1em'}>
 
-                                    <Flex direction={'column'} flex={1} gap={'1em'} sx={{bgColor:'cyan.200'}}>
-                                        <Box>
+                                    <Flex direction={'column'} flex={1} gap={'1em'} sx={{borderRight:'0.1em dashed teal'}} alignItems={'flex-start'}>
+                                        <Box textAlign={"left"}>
                                             <Text> Creacion Orden de Produccion: </Text>
                                             <Text> Fecha: {ordenSeg.fechaInicio!.split('T')[0]} </Text>
                                             <Text> Hora: {ordenSeg.fechaInicio!.split('T')[1].split('.')[0]} </Text>
@@ -86,28 +86,30 @@ function WorkLoadList({zonaId, }:WorkLoadListProps){
                                         <Text>Cantidad: {ordenSeg.insumo.cantidadRequerida}  </Text>
                                     </Flex>
 
-                                    <Flex direction={'column'} flex={3} gap={'1em'} sx={{bgColor:'green.200'}} >
+                                    <Flex direction={'column'} flex={3} gap={'1em'} sx={{}} alignItems={'flex-start'}>
                                         <Text as={'p'}> Observaciones : {ordenSeg.observaciones} </Text>
+                                    </Flex>
+
+                                    <Flex justifyContent={'center'} alignItems={'center'}>
+                                        <IconButton
+                                            aria-label='Toggle State'
+                                            icon={ordenSeg.estado ? <MdPendingActions/> : <MdDone/>}
+                                            onClick={ () =>{
+                                                ordenSeg.estado ? ordenSeg.estado=1 : ordenSeg.estado=0;
+                                                // Non-null Assertion Operator (!): This operator can be used to assert that an expression is non-null and non-undefined
+                                                //in situations where TypeScript can’t infer that from the surrounding code.
+                                                ActualizarEstadoOrdenSeguimiento(ordenSeg.seguimientoId!, ordenSeg.estado);
+                                            }}
+                                            fontSize={{ base: "1.2em", md: "2em", lg: "2.8m", xl:"3.5em" }}  // Responsive font size
+                                            size={"xl"}
+                                            colorScheme={"green"}
+                                            p={2}
+                                        />
                                     </Flex>
 
                                 </Flex>
 
                             </CardBody>
-
-                            <CardFooter>
-                                <IconButton
-                                    aria-label='Toggle State'
-                                    icon={ordenSeg.estado ? <MdPendingActions/> : <MdDone/>}
-                                    onClick={ () =>{
-                                        ordenSeg.estado ? ordenSeg.estado=1 : ordenSeg.estado=0;
-                                        // Non-null Assertion Operator (!): This operator can be used to assert that an expression is non-null and non-undefined
-                                        //in situations where TypeScript can’t infer that from the surrounding code.
-                                        ActualizarEstadoOrdenSeguimiento(ordenSeg.seguimientoId!, ordenSeg.estado);
-                                    }}
-                                    fontSize={{ base: "1.2em", md: "2em", lg: "2.8m", xl:"3.5em" }}  // Responsive font size
-                                    size={"lg"}
-                                />
-                            </CardFooter>
                         </Card>
                     </ListItem>
                 ))}
@@ -119,25 +121,47 @@ function WorkLoadList({zonaId, }:WorkLoadListProps){
                 {listaOrdenesProd.map((ordenProd:OrdenProduccion, index) => (
                     <ListItem key={index} onClick={() => onOrdenProdClick(ordenProd)}>
                         <Card>
-                            <CardHeader>
-                                <Flex direction={'row'} gap={'2em'}>
-                                    <Text fontSize={'xl'} >ID de Orden de Produccion: {ordenProd.ordenId} </Text>
-                                    <Text as={'h2'} fontSize={'xl'} > Producto Terminado: {ordenProd.terminado.nombre} </Text>
+                            <CardHeader sx={{bgColor:'orange.200'}}>
+                                <Flex direction={'row'} gap={'2em'} justifyContent={"center"}>
+                                    <Text flex={2} as={'b'} fontSize={'xl'} > Producto Terminado: {ordenProd.terminado.nombre} </Text>
+                                    <Text flex={1} fontSize={'lg'} >ID de Orden de Produccion: {ordenProd.ordenId} </Text>
                                 </Flex>
                             </CardHeader>
 
-                            <CardBody>
-                                <Flex direction={'row'} gap={10}>
-                                    <Flex direction={'column'} flex={1} sx={{bgColor:'teal.200'}} gap={'.2em'}>
+                            <CardBody sx={{bgColor:'orange.50'}}>
+                                <Flex direction={'row'} gap={10} >
+                                    <Flex direction={'column'} flex={1} gap={'.2em'} sx={{borderRight:'0.1em dashed teal'}} alignItems={'flex-start'}>
                                         <Text> Creacion Orden de Produccion: </Text>
                                         <Text> Fecha: {ordenProd.fechaInicio.split('T')[0]} </Text>
                                         <Text> Hora: {ordenProd.fechaInicio.split('T')[1].split('.')[0]} </Text>
                                     </Flex>
 
-                                    <Flex direction={'column'} flex={3} sx={{bgColor:'pink.200'}} >
+                                    <Flex direction={'column'} flex={3} sx={{}} >
                                         <Text as={'p'}> Observaciones : {ordenProd.observaciones} </Text>
                                     </Flex>
+
+                                    <Flex>
+                                        <IconButton
+                                            aria-label='Toggle State'
+                                            icon={ordenProd.estadoOrden ? <MdPendingActions/> : <MdDone/>}
+                                            onClick={ () =>{
+                                                //ordenProd.estadoOrden ? ordenProd.estadoOrden=1 : ordenProd.estadoOrden=0;
+
+                                                onOpen();
+
+                                                // Non-null Assertion Operator (!): This operator can be used to assert that an expression is non-null and non-undefined
+                                                // in situations where TypeScript can’t infer that from the surrounding code.
+                                                // ActualizarEstadoOrdenSeguimiento(ordenSeg.seguimientoId!, ordenSeg.estado);
+                                            }}
+                                            fontSize={{ base: "1.2em", md: "2em", lg: "2.8m", xl:"3.5em" }}  // Responsive font size
+                                            size={"xl"}
+                                            colorScheme={"green"}
+                                        />
+                                    </Flex>
                                 </Flex>
+                            </CardBody>
+
+                            <CardFooter sx={{bgColor:'green.50'}} mt={'0.5em'}>
                                 <List>
                                     {ordenProd.ordenesSeguimiento.map((ordenSeg:OrdenSeguimiento, index) => (
                                         <ListItem key={index} >
@@ -145,25 +169,8 @@ function WorkLoadList({zonaId, }:WorkLoadListProps){
                                         </ListItem>
                                     ))}
                                 </List>
-                            </CardBody>
-
-                            <CardFooter>
-                                <IconButton
-                                    aria-label='Toggle State'
-                                    icon={ordenProd.estadoOrden ? <MdPendingActions/> : <MdDone/>}
-                                    onClick={ () =>{
-                                        //ordenProd.estadoOrden ? ordenProd.estadoOrden=1 : ordenProd.estadoOrden=0;
-
-                                        onOpen();
-
-                                        // Non-null Assertion Operator (!): This operator can be used to assert that an expression is non-null and non-undefined
-                                        // in situations where TypeScript can’t infer that from the surrounding code.
-                                        // ActualizarEstadoOrdenSeguimiento(ordenSeg.seguimientoId!, ordenSeg.estado);
-                                    }}
-                                    fontSize={{ base: "1.2em", md: "2em", lg: "2.8m", xl:"3.5em" }}  // Responsive font size
-                                    size={"lg"}
-                                />
                             </CardFooter>
+
                         </Card>
                     </ListItem>
                 ))}
