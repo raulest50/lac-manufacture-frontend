@@ -18,7 +18,7 @@ function BodegaZona1(){
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
             <MyHeader title={'Seccion: Bodega 1er Piso'} />
-            <WorkLoadList zonaId={1} >
+            <WorkLoadList zonaId={101} >
             </WorkLoadList>
 
         </Container>

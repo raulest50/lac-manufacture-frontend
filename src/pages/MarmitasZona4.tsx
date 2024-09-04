@@ -13,7 +13,7 @@ function MarmitasZona4(){
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
             <MyHeader title={'Seccion: Marmitas 3er Piso'} />
-            <WorkLoadList zonaId={4} >
+            <WorkLoadList zonaId={304} >
             </WorkLoadList>
         </Container>
     );

@@ -15,7 +15,7 @@ import MyHeader from '../components/MyHeader.tsx';
 
 
 import {my_style_tab} from "../styles/styles_general.tsx";
-import {SECCION} from "../models/constants.tsx";
+//import {SECCION} from "../models/constants.tsx";
 import {Terminado} from "../models/Terminado.tsx";
 import {SpringRequestHandler} from "../api/SpringRequestHandler.tsx";
 import {OrdenProduccionDTA} from "../models/OrdenProduccionDTA.tsx";
@@ -38,7 +38,7 @@ export default function Produccion(){
 
     const [tipo_search_sel, setTipoSearchSel] = useState(TIPO_BUSQUEDAS.NOMBRE);
     const [busqueda, setBusqueda] = useState('');
-    const [seccion_responsable_sel, setSeccionResponsable] = useState(SECCION.BODEGA_PISO_1.id);
+    //const [seccion_responsable_sel, setSeccionResponsable] = useState(SECCION.BODEGA_PISO_1.id);
     const [observaciones, setObservaciones] = useState('');
 
     const [listaTerminados, setListaTerminados] = useState<Terminado[]>([]);
@@ -65,7 +65,7 @@ export default function Produccion(){
     const CrearOrdenProduccion = async () => {
         const ordenProduccionDTA:OrdenProduccionDTA = {
             terminadoId: selectedTerminado.productoId,
-            seccionResponsable: seccion_responsable_sel,
+            //seccionResponsable: seccion_responsable_sel, // ya esta establecida a la hora de codificar terminado o smeiterminado
             observaciones: observaciones,
         };
         SpringRequestHandler.CrearOrdenProduccion(toast, ordenProduccionDTA);
@@ -141,18 +141,7 @@ export default function Produccion(){
                                     </Select>
                                 </FormControl>
 
-                                <FormControl p={'1em'}>
-                                    <FormLabel>Seccion Responsable: </FormLabel>
-                                    <Select
-                                        value={seccion_responsable_sel}
-                                        onChange={(e)=>setSeccionResponsable(Number(e.target.value))}
-                                    >
-                                        <option value={SECCION.BODEGA_PISO_1.id}>{SECCION.BODEGA_PISO_1.nombre}</option>
-                                        <option value={SECCION.ETIQUETAS.id}>{SECCION.ETIQUETAS.nombre}</option>
-                                        <option value={SECCION.LLENADO.id}>{SECCION.LLENADO.nombre}</option>
-                                        <option value={SECCION.MARMITAS.id}>{SECCION.MARMITAS.nombre}</option>
-                                    </Select>
-                                </FormControl>
+
                             </Flex>
                             <FormControl p={'1em'}>
                                 <FormLabel>Observaciones:</FormLabel>
@@ -291,3 +280,24 @@ export default function Produccion(){
         </Container>
     )
 }
+
+
+
+/*
+<FormControl p={'1em'}>
+    <FormLabel>Seccion Responsable: </FormLabel>
+    <Select
+        value={seccion_responsable_sel}
+        onChange={(e)=>setSeccionResponsable(Number(e.target.value))}
+    >
+        {
+            Object.keys(SECCION).map((key)=> (
+                    <option key={SECCION[key].id} value={SECCION[key].id} >
+                        {SECCION[key].nombre}
+                    </option>
+                )
+            )
+        }
+    </Select>
+</FormControl>
+*/

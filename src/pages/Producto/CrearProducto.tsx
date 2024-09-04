@@ -24,6 +24,9 @@ import { MdWaterDrop } from "react-icons/md"; // L
 import { FaHashtag } from "react-icons/fa6"; // U
 import { GiWeight } from "react-icons/gi";  // KG
 
+
+import { FaSearch } from "react-icons/fa";
+
 // Supports weights 100-900
 import '@fontsource-variable/league-spartan';
 import '@fontsource/anton';
@@ -298,6 +301,39 @@ function CrearProducto(){
                                             value={costo}
                                             onChange={(e) => setCosto(e.target.value)}
                                             sx={input_style}/>
+                                    </FormControl>
+                                </GridItem>
+
+                                <GridItem colSpan={2}>
+                                    <FormControl>
+                                        <FormLabel>Proveedor</FormLabel>
+                                        <HStack>
+                                            <IconButton
+                                                aria-label='Search Proveedor'
+                                                icon={<FaSearch color={'black'}/>}
+                                                onClick={ () =>{
+
+                                                }}
+                                                colorScheme={'blue'}
+                                                fontSize={{ base: "1.2em", md: "2em", lg: "2.8m", xl:"3.5em" }}  // Responsive font size
+                                                p={'0.5em'}
+                                                size={"lg"}
+                                            />
+                                            <Input
+                                                isReadOnly
+                                                sx={input_style}
+                                            />
+                                        </HStack>
+                                    </FormControl>
+                                </GridItem>
+
+
+                                <GridItem colSpan={1}>
+                                    <FormControl>
+                                        <FormLabel>Url Ficha Tecnica</FormLabel>
+                                        <Input
+                                            sx={input_style}
+                                        />
                                     </FormControl>
                                 </GridItem>
 

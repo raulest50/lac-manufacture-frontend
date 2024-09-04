@@ -13,7 +13,7 @@ function EnvasadoZona2(){
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
             <MyHeader title={'Seccion: Envasado 2do Piso'} />
-            <WorkLoadList zonaId={2} >
+            <WorkLoadList zonaId={202} >
             </WorkLoadList>
         </Container>
     );

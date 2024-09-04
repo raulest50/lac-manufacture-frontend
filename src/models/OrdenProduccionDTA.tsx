@@ -5,6 +5,6 @@
  */
 export type OrdenProduccionDTA = {
     terminadoId:number;
-    seccionResponsable:number;
+    //seccionResponsable:number;
     observaciones:string;
 }
