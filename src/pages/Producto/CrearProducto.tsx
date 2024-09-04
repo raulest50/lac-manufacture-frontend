@@ -83,7 +83,7 @@ function CrearProducto(){
     const [observaciones_st, setObservaciones_st] = useState('');
     const [tipo_unidad_st, setTipo_unidad_st] = useState(UNIDADES.KG);
     const [cantidad_unidad_st, setCantidad_unidad_st] = useState('');
-    const [seccion_responsable_st, setSeccionResponsable_st] = useState(SECCION.BODEGA.id);
+    const [seccion_responsable_st, setSeccionResponsable_st] = useState(SECCION.BODEGA_PISO_1.id);
     const [tipo_producto_st, setTipoProducto_st] = useState(TIPOS_PRODUCTOS.semiTerminado)
 
     const TIPO_BUSQUEDA = {NOMBRE:"NOMBRE", ID:"ID"};
@@ -241,12 +241,12 @@ function CrearProducto(){
 
             if (isItemSelected) {
                 // Item is already in the list, remove it
-                setCostoBase(costoBase - item.costo)
+                setCostoBase(costoBase - item.costo*Number(item.cantidadRequerida));
                 return prevSelected.filter((selectedItem) => selectedItem.productoId !== item.productoId);
             } else {
                 // Item is not in the list, add it
-                item.cantidadRequerida="";
-                setCostoBase(costoBase + item.costo)
+                item.cantidadRequerida="1";
+                setCostoBase(costoBase + item.costo*Number(item.cantidadRequerida));
                 return [...prevSelected, item];
             }
         });
@@ -258,8 +258,9 @@ function CrearProducto(){
         const listaS = [...listaSelected];
         listaS[index].cantidadRequerida = e.target.value;
         setListaSelected(listaS);
-        console.log("HANDLE CANTIDAD CHANGE")
-        console.log(listaSelected)
+        setCostoBase(listaSelected.reduce( (sum, item) => sum + item.costo*Number(item.cantidadRequerida), 0));
+        console.log("HANDLE CANTIDAD CHANGE");
+        console.log(listaSelected);
     };
 
 
@@ -428,10 +429,15 @@ function CrearProducto(){
                                             value={seccion_responsable_st}
                                             onChange={(e) => setSeccionResponsable_st(Number(e.target.value))}
                                     >
-                                        <option value={SECCION.BODEGA.id}>{SECCION.BODEGA.nombre}</option>
-                                        <option value={SECCION.ETIQUETAS.id}>{SECCION.ETIQUETAS.nombre}</option>
-                                        <option value={SECCION.LLENADO.id}>{SECCION.LLENADO.nombre}</option>
-                                        <option value={SECCION.MARMITAS.id}>{SECCION.MARMITAS.nombre}</option>
+
+                                        {
+                                            Object.keys(SECCION).map((key)=> (
+                                                    <option key={SECCION[key].id} value={SECCION[key].id} >
+                                                        {SECCION[key].nombre}
+                                                    </option>
+                                                )
+                                            )
+                                        }
                                     </Select>
                                     <FormLabel>Nombre</FormLabel>
                                     <Input

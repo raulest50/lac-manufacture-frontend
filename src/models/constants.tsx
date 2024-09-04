@@ -3,12 +3,23 @@ const TIPOS_PRODUCTOS = {materiaPrima: "M", semiTerminado:"S", Terminado:"T"};
 
 const UNIDADES = {L:"L", KG:"KG", U:"U"};
 
-const SECCION = {
-    BODEGA: {nombre:"Bodega", id:1},
-    LLENADO: {nombre:"Envasar", id:2},
-    ETIQUETAS: {nombre:"Quema Etiquetas", id:3},
-    MARMITAS: {nombre:"Marmitas", id:4},
+
+
+type Seccion = {
+    nombre: string;
+    id: number;
 };
+
+const SECCION: Record<string, Seccion> = {
+    BODEGA_PISO_1: {nombre:"Bodega Piso 1", id:101},
+    BODEGA_PISO_2: {nombre:"Bodega Piso 2", id:201},
+    LLENADO_PISO_1: {nombre:"LLenado Piso 1", id:102},
+    LLENADO_PISO_2: {nombre:"LLenado Piso 2", id:202},
+    ETIQUETAS_PISO_3: {nombre:"Etiquetas Piso 3", id:303},
+    MARMITAS_PISO_3: {nombre:"Marmitas Piso 3", id:304},
+};
+
+
 
 const CAUSAS_MOVIMIENTOS = {
     VENTA:"VENTA",

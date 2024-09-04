@@ -38,7 +38,7 @@ export default function Produccion(){
 
     const [tipo_search_sel, setTipoSearchSel] = useState(TIPO_BUSQUEDAS.NOMBRE);
     const [busqueda, setBusqueda] = useState('');
-    const [seccion_responsable_sel, setSeccionResponsable] = useState(SECCION.BODEGA.id);
+    const [seccion_responsable_sel, setSeccionResponsable] = useState(SECCION.BODEGA_PISO_1.id);
     const [observaciones, setObservaciones] = useState('');
 
     const [listaTerminados, setListaTerminados] = useState<Terminado[]>([]);
@@ -147,7 +147,7 @@ export default function Produccion(){
                                         value={seccion_responsable_sel}
                                         onChange={(e)=>setSeccionResponsable(Number(e.target.value))}
                                     >
-                                        <option value={SECCION.BODEGA.id}>{SECCION.BODEGA.nombre}</option>
+                                        <option value={SECCION.BODEGA_PISO_1.id}>{SECCION.BODEGA_PISO_1.nombre}</option>
                                         <option value={SECCION.ETIQUETAS.id}>{SECCION.ETIQUETAS.nombre}</option>
                                         <option value={SECCION.LLENADO.id}>{SECCION.LLENADO.nombre}</option>
                                         <option value={SECCION.MARMITAS.id}>{SECCION.MARMITAS.nombre}</option>
