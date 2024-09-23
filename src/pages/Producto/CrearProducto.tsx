@@ -1,5 +1,7 @@
 
 import {useState} from 'react'
+
+import BandejaCodificacion from "./BandejaCodificacion.tsx";
 import MyHeader from '../../components/MyHeader.tsx'
 
 import {ServerParams} from '../../api/params.tsx'
@@ -25,7 +27,6 @@ import { FaHashtag } from "react-icons/fa6"; // U
 import { GiWeight } from "react-icons/gi";  // KG
 
 
-import { FaSearch } from "react-icons/fa";
 
 // Supports weights 100-900
 import '@fontsource-variable/league-spartan';
@@ -36,12 +37,6 @@ import {my_style_tab} from "../../styles/styles_general.tsx";
 
 import {MiItem, Insumo, MateriaPrima, CrearProductoHelper} from "./CrearProductoHelper.tsx";
 
-
-const input_style = {
-    bg:'gray.200',
-    variant:'filled',
-    borderRadius:0,
-}
 
 const cardItem_style_sel_tray = {
     borderRadius:'0',
@@ -73,16 +68,9 @@ function CrearProducto(){
     //const [bcod_color, setBcodColor] = useState(bcod_colors.cod)
     //const [bcod_text, setBcodText] = useState(strs_bcod.cod)
 
-    // states para codificar materia prima
-    const [nombre, setNombre] = useState('');
-    const [costo, setCosto] = useState('');
-    const [observaciones, setObservaciones] = useState('');
-    const [tipo_unidad, setTipo_unidad] = useState(UNIDADES.KG);
-    const [cantidad_unidad, setCantidad_unidad] = useState('');
-
     // states para codificar semiterminado o terminado
     const [nombre_st, setNombre_st] = useState('');
-    const [costoFinal, setCostoFinal] = useState('');
+
     const [observaciones_st, setObservaciones_st] = useState('');
     const [tipo_unidad_st, setTipo_unidad_st] = useState(UNIDADES.KG);
     const [cantidad_unidad_st, setCantidad_unidad_st] = useState('');
@@ -105,7 +93,7 @@ function CrearProducto(){
     const [listaMP, setListaMP] = useState([]);
     const [listaSemi, setListaSemi] = useState([]);
 
-    const [costoBase, setCostoBase] = useState(0);
+    const [costoSuma, setCostoSuma] = useState(0);
 
     const [listaSelected, setListaSelected] = useState<MiItem[]>([]);
 
@@ -113,12 +101,7 @@ function CrearProducto(){
     const toast = useToast();
 
 
-    const clearMP_Cod_Fields = () => {
-        setNombre('');
-        setCosto('');
-        setObservaciones('');
-        setCantidad_unidad('');
-    };
+
 
 
     const get_UnitsIcon = (tipo_unidades:string) => {
@@ -165,8 +148,7 @@ function CrearProducto(){
         const semiTermi = {
             nombre:nombre_st,
             observaciones:observaciones_st,
-            costo:costoBase,
-            costoFinal:costoFinal,
+            costo:costoSuma,
             tipoUnidades:tipo_unidad_st,
             cantidadUnidad:cantidad_unidad_st,
             tipo_producto:tipo_producto_st,
@@ -244,12 +226,12 @@ function CrearProducto(){
 
             if (isItemSelected) {
                 // Item is already in the list, remove it
-                setCostoBase(costoBase - item.costo*Number(item.cantidadRequerida));
+                setCostoSuma(costoSuma - item.costo*Number(item.cantidadRequerida));
                 return prevSelected.filter((selectedItem) => selectedItem.productoId !== item.productoId);
             } else {
                 // Item is not in the list, add it
                 item.cantidadRequerida="1";
-                setCostoBase(costoBase + item.costo*Number(item.cantidadRequerida));
+                setCostoSuma(costoSuma + item.costo*Number(item.cantidadRequerida));
                 return [...prevSelected, item];
             }
         });
@@ -261,7 +243,7 @@ function CrearProducto(){
         const listaS = [...listaSelected];
         listaS[index].cantidadRequerida = e.target.value;
         setListaSelected(listaS);
-        setCostoBase(listaSelected.reduce( (sum, item) => sum + item.costo*Number(item.cantidadRequerida), 0));
+        setCostoSuma(listaSelected.reduce( (sum, item) => sum + item.costo*Number(item.cantidadRequerida), 0));
         console.log("HANDLE CANTIDAD CHANGE");
         console.log(listaSelected);
     };
@@ -280,97 +262,7 @@ function CrearProducto(){
 
                     {/*panel codificar materia prima*/}
                     <TabPanel >
-                        <VStack w={'full'} h={'full'} spacing={4}>
-                            {/*descripcion input*/}
-                            <SimpleGrid w={'full'} h={'full'} columns={3} gap={'2em'}>
-                                <GridItem colSpan={2}>
-                                    <FormControl>
-                                        <FormLabel>Descripcion</FormLabel>
-                                        <Input
-                                            value={nombre}
-                                            onChange={(e) => setNombre(e.target.value)}
-                                            sx={input_style}/>
-                                    </FormControl>
-                                </GridItem>
 
-                                {/*costo input*/}
-                                <GridItem colSpan={1}>
-                                    <FormControl>
-                                        <FormLabel>Costo</FormLabel>
-                                        <Input
-                                            value={costo}
-                                            onChange={(e) => setCosto(e.target.value)}
-                                            sx={input_style}/>
-                                    </FormControl>
-                                </GridItem>
-
-                                <GridItem colSpan={2}>
-                                    <FormControl>
-                                        <FormLabel>Proveedor</FormLabel>
-                                        <HStack>
-                                            <IconButton
-                                                aria-label='Search Proveedor'
-                                                icon={<FaSearch color={'black'}/>}
-                                                onClick={ () =>{
-
-                                                }}
-                                                colorScheme={'blue'}
-                                                fontSize={{ base: "1.2em", md: "2em", lg: "2.8m", xl:"3.5em" }}  // Responsive font size
-                                                p={'0.5em'}
-                                                size={"lg"}
-                                            />
-                                            <Input
-                                                isReadOnly
-                                                sx={input_style}
-                                            />
-                                        </HStack>
-                                    </FormControl>
-                                </GridItem>
-
-
-                                <GridItem colSpan={1}>
-                                    <FormControl>
-                                        <FormLabel>Url Ficha Tecnica</FormLabel>
-                                        <Input
-                                            sx={input_style}
-                                        />
-                                    </FormControl>
-                                </GridItem>
-
-                                <GridItem colSpan={2}>
-                                    <FormControl>
-                                        <FormLabel>Observaciones</FormLabel>
-                                        <Textarea
-                                            value={observaciones}
-                                            onChange={(e) => setObservaciones(e.target.value)}
-                                            variant={'filled'}/>
-                                    </FormControl>
-                                </GridItem>
-
-                                <GridItem colSpan={1}>
-                                    <Flex w={'full'} direction={'row'} align={'flex-end'} justify={'space-around'} gap={4}>
-                                        <Select flex={"1"}
-                                                value={tipo_unidad}
-                                                onChange={(e) => setTipo_unidad(e.target.value)}
-                                        >
-                                            <option value={UNIDADES.KG}>{UNIDADES.KG}</option>
-                                            <option value={UNIDADES.L}>{UNIDADES.L}</option>
-                                            <option value={UNIDADES.U}>{UNIDADES.U}</option>
-                                        </Select>
-                                        <FormControl flex={"4"}>
-                                            <FormLabel>Cantidad por Unidad</FormLabel>
-                                            <Input
-                                                value={cantidad_unidad}
-                                                onChange={(e) => setCantidad_unidad(e.target.value)}
-                                                variant={'filled'}/>
-                                        </FormControl>
-                                    </Flex>
-                                </GridItem>
-
-                            </SimpleGrid>
-                        </VStack>
-                        <Button m={5} colorScheme={'teal'} onClick={saveMateriaPrimSubmit}>{"Codificar Materia Prima"}</Button>
-                        <Button m={5} colorScheme={'orange'} onClick={clearMP_Cod_Fields}>{"Borrar Campos"}</Button>
                     </TabPanel>
 
 
@@ -451,45 +343,43 @@ function CrearProducto(){
                                 <Heading w={'full'} p={2} bg={'green.200'} size={'md'}>Receta</Heading>
                                 <FormControl>
                                     <Flex direction={'row'}>
-                                    <FormLabel>Tipo Producto</FormLabel>
-                                        <Select flex={'3'}
-                                                value={tipo_producto_st}
-                                                onChange={(e) => setTipoProducto_st(e.target.value)}
-                                        >
-                                            <option value={TIPOS_PRODUCTOS.semiTerminado}>{'Semi Terminado'}</option>
-                                            <option value={TIPOS_PRODUCTOS.Terminado}>{'Terminado'}</option>
-                                        </Select>
+                                        <FormLabel>Tipo Producto</FormLabel>
+                                            <Select flex={'3'}
+                                                    value={tipo_producto_st}
+                                                    onChange={(e) => setTipoProducto_st(e.target.value)}
+                                            >
+                                                <option value={TIPOS_PRODUCTOS.semiTerminado}>{'Semi Terminado'}</option>
+                                                <option value={TIPOS_PRODUCTOS.Terminado}>{'Terminado'}</option>
+                                            </Select>
                                     </Flex>
-                                    <FormLabel>Seccion Responsable</FormLabel>
-                                    <Select flex={'1'}
-                                            value={seccion_responsable_st}
-                                            onChange={(e) => setSeccionResponsable_st(Number(e.target.value))}
-                                    >
+                                    <Flex direction={'row'}>
+                                        <FormLabel>Seccion Responsable</FormLabel>
+                                        <Select flex={'1'}
+                                                value={seccion_responsable_st}
+                                                onChange={(e) => setSeccionResponsable_st(Number(e.target.value))}
+                                        >
 
-                                        {
-                                            Object.keys(SECCION).map((key)=> (
-                                                    <option key={SECCION[key].id} value={SECCION[key].id} >
-                                                        {SECCION[key].nombre}
-                                                    </option>
+                                            {
+                                                Object.keys(SECCION).map((key)=> (
+                                                        <option key={SECCION[key].id} value={SECCION[key].id} >
+                                                            {SECCION[key].nombre}
+                                                        </option>
+                                                    )
                                                 )
-                                            )
-                                        }
-                                    </Select>
+                                            }
+                                        </Select>
+
+                                        <FormLabel>Tiempo Requerido Estimado</FormLabel>
+                                        <Input flex={'1'} sx={input_style} />
+                                    </Flex>
                                     <FormLabel>Nombre</FormLabel>
                                     <Input
                                         value={nombre_st}
                                         onChange={(e) => setNombre_st(e.target.value)}
                                         sx={input_style}/>
                                 </FormControl>
-                                <Text>Costo Base: { costoBase } </Text>
                                 <FormControl>
                                     <Flex>
-                                        <FormLabel>CostoFinal</FormLabel>
-                                        <Input
-                                            flex={'2'}
-                                            value={costoFinal}
-                                            onChange={(e) => setCostoFinal(e.target.value)}
-                                            sx={input_style}/>
                                             <FormLabel>Unidades</FormLabel>
                                             <Select flex={'1'}
                                                     value={tipo_unidad_st}
@@ -513,6 +403,9 @@ function CrearProducto(){
                                         onChange={(e) => setObservaciones_st(e.target.value)}
                                         variant={'filled'}/>
                                 </FormControl>
+
+                                <Text>Costo: { costoSuma } </Text>
+
                                 <Box w={'full'} h={'full'}>
                                     <List spacing={'0.5em'}>
                                         {listaSelected.map((item:MiItem, index) => (
@@ -553,7 +446,7 @@ function CrearProducto(){
                                     <FormControl>
                                         <Button m={5} colorScheme={'teal'}
                                                 onClick={() =>{
-                                                    if( !(listaSelected.length == 0) && Number(costoFinal) >= costoBase ){
+                                                    if( !(listaSelected.length == 0) && Number(costoFinal) >= costoSuma ){
                                                         saveSemi_or_Termi_Submit();
                                                     }
                                                 }}
@@ -563,7 +456,7 @@ function CrearProducto(){
                                         <Button m={5} colorScheme={'orange'}
                                                 onClick={() =>{
                                                     setListaSelected([]);
-                                                    setCostoBase(0);
+                                                    setCostoSuma(0);
                                                 }}
                                         >{"Limpiar Lista"}</Button>
                                     </FormControl>

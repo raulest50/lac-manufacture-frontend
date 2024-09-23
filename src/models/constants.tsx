@@ -10,6 +10,30 @@ type Seccion = {
     id: number;
 };
 
+/*
+picking materias primas : primer piso bodega
+
+3er piso :
+    mezcla de quimicos
+    etiqueteado de envases
+    picking etiquetas
+    picking de los envases
+    armado y almacenamiento de cajas
+
+2do piso:
+    llega tratamiento neutro
+    se agrega fragancia a tratamiento neutro
+    llenado shampoo
+    llenado acondicionador
+
+1er piso:
+    llenado de tratamiento
+    picking materia prima
+    almacenamiento
+    despacho
+
+
+ */
 const SECCION: Record<string, Seccion> = {
     BODEGA_PISO_1: {nombre:"Bodega Piso 1", id:101},
     BODEGA_PISO_2: {nombre:"Bodega Piso 2", id:201},

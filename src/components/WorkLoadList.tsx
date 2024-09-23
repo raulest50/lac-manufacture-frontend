@@ -69,7 +69,7 @@ function WorkLoadList({zonaId, }:WorkLoadListProps){
                         <Card>
                             <CardHeader sx={{bgColor:'blue.200'}}>
                                 <Flex direction={'row'} gap={'1em'} justifyContent={"center"} >
-                                    <Text as={'b'} flex={2} fontSize={"xl"}>{ordenSeg.insumo.producto.tipo_producto == 'M' ? "Materia Prima" : "Semiterminado"} : {ordenSeg.insumo.producto.nombre}  </Text>
+                                    <Text as={'b'} flex={2} fontSize={"xl"}>{ordenSeg.insumo.producto.tipo_producto == 'M' ? "PICKING Materia Prima" : "Semiterminado"} : {ordenSeg.insumo.producto.nombre}  </Text>
                                     <Text flex={1} fontSize={"lg"} >ID Orden Seguimiento: {ordenSeg.seguimientoId}  </Text>
                                 </Flex>
                             </CardHeader>
@@ -106,10 +106,14 @@ function WorkLoadList({zonaId, }:WorkLoadListProps){
                                             p={2}
                                         />
                                     </Flex>
-
                                 </Flex>
-
                             </CardBody>
+                            {ordenSeg.insumo.producto.tipo_producto == 'M' ? null : (
+                                    <CardFooter> {/* si es materia prima no hay card footer */}
+                                        
+                                    </CardFooter>
+                                )
+                            }
                         </Card>
                     </ListItem>
                 ))}
