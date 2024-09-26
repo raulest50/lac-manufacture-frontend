@@ -307,26 +307,6 @@ function SubModuloRecetas(){
                             <option value={TIPOS_PRODUCTOS.Terminado}>{'Terminado'}</option>
                         </Select>
                     </Flex>
-                    <Flex direction={'row'}>
-                        <FormLabel>Seccion Responsable</FormLabel>
-                        <Select flex={'1'}
-                                value={seccion_responsable_st}
-                                onChange={(e) => setSeccionResponsable_st(Number(e.target.value))}
-                        >
-
-                            {
-                                Object.keys(SECCION).map((key)=> (
-                                        <option key={SECCION[key].id} value={SECCION[key].id} >
-                                            {SECCION[key].nombre}
-                                        </option>
-                                    )
-                                )
-                            }
-                        </Select>
-
-                        <FormLabel>Tiempo Requerido Estimado</FormLabel>
-                        <Input flex={'1'} sx={input_style} />
-                    </Flex>
                     <FormLabel>Nombre</FormLabel>
                     <Input
                         value={nombre_st}
