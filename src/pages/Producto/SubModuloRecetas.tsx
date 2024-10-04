@@ -7,7 +7,7 @@ import {CrearProductoHelper, Insumo, MiItem} from "./CrearProductoHelper.tsx";
 import axios from 'axios'
 import {ServerParams} from '../../api/params.tsx'
 
-import {SECCION, TIPOS_PRODUCTOS, UNIDADES} from "../../models/constants.tsx";
+import {TIPOS_PRODUCTOS, UNIDADES} from "../../models/constants.tsx";
 
 import NormalStyle from "../../styles/CustomStyles";
 const input_style = NormalStyle.input_style;
@@ -36,19 +36,22 @@ import {
     FormControl,
     FormLabel,
     Heading,
-    HStack, Icon,
-    IconButton,
+    HStack, Icon, IconButton,
     Input, List, ListItem,
-    Select, Text, Textarea,
+    Select, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Textarea,
     useToast,
     VStack
 } from "@chakra-ui/react";
 
-import {IoCubeSharp} from "react-icons/io5";
-import {FaCubes} from "react-icons/fa";
 import {MdWaterDrop} from "react-icons/md";
 import {GiWeight} from "react-icons/gi";
 import {FaHashtag} from "react-icons/fa6";
+import {my_style_tab} from "../../styles/styles_general.tsx";
+import BandejaCodificacion from "./BandejaCodificacion.tsx";
+import {RxUpdate} from "react-icons/rx";
+import MyLoading from "../../components/MyLoading.tsx";
+import MateriaPrimaCard from "../../components/MateriaPrimaCard.tsx";
+import MyPagination from "../../components/MyPagination.tsx";
 
 
 function SubModuloRecetas(){
@@ -59,21 +62,14 @@ function SubModuloRecetas(){
     const [observaciones_st, setObservaciones_st] = useState('');
     const [tipo_unidad_st, setTipo_unidad_st] = useState(UNIDADES.KG);
     const [cantidad_unidad_st, setCantidad_unidad_st] = useState('');
-    const [seccion_responsable_st, setSeccionResponsable_st] = useState(SECCION.BODEGA_PISO_1.id);
     const [tipo_producto_st, setTipoProducto_st] = useState(TIPOS_PRODUCTOS.semiTerminado)
 
     const TIPO_BUSQUEDA = {NOMBRE:"NOMBRE", ID:"ID"};
 
     const [busqueda, setBusqueda] = useState('');
 
-    // true: se muestra la lista de materias primas | false: se muestra la lista de semiterminados
-    const [busqueda_tipo_mp, setBusqueda_tipo_mp] = useState(true);
-
     // para definir si se busca por ID o por NOMBRE
     const [busqueda_param, setBusqueda_param] = useState(TIPO_BUSQUEDA.NOMBRE);
-
-    //const [tipo_producto, setTipo_producto] = useState(TIPOS_PRODUCTOS.semiTerminado)
-    //const [listaProductos, setListaProductos] = useState([])
 
     const [listaMP, setListaMP] = useState([]);
     const [listaSemi, setListaSemi] = useState([]);
@@ -81,8 +77,6 @@ function SubModuloRecetas(){
     const [costoSuma, setCostoSuma] = useState(0);
 
     const [listaSelected, setListaSelected] = useState<MiItem[]>([]);
-
-    const [costoFinal, setCostoFinal] = useState(0);
 
 
 
@@ -112,7 +106,6 @@ function SubModuloRecetas(){
             tipoUnidades:tipo_unidad_st,
             cantidadUnidad:cantidad_unidad_st,
             tipo_producto:tipo_producto_st,
-            seccionResponsable:seccion_responsable_st,
             insumos:insumos,
             status:tipo_producto_st == TIPOS_PRODUCTOS.semiTerminado ? null : 0
         };
@@ -195,11 +188,6 @@ function SubModuloRecetas(){
         console.log(listaSelected);
     };
 
-    // deacuerdo al toggle button se selecciona que lisat va en la bandeja, mprimas o semiterminado.
-    const getListaProductos = () => {
-        if(busqueda_tipo_mp) return listaMP;
-        else return listaSemi;
-    };
 
     const onKeyPress_InputBuscar = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
@@ -244,15 +232,6 @@ function SubModuloRecetas(){
                             onKeyDown={(e) => onKeyPress_InputBuscar(e)}
                             sx={input_style}/>
                     </FormControl>
-                    <IconButton
-                        aria-label='Search database'
-                        icon={busqueda_tipo_mp ? <IoCubeSharp/> : <FaCubes/>}
-                        onClick={ () =>{
-                            setBusqueda_tipo_mp(!busqueda_tipo_mp);
-                        }}
-                        fontSize={{ base: "1.2em", md: "2em", lg: "2.8m", xl:"3.5em" }}  // Responsive font size
-                        size={"lg"}
-                    />
                     <Select
                         value={busqueda_param}
                         onChange={(e) => setBusqueda_param(e.target.value)}
@@ -261,6 +240,74 @@ function SubModuloRecetas(){
                         <option value={TIPO_BUSQUEDA.ID}>{TIPO_BUSQUEDA.ID}</option>
                     </Select>
                 </HStack>
+
+                <Tabs isFitted gap={'1em'} variant="line">
+                    <TabList>
+                        <Tab sx={my_style_tab}>Materias Primas</Tab>
+                        <Tab sx={my_style_tab}>Semiterminados</Tab>
+                    </TabList>
+
+                    <TabPanels>
+                        <TabPanel >
+                            <Flex flex={1} direction="column" p={4}>
+                                {/* Encabezado con botón de actualizar */}
+                                <HStack mb={4}>
+                                    <Heading>Materias Primas Pendientes</Heading>
+                                    <IconButton
+                                        aria-label="Actualizar"
+                                        icon={<RxUpdate />}
+                                        onClick={() => fetchMateriasPrimas(page)}
+                                        isDisabled={loading}
+                                        colorScheme="blue"
+                                    />
+                                </HStack>
+                                <MyLoading loading={loading} error={error} />
+                                {/* Lista de Materias Primas */}
+                                <Stack spacing={4}>
+                                    {materiasPrimas.map((mp) => (
+                                        <MateriaPrimaCard
+                                            key={mp.referencia}
+                                            materiaPrima={mp}
+                                            isSelected={selectedMateriaPrima?.referencia === mp.referencia}
+                                            onClick={onClickMateriaPrimaCard}
+                                        />
+                                    ))}
+                                </Stack>
+                                <MyPagination page={page} handlePageChange={handlePageChange} loading={loading} totalPages={totalPages} />
+                            </Flex>
+                        </TabPanel>
+
+                        <TabPanel>
+                            <Flex flex={1} direction="column" p={4}>
+                                {/* Encabezado con botón de actualizar */}
+                                <HStack mb={4}>
+                                    <Heading>Materias Primas Pendientes</Heading>
+                                    <IconButton
+                                        aria-label="Actualizar"
+                                        icon={<RxUpdate />}
+                                        onClick={() => fetchMateriasPrimas(page)}
+                                        isDisabled={loading}
+                                        colorScheme="blue"
+                                    />
+                                </HStack>
+                                <MyLoading loading={loading} error={error} />
+                                {/* Lista de Materias Primas */}
+                                <Stack spacing={4}>
+                                    {materiasPrimas.map((mp) => (
+                                        <MateriaPrimaCard
+                                            key={mp.referencia}
+                                            materiaPrima={mp}
+                                            isSelected={selectedMateriaPrima?.referencia === mp.referencia}
+                                            onClick={onClickMateriaPrimaCard}
+                                        />
+                                    ))}
+                                </Stack>
+                                <MyPagination page={page} handlePageChange={handlePageChange} loading={loading} totalPages={totalPages} />
+                            </Flex>
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
+
                 <Box w={'full'} >
                     <List spacing={'0.5em'}>
                         {getListaProductos().map((item:MiItem) => (

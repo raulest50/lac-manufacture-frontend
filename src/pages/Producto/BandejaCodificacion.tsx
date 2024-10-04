@@ -186,6 +186,7 @@ function BandejaCodificacion(){
 
     return(
         <Flex direction={'row'}>
+
             <Flex flex={1} direction="column" p={4}>
                 {/* Encabezado con botón de actualizar */}
                 <HStack mb={4}>
