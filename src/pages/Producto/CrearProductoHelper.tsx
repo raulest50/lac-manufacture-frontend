@@ -134,6 +134,7 @@ export class CrearProductoHelper {
     };
     
     static ValidateSemiTerCreation = (semiTermi:SemiTermi): boolean => {
+        console.log(semiTermi);
         return true;
     };
     

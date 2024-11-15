@@ -16,7 +16,7 @@ import EnvasadoZona2 from "./pages/EnvasadoZona2.tsx";
 import MarmitasZona4 from "./pages/MarmitasZona4.tsx";
 
 import ClientesPage from "./pages/ClientesPage.tsx";
-import ProveedoresPage from "./pages/ProveedoresPages.tsx";
+import ProveedoresPage from "./pages/Proveedores.tsx";
 import VentasPage from "./pages/VentasPage.tsx";
 
 const router = createBrowserRouter(
