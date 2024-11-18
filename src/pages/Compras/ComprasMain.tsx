@@ -7,11 +7,11 @@ import {
 from "@chakra-ui/react";
 
 
-import MyHeader from "../components/MyHeader.tsx";
+import MyHeader from "../../components/MyHeader.tsx";
 
 
 
-function ComprasPage(){
+function ComprasMain(){
 
 
     return(
@@ -22,4 +22,4 @@ function ComprasPage(){
     );
 }
 
-export default ComprasPage;
+export default ComprasMain;

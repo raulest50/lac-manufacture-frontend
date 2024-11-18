@@ -15,7 +15,7 @@ import Responsable_1 from "./pages/Responsable_1.tsx";
 import Responsable_2 from "./pages/Responsable_2.tsx";
 
 import ProveedoresPage from "./pages/Proveedores.tsx";
-import ComprasPage from "./pages/ComprasPage.tsx";
+import ComprasMain from "./pages/Compras/ComprasMain.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,7 +27,7 @@ const router = createBrowserRouter(
       <Route path={"/responsable_1"} element={<Responsable_1/>} />
       <Route path={"/responsable_2"} element={<Responsable_2/>} />
       <Route path={"/proveedores"} element={<ProveedoresPage/>} />
-      <Route path={"/compras"} element={<ComprasPage/>} />
+      <Route path={"/compras"} element={<ComprasMain/>} />
     </Route>
   )
 )

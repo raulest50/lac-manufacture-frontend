@@ -25,8 +25,6 @@ import { FaHashtag } from "react-icons/fa6"; // U
 import { GiWeight } from "react-icons/gi";  // KG
 
 
-import { FaSearch } from "react-icons/fa";
-
 // Supports weights 100-900
 import '@fontsource-variable/league-spartan';
 import '@fontsource/anton';
@@ -35,7 +33,6 @@ import {my_style_tab} from "../../styles/styles_general.tsx";
 
 
 import {MiItem, Insumo, MateriaPrima, CrearProductoHelper} from "./CrearProductoHelper.tsx";
-import ProveedorPicker from "./ProveedorPicker.tsx";
 
 
 const input_style = {
@@ -135,16 +132,6 @@ function CrearProducto(){
     };
 
     const saveMateriaPrimSubmit = async () => {
-        if (selectedProveedorId === null) {
-            toast({
-                title: 'Proveedor Required',
-                description: 'Please select a proveedor.',
-                status: 'warning',
-                duration: 5000,
-                isClosable: true,
-            });
-            return;
-        }
 
         const materiaPrima: MateriaPrima = {
             nombre: nombre,
@@ -153,7 +140,6 @@ function CrearProducto(){
             tipoUnidades: tipo_unidad,
             cantidadUnidad: cantidad_unidad,
             tipo_producto: TIPOS_PRODUCTOS.materiaPrima,
-            proveedorId: selectedProveedorId, // Use the NIT
         };
         await CrearProductoHelper.CodificarMateriaPrima(materiaPrima, toast);
     };
@@ -277,10 +263,6 @@ function CrearProducto(){
     };
 
 
-
-    const [isProveedorPickerOpen, setIsProveedorPickerOpen] = useState(false);
-    const [selectedProveedorId, setSelectedProveedorId] = useState('');
-
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
             <MyHeader title={'Codificar Producto'}/>
@@ -315,30 +297,6 @@ function CrearProducto(){
                                             value={costo}
                                             onChange={(e) => setCosto(e.target.value)}
                                             sx={input_style}/>
-                                    </FormControl>
-                                </GridItem>
-
-                                <GridItem colSpan={2}>
-                                    <FormControl>
-                                        <FormLabel>Proveedor</FormLabel>
-                                        <HStack>
-                                            <IconButton
-                                                aria-label="Search Proveedor"
-                                                icon={<FaSearch color={'black'} />}
-                                                onClick={() => {
-                                                    setIsProveedorPickerOpen(true);
-                                                }}
-                                                colorScheme={'blue'}
-                                                fontSize={{ base: '1.2em', md: '2em', lg: '2.8m', xl: '3.5em' }}
-                                                p={'0.5em'}
-                                                size={'lg'}
-                                            />
-                                            <Input
-                                                isReadOnly
-                                                value={selectedProveedorId ? `NIT: ${selectedProveedorId}` : ''}
-                                                sx={input_style}
-                                            />
-                                        </HStack>
                                     </FormControl>
                                 </GridItem>
 
@@ -568,12 +526,6 @@ function CrearProducto(){
                     </TabPanel>
                 </TabPanels>
             </Tabs>
-
-            <ProveedorPicker
-                isOpen={isProveedorPickerOpen}
-                onClose={() => setIsProveedorPickerOpen(false)}
-                onSelectProveedor={setSelectedProveedorId}
-            />
 
         </Container>
         
