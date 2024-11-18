@@ -35,6 +35,7 @@ import {my_style_tab} from "../../styles/styles_general.tsx";
 
 
 import {MiItem, Insumo, MateriaPrima, CrearProductoHelper} from "./CrearProductoHelper.tsx";
+import ProveedorPicker from "./ProveedorPicker.tsx";
 
 
 const input_style = {
@@ -63,7 +64,7 @@ const cardItem_style_rcta = {
 
 
 
-import {TIPOS_PRODUCTOS, UNIDADES, SECCION} from "../../models/constants.tsx";
+import {TIPOS_PRODUCTOS, UNIDADES} from "../../models/constants.tsx";
 
 function CrearProducto(){
 
@@ -82,11 +83,12 @@ function CrearProducto(){
 
     // states para codificar semiterminado o terminado
     const [nombre_st, setNombre_st] = useState('');
-    const [costoFinal, setCostoFinal] = useState('');
+    //const [costoFinal, setCostoFinal] = useState('');
+    const [costo_st, setCosto_st] = useState(0);
     const [observaciones_st, setObservaciones_st] = useState('');
     const [tipo_unidad_st, setTipo_unidad_st] = useState(UNIDADES.KG);
     const [cantidad_unidad_st, setCantidad_unidad_st] = useState('');
-    const [seccion_responsable_st, setSeccionResponsable_st] = useState(SECCION.BODEGA_PISO_1.id);
+    //const [seccion_responsable_st, setSeccionResponsable_st] = useState(SECCION.BODEGA_PISO_1.id);
     const [tipo_producto_st, setTipoProducto_st] = useState(TIPOS_PRODUCTOS.semiTerminado)
 
     const TIPO_BUSQUEDA = {NOMBRE:"NOMBRE", ID:"ID"};
@@ -104,8 +106,6 @@ function CrearProducto(){
 
     const [listaMP, setListaMP] = useState([]);
     const [listaSemi, setListaSemi] = useState([]);
-
-    const [costoBase, setCostoBase] = useState(0);
 
     const [listaSelected, setListaSelected] = useState<MiItem[]>([]);
 
@@ -135,14 +135,26 @@ function CrearProducto(){
     };
 
     const saveMateriaPrimSubmit = async () => {
-        const materiaPrima:MateriaPrima = {
-            nombre:nombre,
-            observaciones:observaciones,
-            costo:costo,
-            tipoUnidades:tipo_unidad,
-            cantidadUnidad:cantidad_unidad,
-            tipo_producto:TIPOS_PRODUCTOS.materiaPrima
+        if (selectedProveedorId === null) {
+            toast({
+                title: 'Proveedor Required',
+                description: 'Please select a proveedor.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
         }
+
+        const materiaPrima: MateriaPrima = {
+            nombre: nombre,
+            observaciones: observaciones,
+            costo: costo,
+            tipoUnidades: tipo_unidad,
+            cantidadUnidad: cantidad_unidad,
+            tipo_producto: TIPOS_PRODUCTOS.materiaPrima,
+            proveedorId: selectedProveedorId, // Use the NIT
+        };
         await CrearProductoHelper.CodificarMateriaPrima(materiaPrima, toast);
     };
 
@@ -165,12 +177,10 @@ function CrearProducto(){
         const semiTermi = {
             nombre:nombre_st,
             observaciones:observaciones_st,
-            costo:costoBase,
-            costoFinal:costoFinal,
+            costo:costo_st,
             tipoUnidades:tipo_unidad_st,
             cantidadUnidad:cantidad_unidad_st,
             tipo_producto:tipo_producto_st,
-            seccionResponsable:seccion_responsable_st,
             insumos:insumos,
             status:tipo_producto_st == TIPOS_PRODUCTOS.semiTerminado ? null : 0
         };
@@ -244,12 +254,12 @@ function CrearProducto(){
 
             if (isItemSelected) {
                 // Item is already in the list, remove it
-                setCostoBase(costoBase - item.costo*Number(item.cantidadRequerida));
+                setCosto_st(costo_st - item.costo*Number(item.cantidadRequerida));
                 return prevSelected.filter((selectedItem) => selectedItem.productoId !== item.productoId);
             } else {
                 // Item is not in the list, add it
                 item.cantidadRequerida="1";
-                setCostoBase(costoBase + item.costo*Number(item.cantidadRequerida));
+                setCosto_st(costo_st + item.costo*Number(item.cantidadRequerida));
                 return [...prevSelected, item];
             }
         });
@@ -261,11 +271,15 @@ function CrearProducto(){
         const listaS = [...listaSelected];
         listaS[index].cantidadRequerida = e.target.value;
         setListaSelected(listaS);
-        setCostoBase(listaSelected.reduce( (sum, item) => sum + item.costo*Number(item.cantidadRequerida), 0));
+        setCosto_st(listaSelected.reduce( (sum, item) => sum + item.costo*Number(item.cantidadRequerida), 0));
         console.log("HANDLE CANTIDAD CHANGE");
         console.log(listaSelected);
     };
 
+
+
+    const [isProveedorPickerOpen, setIsProveedorPickerOpen] = useState(false);
+    const [selectedProveedorId, setSelectedProveedorId] = useState('');
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
@@ -309,18 +323,19 @@ function CrearProducto(){
                                         <FormLabel>Proveedor</FormLabel>
                                         <HStack>
                                             <IconButton
-                                                aria-label='Search Proveedor'
-                                                icon={<FaSearch color={'black'}/>}
-                                                onClick={ () =>{
-
+                                                aria-label="Search Proveedor"
+                                                icon={<FaSearch color={'black'} />}
+                                                onClick={() => {
+                                                    setIsProveedorPickerOpen(true);
                                                 }}
                                                 colorScheme={'blue'}
-                                                fontSize={{ base: "1.2em", md: "2em", lg: "2.8m", xl:"3.5em" }}  // Responsive font size
+                                                fontSize={{ base: '1.2em', md: '2em', lg: '2.8m', xl: '3.5em' }}
                                                 p={'0.5em'}
-                                                size={"lg"}
+                                                size={'lg'}
                                             />
                                             <Input
                                                 isReadOnly
+                                                value={selectedProveedorId ? `NIT: ${selectedProveedorId}` : ''}
                                                 sx={input_style}
                                             />
                                         </HStack>
@@ -460,50 +475,30 @@ function CrearProducto(){
                                             <option value={TIPOS_PRODUCTOS.Terminado}>{'Terminado'}</option>
                                         </Select>
                                     </Flex>
-                                    <FormLabel>Seccion Responsable</FormLabel>
-                                    <Select flex={'1'}
-                                            value={seccion_responsable_st}
-                                            onChange={(e) => setSeccionResponsable_st(Number(e.target.value))}
-                                    >
 
-                                        {
-                                            Object.keys(SECCION).map((key)=> (
-                                                    <option key={SECCION[key].id} value={SECCION[key].id} >
-                                                        {SECCION[key].nombre}
-                                                    </option>
-                                                )
-                                            )
-                                        }
-                                    </Select>
                                     <FormLabel>Nombre</FormLabel>
                                     <Input
                                         value={nombre_st}
                                         onChange={(e) => setNombre_st(e.target.value)}
                                         sx={input_style}/>
                                 </FormControl>
-                                <Text>Costo Base: { costoBase } </Text>
+                                <Text>Costo Ingredientes: { costo_st } </Text>
                                 <FormControl>
                                     <Flex>
-                                        <FormLabel>CostoFinal</FormLabel>
-                                        <Input
-                                            flex={'2'}
-                                            value={costoFinal}
-                                            onChange={(e) => setCostoFinal(e.target.value)}
+                                        <FormLabel>Unidades</FormLabel>
+                                        <Select flex={'1'}
+                                                value={tipo_unidad_st}
+                                                onChange={(e) => setTipo_unidad_st(e.target.value)}
+                                        >
+                                            <option value={UNIDADES.KG}>{UNIDADES.KG}</option>
+                                            <option value={UNIDADES.L}>{UNIDADES.L}</option>
+                                            <option value={UNIDADES.U}>{UNIDADES.U}</option>
+                                        </Select>
+                                        <FormLabel flex={'0.5'}>Cantidad por unidad</FormLabel>
+                                        <Input flex={'1'}
+                                            value={cantidad_unidad_st}
+                                            onChange={(e) => setCantidad_unidad_st(e.target.value)}
                                             sx={input_style}/>
-                                            <FormLabel>Unidades</FormLabel>
-                                            <Select flex={'1'}
-                                                    value={tipo_unidad_st}
-                                                    onChange={(e) => setTipo_unidad_st(e.target.value)}
-                                            >
-                                                <option value={UNIDADES.KG}>{UNIDADES.KG}</option>
-                                                <option value={UNIDADES.L}>{UNIDADES.L}</option>
-                                                <option value={UNIDADES.U}>{UNIDADES.U}</option>
-                                            </Select>
-                                            <FormLabel flex={'0.5'}>Cantidad por unidad</FormLabel>
-                                            <Input flex={'1'}
-                                                value={cantidad_unidad_st}
-                                                onChange={(e) => setCantidad_unidad_st(e.target.value)}
-                                                sx={input_style}/>
                                     </Flex>
                                 </FormControl>
                                 <FormControl>
@@ -553,7 +548,7 @@ function CrearProducto(){
                                     <FormControl>
                                         <Button m={5} colorScheme={'teal'}
                                                 onClick={() =>{
-                                                    if( !(listaSelected.length == 0) && Number(costoFinal) >= costoBase ){
+                                                    if( !(listaSelected.length == 0) ){
                                                         saveSemi_or_Termi_Submit();
                                                     }
                                                 }}
@@ -563,7 +558,7 @@ function CrearProducto(){
                                         <Button m={5} colorScheme={'orange'}
                                                 onClick={() =>{
                                                     setListaSelected([]);
-                                                    setCostoBase(0);
+                                                    setCosto_st(0);
                                                 }}
                                         >{"Limpiar Lista"}</Button>
                                     </FormControl>
@@ -573,6 +568,13 @@ function CrearProducto(){
                     </TabPanel>
                 </TabPanels>
             </Tabs>
+
+            <ProveedorPicker
+                isOpen={isProveedorPickerOpen}
+                onClose={() => setIsProveedorPickerOpen(false)}
+                onSelectProveedor={setSelectedProveedorId}
+            />
+
         </Container>
         
     );

@@ -39,7 +39,8 @@ export interface MateriaPrima {
     costo:string,
     tipoUnidades:string,
     cantidadUnidad:string,
-    tipo_producto:string
+    tipo_producto:string,
+    proveedorId:string,
 }
 
 
@@ -79,8 +80,7 @@ export class CrearProductoHelper {
                 })
         }
     }
-    
-    
+
     static CodificarSemiTermi = async (semiTermi:SemiTermi, toast:CreateToastFnReturn) => {
         
         if(CrearProductoHelper.ValidateSemiTerCreation(semiTermi)){

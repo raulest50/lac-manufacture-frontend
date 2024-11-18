@@ -11,15 +11,15 @@ import MyHeader from "../components/MyHeader.tsx";
 
 
 
-function VentasPage(){
+function ComprasPage(){
 
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
-            <MyHeader title={'Ventas'} />
+            <MyHeader title={'Compras'} />
 
         </Container>
     );
 }
 
-export default VentasPage;
+export default ComprasPage;
