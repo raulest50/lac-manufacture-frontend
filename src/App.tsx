@@ -7,7 +7,7 @@ import './App.css'
 import RootLayout from "./pages/RootLayout.tsx";
 import Home from "./pages/Home.tsx"
 import CrearProducto from './pages/Producto/CrearProducto.tsx'
-import StockPage from "./pages/StockPage.tsx";
+import StockPage from "./pages/Stock/StockPage.tsx";
 import Produccion from "./pages/Produccion.tsx";
 
 import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom"

@@ -103,6 +103,15 @@ class ServerParams {
         return `${ServerParams.getDomain()}/${ServerParams.produccion_api}/${ServerParams.endPoint_Update_OrdSeg_Estado}`;
     }
 
+
+    static getSearchProductsWithStockEndpoint() {
+        return `${this.getDomain()}/movimientos/search_products_with_stock`;
+    }
+
+    static getMovimientosByProductoEndpoint() {
+        return `${this.getDomain()}/movimientos/get_movimientos_by_producto`;
+    }
+
 }
 
 export {ServerParams};
