@@ -8,6 +8,11 @@ export interface Producto {
     // Other fields...
 }
 
+export interface ProductoStockDTO {
+    producto: Producto;
+    stock: number;
+}
+
 export interface InsumoWithStock {
     insumoId: number;
     productoId: number;

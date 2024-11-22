@@ -1,39 +1,24 @@
 // src/pages/Produccion/CrearOrdenes.tsx
 
-import { useState } from 'react';
-import { Textarea, Select, Button, VStack } from "@chakra-ui/react";
-import { RecetaPicker } from './RecetaPicker.tsx';
+import { useState, useRef } from 'react';
+import { Textarea, Select, Button, VStack } from '@chakra-ui/react';
+import { RecetaPicker, RecetaPickerRef } from './RecetaPicker';
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
+import {ProductoWithInsumos} from "./types.tsx";
+import {ServerParams} from "../../api/params.tsx";
 
-interface ProductoWithInsumos {
-    producto: Producto;
-    insumos: InsumoWithStock[];
-}
-
-interface Producto {
-    productoId: number;
-    nombre: string;
-    tipo_producto: string;
-    // Other fields...
-}
-
-interface InsumoWithStock {
-    insumoId: number;
-    productoId: number;
-    productoNombre: string;
-    cantidadRequerida: number;
-    stockActual: number;
-}
 
 export default function CrearOrdenes() {
-
     const toast = useToast();
 
     const [canProduce, setCanProduce] = useState(false);
     const [selectedProducto, setSelectedProducto] = useState<ProductoWithInsumos | null>(null);
     const [observaciones, setObservaciones] = useState('');
     const [responsableId, setResponsableId] = useState(1);
+
+    // Create a ref to RecetaPicker to access the refresh method
+    const recetaPickerRef = useRef<RecetaPickerRef>(null);
 
     const handleCrearOrden = async () => {
         if (selectedProducto) {
@@ -43,8 +28,7 @@ export default function CrearOrdenes() {
                     responsableId: responsableId,
                     observaciones: observaciones,
                 };
-                await axios.post('/produccion/save', ordenProduccion);
-                //const response = await axios.post('/produccion/save', ordenProduccion);
+                await axios.post(`${ServerParams.getDomain()}/produccion/save`, ordenProduccion);
                 // Handle success
                 toast({
                     title: 'Orden de Producción creada',
@@ -57,6 +41,11 @@ export default function CrearOrdenes() {
                 setSelectedProducto(null);
                 setObservaciones('');
                 setCanProduce(false);
+                // Trigger a refresh in RecetaPicker to update stocks
+                if (recetaPickerRef.current) {
+                    recetaPickerRef.current.refresh();
+                    console.log("entered the if refresh")
+                }
             } catch (error) {
                 console.error('Error creating orden de producción:', error);
                 toast({
@@ -67,12 +56,24 @@ export default function CrearOrdenes() {
                     isClosable: true,
                 });
             }
+        } else {
+            toast({
+                title: 'Sin producto seleccionado',
+                description: 'Por favor, selecciona un producto antes de crear la orden.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
 
     return (
         <VStack align="stretch">
-            <RecetaPicker setCanProduce={setCanProduce} setSelectedProducto={setSelectedProducto} />
+            <RecetaPicker
+                setCanProduce={setCanProduce}
+                setSelectedProducto={setSelectedProducto}
+                ref={recetaPickerRef} // Pass the ref to RecetaPicker
+            />
             <Textarea
                 placeholder="Observaciones"
                 value={observaciones}

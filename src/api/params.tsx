@@ -112,6 +112,10 @@ class ServerParams {
         return `${this.getDomain()}/movimientos/get_movimientos_by_producto`;
     }
 
+    static getSearchSemiyTermiEndpoint() {
+        return `${this.getDomain()}/productos/search_semiytermi`;
+    }
+
 }
 
 export {ServerParams};
