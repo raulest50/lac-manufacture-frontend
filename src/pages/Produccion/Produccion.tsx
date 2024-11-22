@@ -1,7 +1,4 @@
 
-import {useState} from 'react';
-import { useToast } from '@chakra-ui/react';
-
 import {Container, Tabs, TabList, Tab, TabPanels, TabPanel
 } from "@chakra-ui/react";
 
@@ -11,8 +8,8 @@ import MyHeader from '../../components/MyHeader.tsx';
 
 import {my_style_tab} from "../../styles/styles_general.tsx";
 
-import { CrearOrdenes } from "./CrearOrdenes.tsx";
-import { SeguimientoOrdenes } from "./SeguimientoOrdenes.tsx"
+import CrearOrdenes from "./CrearOrdenes.tsx";
+import SeguimientoOrdenes from "./SeguimientoOrdenes.tsx";
 
 
 export default function Produccion(){
@@ -25,16 +22,15 @@ export default function Produccion(){
                 <TabList>
                     <Tab sx={my_style_tab}>Crear Orden Produccion</Tab>
                     <Tab sx={my_style_tab}>Ordenes Activas</Tab>
-                    <Tab sx={my_style_tab}>Historial</Tab>
                 </TabList>
                 <TabPanels>
+
                     <TabPanel>
                         <CrearOrdenes/>
                     </TabPanel>
+
                     <TabPanel>
                         <SeguimientoOrdenes/>
-                    </TabPanel>
-                    <TabPanel>
                     </TabPanel>
 
                 </TabPanels>
