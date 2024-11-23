@@ -12,6 +12,9 @@ import {
 
 import MyHeader from "../components/MyHeader";
 import axios, { AxiosError } from 'axios';
+import EndPointsURL from "../api/EndPointsURL.tsx";
+
+const endPoints = new EndPointsURL();
 
 
 function ProveedoresPage() {
@@ -71,7 +74,7 @@ function ProveedoresPage() {
         };
 
         try {
-            const response = await axios.post('http://localhost:8080/proveedores/save', nuevoProveedor);
+            const response = await axios.post(endPoints.save_proveedores, nuevoProveedor);
             console.log('Proveedor registrado exitosamente:', response.data);
 
             toast({

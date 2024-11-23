@@ -6,8 +6,9 @@ import { RecetaPicker, RecetaPickerRef } from './RecetaPicker';
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
 import {ProductoWithInsumos} from "./types.tsx";
-import {ServerParams} from "../../api/params.tsx";
+import EndPointsURL from "../../api/EndPointsURL.tsx";
 
+const endPoints = new EndPointsURL();
 
 export default function CrearOrdenes() {
     const toast = useToast();
@@ -28,7 +29,7 @@ export default function CrearOrdenes() {
                     responsableId: responsableId,
                     observaciones: observaciones,
                 };
-                await axios.post(`${ServerParams.getDomain()}/produccion/save`, ordenProduccion);
+                await axios.post(endPoints.save_produccion, ordenProduccion);
                 // Handle success
                 toast({
                     title: 'Orden de Producción creada',

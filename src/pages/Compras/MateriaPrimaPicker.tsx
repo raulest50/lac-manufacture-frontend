@@ -25,8 +25,10 @@ import {
     Select,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import { ServerParams } from '../../api/params.tsx';
 import { MiItem } from './types.tsx';
+import EndPointsURL from "../../api/EndPointsURL.tsx";
+
+const endPoints = new EndPointsURL();
 
 interface MateriaPrimaPickerProps {
     isOpen: boolean;
@@ -47,7 +49,7 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
 
     const handleSearch = async () => {
         try {
-            const response = await axios.get(ServerParams.getMateriaPrimaEndPoint_search(), {
+            const response = await axios.get(endPoints.search_mprima, {
                 params: { search: searchText, tipoBusqueda: tipoBusqueda },
             });
             const updatedMateriasPrimas = response.data.content.map((item: MiItem) => ({

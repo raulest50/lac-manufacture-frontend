@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ServerParams } from "../../api/params.tsx";
+import EndPointsURL from "../../api/EndPointsURL.tsx";
 import { CreateToastFnReturn } from '@chakra-ui/react';
 
 export interface MiItem {
@@ -42,16 +42,18 @@ export interface MateriaPrima {
     // Removed proveedorId
 }
 
+const endPoints = new EndPointsURL();
+
 export class CrearProductoHelper {
+
     static CodificarMateriaPrima = async (
         materiaPrima: MateriaPrima,
         toast: CreateToastFnReturn
     ) => {
         if (CrearProductoHelper.ValidateMateriaPrimaCreation(materiaPrima)) {
             try {
-                console.log(ServerParams.getProductoEndPoint_save());
                 const response = await axios.post(
-                    ServerParams.getProductoEndPoint_save(),
+                    endPoints.save_producto,
                     materiaPrima
                 );
                 console.log('Product saved successfully:', response.data);
@@ -90,9 +92,9 @@ export class CrearProductoHelper {
     ) => {
         if (CrearProductoHelper.ValidateSemiTerCreation(semiTermi)) {
             try {
-                console.log(ServerParams.getProductoEndPoint_save());
+
                 const response = await axios.post(
-                    ServerParams.getProductoEndPoint_save(),
+                    endPoints.save_producto,
                     semiTermi
                 );
                 console.log('Product saved successfully:', response.data);

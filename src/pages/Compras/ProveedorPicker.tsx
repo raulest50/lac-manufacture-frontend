@@ -22,6 +22,9 @@ import {
     RadioGroup,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import EndPointsURL from "../../api/EndPointsURL.tsx";
+
+const endPoints = new EndPointsURL();
 
 interface Proveedor {
     id: number;
@@ -46,7 +49,7 @@ const ProveedorPicker: React.FC<ProveedorPickerProps> = ({
 
     const handleSearch = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/proveedores/search', {
+            const response = await axios.get(endPoints.search_proveedores, {
                 params: { q: searchText },
             });
             setProveedores(response.data);

@@ -20,10 +20,12 @@ import '@fontsource/anton';
 import { my_style_tab } from "../../styles/styles_general";
 
 import axios from 'axios';
-import { ServerParams } from '../../api/params';
+
+const endPoints = new EndPointsURL();
 
 import MyPagination from '../../components/MyPagination';
 import { ProductStockDTO, Movimiento } from './types.tsx';
+import EndPointsURL from "../../api/EndPointsURL.tsx";
 
 function StockPage() {
 
@@ -45,7 +47,7 @@ function StockPage() {
     const handleSearch = async () => {
         setLoadingProductos(true);
         try {
-            const response = await axios.get(ServerParams.getSearchProductsWithStockEndpoint(), {
+            const response = await axios.get(endPoints.search_products_with_stock, {
                 params: {
                     searchTerm,
                     tipoBusqueda,
@@ -91,7 +93,7 @@ function StockPage() {
     const fetchMovimientos = async (productoId: number, page: number) => {
         setLoadingMovimientos(true);
         try {
-            const response = await axios.get(ServerParams.getMovimientosByProductoEndpoint(), {
+            const response = await axios.get(endPoints.get_movimientos_by_producto, {
                 params: {
                     productoId,
                     page,

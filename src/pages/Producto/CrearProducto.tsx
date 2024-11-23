@@ -2,7 +2,7 @@
 import {useState} from 'react'
 import MyHeader from '../../components/MyHeader.tsx'
 
-import {ServerParams} from '../../api/params.tsx'
+import EndPointsURL from '../../api/EndPointsURL.tsx'
 
 import axios from 'axios'
 
@@ -59,17 +59,11 @@ const cardItem_style_rcta = {
     borderColor: "green.200",
 }
 
-
+const endPoints = new EndPointsURL();
 
 import {TIPOS_PRODUCTOS, UNIDADES} from "../../models/constants.tsx";
 
 function CrearProducto(){
-
-    //const strs_bcod = {cod:'Codificar', mod:'Modificar'}
-    //const bcod_colors = {cod:'teal', mod:'orange'}
-
-    //const [bcod_color, setBcodColor] = useState(bcod_colors.cod)
-    //const [bcod_text, setBcodText] = useState(strs_bcod.cod)
 
     // states para codificar materia prima
     const [nombre, setNombre] = useState('');
@@ -179,7 +173,7 @@ function CrearProducto(){
     const SearchMprimas = async () => {
         try {
             const response =
-                await axios.get(ServerParams.getMateriaPrimaEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
+                await axios.get(endPoints.search_mprima, {params:{search:busqueda, tipoBusqueda:busqueda_param}});
             //console.log(serverParams.getProductoEndPoint_getall());
             const updatedListaMP = response.data.content.map((item: MiItem) => ({
                 ...item,
@@ -195,7 +189,7 @@ function CrearProducto(){
     const SearchSemi = async () => {
         try {
             const response =
-                await axios.get(ServerParams.getSemiTerminadoEndPoint_search(), {params:{search:busqueda, tipoBusqueda:busqueda_param}});
+                await axios.get(endPoints.search_semi, {params:{search:busqueda, tipoBusqueda:busqueda_param}});
             //console.log(serverParams.getProductoEndPoint_getall());
             const updatedListaSemi = response.data.content.map((item: MiItem) => ({
                 ...item,

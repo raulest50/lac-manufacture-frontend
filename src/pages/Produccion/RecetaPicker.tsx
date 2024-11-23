@@ -15,8 +15,9 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import MyPagination from '../../components/MyPagination';
-import { ServerParams } from '../../api/params';
 import { useToast } from '@chakra-ui/react';
+
+const endPoints = new EndPointsURL();
 
 // Import your types
 import {
@@ -25,6 +26,7 @@ import {
     ProductoStockDTO,
     ProductoWithInsumos,
 } from './types';
+import EndPointsURL from "../../api/EndPointsURL.tsx";
 
 interface RecetaPickerProps {
     setCanProduce: (canProduce: boolean) => void;
@@ -56,7 +58,7 @@ export const RecetaPicker = forwardRef<RecetaPickerRef, RecetaPickerProps>(
             setLoadingProductos(true);
             try {
                 const response = await axios.get(
-                    ServerParams.getSearchSemiyTermiEndpoint(),
+                    endPoints.search_semiytermi,
                     {
                         params: {
                             searchTerm,
@@ -121,7 +123,7 @@ export const RecetaPicker = forwardRef<RecetaPickerRef, RecetaPickerProps>(
             setLoadingInsumos(true);
             try {
                 const response = await axios.get(
-                    `${ServerParams.getDomain()}/productos/${producto.productoId}/insumos_with_stock`
+                    endPoints.insumos_with_stock.replace("{id}", producto.productoId.toString())
                 );
                 const insumos: InsumoWithStock[] = response.data;
                 const productoWithInsumos: ProductoWithInsumos = {
