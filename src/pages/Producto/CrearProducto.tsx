@@ -61,7 +61,7 @@ const cardItem_style_rcta = {
 
 const endPoints = new EndPointsURL();
 
-import {TIPOS_PRODUCTOS, UNIDADES} from "../../models/constants.tsx";
+import {TIPOS_PRODUCTOS, UNIDADES} from "../../api/constants.tsx";
 
 function CrearProducto(){
 
