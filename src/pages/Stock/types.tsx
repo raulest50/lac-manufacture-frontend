@@ -24,3 +24,21 @@ export interface Movimiento {
     observaciones: string;
     fechaMovimiento: string;
 }
+
+
+export interface InventarioEnTransitoDTO {
+    productoId: number;
+    productoNombre: string;
+    cantidadTotal: number;
+    ordenesProduccionIds: number[];
+}
+
+// Interface for paginated response
+export interface PaginatedResponse<T> {
+    content: T[];
+    totalPages: number;
+    totalElements: number;
+    number: number; // Current page number
+    size: number; // Page size
+    // ... other fields if needed
+}
