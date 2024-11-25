@@ -25,3 +25,20 @@ export interface ProductoWithInsumos {
     producto: Producto;
     insumos: InsumoWithStock[];
 }
+
+export interface OrdenSeguimientoDTO {
+    seguimientoId: number;
+    insumoNombre: string;
+    cantidadRequerida: number;
+    estado: number; // 0: pendiente, 1: finalizada
+}
+
+export interface OrdenProduccionDTO {
+    ordenId: number;
+    productoNombre: string;
+    fechaInicio: string; // ISO date string
+    estadoOrden: number; // 0: en produccion, 1: terminada
+    responsableId: number;
+    observaciones: string;
+    ordenesSeguimiento: OrdenSeguimientoDTO[];
+}

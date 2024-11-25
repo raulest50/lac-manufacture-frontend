@@ -9,7 +9,7 @@ import MyHeader from '../../components/MyHeader.tsx';
 import {my_style_tab} from "../../styles/styles_general.tsx";
 
 import CrearOrdenes from "./CrearOrdenes.tsx";
-import SeguimientoOrdenes from "./SeguimientoOrdenes.tsx";
+import HistorialOrdenes from "./HistorialOrdenes.tsx";
 
 
 export default function Produccion(){
@@ -21,7 +21,7 @@ export default function Produccion(){
             <Tabs>
                 <TabList>
                     <Tab sx={my_style_tab}>Crear Orden Produccion</Tab>
-                    <Tab sx={my_style_tab}>Ordenes Activas</Tab>
+                    <Tab sx={my_style_tab}>Historial</Tab>
                 </TabList>
                 <TabPanels>
 
@@ -30,7 +30,7 @@ export default function Produccion(){
                     </TabPanel>
 
                     <TabPanel>
-                        <SeguimientoOrdenes/>
+                        <HistorialOrdenes/>
                     </TabPanel>
 
                 </TabPanels>

@@ -16,6 +16,7 @@ export default class EndPointsURL{
 
     // produccion resource
     public save_produccion:string;
+    public search_ordenes_within_range:string;
 
 
     // compras resource
@@ -52,6 +53,7 @@ export default class EndPointsURL{
 
         // produccion endpoints
         this.save_produccion = `${domain}/${produccion_res}/save`;
+        this.search_ordenes_within_range = `${domain}/${produccion_res}/search_within_range`;
 
         // movimientos endpoints
         this.search_products_with_stock = `${domain}/${movimientos_res}/search_products_with_stock`;
