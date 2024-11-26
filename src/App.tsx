@@ -6,26 +6,28 @@ import './App.css'
 
 import RootLayout from "./pages/RootLayout.tsx";
 import Home from "./pages/Home.tsx"
-import ModuloDeProductos from './pages/Producto/ModuloDeProductos.tsx'
-import StockPage from "./pages/StockPage.tsx";
-import Produccion from "./pages/Produccion.tsx";
+import CrearProducto from './pages/Producto/CrearProducto.tsx'
+import StockPage from "./pages/Stock/StockPage.tsx";
+import Produccion from "./pages/Produccion/Produccion.tsx";
 
 import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom"
-import BodegaZona1 from "./pages/BodegaZona1.tsx";
-import EnvasadoZona2 from "./pages/EnvasadoZona2.tsx";
-import MarmitasZona4 from "./pages/MarmitasZona4.tsx";
+import Responsable_1 from "./pages/Operarios/Responsable_1.tsx";
+import Responsable_2 from "./pages/Operarios/Responsable_2.tsx";
 
+import ProveedoresPage from "./pages/Proveedores.tsx";
+import ComprasMain from "./pages/Compras/ComprasMain.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path={"/"} element={<RootLayout/>}>
       <Route index element={<Home/>} />
-      <Route path={"/producto"} element={<ModuloDeProductos/>} />
+      <Route path={"/producto"} element={<CrearProducto/>} />
       <Route path={"/produccion"} element={<Produccion/>} />
       <Route path={"/stock"} element={<StockPage/>} />
-      <Route path={"/bodega_zona1"} element={<BodegaZona1/>} />
-      <Route path={"/envasado_zona2"} element={<EnvasadoZona2/>} />
-      <Route path={"/marmitas_zona3"} element={<MarmitasZona4/>} />
+      <Route path={"/responsable_1"} element={<Responsable_1/>} />
+      <Route path={"/responsable_2"} element={<Responsable_2/>} />
+      <Route path={"/proveedores"} element={<ProveedoresPage/>} />
+      <Route path={"/compras"} element={<ComprasMain/>} />
     </Route>
   )
 )
