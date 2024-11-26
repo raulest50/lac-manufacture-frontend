@@ -11,8 +11,8 @@ import StockPage from "./pages/Stock/StockPage.tsx";
 import Produccion from "./pages/Produccion/Produccion.tsx";
 
 import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom"
-import Responsable_1 from "./pages/Responsable_1.tsx";
-import Responsable_2 from "./pages/Responsable_2.tsx";
+import Responsable_1 from "./pages/Operarios/Responsable_1.tsx";
+import Responsable_2 from "./pages/Operarios/Responsable_2.tsx";
 
 import ProveedoresPage from "./pages/Proveedores.tsx";
 import ComprasMain from "./pages/Compras/ComprasMain.tsx";

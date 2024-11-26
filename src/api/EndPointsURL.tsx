@@ -18,6 +18,9 @@ export default class EndPointsURL{
     public save_produccion:string;
     public search_ordenes_within_range:string;
     public inventario_en_transito:string;
+    public orden_seguimiento_update_estado:string;
+    public orden_produccion_update_estado:string;
+    public search_ordenes_by_responsable:string;
 
 
     // compras resource
@@ -56,6 +59,9 @@ export default class EndPointsURL{
         this.save_produccion = `${domain}/${produccion_res}/save`;
         this.search_ordenes_within_range = `${domain}/${produccion_res}/search_within_range`;
         this.inventario_en_transito = `${domain}/${produccion_res}/inventario_en_transito`;
+        this.orden_seguimiento_update_estado = `${domain}/${produccion_res}/orden_seguimiento/{id}/update_estado`;
+        this.orden_produccion_update_estado = `${domain}/${produccion_res}/orden_produccion/{id}/update_estado`;
+        this.search_ordenes_by_responsable = `${domain}/${produccion_res}/ordenes_produccion/responsable/{responsableId}`;
 
         // movimientos endpoints
         this.search_products_with_stock = `${domain}/${movimientos_res}/search_products_with_stock`;
