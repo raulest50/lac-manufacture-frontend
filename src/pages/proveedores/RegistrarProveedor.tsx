@@ -1,3 +1,5 @@
+
+
 import { useState } from 'react';
 import {
     Container,
@@ -10,14 +12,13 @@ import {
     useToast,
 } from "@chakra-ui/react";
 
-import MyHeader from "../components/MyHeader";
 import axios, { AxiosError } from 'axios';
-import EndPointsURL from "../api/EndPointsURL.tsx";
+import EndPointsURL from "../../api/EndPointsURL.tsx";
 
 const endPoints = new EndPointsURL();
 
 
-function ProveedoresPage() {
+function RegistrarProveedor() {
     // Declaración de estados para cada campo
     const [id, setId] = useState('');
     const [nombre, setNombre] = useState('');
@@ -126,8 +127,6 @@ function ProveedoresPage() {
 
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
-            <MyHeader title={'Registrar Proveedor'} />
-
             <VStack
                 as="form"
                 spacing={4}
@@ -236,4 +235,4 @@ function ProveedoresPage() {
     );
 }
 
-export default ProveedoresPage;
+export default RegistrarProveedor;

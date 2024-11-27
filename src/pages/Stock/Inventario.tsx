@@ -13,7 +13,7 @@ import {
     Select,
 } from "@chakra-ui/react";
 
-import MyHeader from "../../components/MyHeader";
+
 import '@fontsource-variable/league-spartan';
 import '@fontsource/anton';
 
@@ -127,7 +127,7 @@ function Inventario() {
 
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'} >
-            <MyHeader title={'Movimientos y Stock'} />
+
                 <VStack h={'full'} w={'full'} align="stretch">
                             <FormControl>
                                 <HStack>

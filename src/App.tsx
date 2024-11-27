@@ -6,7 +6,7 @@ import './App.css'
 
 import RootLayout from "./pages/RootLayout.tsx";
 import Home from "./pages/Home.tsx"
-import CrearProducto from './pages/Producto/CrearProducto.tsx'
+import ProductosPage from './pages/Producto/ProductosPage.tsx'
 import StockPage from "./pages/Stock/StockPage.tsx";
 import Produccion from "./pages/Produccion/Produccion.tsx";
 
@@ -14,14 +14,14 @@ import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} fr
 import Responsable_1 from "./pages/Operarios/Responsable_1.tsx";
 import Responsable_2 from "./pages/Operarios/Responsable_2.tsx";
 
-import ProveedoresPage from "./pages/Proveedores.tsx";
+import ProveedoresPage from "./pages/proveedores/Proveedores.tsx";
 import ComprasMain from "./pages/Compras/ComprasMain.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path={"/"} element={<RootLayout/>}>
       <Route index element={<Home/>} />
-      <Route path={"/producto"} element={<CrearProducto/>} />
+      <Route path={"/producto"} element={<ProductosPage/>} />
       <Route path={"/produccion"} element={<Produccion/>} />
       <Route path={"/stock"} element={<StockPage/>} />
       <Route path={"/responsable_1"} element={<Responsable_1/>} />
