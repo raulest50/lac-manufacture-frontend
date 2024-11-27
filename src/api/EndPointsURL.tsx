@@ -12,6 +12,7 @@ export default class EndPointsURL{
     // proveedores resouce
     public save_proveedores:string;
     public search_proveedores:string;
+    public search_proveedores_pag :string;
 
 
     // produccion resource
@@ -25,6 +26,8 @@ export default class EndPointsURL{
 
     // compras resource
     public save_compra:string;
+    public byProveedorAndDate:string;
+    public get_compra_items_by_compra_id:string
 
 
     // movimientos resource
@@ -51,9 +54,12 @@ export default class EndPointsURL{
         // proveedores endpoints
         this.save_proveedores = `${domain}/${proveedores_res}/save`;
         this.search_proveedores = `${domain}/${proveedores_res}/search`;
+        this.search_proveedores_pag = `${domain}/${proveedores_res}/search_pag`;
 
         // compras endpoints
         this.save_compra = `${domain}/${compras_res}/save`;
+        this.byProveedorAndDate = `${domain}/${compras_res}/byProveedorAndDate`;
+        this.get_compra_items_by_compra_id = `${domain}/${compras_res}/{compraId}/items`;
 
         // produccion endpoints
         this.save_produccion = `${domain}/${produccion_res}/save`;
