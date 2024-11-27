@@ -6,8 +6,8 @@ import {
 } from '@chakra-ui/react';
 
 import { UNIDADES, TIPOS_PRODUCTOS } from '../../api/constants.tsx';
-import { input_style } from '../../styles/styles_general.tsx';
 import { CrearProductoHelper, MateriaPrima } from './CrearProductoHelper.tsx';
+import {input_style} from "../../styles/styles_general.tsx";
 
 function CodificarProducto() {
     const [nombre, setNombre] = useState('');
