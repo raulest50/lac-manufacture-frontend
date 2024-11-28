@@ -6,7 +6,7 @@ import './App.css'
 
 import RootLayout from "./pages/RootLayout.tsx";
 import Home from "./pages/Home.tsx"
-import ProductosPage from './pages/Producto/ProductosPage.tsx'
+import ProductosPage from './pages/Productos/ProductosPage.tsx'
 import StockPage from "./pages/Stock/StockPage.tsx";
 import Produccion from "./pages/Produccion/Produccion.tsx";
 
@@ -18,24 +18,24 @@ import ProveedoresPage from "./pages/proveedores/Proveedores.tsx";
 import ComprasMain from "./pages/Compras/ComprasMain.tsx";
 
 const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path={"/"} element={<RootLayout/>}>
-      <Route index element={<Home/>} />
-      <Route path={"/producto"} element={<ProductosPage/>} />
-      <Route path={"/produccion"} element={<Produccion/>} />
-      <Route path={"/stock"} element={<StockPage/>} />
-      <Route path={"/responsable_1"} element={<Responsable_1/>} />
-      <Route path={"/responsable_2"} element={<Responsable_2/>} />
-      <Route path={"/proveedores"} element={<ProveedoresPage/>} />
-      <Route path={"/compras"} element={<ComprasMain/>} />
-    </Route>
-  )
+    createRoutesFromElements(
+        <Route path={"/"} element={<RootLayout/>}>
+            <Route index element={<Home/>} />
+            <Route path={"/producto"} element={<ProductosPage/>} />
+            <Route path={"/produccion"} element={<Produccion/>} />
+            <Route path={"/stock"} element={<StockPage/>} />
+            <Route path={"/responsable_1"} element={<Responsable_1/>} />
+            <Route path={"/responsable_2"} element={<Responsable_2/>} />
+            <Route path={"/proveedores"} element={<ProveedoresPage/>} />
+            <Route path={"/compras"} element={<ComprasMain/>} />
+        </Route>
+    )
 )
 
 function App() {
-  return (
-    <RouterProvider router={router} />
-  )
+    return (
+        <RouterProvider router={router} />
+    )
 }
 
 export default App

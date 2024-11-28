@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Container, Tabs, TabList, TabPanels, TabPanel, Tab } from '@chakra-ui/react';
 
 import MyHeader from '../../components/MyHeader.tsx';
@@ -6,6 +6,7 @@ import { my_style_tab } from '../../styles/styles_general.tsx';
 
 import CodificarProducto from './CodificarProducto';
 import CrearReceta from './CrearReceta';
+import ProcesosDesign from "./ProcesosDesign.tsx";
 
 function ProductosPage() {
     return (
@@ -15,6 +16,7 @@ function ProductosPage() {
                 <TabList>
                     <Tab sx={my_style_tab}>Crear Materia Prima</Tab>
                     <Tab sx={my_style_tab}>Crear Terminado/Semiterminado</Tab>
+                    <Tab sx={my_style_tab}>Diseño De Procesos</Tab>
                 </TabList>
 
                 <TabPanels>
@@ -25,6 +27,11 @@ function ProductosPage() {
                     <TabPanel>
                         <CrearReceta />
                     </TabPanel>
+
+                    <TabPanel p={0} height="100%">
+                        <ProcesosDesign />
+                    </TabPanel>
+
                 </TabPanels>
             </Tabs>
         </Container>
