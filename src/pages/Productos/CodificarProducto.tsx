@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     VStack, SimpleGrid, GridItem,
     FormControl, FormLabel, Input,
@@ -63,12 +63,6 @@ function CodificarProducto() {
                         </FormControl>
                     </GridItem>
 
-                    <GridItem colSpan={1}>
-                        <FormControl>
-                            <FormLabel>Url Ficha Tecnica</FormLabel>
-                            <Input sx={input_style} />
-                        </FormControl>
-                    </GridItem>
 
                     <GridItem colSpan={2}>
                         <FormControl>

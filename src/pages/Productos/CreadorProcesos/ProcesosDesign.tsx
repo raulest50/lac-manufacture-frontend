@@ -1,16 +1,16 @@
-import { useCallback } from 'react';
+import {useCallback} from 'react';
 import {
-    ReactFlow,
-    MiniMap,
-    Controls,
-    Background,
-    useNodesState,
-    useEdgesState,
     addEdge,
+    Background,
+    BackgroundVariant, Connection,
+    Controls,
+    MiniMap,
+    ReactFlow,
+    useEdgesState,
+    useNodesState,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
-
 
 
 const initialNodes = [
@@ -24,7 +24,7 @@ export default function App() {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
     const onConnect = useCallback(
-        (params) => setEdges((eds) => addEdge(params, eds)),
+        (params: Connection | { id: string; source: string; target: string }) => setEdges((eds) => addEdge(params, eds)),
         [setEdges],
     );
 
@@ -40,7 +40,7 @@ export default function App() {
             >
                 <Controls />
                 <MiniMap />
-                <Background variant="dots" gap={12} size={1} />
+                <Background variant={BackgroundVariant.Lines} gap={12} size={1} />
             </ReactFlow>
         </div>
 

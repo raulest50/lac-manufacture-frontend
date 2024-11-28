@@ -6,7 +6,7 @@ import { my_style_tab } from '../../styles/styles_general.tsx';
 
 import CodificarProducto from './CodificarProducto';
 import CrearReceta from './CrearReceta';
-import ProcesosDesign from "./ProcesosDesign.tsx";
+import ProcesosDesign from "./CreadorProcesos/ProcesosDesign.tsx";
 
 function ProductosPage() {
     return (
