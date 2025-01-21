@@ -16,19 +16,87 @@ import Responsable_2 from "./pages/Operarios/Responsable_2.tsx";
 
 import ProveedoresPage from "./pages/proveedores/Proveedores.tsx";
 import ComprasMain from "./pages/Compras/ComprasMain.tsx";
+import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path={"/"} element={<RootLayout/>}>
-            <Route index element={<Home/>} />
-            <Route path={"/producto"} element={<ProductosPage/>} />
-            <Route path={"/produccion"} element={<Produccion/>} />
-            <Route path={"/stock"} element={<StockPage/>} />
-            <Route path={"/responsable_1"} element={<Responsable_1/>} />
-            <Route path={"/responsable_2"} element={<Responsable_2/>} />
-            <Route path={"/proveedores"} element={<ProveedoresPage/>} />
-            <Route path={"/compras"} element={<ComprasMain/>} />
-        </Route>
+        <>
+            {/* Public login route (outside RootLayout if you like) */}
+            <Route path="/login" element={<LoginPage />} />
+
+            <Route path="/" element={<RootLayout />}>
+                {/* Home is protected => if not logged in => go to /login */}
+                <Route
+                    index
+                    element={
+                        <ProtectedRoute>
+                            <Home />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Worker routes */}
+                <Route
+                    path="responsable_1"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_WORKER">
+                            <Responsable_1/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="responsable_2"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_WORKER">
+                            <Responsable_2/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Master routes */}
+                <Route
+                    path="producto"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_MASTER">
+                            <ProductosPage/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="produccion"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_MASTER">
+                            <Produccion/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="stock"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_MASTER">
+                            <StockPage/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="proveedores"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_MASTER">
+                            <ProveedoresPage/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="compras"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_MASTER">
+                            <ComprasMain/>
+                        </ProtectedRoute>
+                    }
+                />
+            </Route>
+        </>
     )
 )
 

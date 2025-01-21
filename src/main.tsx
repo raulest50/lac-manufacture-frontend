@@ -6,6 +6,7 @@ import './index.css'
 import {ChakraProvider} from "@chakra-ui/react";
 
 import { extendTheme } from "@chakra-ui/react";
+import {AuthProvider} from "./context/AuthContext.tsx";
 
 const theme = extendTheme({
   sizes: {
@@ -20,8 +21,10 @@ const theme = extendTheme({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   
     <React.StrictMode>
-      <ChakraProvider theme={theme}>      
-        <App />
+      <ChakraProvider theme={theme}>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
       </ChakraProvider>
     </React.StrictMode>
   ,
