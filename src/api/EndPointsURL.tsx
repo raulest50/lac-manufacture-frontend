@@ -9,7 +9,7 @@ export default class EndPointsURL{
     public search_semiytermi:string;
 
 
-    // proveedores resouce
+    // Proveedores resouce
     public save_proveedores:string;
     public search_proveedores:string;
     public search_proveedores_pag :string;
@@ -34,15 +34,21 @@ export default class EndPointsURL{
     public search_products_with_stock:string;
     public get_movimientos_by_producto:string;
 
+
+    // user resources
+    public whoami:string;
+
+
     constructor() {
 
         const domain = EndPointsURL.getDomain();
 
         const productos_res = 'productos';
-        const proveedores_res = 'proveedores';
+        const proveedores_res = 'Proveedores';
         const compras_res = 'compras';
         const produccion_res = 'produccion';
         const movimientos_res = 'movimientos';
+        const user_res = 'user';
 
         // productos endpoints
         this.search_mprima = `${domain}/${productos_res}/search_mprima`;
@@ -51,7 +57,7 @@ export default class EndPointsURL{
         this.insumos_with_stock = `${domain}/${productos_res}/{id}/insumos_with_stock`;
         this.search_semiytermi = `${domain}/${productos_res}/search_semiytermi`;
 
-        // proveedores endpoints
+        // Proveedores endpoints
         this.save_proveedores = `${domain}/${proveedores_res}/save`;
         this.search_proveedores = `${domain}/${proveedores_res}/search`;
         this.search_proveedores_pag = `${domain}/${proveedores_res}/search_pag`;
@@ -72,6 +78,9 @@ export default class EndPointsURL{
         // movimientos endpoints
         this.search_products_with_stock = `${domain}/${movimientos_res}/search_products_with_stock`;
         this.get_movimientos_by_producto = `${domain}/${movimientos_res}/get_movimientos_by_producto`;
+
+        // user endpoints
+        this.whoami = `${domain}/${user_res}/whoami`;
 
     }
 

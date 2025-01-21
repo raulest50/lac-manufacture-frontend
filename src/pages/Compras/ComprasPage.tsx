@@ -9,7 +9,7 @@ import RegistrarCompras from "./RegistrarCompras.tsx";
 import HistorialCompras from "./HistorialCompras.tsx";
 import {my_style_tab} from "../../styles/styles_general.tsx";
 
-function ComprasMain() {
+function ComprasPage() {
 
 
     return (
@@ -37,4 +37,4 @@ function ComprasMain() {
     );
 }
 
-export default ComprasMain;
+export default ComprasPage;

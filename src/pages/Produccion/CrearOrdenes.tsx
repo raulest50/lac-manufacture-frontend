@@ -1,4 +1,4 @@
-// src/pages/Produccion/CrearOrdenes.tsx
+// src/pages/ProduccionPage/CrearOrdenes.tsx
 
 import { useState, useRef } from 'react';
 import { Textarea, Select, Button, VStack } from '@chakra-ui/react';

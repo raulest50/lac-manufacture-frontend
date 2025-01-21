@@ -55,10 +55,10 @@ const ProveedorPicker: React.FC<ProveedorPickerProps> = ({
             setProveedores(response.data);
             setSelectedProveedorId(null); // Reset selection on new search
         } catch (error) {
-            console.error('Error searching proveedores:', error);
+            console.error('Error searching Proveedores:', error);
             toast({
                 title: 'Error',
-                description: 'Failed to search proveedores.',
+                description: 'Failed to search Proveedores.',
                 status: 'error',
                 duration: 5000,
                 isClosable: true,

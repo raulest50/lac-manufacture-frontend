@@ -133,7 +133,7 @@ export default function HistorialOrdenes() {
                 </Text>
             )}
 
-            {/* Display List of Ordenes Produccion */}
+            {/* Display List of Ordenes ProduccionPage */}
             <VStack spacing={4} align="stretch">
                 {ordenes.map((orden) => (
                     <OrdenProduccionCard key={orden.ordenId} ordenProduccion={orden} />

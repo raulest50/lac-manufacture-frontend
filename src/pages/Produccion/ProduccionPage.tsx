@@ -12,11 +12,11 @@ import CrearOrdenes from "./CrearOrdenes.tsx";
 import HistorialOrdenes from "./HistorialOrdenes.tsx";
 
 
-export default function Produccion(){
+export default function ProduccionPage(){
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
-            <MyHeader title={'Ordenes De Produccion'}/>
+            <MyHeader title={'Ordenes De ProduccionPage'}/>
             
             <Tabs>
                 <TabList>

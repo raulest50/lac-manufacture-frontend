@@ -8,14 +8,14 @@ import RootLayout from "./pages/RootLayout.tsx";
 import Home from "./pages/Home.tsx"
 import ProductosPage from './pages/Productos/ProductosPage.tsx'
 import StockPage from "./pages/Stock/StockPage.tsx";
-import Produccion from "./pages/Produccion/Produccion.tsx";
+import ProduccionPage from "./pages/Produccion/ProduccionPage.tsx";
 
 import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom"
 import Responsable_1 from "./pages/Operarios/Responsable_1.tsx";
 import Responsable_2 from "./pages/Operarios/Responsable_2.tsx";
 
-import ProveedoresPage from "./pages/proveedores/Proveedores.tsx";
-import ComprasMain from "./pages/Compras/ComprasMain.tsx";
+import ProveedoresPage from "./pages/Proveedores/ProveedoresPage.tsx";
+import ComprasPage from "./pages/Compras/ComprasPage.tsx";
 import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 
@@ -67,7 +67,7 @@ const router = createBrowserRouter(
                     path="produccion"
                     element={
                         <ProtectedRoute requiredRole="ROLE_MASTER">
-                            <Produccion/>
+                            <ProduccionPage/>
                         </ProtectedRoute>
                     }
                 />
@@ -91,7 +91,7 @@ const router = createBrowserRouter(
                     path="compras"
                     element={
                         <ProtectedRoute requiredRole="ROLE_MASTER">
-                            <ComprasMain/>
+                            <ComprasPage/>
                         </ProtectedRoute>
                     }
                 />

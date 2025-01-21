@@ -1,4 +1,4 @@
-// src/pages/Produccion/RecetaPicker.tsx
+// src/pages/ProduccionPage/RecetaPicker.tsx
 
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import {

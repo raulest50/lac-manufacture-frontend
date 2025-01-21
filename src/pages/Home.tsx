@@ -42,9 +42,9 @@ export default function Home(){
                 {roles.includes('ROLE_MASTER') && (
                     <>
                         <SectionCard to={'/producto'}    name={'Codificar Productos'} icon={PiDownloadDuotone} />
-                        <SectionCard to={'/produccion'}  name={'Produccion'}          icon={AiOutlineAudit} />
+                        <SectionCard to={'/produccion'}  name={'ProduccionPage'}          icon={AiOutlineAudit} />
                         <SectionCard to={'/stock'}       name={'Stock'}               icon={BsDatabaseCheck} />
-                        <SectionCard to={'/proveedores'} name={'Proveedores'}         icon={FaIndustry} />
+                        <SectionCard to={'/Proveedores'} name={'Proveedores'}         icon={FaIndustry} />
                         <SectionCard to={'/compras'}     name={'Compras'}             icon={GiBuyCard} />
                     </>
                 )}
@@ -52,8 +52,8 @@ export default function Home(){
                 {/* Worker Only */}
                 {roles.includes('ROLE_WORKER') && (
                     <>
-                        <SectionCard to={'/responsable_1'} name={'Responsable 1 Produccion'} icon={IoPerson} />
-                        <SectionCard to={'/responsable_2'} name={'Responsable 2 Produccion'} icon={IoPerson} />
+                        <SectionCard to={'/responsable_1'} name={'Responsable 1 ProduccionPage'} icon={IoPerson} />
+                        <SectionCard to={'/responsable_2'} name={'Responsable 2 ProduccionPage'} icon={IoPerson} />
                     </>
                 )}
             </SimpleGrid>

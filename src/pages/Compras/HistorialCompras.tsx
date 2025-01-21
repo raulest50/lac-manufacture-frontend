@@ -36,7 +36,7 @@ interface Compra {
 const endPoints = new EndPointsURL();
 
 function HistorialCompras() {
-    // State variables for proveedores
+    // State variables for Proveedores
     const [searchType, setSearchType] = useState('nombre');
     const [searchText, setSearchText] = useState('');
     const [proveedores, setProveedores] = useState<Proveedor[]>([]);
@@ -59,7 +59,7 @@ function HistorialCompras() {
 
     const toast = useToast();
 
-    // Function to search proveedores with pagination
+    // Function to search Proveedores with pagination
     const searchProveedores = async (pageNumber = 0) => {
         setProvLoading(true);
         try {
@@ -75,10 +75,10 @@ function HistorialCompras() {
             setProvTotalPages(response.data.totalPages);
             setProvPage(response.data.number);
         } catch (error) {
-            console.error('Error fetching proveedores:', error);
+            console.error('Error fetching Proveedores:', error);
             toast({
                 title: 'Error',
-                description: 'No se pudieron obtener los proveedores.',
+                description: 'No se pudieron obtener los Proveedores.',
                 status: 'error',
                 duration: 5000,
                 isClosable: true,
@@ -159,7 +159,7 @@ function HistorialCompras() {
         fetchItemsCompra(compra.compraId);
     };
 
-    // Handle page change for proveedores
+    // Handle page change for Proveedores
     const handleProvPageChange = (newPage: number) => {
         searchProveedores(newPage);
     };
