@@ -7,6 +7,8 @@ import { AiOutlineAudit } from "react-icons/ai";
 import { FaIndustry } from "react-icons/fa";
 import { IoPerson } from "react-icons/io5";
 import { GiBuyCard } from "react-icons/gi";
+import { TbReportSearch } from "react-icons/tb";
+import { FaTruckRampBox } from "react-icons/fa6";
 
 import '@fontsource-variable/comfortaa'
 
@@ -42,10 +44,11 @@ export default function Home(){
                 {roles.includes('ROLE_MASTER') && (
                     <>
                         <SectionCard to={'/producto'}    name={'Codificar Productos'} icon={PiDownloadDuotone} />
-                        <SectionCard to={'/produccion'}  name={'ProduccionPage'}          icon={AiOutlineAudit} />
+                        <SectionCard to={'/produccion'}  name={'ProduccionPage'}      icon={AiOutlineAudit} />
                         <SectionCard to={'/stock'}       name={'Stock'}               icon={BsDatabaseCheck} />
                         <SectionCard to={'/Proveedores'} name={'Proveedores'}         icon={FaIndustry} />
                         <SectionCard to={'/compras'}     name={'Compras'}             icon={GiBuyCard} />
+                        <SectionCard to={'/informes'}    name={'Informes'}            icon={TbReportSearch} />
                     </>
                 )}
 
@@ -54,6 +57,7 @@ export default function Home(){
                     <>
                         <SectionCard to={'/responsable_1'} name={'Responsable 1 ProduccionPage'} icon={IoPerson} />
                         <SectionCard to={'/responsable_2'} name={'Responsable 2 ProduccionPage'} icon={IoPerson} />
+                        <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox} />
                     </>
                 )}
             </SimpleGrid>

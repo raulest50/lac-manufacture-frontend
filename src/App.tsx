@@ -18,6 +18,8 @@ import ProveedoresPage from "./pages/Proveedores/ProveedoresPage.tsx";
 import ComprasPage from "./pages/Compras/ComprasPage.tsx";
 import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import InformesPage from "./pages/Informes/InformesPage.tsx";
+import RecibirMercanciaPage from "./pages/RecibirMercancia/RecibirMercanciaPage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -50,6 +52,14 @@ const router = createBrowserRouter(
                     element={
                         <ProtectedRoute requiredRole="ROLE_WORKER">
                             <Responsable_2/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="recepcion_mprima"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_WORKER">
+                            <RecibirMercanciaPage/>
                         </ProtectedRoute>
                     }
                 />
@@ -95,6 +105,16 @@ const router = createBrowserRouter(
                         </ProtectedRoute>
                     }
                 />
+                <Route
+                    path="informes"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_MASTER">
+                            <InformesPage/>
+                        </ProtectedRoute>
+                    }
+                />
+
+
             </Route>
         </>
     )

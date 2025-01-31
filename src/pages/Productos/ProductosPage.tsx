@@ -20,6 +20,7 @@ function ProductosPage() {
                 </TabList>
 
                 <TabPanels>
+
                     <TabPanel>
                         <CodificarProducto />
                     </TabPanel>

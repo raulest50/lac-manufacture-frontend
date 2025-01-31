@@ -44,7 +44,7 @@ export default class EndPointsURL{
         const domain = EndPointsURL.getDomain();
 
         const productos_res = 'productos';
-        const proveedores_res = 'Proveedores';
+        const proveedores_res = 'proveedores';
         const compras_res = 'compras';
         const produccion_res = 'produccion';
         const movimientos_res = 'movimientos';

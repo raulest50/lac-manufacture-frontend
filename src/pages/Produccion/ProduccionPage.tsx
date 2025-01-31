@@ -19,10 +19,12 @@ export default function ProduccionPage(){
             <MyHeader title={'Ordenes De ProduccionPage'}/>
             
             <Tabs>
+
                 <TabList>
                     <Tab sx={my_style_tab}>Crear Orden Produccion</Tab>
                     <Tab sx={my_style_tab}>Historial</Tab>
                 </TabList>
+
                 <TabPanels>
 
                     <TabPanel>
