@@ -1,5 +1,3 @@
-
-
 import { useState } from 'react';
 import {
     Container,
@@ -11,21 +9,19 @@ import {
     Textarea,
     useToast,
 } from "@chakra-ui/react";
-
 import axios, { AxiosError } from 'axios';
 import EndPointsURL from "../../api/EndPointsURL.tsx";
 
 const endPoints = new EndPointsURL();
 
-
 function RegistrarProveedor() {
-    // Declaración de estados para cada campo
+    // State declarations for each field
     const [id, setId] = useState('');
     const [nombre, setNombre] = useState('');
     const [direccion, setDireccion] = useState('');
     const [ciudad, setCiudad] = useState('');
     const [departamento, setDepartamento] = useState('');
-    const [contacto, setContacto] = useState('');
+    const [contacto, setContacto] = useState(''); // This will be mapped to "nombreContacto"
     const [telefono, setTelefono] = useState('');
     const [email, setEmail] = useState('');
     const [url, setUrl] = useState('');
@@ -33,11 +29,7 @@ function RegistrarProveedor() {
 
     const toast = useToast();
 
-    // Función para manejar el envío del formulario
-
-
-
-    // Función para validar los datos del proveedor
+    // Function to validate required fields
     const validarProveedor = () => {
         if (!id || !nombre) {
             toast({
@@ -49,25 +41,27 @@ function RegistrarProveedor() {
             });
             return false;
         }
-        // Puedes agregar más validaciones aquí según tus necesidades
         return true;
     };
 
-    // Función mejorada usando axios y async/await
-    const handleSubmit = async () => {
+    // Submit handler using axios and async/await
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
         if (!validarProveedor()) {
             return;
         }
 
-        // Crear objeto con los datos del proveedor
+        // Create the payload using the expected property names:
+        // - Convert "id" to a number with parseInt
+        // - Map "contacto" to "nombreContacto"
         const nuevoProveedor = {
-            id,
+            id: parseInt(id),
             nombre,
             direccion,
             ciudad,
             departamento,
-            contacto,
+            nombreContacto: contacto,
             telefono,
             email,
             url,
@@ -86,7 +80,7 @@ function RegistrarProveedor() {
                 isClosable: true,
             });
 
-            // Reiniciar campos del formulario
+            // Reset the form fields
             setId('');
             setNombre('');
             setDireccion('');
@@ -101,7 +95,7 @@ function RegistrarProveedor() {
             const err = error as AxiosError;
             console.error('Error al registrar el proveedor:', error);
             if (err.response && err.response.status === 409) {
-                // Manejo de error si el NIT ya existe
+                // Handle error if the Nit already exists
                 toast({
                     title: 'Error al registrar',
                     description: 'Ya existe un proveedor con el NIT proporcionado.',
@@ -121,12 +115,8 @@ function RegistrarProveedor() {
         }
     };
 
-
-
-
-
     return (
-        <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
+        <Container minW={['auto', 'container.lg', 'container.xl']} w="full" h="full">
             <VStack
                 as="form"
                 spacing={4}
@@ -134,13 +124,12 @@ function RegistrarProveedor() {
                 onSubmit={handleSubmit}
                 align="stretch"
             >
-
                 <FormControl isRequired>
                     <FormLabel>Nit</FormLabel>
                     <Input
                         value={id}
                         onChange={(e) => setId(e.target.value)}
-                        placeholder="Nit o identificacion del proveedor"
+                        placeholder="Nit o identificación del proveedor"
                     />
                 </FormControl>
 
@@ -227,7 +216,7 @@ function RegistrarProveedor() {
                     />
                 </FormControl>
 
-                <Button onClick={() => handleSubmit()} colorScheme="blue" alignSelf="flex-end">
+                <Button type="submit" colorScheme="blue" alignSelf="flex-end">
                     Registrar Proveedor
                 </Button>
             </VStack>

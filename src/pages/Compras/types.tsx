@@ -3,7 +3,15 @@
 export interface Proveedor {
     id: number;
     nombre: string;
-    // Add other fields as needed
+    direccion: string;
+    ciudad: string;
+    departamento: string;
+    nombreContacto: string;
+    telefono: string;
+    email: string;
+    url: string;
+    observacion: string;
+    fechaRegistro: string;
 }
 
 export interface MiItem {

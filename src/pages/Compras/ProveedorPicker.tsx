@@ -1,3 +1,5 @@
+// ProveedorPicker.tsx
+
 import React, { useState } from 'react';
 import {
     Box,
@@ -23,18 +25,14 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from "../../api/EndPointsURL.tsx";
+import { Proveedor } from "./types"; // Import the full Proveedor type
 
 const endPoints = new EndPointsURL();
-
-interface Proveedor {
-    id: number;
-    nombre: string;
-}
 
 interface ProveedorPickerProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelectProveedor: (nit: string) => void;
+    onSelectProveedor: (proveedor: Proveedor) => void;
 }
 
 const ProveedorPicker: React.FC<ProveedorPickerProps> = ({
@@ -68,11 +66,9 @@ const ProveedorPicker: React.FC<ProveedorPickerProps> = ({
 
     const handleConfirm = () => {
         if (selectedProveedorId !== null) {
-            const selectedProveedor = proveedores.find(
-                (p) => p.id === selectedProveedorId
-            );
-            if (selectedProveedor) {
-                onSelectProveedor(selectedProveedor.id.toString());
+            const proveedor = proveedores.find((p) => p.id === selectedProveedorId);
+            if (proveedor) {
+                onSelectProveedor(proveedor); // Pass the full proveedor object
             }
         }
         onClose();
@@ -107,7 +103,7 @@ const ProveedorPicker: React.FC<ProveedorPickerProps> = ({
                         </FormControl>
                         <Box w="full">
                             <RadioGroup
-                                value={selectedProveedorId ? selectedProveedorId.toString() : ''}
+                                value={selectedProveedorId !== null ? selectedProveedorId.toString() : ''}
                                 onChange={(value) => setSelectedProveedorId(parseInt(value))}
                             >
                                 <List spacing={2}>
