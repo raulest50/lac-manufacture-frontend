@@ -1,5 +1,4 @@
-// src/models/types.ts
-
+// ./types.tsx
 export interface Proveedor {
     id: number;
     nombre: string;
@@ -14,33 +13,53 @@ export interface Proveedor {
     fechaRegistro: string;
 }
 
-export interface MiItem {
+export interface MateriaPrima {
     productoId: number;
-    tipo_producto: string;
     nombre: string;
-    observaciones: string;
     costo: number;
-    tipoUnidades: string;
-    cantidadUnidad: string;
-    fechaCreacion: string;
-    cantidadRequerida?: string; // Optional, since it might not be present
+    // add other properties if needed
 }
 
-export interface ItemCompra {
-    materiaPrima: MiItem;
-    cantidad: string; // Using string to match the input field value
-    precioCompra: string; // Using string to match the input field value
+export interface ItemOrdenCompra {
+    // The selected MateriaPrima is wrapped here.
+    materiaPrima: MateriaPrima;
+    cantidad: number;
+    precioUnitario: number;
+    iva19: number;
+    subTotal: number;
+    /**
+     * 0: aún por revisar
+     * 1: si concuerda
+     * -1: no concuerda
+     */
+    cantidadCorrecta: number;
+    /**
+     * 0: aún por revisar
+     * 1: si concuerda
+     * -1: no concuerda
+     */
+    precioCorrecto: number;
 }
 
-export interface Compra {
+export interface OrdenCompra {
+    // The backend generates this id
+    ordenCompraId?: number;
+    fechaEmision?: string;
+    fechaVencimiento?: string;
     proveedor: Proveedor;
+    itemOrdenCompra: ItemOrdenCompra[];
+    subTotal: number;
+    iva19: number;
+    totalPagar: number;
+    condicionPago: string;
+    tiempoEntrega: string;
+    plazo_pago: number;
+    /**
+     * -1: cancelada
+     *  0: pendiente aprobación proveedor
+     *  1: pendiente revisión precio
+     *  2: pendiente conteo
+     *  3: cerrada con éxito
+     */
     estado: number;
-    itemsCompra: {
-        materiaPrima: {
-            productoId: number;
-            tipo_producto: string;
-        };
-        cantidad: number;
-        precioCompra: number;
-    }[];
 }

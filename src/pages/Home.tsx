@@ -44,7 +44,7 @@ export default function Home(){
                 {roles.includes('ROLE_MASTER') && (
                     <>
                         <SectionCard to={'/producto'}    name={'Codificar Productos'} icon={PiDownloadDuotone} />
-                        <SectionCard to={'/produccion'}  name={'ProduccionPage'}      icon={AiOutlineAudit} />
+                        <SectionCard to={'/produccion'}  name={'Produccion'}      icon={AiOutlineAudit} />
                         <SectionCard to={'/stock'}       name={'Stock'}               icon={BsDatabaseCheck} />
                         <SectionCard to={'/Proveedores'} name={'Proveedores'}         icon={FaIndustry} />
                         <SectionCard to={'/compras'}     name={'Compras'}             icon={GiBuyCard} />

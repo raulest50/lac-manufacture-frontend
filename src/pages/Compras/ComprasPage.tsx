@@ -5,7 +5,6 @@ import {
 } from '@chakra-ui/react';
 
 import MyHeader from '../../components/MyHeader';
-import RegistrarCompras from "./RegistrarCompras.tsx";
 import HistorialCompras from "./HistorialCompras.tsx";
 import {my_style_tab} from "../../styles/styles_general.tsx";
 import CrearOrdenCompra from "./CrearOrdenCompra.tsx";
@@ -27,10 +26,6 @@ function ComprasPage() {
                 <TabPanels>
                     <TabPanel>
                         <CrearOrdenCompra/>
-                    </TabPanel>
-
-                    <TabPanel>
-                        <RegistrarCompras/>
                     </TabPanel>
 
                     <TabPanel>

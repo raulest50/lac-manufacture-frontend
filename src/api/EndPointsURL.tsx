@@ -29,6 +29,8 @@ export default class EndPointsURL{
     public byProveedorAndDate:string;
     public get_compra_items_by_compra_id:string
 
+    public save_orden_compra: string;
+
 
     // movimientos resource
     public search_products_with_stock:string;
@@ -66,6 +68,7 @@ export default class EndPointsURL{
         this.save_compra = `${domain}/${compras_res}/save`;
         this.byProveedorAndDate = `${domain}/${compras_res}/byProveedorAndDate`;
         this.get_compra_items_by_compra_id = `${domain}/${compras_res}/{compraId}/items`;
+        this.save_orden_compra = `${domain}/${compras_res}/save_orden_compra`;
 
         // produccion endpoints
         this.save_produccion = `${domain}/${produccion_res}/save`;

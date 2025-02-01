@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import DateRangePicker from '../../components/DateRangePicker';
-import CompraItemsDialog from './CompraItemsDialog';
+import CompraItemsDialog from './components/CompraItemsDialog.tsx';
 import MyPagination from '../../components/MyPagination';
 import EndPointsURL from "../../api/EndPointsURL.tsx";
 

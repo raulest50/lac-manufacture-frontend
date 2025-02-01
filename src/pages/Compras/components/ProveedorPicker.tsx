@@ -24,8 +24,8 @@ import {
     RadioGroup,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import EndPointsURL from "../../api/EndPointsURL.tsx";
-import { Proveedor } from "./types"; // Import the full Proveedor type
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
+import { Proveedor } from "../types.tsx"; // Import the full Proveedor type
 
 const endPoints = new EndPointsURL();
 

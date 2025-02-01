@@ -1,5 +1,4 @@
-// src/components/MateriaPrimaPicker.tsx
-
+// ./MateriaPrimaPicker.tsx
 import React, { useState } from 'react';
 import {
     Box,
@@ -25,15 +24,15 @@ import {
     Select,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import { MiItem } from './types.tsx';
-import EndPointsURL from "../../api/EndPointsURL.tsx";
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
+import { MateriaPrima } from '../types.tsx';
 
 const endPoints = new EndPointsURL();
 
 interface MateriaPrimaPickerProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelectMateriaPrima: (materiaPrima: MiItem) => void;
+    onSelectMateriaPrima: (materiaPrima: MateriaPrima) => void;
 }
 
 const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
@@ -43,21 +42,22 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
                                                                }) => {
     const [searchText, setSearchText] = useState('');
     const [tipoBusqueda, setTipoBusqueda] = useState('NOMBRE'); // 'NOMBRE' or 'ID'
-    const [materiasPrimas, setMateriasPrimas] = useState<MiItem[]>([]);
+    const [materiasPrimas, setMateriasPrimas] = useState<MateriaPrima[]>([]);
     const [selectedMateriaPrimaId, setSelectedMateriaPrimaId] = useState<number | null>(null);
     const toast = useToast();
 
     const handleSearch = async () => {
         try {
             const response = await axios.get(endPoints.search_mprima, {
-                params: { search: searchText, tipoBusqueda: tipoBusqueda },
+                params: { search: searchText, tipoBusqueda },
             });
-            const updatedMateriasPrimas = response.data.content.map((item: MiItem) => ({
+            // Assuming the endpoint returns an object with a "content" array:
+            const updatedMateriasPrimas = response.data.content.map((item: MateriaPrima) => ({
                 ...item,
-                tipo_producto: 'M', // Ensure tipo_producto is set
+                // Optionally adjust properties if needed.
             }));
             setMateriasPrimas(updatedMateriasPrimas);
-            setSelectedMateriaPrimaId(null); // Reset selection on new search
+            setSelectedMateriaPrimaId(null);
         } catch (error) {
             console.error('Error searching materias primas:', error);
             toast({
@@ -122,26 +122,16 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
                         </FormControl>
                         <Box w="full">
                             <RadioGroup
-                                value={
-                                    selectedMateriaPrimaId
-                                        ? selectedMateriaPrimaId.toString()
-                                        : ''
-                                }
-                                onChange={(value) =>
-                                    setSelectedMateriaPrimaId(parseInt(value))
-                                }
+                                value={selectedMateriaPrimaId !== null ? selectedMateriaPrimaId.toString() : ''}
+                                onChange={(value) => setSelectedMateriaPrimaId(parseInt(value))}
                             >
                                 <List spacing={2}>
                                     {materiasPrimas.map((materiaPrima) => (
-                                        <ListItem
-                                            key={materiaPrima.productoId}
-                                            borderBottom="1px solid #ccc"
-                                        >
+                                        <ListItem key={materiaPrima.productoId} borderBottom="1px solid #ccc">
                                             <HStack>
                                                 <Radio value={materiaPrima.productoId.toString()} />
                                                 <Text>
-                                                    ID: {materiaPrima.productoId} -{' '}
-                                                    {materiaPrima.nombre}
+                                                    ID: {materiaPrima.productoId} - {materiaPrima.nombre}
                                                 </Text>
                                             </HStack>
                                         </ListItem>

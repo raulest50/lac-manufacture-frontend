@@ -13,7 +13,7 @@ import {
     Text,
 } from "@chakra-ui/react";
 import { FaSearch } from "react-icons/fa";
-import { Proveedor } from "./types"; // Adjust path if needed
+import { Proveedor } from "../types.tsx"; // Adjust path if needed
 
 interface ProveedorCardProps {
     selectedProveedor: Proveedor | null;
