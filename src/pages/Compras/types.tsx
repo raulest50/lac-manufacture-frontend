@@ -15,6 +15,7 @@ export interface Proveedor {
 
 export interface MateriaPrima {
     productoId: number;
+    tipo_producto: string;
     nombre: string;
     costo: number;
     // add other properties if needed
@@ -47,7 +48,7 @@ export interface OrdenCompra {
     fechaEmision?: string;
     fechaVencimiento?: string;
     proveedor: Proveedor;
-    itemOrdenCompra: ItemOrdenCompra[];
+    itemsOrdenCompra: ItemOrdenCompra[];
     subTotal: number;
     iva19: number;
     totalPagar: number;

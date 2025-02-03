@@ -23,7 +23,7 @@ export default function CrearOrdenCompra() {
         const newItem: ItemOrdenCompra = {
             materiaPrima: materia,
             cantidad: 0,
-            precioUnitario: 0,
+            precioUnitario: materia.costo,
             iva19: 0,
             subTotal: 0,
             cantidadCorrecta: 0,
@@ -53,6 +53,7 @@ export default function CrearOrdenCompra() {
         item.subTotal = item.cantidad * item.precioUnitario;
         newList[index] = item;
         setListaItemsOrdenCompra(newList);
+        console.log(listaItemsOrdenCompra);
     };
 
     // Called when the user clicks "Crear Orden de Compra"
@@ -87,7 +88,7 @@ export default function CrearOrdenCompra() {
 
         const nuevaOrdenCompra: OrdenCompra = {
             proveedor: selectedProveedor,
-            itemOrdenCompra: listaItemsOrdenCompra,
+            itemsOrdenCompra: listaItemsOrdenCompra,
             subTotal: subTotal,
             iva19: iva19,
             totalPagar: totalPagar,
@@ -161,7 +162,10 @@ export default function CrearOrdenCompra() {
             <MateriaPrimaPicker
                 isOpen={isMateriaPrimaPickerOpen}
                 onClose={() => setIsMateriaPrimaPickerOpen(false)}
-                onSelectMateriaPrima={handleAddMateriaPrima}
+                onSelectMateriaPrima={ (materia: MateriaPrima) => {
+                    handleAddMateriaPrima(materia);
+                    }
+                }
             />
         </Container>
     );
