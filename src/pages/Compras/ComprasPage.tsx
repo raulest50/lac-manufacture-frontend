@@ -5,9 +5,9 @@ import {
 } from '@chakra-ui/react';
 
 import MyHeader from '../../components/MyHeader';
-import HistorialCompras from "./HistorialCompras.tsx";
 import {my_style_tab} from "../../styles/styles_general.tsx";
 import CrearOrdenCompra from "./CrearOrdenCompra.tsx";
+import ReporteOrdenesCompras from "./ReporteOrdenesCompras.tsx";
 
 function ComprasPage() {
 
@@ -19,8 +19,7 @@ function ComprasPage() {
             <Tabs>
                 <TabList>
                     <Tab sx={my_style_tab}>Generar Orden de Compra</Tab>
-                    <Tab sx={my_style_tab}>Registrar Compras</Tab>
-                    <Tab sx={my_style_tab}>Historial Compras</Tab>
+                    <Tab sx={my_style_tab}>Reportes</Tab>
                 </TabList>
 
                 <TabPanels>
@@ -29,8 +28,9 @@ function ComprasPage() {
                     </TabPanel>
 
                     <TabPanel>
-                        <HistorialCompras/>
+                        <ReporteOrdenesCompras/>
                     </TabPanel>
+
                 </TabPanels>
             </Tabs>
 
