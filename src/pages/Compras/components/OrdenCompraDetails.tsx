@@ -16,7 +16,7 @@ import {
     Tbody,
     Tr,
     Th,
-    Td
+    Td, Tfoot
 } from '@chakra-ui/react';
 import { OrdenCompra } from '../types';
 
@@ -52,7 +52,7 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                         <Text><strong>Estado:</strong> {orden.estado}</Text>
                         <Text><strong>Condición de Pago:</strong> {orden.condicionPago}</Text>
                         <Text><strong>Tiempo de Entrega:</strong> {orden.tiempoEntrega}</Text>
-                        <Text><strong>Plazo de Pago:</strong> {orden.plazo_pago}</Text>
+                        <Text><strong>Plazo de Pago:</strong> {orden.plazoPago}</Text>
                     </Box>
                     <Box>
                         <Text fontWeight="bold" mb={2}>Items de la Orden</Text>
@@ -84,6 +84,32 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                                         </Tr>
                                     ))}
                                 </Tbody>
+                                <Tfoot>
+                                    <Tr>
+                                        <Td colSpan={4} textAlign="right">
+                                            <strong>SubTotal:</strong>
+                                        </Td>
+                                        <Td isNumeric colSpan={3}>
+                                            {orden.subTotal}
+                                        </Td>
+                                    </Tr>
+                                    <Tr>
+                                        <Td colSpan={4} textAlign="right">
+                                            <strong>IVA (19%):</strong>
+                                        </Td>
+                                        <Td isNumeric colSpan={3}>
+                                            {orden.iva19}
+                                        </Td>
+                                    </Tr>
+                                    <Tr>
+                                        <Td colSpan={4} textAlign="right">
+                                            <strong>Total a Pagar:</strong>
+                                        </Td>
+                                        <Td isNumeric colSpan={3}>
+                                            {orden.totalPagar}
+                                        </Td>
+                                    </Tr>
+                                </Tfoot>
                             </Table>
                         ) : (
                             <Text>No hay items en esta orden.</Text>

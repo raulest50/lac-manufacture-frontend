@@ -1,4 +1,4 @@
-// ListaOrdenesCompra.tsx
+// src/components/ListaOrdenesCompra.tsx
 import React, { useState } from 'react';
 import {
     Table,
@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { OrdenCompra } from '../types';
 import OrdenCompraDetails from './OrdenCompraDetails';
+import PdfGenerator from "../pdfGenerator";
 
 interface ListaOrdenesCompraProps {
     ordenes: OrdenCompra[];
@@ -44,8 +45,10 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
     };
 
     const handleGenerarPDF = () => {
-        // For now, just show an alert (or do nothing)
-        alert('Generar PDF clicked');
+        if (contextMenu) {
+            // This will create and download the PDF
+            new PdfGenerator(contextMenu.orden);
+        }
         setContextMenu(null);
     };
 

@@ -47,7 +47,7 @@ export interface OrdenCompra {
     // The backend generates this id
     ordenCompraId?: number;
     fechaEmision?: string;
-    fechaVencimiento?: string;
+    fechaVencimiento: string;
     proveedor: Proveedor;
     itemsOrdenCompra: ItemOrdenCompra[];
     subTotal: number;
@@ -55,7 +55,7 @@ export interface OrdenCompra {
     totalPagar: number;
     condicionPago: string;
     tiempoEntrega: string;
-    plazo_pago: number;
+    plazoPago: number;
     /**
      * -1: cancelada
      *  0: pendiente aprobación proveedor

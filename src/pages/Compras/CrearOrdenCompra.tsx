@@ -7,7 +7,7 @@ import EndPointsURL from '../../api/EndPointsURL';
 import ProveedorPicker from './components/ProveedorPicker.tsx';
 import ProveedorCard from './components/ProveedorCard.tsx';
 import MateriaPrimaPicker from './components/MateriaPrimaPicker.tsx';
-import OrdenCompraItems from './components/OrdenCompraItems.tsx';
+import ListaOrdenCompraItems from './components/ListaOrdenCompraItems.tsx';
 import MyDatePicker from "../../components/MyDatePicker.tsx";
 import {format} from "date-fns";
 
@@ -38,6 +38,12 @@ export default function CrearOrdenCompra() {
         );
         setTotalPagar(subTotal + iva19);
     }
+
+    const clearAll = () =>{
+        setSelectedProveedor(null);
+        setListaItemsOrdenCompra([]);
+        updateTotales();
+    };
 
     // When a MateriaPrima is selected from the picker, create an ItemOrdenCompra with default numeric values.
     const handleAddMateriaPrima = (materia: MateriaPrima) => {
@@ -72,6 +78,7 @@ export default function CrearOrdenCompra() {
         }
         // Recalculate subTotal = cantidad * precioUnitario
         item.subTotal = item.cantidad * item.precioUnitario;
+        item.iva19 = Math.round(item.subTotal * 0.19);
         newList[index] = item;
         setListaItemsOrdenCompra(newList);
         updateTotales();
@@ -105,13 +112,14 @@ export default function CrearOrdenCompra() {
 
         const nuevaOrdenCompra: OrdenCompra = {
             proveedor: selectedProveedor,
+            fechaVencimiento: fechaVencimiento + "T00:00:00",
             itemsOrdenCompra: listaItemsOrdenCompra,
             subTotal: subTotal,
             iva19: iva19,
             totalPagar: totalPagar,
             condicionPago: condicionPago,    // Adjust as needed
             tiempoEntrega: tiempoEntrega,
-            plazo_pago: plazoPago,
+            plazoPago: plazoPago,
             estado: 0,            // 0 = pendiente aprobación proveedor
         };
 
@@ -131,8 +139,7 @@ export default function CrearOrdenCompra() {
                 isClosable: true,
             });
             // Optionally, clear the form:
-            // setSelectedProveedor(null);
-            // setListaItemsOrdenCompra([]);
+            clearAll();
         } catch (error) {
             console.error(error);
             toast({
@@ -163,7 +170,11 @@ export default function CrearOrdenCompra() {
                             <FormLabel> Condicion de Pago</FormLabel>
                             <Select
                                 value={condicionPago}
-                                onChange={(e) => setCondicionPago(e.target.value)}
+                                onChange={(e) => {
+                                    setCondicionPago(e.target.value)
+                                    if(e.target.value == "1") setPlazoPago(0);
+                                    }
+                                }
                                 ml={4}
                                 width="200px"
                             >
@@ -203,7 +214,7 @@ export default function CrearOrdenCompra() {
                     Agregar Materia Prima
                 </Button>
 
-                <OrdenCompraItems
+                <ListaOrdenCompraItems
                     items={listaItemsOrdenCompra}
                     onRemoveItem={handleRemoveItem}
                     onUpdateItem={handleUpdateItem}
