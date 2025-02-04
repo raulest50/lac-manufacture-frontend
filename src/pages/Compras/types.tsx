@@ -22,6 +22,7 @@ export interface MateriaPrima {
 }
 
 export interface ItemOrdenCompra {
+    itemOrdenId?: number;
     // The selected MateriaPrima is wrapped here.
     materiaPrima: MateriaPrima;
     cantidad: number;

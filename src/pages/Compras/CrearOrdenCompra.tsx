@@ -1,6 +1,6 @@
 // ./CrearOrdenCompra.tsx
 import { useState } from 'react';
-import { Button, Container, Flex, useToast } from '@chakra-ui/react';
+import {Button, Container, Flex, FormControl, FormLabel, Input, Select, useToast, } from '@chakra-ui/react';
 import axios from 'axios';
 import { Proveedor, MateriaPrima, ItemOrdenCompra, OrdenCompra } from './types';
 import EndPointsURL from '../../api/EndPointsURL';
@@ -8,6 +8,8 @@ import ProveedorPicker from './components/ProveedorPicker.tsx';
 import ProveedorCard from './components/ProveedorCard.tsx';
 import MateriaPrimaPicker from './components/MateriaPrimaPicker.tsx';
 import OrdenCompraItems from './components/OrdenCompraItems.tsx';
+import MyDatePicker from "../../components/MyDatePicker.tsx";
+import {format} from "date-fns";
 
 const endPoints = new EndPointsURL();
 
@@ -17,6 +19,25 @@ export default function CrearOrdenCompra() {
     const [isMateriaPrimaPickerOpen, setIsMateriaPrimaPickerOpen] = useState(false);
     const [listaItemsOrdenCompra, setListaItemsOrdenCompra] = useState<ItemOrdenCompra[]>([]);
     const toast = useToast();
+
+    const [plazoPago, setPlazoPago] = useState(30);
+    const [condicionPago, setCondicionPago] = useState("0");
+    const [tiempoEntrega, setTiempoEntrega] = useState("15");
+    const [fechaVencimiento, setFechaVencimiento] = useState(format(new Date(), "yyyy-MM-dd"));
+
+    const [subTotal, setSubTotal] = useState(0);
+    const [iva19, setIva19] = useState(0);
+    const [totalPagar, setTotalPagar] = useState(0);
+
+    const updateTotales = () => {
+        setSubTotal(listaItemsOrdenCompra.reduce((sum, item) => sum + item.subTotal, 0));
+        setIva19(
+            Math.round(
+                listaItemsOrdenCompra.reduce((sum, item) => sum + item.subTotal * 0.19, 0)
+            )
+        );
+        setTotalPagar(subTotal + iva19);
+    }
 
     // When a MateriaPrima is selected from the picker, create an ItemOrdenCompra with default numeric values.
     const handleAddMateriaPrima = (materia: MateriaPrima) => {
@@ -53,7 +74,7 @@ export default function CrearOrdenCompra() {
         item.subTotal = item.cantidad * item.precioUnitario;
         newList[index] = item;
         setListaItemsOrdenCompra(newList);
-        console.log(listaItemsOrdenCompra);
+        updateTotales();
     };
 
     // Called when the user clicks "Crear Orden de Compra"
@@ -80,11 +101,7 @@ export default function CrearOrdenCompra() {
         }
 
         // Calculate subTotal, IVA (19%), and totalPagar
-        const subTotal = listaItemsOrdenCompra.reduce((sum, item) => sum + item.subTotal, 0);
-        const iva19 = Math.round(
-            listaItemsOrdenCompra.reduce((sum, item) => sum + item.subTotal * 0.19, 0)
-        );
-        const totalPagar = subTotal + iva19;
+        updateTotales();
 
         const nuevaOrdenCompra: OrdenCompra = {
             proveedor: selectedProveedor,
@@ -92,9 +109,9 @@ export default function CrearOrdenCompra() {
             subTotal: subTotal,
             iva19: iva19,
             totalPagar: totalPagar,
-            condicionPago: '',    // Adjust as needed
-            tiempoEntrega: '',
-            plazo_pago: 0,
+            condicionPago: condicionPago,    // Adjust as needed
+            tiempoEntrega: tiempoEntrega,
+            plazo_pago: plazoPago,
             estado: 0,            // 0 = pendiente aprobación proveedor
         };
 
@@ -131,10 +148,56 @@ export default function CrearOrdenCompra() {
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w="full" h="full">
             <Flex direction="column" p={0} m={0} w="full" h="full">
+
                 <ProveedorCard
                     selectedProveedor={selectedProveedor}
                     onSearchClick={() => setIsProveedorPickerOpen(true)}
                 />
+
+
+                <Flex direction={"column"} mt={"1em"} w="full" h="full" gap={"2"} p={"1em"}>
+
+                    <Flex direction={"row"} gap={"2"} >
+
+                        <FormControl>
+                            <FormLabel> Condicion de Pago</FormLabel>
+                            <Select
+                                value={condicionPago}
+                                onChange={(e) => setCondicionPago(e.target.value)}
+                                ml={4}
+                                width="200px"
+                            >
+                                <option value="0">Credito</option>
+                                <option value="1">Contado</option>
+                            </Select>
+                        </FormControl>
+
+                        <FormControl isRequired={condicionPago == "0"} isDisabled={condicionPago == "1"}>
+                            <FormLabel>Plazo de pago (dias)</FormLabel>
+                            <Input
+                                value={plazoPago}
+                                onChange={ (e) => {setPlazoPago(Number(e.target.value))} }
+                            />
+                        </FormControl>
+
+                        <FormControl isRequired>
+                            <FormLabel>Tiempo de entrega (dias)</FormLabel>
+                            <Input
+                                value={tiempoEntrega}
+                                onChange={ (e) => {setTiempoEntrega(e.target.value)} }
+                            />
+                        </FormControl>
+
+                        <MyDatePicker
+                            date = {fechaVencimiento}
+                            setDate = {setFechaVencimiento}
+                            defaultDate = {format(new Date(), "yyyy-MM-dd")}
+                            label = {"Fecha de Vencimiento Orden"}
+                        />
+
+                    </Flex>
+
+                </Flex>
 
                 <Button onClick={() => setIsMateriaPrimaPickerOpen(true)}>
                     Agregar Materia Prima
