@@ -3,6 +3,7 @@ export interface Proveedor {
     id: number;
     nombre: string;
     direccion: string;
+    regimenTributario: number;
     ciudad: string;
     departamento: string;
     nombreContacto: string;

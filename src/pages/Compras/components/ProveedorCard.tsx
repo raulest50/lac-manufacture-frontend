@@ -42,17 +42,26 @@ const ProveedorCard: React.FC<ProveedorCardProps> = ({
             </CardHeader>
             <Divider />
             <CardBody>
-                <VStack alignItems="start">
-                    <Text pt="2" fontSize="sm">
-                        Nit: {selectedProveedor ? selectedProveedor.id : ""}
-                    </Text>
-                    <Text pt="2" fontSize="sm">
-                        Tel: {selectedProveedor ? selectedProveedor.telefono : ""}
-                    </Text>
-                    <Text pt="2" fontSize="sm">
-                        Ciudad: {selectedProveedor ? selectedProveedor.ciudad : ""}
-                    </Text>
-                </VStack>
+                <HStack>
+                    <VStack alignItems="start">
+                        <Text pt="2" fontSize="sm">
+                            Nit: {selectedProveedor ? selectedProveedor.id : ""}
+                        </Text>
+                        <Text pt="2" fontSize="sm">
+                            Tel: {selectedProveedor ? selectedProveedor.telefono : ""}
+                        </Text>
+                        <Text pt="2" fontSize="sm">
+                            Ciudad: {selectedProveedor ? selectedProveedor.ciudad : ""}
+                        </Text>
+                    </VStack>
+
+                    <VStack alignItems="start">
+                        <Text pt="2" fontSize="sm">
+                            RegimenTributario: {selectedProveedor ? selectedProveedor.regimenTributario : ""}
+                        </Text>
+                    </VStack>
+
+                </HStack>
             </CardBody>
         </Card>
     );

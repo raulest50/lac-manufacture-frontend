@@ -33,6 +33,7 @@ export interface SemiTermi {
 }
 
 export interface MateriaPrima {
+    productoId?: string;
     nombre: string;
     observaciones: string;
     costo: string;

@@ -15,6 +15,7 @@ function CodificarProducto() {
     const [observaciones, setObservaciones] = useState('');
     const [tipo_unidad, setTipo_unidad] = useState(UNIDADES.KG);
     const [cantidad_unidad, setCantidad_unidad] = useState('');
+    const [codigo, setCodigo] = useState('');
 
     const toast = useToast();
 
@@ -23,10 +24,12 @@ function CodificarProducto() {
         setCosto('');
         setObservaciones('');
         setCantidad_unidad('');
+        setCodigo('');
     };
 
     const saveMateriaPrimSubmit = async () => {
         const materiaPrima: MateriaPrima = {
+            productoId: codigo,
             nombre,
             observaciones,
             costo,
@@ -41,6 +44,18 @@ function CodificarProducto() {
         <>
             <VStack w="full" h="full" spacing={4}>
                 <SimpleGrid w="full" h="full" columns={3} gap="2em">
+
+                    <GridItem colSpan={1}>
+                        <FormControl>
+                            <FormLabel>Codigo</FormLabel>
+                            <Input
+                                value={codigo}
+                                onChange={(e) => setCodigo(e.target.value)}
+                                sx={input_style}
+                            />
+                        </FormControl>
+                    </GridItem>
+
                     <GridItem colSpan={2}>
                         <FormControl>
                             <FormLabel>Descripcion</FormLabel>

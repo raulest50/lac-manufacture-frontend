@@ -7,7 +7,7 @@ import {
     VStack,
     Button,
     Textarea,
-    useToast,
+    useToast, Select,
 } from "@chakra-ui/react";
 import axios, { AxiosError } from 'axios';
 import EndPointsURL from "../../api/EndPointsURL.tsx";
@@ -26,6 +26,7 @@ function RegistrarProveedor() {
     const [email, setEmail] = useState('');
     const [url, setUrl] = useState('');
     const [observacion, setObservacion] = useState('');
+    const [regimenTributario, setRegimenTributario] = useState(0);
 
     const toast = useToast();
 
@@ -59,6 +60,7 @@ function RegistrarProveedor() {
             id: parseInt(id),
             nombre,
             direccion,
+            regimen_tributario: regimenTributario,
             ciudad,
             departamento,
             nombreContacto: contacto,
@@ -149,6 +151,19 @@ function RegistrarProveedor() {
                         onChange={(e) => setDireccion(e.target.value)}
                         placeholder="Dirección del proveedor"
                     />
+                </FormControl>
+
+                <FormControl>
+                    <FormLabel>Regimen Tributario</FormLabel>
+                    <Select
+                        flex="1"
+                        value={regimenTributario}
+                        onChange={(e) => setRegimenTributario(Number(e.target.value))}
+                    >
+                        <option value={0}>{"Regimen Comun"}</option>
+                        <option value={1}>{"Regimen Simplificado"}</option>
+                        <option value={2}>{"Regimen Especial"}</option>
+                    </Select>
                 </FormControl>
 
                 <FormControl>

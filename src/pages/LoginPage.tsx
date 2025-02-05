@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import {Button, Container, Flex, FormControl, FormLabel, Heading, Input} from "@chakra-ui/react";
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -22,28 +23,34 @@ export default function LoginPage() {
     };
 
     return (
-        <div style={{ padding: 20 }}>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <input
+        <Container minW={['auto', 'container.md', 'container.md']} w={"full"} h={"full"}>
+            <Flex direction={"column"} gap={7} border={"0.5px solid gray"} borderRadius={"2em"} p={"4em"}>
+                <Heading>Exotic Manufacture Login</Heading>
+                <FormControl isRequired>
+                    <FormLabel>Usuario</FormLabel>
+                    <Input
                         placeholder="username"
                         value={username}
                         onChange={e => setUsername(e.target.value)}
-                        required
                     />
-                </div>
-                <div>
-                    <input
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Contraseña</FormLabel>
+                    <Input
                         placeholder="password"
                         type="password"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         required
                     />
-                </div>
-                <button type="submit">Login</button>
-            </form>
-        </div>
+                </FormControl>
+                <Button
+                    variant="solid"
+                    colorScheme={"blue"}
+                    onClick={handleLogin}
+                >Login
+                </Button>
+            </Flex>
+        </Container>
     );
 }
