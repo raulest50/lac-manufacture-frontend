@@ -23,8 +23,8 @@ export function getRegimenTributario(regimen: number) {
 export function getEstadoText(estado: number){
     if(estado == -1) return "Cancelada";
     if(estado == 0) return "Pendiente confirmacion proveedor";
-    if(estado == 1) return "Pendiente recepcion y verificacion de precios negociadas";
-    if(estado == 2) return "Pendiente recepcion y verificacion de cantidades negociadas";
+    if(estado == 1) return "Pendiente recepcion y verificacion precios";
+    if(estado == 2) return "Pendiente recepcion y verificacion cantidades";
     if(estado == 3) return "Cerrada exitosamente";
 }
 

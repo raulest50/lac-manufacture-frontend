@@ -14,6 +14,7 @@ import {getEstadoText, OrdenCompra} from '../types';
 import OrdenCompraDetails from './OrdenCompraDetails';
 import PdfGenerator from "../pdfGenerator";
 import CancelarOrdenDialog from './CancelarOrdenDialog';
+import ActualizarEstadoOrdenCompraDialog from "./ActualizarEstadoOrdenCompraDialog.tsx";
 
 interface ListaOrdenesCompraProps {
     ordenes: OrdenCompra[];
@@ -30,6 +31,9 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
     const [selectedOrden, setSelectedOrden] = useState<OrdenCompra | null>(null);
     const [ordenToCancel, setOrdenToCancel] = useState<OrdenCompra | null>(null);
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+
+    const [actualizarDialogOpen, setActualizarDialogOpen] = useState(false);
+    const [ordenToActualizar, setOrdenToActualizar] = useState<OrdenCompra | null>(null);
 
     const contextMenuRef = React.useRef<HTMLDivElement>(null);
     useOutsideClick({
@@ -69,7 +73,10 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
     };
 
     const handleActualizarOrden = () => {
-        // Implement update logic as needed.
+        if (contextMenu) {
+            setOrdenToActualizar(contextMenu.orden);
+            setActualizarDialogOpen(true);
+        }
         setContextMenu(null);
     };
 
@@ -180,6 +187,21 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
                     orden={ordenToCancel}
                     onOrderCancelled={() => {
                         // Optionally refresh the list or update UI state here.
+                    }}
+                />
+            )}
+
+            {/* Modal Dialog to some OrdenCompra states */}
+            {ordenToActualizar && (
+                <ActualizarEstadoOrdenCompraDialog
+                    isOpen={actualizarDialogOpen}
+                    onClose={() => {
+                        setActualizarDialogOpen(false);
+                        setOrdenToActualizar(null);
+                    }}
+                    orden={ordenToActualizar}
+                    onEstadoUpdated={() => {
+                        // Optionally refresh the order list here.
                     }}
                 />
             )}
