@@ -18,6 +18,8 @@ import ActualizarEstadoOrdenCompraDialog from "./ActualizarEstadoOrdenCompraDial
 
 interface ListaOrdenesCompraProps {
     ordenes: OrdenCompra[];
+    onClose4Dialogs: (page:number) => void;
+    page: number;
 }
 
 interface ContextMenuState {
@@ -26,7 +28,7 @@ interface ContextMenuState {
     orden: OrdenCompra;
 }
 
-const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
+const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClose4Dialogs, page}) => {
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
     const [selectedOrden, setSelectedOrden] = useState<OrdenCompra | null>(null);
     const [ordenToCancel, setOrdenToCancel] = useState<OrdenCompra | null>(null);
@@ -183,6 +185,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
                     onClose={() => {
                         setCancelDialogOpen(false);
                         setOrdenToCancel(null);
+                        onClose4Dialogs(page);
                     }}
                     orden={ordenToCancel}
                     onOrderCancelled={() => {
@@ -198,6 +201,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
                     onClose={() => {
                         setActualizarDialogOpen(false);
                         setOrdenToActualizar(null);
+                        onClose4Dialogs(page);
                     }}
                     orden={ordenToActualizar}
                     onEstadoUpdated={() => {

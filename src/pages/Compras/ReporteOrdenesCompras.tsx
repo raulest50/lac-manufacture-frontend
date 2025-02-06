@@ -78,7 +78,7 @@ export default function ReporteOrdenesCompras() {
                     <Spinner mt={4} />
                 ) : (
                     <>
-                        <ListaOrdenesCompra ordenes={listaOrdenesCompras} />
+                        <ListaOrdenesCompra ordenes={listaOrdenesCompras} onClose4Dialogs={onClickBuscar} page={currentPage} />
                         <MyPagination
                             page={currentPage}
                             totalPages={totalPages}
