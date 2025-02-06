@@ -18,7 +18,7 @@ import {
     Th,
     Td, Tfoot
 } from '@chakra-ui/react';
-import { OrdenCompra } from '../types';
+import {getCondicionPagoText, getEstadoText, OrdenCompra} from '../types';
 
 interface OrdenCompraDetailsProps {
     isOpen: boolean;
@@ -49,8 +49,8 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                             {orden.proveedor ? orden.proveedor.nombre : '-'}
                         </Text>
                         <Text><strong>Total a Pagar:</strong> {orden.totalPagar}</Text>
-                        <Text><strong>Estado:</strong> {orden.estado}</Text>
-                        <Text><strong>Condición de Pago:</strong> {orden.condicionPago}</Text>
+                        <Text><strong>Estado:</strong> {getEstadoText(orden.estado)}</Text>
+                        <Text><strong>Condición de Pago:</strong> {getCondicionPagoText(orden.condicionPago)}</Text>
                         <Text><strong>Tiempo de Entrega:</strong> {orden.tiempoEntrega}</Text>
                         <Text><strong>Plazo de Pago:</strong> {orden.plazoPago}</Text>
                     </Box>

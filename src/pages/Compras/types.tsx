@@ -14,6 +14,25 @@ export interface Proveedor {
     fechaRegistro: string;
 }
 
+export function getRegimenTributario(regimen: number) {
+    if(regimen == 0) return "Regimen Comun";
+    if(regimen == 0) return "Regimen Simplificado";
+    if(regimen == 0) return "Regimen Especial";
+}
+
+export function getEstadoText(estado: number){
+    if(estado == -1) return "Cancelada";
+    if(estado == 0) return "Pendiente confirmacion proveedor";
+    if(estado == 1) return "Pendiente recepcion y verificacion de precios negociadas";
+    if(estado == 2) return "Pendiente recepcion y verificacion de cantidades negociadas";
+    if(estado == 3) return "Cerrada exitosamente";
+}
+
+export function getCondicionPagoText(condicion: string){
+    if(condicion == "0") return "Credito";
+    if(condicion == "1") return "Contado";
+}
+
 export interface MateriaPrima {
     productoId: number;
     tipo_producto: string;

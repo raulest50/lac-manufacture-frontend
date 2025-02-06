@@ -13,7 +13,7 @@ import {
     Text,
 } from "@chakra-ui/react";
 import { FaSearch } from "react-icons/fa";
-import { Proveedor } from "../types.tsx"; // Adjust path if needed
+import {getRegimenTributario, Proveedor} from "../types.tsx"; // Adjust path if needed
 
 interface ProveedorCardProps {
     selectedProveedor: Proveedor | null;
@@ -57,7 +57,7 @@ const ProveedorCard: React.FC<ProveedorCardProps> = ({
 
                     <VStack alignItems="start">
                         <Text pt="2" fontSize="sm">
-                            RegimenTributario: {selectedProveedor ? selectedProveedor.regimenTributario : ""}
+                            RegimenTributario: {selectedProveedor ? getRegimenTributario(selectedProveedor.regimenTributario) : ""}
                         </Text>
                     </VStack>
 

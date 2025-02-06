@@ -10,9 +10,10 @@ import {
     Box,
     useOutsideClick
 } from '@chakra-ui/react';
-import { OrdenCompra } from '../types';
+import {getEstadoText, OrdenCompra} from '../types';
 import OrdenCompraDetails from './OrdenCompraDetails';
 import PdfGenerator from "../pdfGenerator";
+import CancelarOrdenDialog from './CancelarOrdenDialog';
 
 interface ListaOrdenesCompraProps {
     ordenes: OrdenCompra[];
@@ -27,8 +28,9 @@ interface ContextMenuState {
 const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
     const [selectedOrden, setSelectedOrden] = useState<OrdenCompra | null>(null);
+    const [ordenToCancel, setOrdenToCancel] = useState<OrdenCompra | null>(null);
+    const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
-    // Reference to the context menu box to detect outside clicks
     const contextMenuRef = React.useRef<HTMLDivElement>(null);
     useOutsideClick({
         ref: contextMenuRef,
@@ -46,7 +48,6 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
 
     const handleGenerarPDF = () => {
         if (contextMenu) {
-            // This will create and download the PDF
             new PdfGenerator(contextMenu.orden);
         }
         setContextMenu(null);
@@ -56,6 +57,19 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
         if (contextMenu) {
             setSelectedOrden(contextMenu.orden);
         }
+        setContextMenu(null);
+    };
+
+    const handleCancelarOrden = () => {
+        if (contextMenu) {
+            setOrdenToCancel(contextMenu.orden);
+            setCancelDialogOpen(true);
+        }
+        setContextMenu(null);
+    };
+
+    const handleActualizarOrden = () => {
+        // Implement update logic as needed.
         setContextMenu(null);
     };
 
@@ -93,7 +107,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
                                 </Td>
                                 <Td>{orden.proveedor ? orden.proveedor.nombre : '-'}</Td>
                                 <Td>{orden.totalPagar}</Td>
-                                <Td>{orden.estado}</Td>
+                                <Td>{getEstadoText(orden.estado)}</Td>
                             </Tr>
                         ))}
                     </Tbody>
@@ -129,6 +143,20 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
                     >
                         Ver más
                     </Box>
+                    <Box
+                        p={1}
+                        _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                        onClick={handleCancelarOrden}
+                    >
+                        Cancelar Orden
+                    </Box>
+                    <Box
+                        p={1}
+                        _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                        onClick={handleActualizarOrden}
+                    >
+                        Actualizar Estado de la Orden
+                    </Box>
                 </Box>
             )}
 
@@ -138,6 +166,21 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes }) => {
                     isOpen={!!selectedOrden}
                     onClose={() => setSelectedOrden(null)}
                     orden={selectedOrden}
+                />
+            )}
+
+            {/* Cancel Order Dialog */}
+            {ordenToCancel && (
+                <CancelarOrdenDialog
+                    isOpen={cancelDialogOpen}
+                    onClose={() => {
+                        setCancelDialogOpen(false);
+                        setOrdenToCancel(null);
+                    }}
+                    orden={ordenToCancel}
+                    onOrderCancelled={() => {
+                        // Optionally refresh the list or update UI state here.
+                    }}
                 />
             )}
         </>
