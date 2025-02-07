@@ -19,7 +19,7 @@ function ComprasPage() {
             <Tabs>
                 <TabList>
                     <Tab sx={my_style_tab}>Generar Orden de Compra</Tab>
-                    <Tab sx={my_style_tab}>Reportes</Tab>
+                    <Tab sx={my_style_tab}>Reportes Ordenes de Compra</Tab>
                 </TabList>
 
                 <TabPanels>

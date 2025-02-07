@@ -18,11 +18,11 @@ import {
     Th,
     Td,
     Input,
-    useToast
+    useToast, HStack
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
-import { OrdenCompra, getEstadoText, getCondicionPagoText } from '../types';
+import {OrdenCompra, getEstadoText, getCondicionPagoText, getCantidadCorrectaText} from '../types';
 
 interface ActualizarEstadoOrdenCompraDialogProps {
     isOpen: boolean;
@@ -41,8 +41,23 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     // For estado 1 and 2, keep a local copy of the items (to update precioCorrecto or to check cantidadCorrecta)
     const [localItems, setLocalItems] = useState(orden.itemsOrdenCompra);
 
+    /**
+     * cada item de la orden de compra debe tener cantidadCorrecta = 1 para que se considere
+     * recibida en bodega y se pueda proceder al cierre de la orden.
+     */
+    const [cantidadesFisicasOk, setCantidadesFisicasOk] = useState(false);
+
+    const checkVerificacionFisica = () => {
+        let cantidadIsOk = true;
+        for (let i = 0; i < localItems.length; i++) {
+            if (localItems[i].cantidadCorrecta != 1) cantidadIsOk = false;
+        }
+        setCantidadesFisicasOk(cantidadIsOk);
+    }
+
     // Generate random code on open
     useEffect(() => {
+        checkVerificacionFisica(); // solo se usa si estado de la orden es 2 pero igual se deja aca por facilidad
         if (isOpen) {
             const code = Math.floor(1000000 + Math.random() * 9000000).toString();
             setRandomCode(code);
@@ -208,19 +223,21 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                             </Table>
                         </Box>
                     )}
-                    <Box mt={4} textAlign="center">
-                        <Text fontWeight="bold">Código: {randomCode}</Text>
-                        <Input
-                            mt={2}
-                            placeholder="Digite el código"
-                            value={inputCode}
-                            onChange={(e) => setInputCode(e.target.value)}
-                            maxW="200px"
-                            mx="auto"
-                        />
-                        <Button mt={4} colorScheme="green" onClick={handleConfirmacionProveedor}>
-                            Confirmación Proveedor
-                        </Button>
+                    <Box mt={4} textAlign="center" p={"1em"} >
+                        <Text fontWeight="bold">Token dinamico de confirmacion: {randomCode}</Text>
+                        <HStack alignItems={"center"}>
+                            <Input
+                                mt={2}
+                                placeholder="Digite token dinamico"
+                                value={inputCode}
+                                onChange={(e) => setInputCode(e.target.value)}
+                                maxW="200px"
+                                mx="auto"
+                            />
+                            <Button mt={4} colorScheme="green" onClick={handleConfirmacionProveedor}>
+                                Confirmación Proveedor
+                            </Button>
+                        </HStack>
                     </Box>
                 </>
             );
@@ -265,8 +282,8 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                                             <Td>{item.iva19}</Td>
                                             <Td>{item.subTotal}</Td>
                                             <Td>
-                                                <Button size="xs" colorScheme="blue" onClick={() => markPrecioCorrecto(index)}>
-                                                    OK
+                                                <Button size="xs" colorScheme="blue" isDisabled={item.precioCorrecto == 1} onClick={() => markPrecioCorrecto(index)}>
+                                                    {item.precioCorrecto == 1 ? "Correcto" : "OK" }
                                                 </Button>
                                             </Td>
                                         </Tr>
@@ -277,22 +294,24 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                     )}
                     <Box mt={4} textAlign="center">
                         <Text fontWeight="bold">Código: {randomCode}</Text>
-                        <Input
-                            mt={2}
-                            placeholder="Digite el código"
-                            value={inputCode}
-                            onChange={(e) => setInputCode(e.target.value)}
-                            maxW="200px"
-                            mx="auto"
-                        />
-                        <Button
-                            mt={4}
-                            colorScheme="green"
-                            onClick={handleConfirmarPrecios}
-                            isDisabled={!allPrecioCorrecto()}
-                        >
-                            Confirmar Precios Concuerdan
-                        </Button>
+                        <HStack p={"1em"}>
+                            <Input
+                                mt={2}
+                                placeholder="Digite el código"
+                                value={inputCode}
+                                onChange={(e) => setInputCode(e.target.value)}
+                                maxW="200px"
+                                mx="auto"
+                            />
+                            <Button
+                                mt={4}
+                                colorScheme="green"
+                                onClick={handleConfirmarPrecios}
+                                isDisabled={!allPrecioCorrecto()}
+                            >
+                                Confirmar Precios Concuerdan
+                            </Button>
+                        </HStack>
                     </Box>
                 </>
             );
@@ -328,31 +347,34 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                                         <Tr key={item.itemOrdenId}>
                                             <Td>{item.itemOrdenId}</Td>
                                             <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre}` : '-'}</Td>
-                                            <Td>{item.cantidadCorrecta}</Td>
+                                            <Td>{getCantidadCorrectaText(item.cantidadCorrecta)}</Td>
                                         </Tr>
                                     ))}
                                 </Tbody>
                             </Table>
                         </Box>
                     )}
-                    <Box mt={4} textAlign="center">
-                        <Text fontWeight="bold">Código: {randomCode}</Text>
-                        <Input
-                            mt={2}
-                            placeholder="Digite el código"
-                            value={inputCode}
-                            onChange={(e) => setInputCode(e.target.value)}
-                            maxW="200px"
-                            mx="auto"
-                        />
-                        <Button
-                            mt={4}
-                            colorScheme="green"
-                            onClick={handleCerrarOrden}
-                            isDisabled={!allCantidadCorrecta()}
-                        >
-                            Cerrar Orden De Compra Exitosamente
-                        </Button>
+                    <Box mt={4} textAlign="center" >
+                        <Text fontWeight="bold" hidden={cantidadesFisicasOk}> En espera del reporte de almacen </Text>
+                        <Text fontWeight="bold" hidden={!cantidadesFisicasOk}>Token Dinamico de confirmacion: {randomCode}</Text>
+                        <HStack hidden={!cantidadesFisicasOk}>
+                            <Input
+                                mt={2}
+                                placeholder="Digite token dinamico"
+                                value={inputCode}
+                                onChange={(e) => setInputCode(e.target.value)}
+                                maxW="200px"
+                                mx="auto"
+                            />
+                            <Button
+                                mt={4}
+                                colorScheme="green"
+                                onClick={handleCerrarOrden}
+                                isDisabled={!allCantidadCorrecta()}
+                            >
+                                Cerrar Orden De Compra Exitosamente
+                            </Button>
+                        </HStack>
                     </Box>
                 </>
             );
@@ -361,7 +383,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size="xl" scrollBehavior="inside">
+        <Modal isOpen={isOpen} onClose={onClose} size={["auto", "4xl"]} scrollBehavior="inside">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Actualizar Estado de la Orden de Compra</ModalHeader>

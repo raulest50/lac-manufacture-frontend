@@ -33,6 +33,12 @@ export function getCondicionPagoText(condicion: string){
     if(condicion == "1") return "Contado";
 }
 
+export function getCantidadCorrectaText(cantidadCorrecta: number){
+    if(cantidadCorrecta == 0) return "Pendiente Revision";
+    if(cantidadCorrecta == 1) return "Cantidad Correcta";
+    if(cantidadCorrecta == -1) return "Cantidad Incorrecta";
+}
+
 export interface MateriaPrima {
     productoId: number;
     tipo_producto: string;
