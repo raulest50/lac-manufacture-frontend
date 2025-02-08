@@ -17,15 +17,16 @@ import Responsable_2 from "./pages/Operarios/Responsable_2.tsx";
 import ProveedoresPage from "./pages/Proveedores/ProveedoresPage.tsx";
 import ComprasPage from "./pages/Compras/ComprasPage.tsx";
 import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
-import LoginPage from "./pages/LoginPage.tsx";
+import LoginPanel from "./pages/LoginPage/LoginPanel.tsx";
 import InformesPage from "./pages/Informes/InformesPage.tsx";
 import RecibirMercanciaPage from "./pages/RecibirMercancia/RecibirMercanciaPage.tsx";
+import UsuariosPage from "./pages/Usuarios/UsuariosPage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <>
             {/* Public login route (outside RootLayout if you like) */}
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/login" element={<LoginPanel />} />
 
             <Route path="/" element={<RootLayout />}>
                 {/* Home is protected => if not logged in => go to /login */}
@@ -110,6 +111,15 @@ const router = createBrowserRouter(
                     element={
                         <ProtectedRoute requiredRole="ROLE_MASTER">
                             <InformesPage/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="usuarios"
+                    element={
+                        <ProtectedRoute requiredRole="ROLE_MASTER">
+                            <UsuariosPage/>
                         </ProtectedRoute>
                     }
                 />

@@ -1,10 +1,10 @@
 // src/pages/LoginPage.tsx
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
-import {Button, Container, Flex, FormControl, FormLabel, Heading, Input} from "@chakra-ui/react";
+import {Button, Container, Flex, FormControl, FormLabel, Heading, Input, Image, Box} from "@chakra-ui/react";
 
-export default function LoginPage() {
+export default function LoginPanel() {
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -24,8 +24,11 @@ export default function LoginPage() {
 
     return (
         <Container minW={['auto', 'container.md', 'container.md']} w={"full"} h={"full"}>
-            <Flex direction={"column"} gap={7} border={"0.5px solid gray"} borderRadius={"2em"} p={"4em"}>
-                <Heading>Exotic Manufacture Login</Heading>
+            <Flex direction={"column"} gap={7} border={"0.5px solid gray"} borderRadius={"2em"} p={"4em"} alignItems={"center"}>
+                <Box boxSize={'3xs'}>
+                    <Image src={'/logo_exotic.svg'} />
+                </Box>
+                <Heading>Login Panel</Heading>
                 <FormControl isRequired>
                     <FormLabel>Usuario</FormLabel>
                     <Input

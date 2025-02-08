@@ -9,6 +9,7 @@ import { IoPerson } from "react-icons/io5";
 import { GiBuyCard } from "react-icons/gi";
 import { TbReportSearch } from "react-icons/tb";
 import { FaTruckRampBox } from "react-icons/fa6";
+import { FaUsersGear } from "react-icons/fa6";
 
 import '@fontsource-variable/comfortaa'
 
@@ -43,6 +44,7 @@ export default function Home(){
                 {/* Master Only */}
                 {roles.includes('ROLE_MASTER') && (
                     <>
+                        <SectionCard to={'/usuarios'}    name={'Roles y Usuarios'}            icon={FaUsersGear} />
                         <SectionCard to={'/producto'}    name={'Codificar Productos'} icon={PiDownloadDuotone} />
                         <SectionCard to={'/produccion'}  name={'Produccion'}      icon={AiOutlineAudit} />
                         <SectionCard to={'/stock'}       name={'Stock'}               icon={BsDatabaseCheck} />

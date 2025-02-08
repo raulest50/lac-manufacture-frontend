@@ -18,6 +18,7 @@
     "@fontsource-variable/comfortaa": "^5.0.20",
     "@fontsource-variable/league-spartan": "^5.0.20",
     "@fontsource/anton": "^5.0.20",
+    "@svgdotjs/svg.js": "^3.2.4",
     "@xyflow/react": "^12.3.5",
     "axios": "^1.6.8",
     "date-fns": "^4.1.0",
