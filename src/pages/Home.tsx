@@ -41,27 +41,23 @@ export default function Home(){
             </Flex>
 
             <SimpleGrid columns={[1,1,2,3,4]} gap={'0.5em'} rowGap={'1.5em'}>
-                {/* Master Only */}
-                {roles.includes('ROLE_MASTER') && (
-                    <>
-                        <SectionCard to={'/usuarios'}    name={'Roles y Usuarios'}            icon={FaUsersGear} />
-                        <SectionCard to={'/producto'}    name={'Codificar Productos'} icon={PiDownloadDuotone} />
-                        <SectionCard to={'/produccion'}  name={'Produccion'}      icon={AiOutlineAudit} />
-                        <SectionCard to={'/stock'}       name={'Stock'}               icon={BsDatabaseCheck} />
-                        <SectionCard to={'/Proveedores'} name={'Proveedores'}         icon={FaIndustry} />
-                        <SectionCard to={'/compras'}     name={'Compras'}             icon={GiBuyCard} />
-                        <SectionCard to={'/informes'}    name={'Informes'}            icon={TbReportSearch} />
-                    </>
-                )}
+                <SectionCard
+                    to={"/usuarios"}
+                    name={"Roles y Usuarios"}
+                    icon={FaUsersGear}
+                    supportedRoles={["ROLE_MASTER"]}
+                    currentRoles={roles}
+                />
 
-                {/* Worker Only */}
-                {roles.includes('ROLE_WORKER') && (
-                    <>
-                        <SectionCard to={'/responsable_1'} name={'Responsable 1 ProduccionPage'} icon={IoPerson} />
-                        <SectionCard to={'/responsable_2'} name={'Responsable 2 ProduccionPage'} icon={IoPerson} />
-                        <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox} />
-                    </>
-                )}
+                <SectionCard to={'/producto'}    name={'Codificar Productos'} icon={PiDownloadDuotone} />
+                <SectionCard to={'/produccion'}  name={'Produccion'}      icon={AiOutlineAudit} />
+                <SectionCard to={'/stock'}       name={'Stock'}               icon={BsDatabaseCheck} />
+                <SectionCard to={'/Proveedores'} name={'Proveedores'}         icon={FaIndustry} />
+                <SectionCard to={'/compras'}     name={'Compras'}             icon={GiBuyCard} />
+                <SectionCard to={'/informes'}    name={'Informes'}            icon={TbReportSearch} />
+                <SectionCard to={'/responsable_1'} name={'Responsable 1 ProduccionPage'} icon={IoPerson} />
+                <SectionCard to={'/responsable_2'} name={'Responsable 2 ProduccionPage'} icon={IoPerson} />
+                <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox} />
             </SimpleGrid>
         </Container>
     );

@@ -38,13 +38,19 @@ export default class EndPointsURL{
     public get_movimientos_by_producto:string;
 
 
-    // user resources
+    // user resources (solo autenticacion)
     public whoami:string;
 
+    // users management CRUD operations
+
+
+    // just in case of need
+    public domain: string;
 
     constructor() {
 
-        const domain = EndPointsURL.getDomain();
+        this.domain = EndPointsURL.getDomain();
+        const domain = this.domain;
 
         const productos_res = 'productos';
         const proveedores_res = 'proveedores';
@@ -92,7 +98,7 @@ export default class EndPointsURL{
 
     // Method to return the correct domain name
     static getDomain(): string {
-        console.log(window.location.hostname);
+        //console.log(window.location.hostname);
         // Check if running on localhost
         if (window.location.hostname === "localhost") {
             return "http://localhost:8080"
