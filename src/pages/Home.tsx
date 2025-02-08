@@ -13,6 +13,8 @@ import { FaUsersGear } from "react-icons/fa6";
 
 import '@fontsource-variable/comfortaa'
 
+import {role_master, role_jefe_prod, role_compras, role_asist_prod, role_almacen} from "../pages/Usuarios/types.tsx";
+
 
 import { useAuth } from '../context/AuthContext';
 
@@ -41,23 +43,16 @@ export default function Home(){
             </Flex>
 
             <SimpleGrid columns={[1,1,2,3,4]} gap={'0.5em'} rowGap={'1.5em'}>
-                <SectionCard
-                    to={"/usuarios"}
-                    name={"Roles y Usuarios"}
-                    icon={FaUsersGear}
-                    supportedRoles={["ROLE_MASTER"]}
-                    currentRoles={roles}
-                />
-
-                <SectionCard to={'/producto'}    name={'Codificar Productos'} icon={PiDownloadDuotone} />
-                <SectionCard to={'/produccion'}  name={'Produccion'}      icon={AiOutlineAudit} />
-                <SectionCard to={'/stock'}       name={'Stock'}               icon={BsDatabaseCheck} />
-                <SectionCard to={'/Proveedores'} name={'Proveedores'}         icon={FaIndustry} />
-                <SectionCard to={'/compras'}     name={'Compras'}             icon={GiBuyCard} />
-                <SectionCard to={'/informes'}    name={'Informes'}            icon={TbReportSearch} />
-                <SectionCard to={'/responsable_1'} name={'Responsable 1 ProduccionPage'} icon={IoPerson} />
-                <SectionCard to={'/responsable_2'} name={'Responsable 2 ProduccionPage'} icon={IoPerson} />
-                <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox} />
+                <SectionCard to={"/usuarios"}         name={"Roles y Usuarios"}     icon={FaUsersGear}          supportedRoles={[role_master]} currentRoles={roles}/>
+                <SectionCard to={'/producto'}         name={'Codificar Productos'}  icon={PiDownloadDuotone}    supportedRoles={[role_master]} currentRoles={roles}/>
+                <SectionCard to={'/produccion'}       name={'Produccion'}           icon={AiOutlineAudit}       supportedRoles={[role_master, role_jefe_prod]} currentRoles={roles}/>
+                <SectionCard to={'/stock'}            name={'Stock'}                icon={BsDatabaseCheck}      supportedRoles={[role_master, role_jefe_prod, role_compras]} currentRoles={roles}/>
+                <SectionCard to={'/Proveedores'}      name={'Proveedores'}          icon={FaIndustry}           supportedRoles={[role_master, role_compras]} currentRoles={roles}/>
+                <SectionCard to={'/compras'}          name={'Compras'}              icon={GiBuyCard}            supportedRoles={[role_master, role_compras]} currentRoles={roles}/>
+                <SectionCard to={'/informes'}         name={'Informes'}             icon={TbReportSearch}       supportedRoles={[role_master, role_compras, role_jefe_prod]} currentRoles={roles}/>
+                <SectionCard to={'/responsable_1'}    name={'Responsable 1 ProduccionPage'} icon={IoPerson}     supportedRoles={[role_master, role_asist_prod]} currentRoles={roles}/>
+                <SectionCard to={'/responsable_2'}    name={'Responsable 2 ProduccionPage'} icon={IoPerson}     supportedRoles={[role_master]} currentRoles={roles}/>
+                <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
             </SimpleGrid>
         </Container>
     );

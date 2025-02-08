@@ -23,11 +23,7 @@ import RecibirMercanciaPage from "./pages/RecibirMercancia/RecibirMercanciaPage.
 import UsuariosPage from "./pages/Usuarios/UsuariosPage.tsx";
 import MultiRoleProtectedRoute from "./components/MultiRoleProtectedRoute.tsx";
 
-const role_master = "ROLE_MASTER";
-const role_compras = "ROLE_COMPRAS";
-const role_jefe_prod = "ROLE_JEFE_PRODUCCION";
-const role_asist_prod = "ROLE_ASISTENTE PRODUCCION";
-const role_almacen = "ROLE_ALMACEN";
+import {role_master, role_jefe_prod, role_compras, role_asist_prod, role_almacen} from "./pages/Usuarios/types.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(

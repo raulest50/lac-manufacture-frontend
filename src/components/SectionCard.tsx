@@ -25,6 +25,7 @@ interface SectionCardProps {
     currentRoles?: string[];
 }
 
+
 function SectionCard({ name, icon, to, supportedRoles, currentRoles }: SectionCardProps) {
     // If supportedRoles is provided, check if there's at least one role
     // in currentRoles that is allowed. If not, do not render anything.
