@@ -12,7 +12,6 @@ import ProduccionPage from "./pages/Produccion/ProduccionPage.tsx";
 
 import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom"
 import Responsable_1 from "./pages/Operarios/Responsable_1.tsx";
-import Responsable_2 from "./pages/Operarios/Responsable_2.tsx";
 
 import ProveedoresPage from "./pages/Proveedores/ProveedoresPage.tsx";
 import ComprasPage from "./pages/Compras/ComprasPage.tsx";
@@ -44,21 +43,14 @@ const router = createBrowserRouter(
 
                 {/* Worker routes */}
                 <Route
-                    path="responsable_1"
+                    path="asistente_produccion"
                     element={
                         <MultiRoleProtectedRoute supportedRoles={[role_master, role_asist_prod]}>
                             <Responsable_1/>
                         </MultiRoleProtectedRoute>
                     }
                 />
-                <Route
-                    path="responsable_2"
-                    element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_asist_prod]}>
-                            <Responsable_2/>
-                        </MultiRoleProtectedRoute>
-                    }
-                />
+
                 <Route
                     path="recepcion_mprima"
                     element={
