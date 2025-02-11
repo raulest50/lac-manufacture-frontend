@@ -76,11 +76,16 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
         }
     }, [isOpen, orden.itemsOrdenCompra]);
 
+    interface EstadoUpdate{
+        newEstado: number;
+        facturaCompraId?: number;
+    }
+
     // Function to update order estado via backend.
     // When newEstado === 1 and a facturaId is provided, include it in the request.
     const updateEstado = async (newEstado: number, facturaId?: string) => {
         try {
-            const requestBody:any = { newEstado };
+            const requestBody:EstadoUpdate = { newEstado: newEstado };
             if (newEstado === 1 && facturaId) {
                 requestBody.facturaCompraId = parseInt(facturaId, 10);
             }
@@ -185,6 +190,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                     <Text><strong>ID:</strong> {orden.ordenCompraId}</Text>
                     <Text><strong>Fecha Emisión:</strong> {orden.fechaEmision ? new Date(orden.fechaEmision).toLocaleString() : '-'}</Text>
                     <Text><strong>Fecha Vencimiento:</strong> {orden.fechaVencimiento ? new Date(orden.fechaVencimiento).toLocaleDateString() : '-'}</Text>
+                    <Text><strong>Id Factura Correspondiente:</strong> {orden.facturaCompraId ? orden.facturaCompraId : 'Pendiente por asignacion proveedor'}</Text>
                     <Text><strong>Proveedor:</strong> {orden.proveedor ? orden.proveedor.nombre : '-'}</Text>
                     <Text><strong>Total a Pagar:</strong> {orden.totalPagar}</Text>
                     <Text><strong>Estado:</strong> {getEstadoText(orden.estado)}</Text>
@@ -246,28 +252,6 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
         );
     }
 
-    function TokenProtectionComponent({onClick, buttonText}: { onClick: () => void; buttonText: string }){
-        return(
-          <>
-              <VStack alignItems="center" mt={2} >
-                  <Text fontWeight="bold">Token dinámico de confirmación: {randomCode}</Text>
-                  <FormControl isRequired>
-                      <FormLabel>Token Dinamico de Confirmacion:</FormLabel>
-                      <Input
-                          placeholder="Digite token dinámico"
-                          value={inputCode}
-                          onChange={(e) => setInputCode(e.target.value)}
-                          maxW="200px"
-                      />
-                  </FormControl>
-                  <Button colorScheme="green" onClick={onClick}>
-                      {buttonText}
-                  </Button>
-              </VStack>
-          </>
-        );
-    }
-
     // Render different content based on the current estado.
     const renderContent = () => {
         if (orden.estado === -1) {
@@ -306,8 +290,6 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                                     />
                                 </FormControl>
                             </VStack>
-
-                            <TokenProtectionComponent onClick={handleConfirmacionProveedor} buttonText={"Confirmación Proveedor"}/>
 
                             <VStack alignItems="center" mt={2} >
                                 <Text fontWeight="bold">Token dinámico de confirmación: {randomCode}</Text>
