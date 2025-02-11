@@ -87,7 +87,6 @@ export default function AsistenteIngresoMercancia() {
                     onChange={(e) => {setActiveStep(Number(e.target.value))}}
                 />
                 <ConditionalRenderStep/>
-
             </Flex>
 
         </Container>

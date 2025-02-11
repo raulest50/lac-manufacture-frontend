@@ -74,6 +74,7 @@ export interface OrdenCompra {
     ordenCompraId?: number;
     fechaEmision?: string;
     fechaVencimiento: string;
+    facturaCompra?: string;
     proveedor: Proveedor;
     itemsOrdenCompra: ItemOrdenCompra[];
     subTotal: number;

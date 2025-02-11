@@ -18,11 +18,12 @@ import {
     Th,
     Td,
     Input,
-    useToast, HStack
+    useToast,
+    HStack, VStack, FormControl, FormLabel
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
-import {OrdenCompra, getEstadoText, getCondicionPagoText, getCantidadCorrectaText} from '../types';
+import { OrdenCompra, getEstadoText, getCondicionPagoText, getCantidadCorrectaText } from '../types';
 
 interface ActualizarEstadoOrdenCompraDialogProps {
     isOpen: boolean;
@@ -31,18 +32,25 @@ interface ActualizarEstadoOrdenCompraDialogProps {
     onEstadoUpdated?: (updatedOrden: OrdenCompra) => void;
 }
 
-const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDialogProps> = ({ isOpen, onClose, orden, onEstadoUpdated }) => {
+const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDialogProps> = ({
+                                                                                                 isOpen,
+                                                                                                 onClose,
+                                                                                                 orden,
+                                                                                                 onEstadoUpdated
+                                                                                             }) => {
     const toast = useToast();
 
     // Generate a random 7-digit code and hold the user input.
     const [randomCode, setRandomCode] = useState<string>('');
     const [inputCode, setInputCode] = useState<string>('');
+    // New state for storing the FacturaCompra id input (used when estado is 0).
+    const [facturaIdInput, setFacturaIdInput] = useState<string>('');
 
-    // For estado 1 and 2, keep a local copy of the items (to update precioCorrecto or to check cantidadCorrecta)
+    // For estados 1 and 2, keep a local copy of the items (to update precioCorrecto or check cantidadCorrecta).
     const [localItems, setLocalItems] = useState(orden.itemsOrdenCompra);
 
     /**
-     * cada item de la orden de compra debe tener cantidadCorrecta = 1 para que se considere
+     * Cada item de la orden de compra debe tener cantidadCorrecta = 1 para que se considere
      * recibida en bodega y se pueda proceder al cierre de la orden.
      */
     const [cantidadesFisicasOk, setCantidadesFisicasOk] = useState(false);
@@ -50,29 +58,35 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     const checkVerificacionFisica = () => {
         let cantidadIsOk = true;
         for (let i = 0; i < localItems.length; i++) {
-            if (localItems[i].cantidadCorrecta != 1) cantidadIsOk = false;
+            if (localItems[i].cantidadCorrecta !== 1) cantidadIsOk = false;
         }
         setCantidadesFisicasOk(cantidadIsOk);
-    }
+    };
 
-    // Generate random code on open
+    // Generate a random code and reset inputs when the modal opens.
     useEffect(() => {
-        checkVerificacionFisica(); // solo se usa si estado de la orden es 2 pero igual se deja aca por facilidad
+        checkVerificacionFisica();
         if (isOpen) {
             const code = Math.floor(1000000 + Math.random() * 9000000).toString();
             setRandomCode(code);
             setInputCode('');
+            setFacturaIdInput('');
             // Clone the items array for local updates.
             setLocalItems(orden.itemsOrdenCompra);
         }
     }, [isOpen, orden.itemsOrdenCompra]);
 
     // Function to update order estado via backend.
-    const updateEstado = async (newEstado: number) => {
+    // When newEstado === 1 and a facturaId is provided, include it in the request.
+    const updateEstado = async (newEstado: number, facturaId?: string) => {
         try {
+            const requestBody:any = { newEstado };
+            if (newEstado === 1 && facturaId) {
+                requestBody.facturaCompraId = parseInt(facturaId, 10);
+            }
             const response = await axios.put(
                 `${EndPointsURL.getDomain()}/compras/orden_compra/${orden.ordenCompraId}/updateEstado`,
-                { newEstado }
+                requestBody
             );
             toast({
                 title: "Estado actualizado",
@@ -94,10 +108,11 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
         onClose();
     };
 
-    // Handlers for the confirmation buttons in different estados.
+    // Handler for confirmar proveedor (estado transition from 0 to 1).
+    // It passes the facturaCompra id along with the confirmation token.
     const handleConfirmacionProveedor = () => {
         if (inputCode === randomCode) {
-            updateEstado(1);
+            updateEstado(1, facturaIdInput);
         } else {
             toast({
                 title: "Código incorrecto",
@@ -110,6 +125,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
         }
     };
 
+    // Handler for confirming precios (estado 1 -> 2).
     const handleConfirmarPrecios = () => {
         if (inputCode === randomCode) {
             updateEstado(2);
@@ -125,6 +141,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
         }
     };
 
+    // Handler for closing the order (estado 2 -> 3).
     const handleCerrarOrden = () => {
         if (inputCode === randomCode) {
             updateEstado(3);
@@ -151,15 +168,105 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
         setLocalItems(updatedItems);
     };
 
-    // For estado 2: Check that all items have cantidadCorrecta == 1.
+    // For estado 2: Check that all items have cantidadCorrecta === 1.
     const allCantidadCorrecta = () => {
         return localItems?.every(item => item.cantidadCorrecta === 1);
     };
 
-    // For estado 1: Check that all items have precioCorrecto == 1.
+    // For estado 1: Check that all items have precioCorrecto === 1.
     const allPrecioCorrecto = () => {
         return localItems?.every(item => item.precioCorrecto === 1);
     };
+
+    function OrdenDetailsComponent(){
+        return(
+            <>
+                <Box mb={4}>
+                    <Text><strong>ID:</strong> {orden.ordenCompraId}</Text>
+                    <Text><strong>Fecha Emisión:</strong> {orden.fechaEmision ? new Date(orden.fechaEmision).toLocaleString() : '-'}</Text>
+                    <Text><strong>Fecha Vencimiento:</strong> {orden.fechaVencimiento ? new Date(orden.fechaVencimiento).toLocaleDateString() : '-'}</Text>
+                    <Text><strong>Proveedor:</strong> {orden.proveedor ? orden.proveedor.nombre : '-'}</Text>
+                    <Text><strong>Total a Pagar:</strong> {orden.totalPagar}</Text>
+                    <Text><strong>Estado:</strong> {getEstadoText(orden.estado)}</Text>
+                    <Text><strong>Condición de Pago:</strong> {getCondicionPagoText(orden.condicionPago)}</Text>
+                    <Text><strong>Tiempo de Entrega:</strong> {orden.tiempoEntrega}</Text>
+                    <Text><strong>Plazo de Pago:</strong> {orden.plazoPago}</Text>
+                </Box>
+            </>
+        )
+    }
+
+    // Component to render the order details and items table.
+    function OrdenCompraItemListComponent() {
+        return (
+            <>
+                {orden.itemsOrdenCompra && orden.itemsOrdenCompra.length > 0 && (
+                    <Box>
+                        <Text fontWeight="bold" mb={2}>Items de la Orden</Text>
+                        <Table variant="simple" size="sm">
+                            <Thead>
+                                <Tr>
+                                    <Th>ID</Th>
+                                    <Th>Materia Prima</Th>
+                                    <Th>Cantidad</Th>
+                                    <Th>Precio Unitario</Th>
+                                    <Th>IVA</Th>
+                                    <Th>Subtotal</Th>
+                                    <Th hidden={orden.estado !== 1}>Confirmar Precio</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {localItems && localItems.map((item, index) => (
+                                    <Tr key={item.itemOrdenId}>
+                                        <Td>{item.itemOrdenId}</Td>
+                                        <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre}` : '-'}</Td>
+                                        <Td hidden={orden.estado === 2}>{item.cantidad}</Td>
+                                        <Td hidden={orden.estado === 2}>{item.precioUnitario}</Td>
+                                        <Td hidden={orden.estado === 2}>{item.iva19}</Td>
+                                        <Td hidden={orden.estado === 2}>{item.subTotal}</Td>
+                                        <Td>
+                                            <Button
+                                                hidden={orden.estado !== 1}
+                                                size="xs"
+                                                colorScheme="blue"
+                                                isDisabled={item.precioCorrecto === 1}
+                                                onClick={() => markPrecioCorrecto(index)}
+                                            >
+                                                {item.precioCorrecto === 1 ? "Correcto" : "OK"}
+                                            </Button>
+                                        </Td>
+                                        <Td hidden={orden.estado!=2}>{getCantidadCorrectaText(item.cantidadCorrecta)}</Td>
+                                    </Tr>
+                                ))}
+                            </Tbody>
+                        </Table>
+                    </Box>
+                )}
+            </>
+        );
+    }
+
+    function TokenProtectionComponent({onClick, buttonText}: { onClick: () => void; buttonText: string }){
+        return(
+          <>
+              <VStack alignItems="center" mt={2} >
+                  <Text fontWeight="bold">Token dinámico de confirmación: {randomCode}</Text>
+                  <FormControl isRequired>
+                      <FormLabel>Token Dinamico de Confirmacion:</FormLabel>
+                      <Input
+                          placeholder="Digite token dinámico"
+                          value={inputCode}
+                          onChange={(e) => setInputCode(e.target.value)}
+                          maxW="200px"
+                      />
+                  </FormControl>
+                  <Button colorScheme="green" onClick={onClick}>
+                      {buttonText}
+                  </Button>
+              </VStack>
+          </>
+        );
+    }
 
     // Render different content based on the current estado.
     const renderContent = () => {
@@ -180,131 +287,64 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
             );
         }
         if (orden.estado === 0) {
-            // Display order details as in your original OrdenCompraDetails and then a random code input for confirmación proveedor.
+            // Estado 0: show full order details plus an extra input for FacturaCompra id and token confirmation.
             return (
                 <>
-                    <Box mb={4}>
-                        <Text><strong>ID:</strong> {orden.ordenCompraId}</Text>
-                        <Text><strong>Fecha Emisión:</strong> {orden.fechaEmision ? new Date(orden.fechaEmision).toLocaleString() : '-'}</Text>
-                        <Text><strong>Fecha Vencimiento:</strong> {orden.fechaVencimiento ? new Date(orden.fechaVencimiento).toLocaleDateString() : '-'}</Text>
-                        <Text><strong>Proveedor:</strong> {orden.proveedor ? orden.proveedor.nombre : '-'}</Text>
-                        <Text><strong>Total a Pagar:</strong> {orden.totalPagar}</Text>
-                        <Text><strong>Estado:</strong> {getEstadoText(orden.estado)}</Text>
-                        <Text><strong>Condición de Pago:</strong> {getCondicionPagoText(orden.condicionPago)}</Text>
-                        <Text><strong>Tiempo de Entrega:</strong> {orden.tiempoEntrega}</Text>
-                        <Text><strong>Plazo de Pago:</strong> {orden.plazoPago}</Text>
-                    </Box>
-                    {orden.itemsOrdenCompra && orden.itemsOrdenCompra.length > 0 && (
-                        <Box>
-                            <Text fontWeight="bold" mb={2}>Items de la Orden</Text>
-                            <Table variant="simple" size="sm">
-                                <Thead>
-                                    <Tr>
-                                        <Th>ID</Th>
-                                        <Th>Materia Prima</Th>
-                                        <Th>Cantidad</Th>
-                                        <Th>Precio Unitario</Th>
-                                        <Th>IVA</Th>
-                                        <Th>Subtotal</Th>
-                                    </Tr>
-                                </Thead>
-                                <Tbody>
-                                    {orden.itemsOrdenCompra.map((item) => (
-                                        <Tr key={item.itemOrdenId}>
-                                            <Td>{item.itemOrdenId}</Td>
-                                            <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre}` : '-'}</Td>
-                                            <Td>{item.cantidad}</Td>
-                                            <Td>{item.precioUnitario}</Td>
-                                            <Td>{item.iva19}</Td>
-                                            <Td>{item.subTotal}</Td>
-                                        </Tr>
-                                    ))}
-                                </Tbody>
-                            </Table>
-                        </Box>
-                    )}
-                    <Box mt={4} textAlign="center" p={"1em"} >
-                        <Text fontWeight="bold">Token dinamico de confirmacion: {randomCode}</Text>
-                        <HStack alignItems={"center"}>
-                            <Input
-                                mt={2}
-                                placeholder="Digite token dinamico"
-                                value={inputCode}
-                                onChange={(e) => setInputCode(e.target.value)}
-                                maxW="200px"
-                                mx="auto"
-                            />
-                            <Button mt={4} colorScheme="green" onClick={handleConfirmacionProveedor}>
-                                Confirmación Proveedor
-                            </Button>
+                    <OrdenDetailsComponent />
+                    <OrdenCompraItemListComponent/>
+
+                    <Box mt={4} textAlign="center" p="1em" >
+                        <HStack justifyContent={"center"} alignItems="flex-start" mt={2} >
+                            <VStack alignItems="center" mt={2} >
+                                <FormControl isRequired>
+                                    <FormLabel>Id Factura Reportada por Proveedor</FormLabel>
+                                    <Input
+                                        placeholder="Digite ID de Factura"
+                                        value={facturaIdInput}
+                                        onChange={(e) => setFacturaIdInput(e.target.value)}
+                                        maxW="200px"
+                                    />
+                                </FormControl>
+                            </VStack>
+
+                            <TokenProtectionComponent onClick={handleConfirmacionProveedor} buttonText={"Confirmación Proveedor"}/>
+
+                            <VStack alignItems="center" mt={2} >
+                                <Text fontWeight="bold">Token dinámico de confirmación: {randomCode}</Text>
+                                <FormControl isRequired>
+                                    <FormLabel>Token Dinamico de Confirmacion:</FormLabel>
+                                    <Input
+                                        placeholder="Digite token dinámico"
+                                        value={inputCode}
+                                        onChange={(e) => setInputCode(e.target.value)}
+                                        maxW="200px"
+                                    />
+                                </FormControl>
+                                <Button colorScheme="green" onClick={handleConfirmacionProveedor}>
+                                    Confirmación Proveedor
+                                </Button>
+                            </VStack>
                         </HStack>
                     </Box>
                 </>
             );
         }
         if (orden.estado === 1) {
-            // For estado 1, show details plus for each item an "OK" button to mark precioCorrecto.
+            // Estado 1: show order details with token confirmation for precios.
             return (
                 <>
-                    <Box mb={4}>
-                        <Text><strong>ID:</strong> {orden.ordenCompraId}</Text>
-                        <Text><strong>Fecha Emisión:</strong> {orden.fechaEmision ? new Date(orden.fechaEmision).toLocaleString() : '-'}</Text>
-                        <Text><strong>Fecha Vencimiento:</strong> {orden.fechaVencimiento ? new Date(orden.fechaVencimiento).toLocaleDateString() : '-'}</Text>
-                        <Text><strong>Proveedor:</strong> {orden.proveedor ? orden.proveedor.nombre : '-'}</Text>
-                        <Text><strong>Total a Pagar:</strong> {orden.totalPagar}</Text>
-                        <Text><strong>Estado:</strong> {getEstadoText(orden.estado)}</Text>
-                        <Text><strong>Condición de Pago:</strong> {getCondicionPagoText(orden.condicionPago)}</Text>
-                        <Text><strong>Tiempo de Entrega:</strong> {orden.tiempoEntrega}</Text>
-                        <Text><strong>Plazo de Pago:</strong> {orden.plazoPago}</Text>
-                    </Box>
-                    {orden.itemsOrdenCompra && orden.itemsOrdenCompra.length > 0 && (
-                        <Box>
-                            <Text fontWeight="bold" mb={2}>Items de la Orden</Text>
-                            <Table variant="simple" size="sm">
-                                <Thead>
-                                    <Tr>
-                                        <Th>ID</Th>
-                                        <Th>Materia Prima</Th>
-                                        <Th>Cantidad</Th>
-                                        <Th>Precio Unitario</Th>
-                                        <Th>IVA</Th>
-                                        <Th>Subtotal</Th>
-                                        <Th>Confirmar Precio</Th>
-                                    </Tr>
-                                </Thead>
-                                <Tbody>
-                                    {localItems && localItems.map((item, index) => (
-                                        <Tr key={item.itemOrdenId}>
-                                            <Td>{item.itemOrdenId}</Td>
-                                            <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre}` : '-'}</Td>
-                                            <Td>{item.cantidad}</Td>
-                                            <Td>{item.precioUnitario}</Td>
-                                            <Td>{item.iva19}</Td>
-                                            <Td>{item.subTotal}</Td>
-                                            <Td>
-                                                <Button size="xs" colorScheme="blue" isDisabled={item.precioCorrecto == 1} onClick={() => markPrecioCorrecto(index)}>
-                                                    {item.precioCorrecto == 1 ? "Correcto" : "OK" }
-                                                </Button>
-                                            </Td>
-                                        </Tr>
-                                    ))}
-                                </Tbody>
-                            </Table>
-                        </Box>
-                    )}
+                    <OrdenDetailsComponent />
+                    <OrdenCompraItemListComponent/>
                     <Box mt={4} textAlign="center">
                         <Text fontWeight="bold">Código: {randomCode}</Text>
-                        <HStack p={"1em"}>
+                        <HStack p="1em">
                             <Input
-                                mt={2}
                                 placeholder="Digite el código"
                                 value={inputCode}
                                 onChange={(e) => setInputCode(e.target.value)}
                                 maxW="200px"
-                                mx="auto"
                             />
                             <Button
-                                mt={4}
                                 colorScheme="green"
                                 onClick={handleConfirmarPrecios}
                                 isDisabled={!allPrecioCorrecto()}
@@ -317,57 +357,23 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
             );
         }
         if (orden.estado === 2) {
-            // For estado 2, show a simplified table (ID, Materia Prima, cantidadCorrecta)
+            // Estado 2: show simplified order details (info and a table with only cantidadCorrecta) and token confirmation for cerrar la orden.
             return (
                 <>
-                    <Box mb={4}>
-                        <Text><strong>ID:</strong> {orden.ordenCompraId}</Text>
-                        <Text><strong>Fecha Emisión:</strong> {orden.fechaEmision ? new Date(orden.fechaEmision).toLocaleString() : '-'}</Text>
-                        <Text><strong>Fecha Vencimiento:</strong> {orden.fechaVencimiento ? new Date(orden.fechaVencimiento).toLocaleDateString() : '-'}</Text>
-                        <Text><strong>Proveedor:</strong> {orden.proveedor ? orden.proveedor.nombre : '-'}</Text>
-                        <Text><strong>Total a Pagar:</strong> {orden.totalPagar}</Text>
-                        <Text><strong>Estado:</strong> {getEstadoText(orden.estado)}</Text>
-                        <Text><strong>Condición de Pago:</strong> {getCondicionPagoText(orden.condicionPago)}</Text>
-                        <Text><strong>Tiempo de Entrega:</strong> {orden.tiempoEntrega}</Text>
-                        <Text><strong>Plazo de Pago:</strong> {orden.plazoPago}</Text>
-                    </Box>
-                    {orden.itemsOrdenCompra && orden.itemsOrdenCompra.length > 0 && (
-                        <Box>
-                            <Text fontWeight="bold" mb={2}>Items de la Orden (Cantidad Correcta)</Text>
-                            <Table variant="simple" size="sm">
-                                <Thead>
-                                    <Tr>
-                                        <Th>ID</Th>
-                                        <Th>Materia Prima</Th>
-                                        <Th>Cantidad Correcta</Th>
-                                    </Tr>
-                                </Thead>
-                                <Tbody>
-                                    {localItems && localItems.map((item) => (
-                                        <Tr key={item.itemOrdenId}>
-                                            <Td>{item.itemOrdenId}</Td>
-                                            <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre}` : '-'}</Td>
-                                            <Td>{getCantidadCorrectaText(item.cantidadCorrecta)}</Td>
-                                        </Tr>
-                                    ))}
-                                </Tbody>
-                            </Table>
-                        </Box>
-                    )}
-                    <Box mt={4} textAlign="center" >
-                        <Text fontWeight="bold" hidden={cantidadesFisicasOk}> En espera del reporte de almacen </Text>
-                        <Text fontWeight="bold" hidden={!cantidadesFisicasOk}>Token Dinamico de confirmacion: {randomCode}</Text>
+                    <OrdenDetailsComponent />
+                    <OrdenCompraItemListComponent/>
+
+                    <Box mt={4} textAlign="center">
+                        <Text fontWeight="bold" hidden={cantidadesFisicasOk}>En espera del reporte de almacén</Text>
+                        <Text fontWeight="bold" hidden={!cantidadesFisicasOk}>Token dinámico de confirmación: {randomCode}</Text>
                         <HStack hidden={!cantidadesFisicasOk}>
                             <Input
-                                mt={2}
-                                placeholder="Digite token dinamico"
+                                placeholder="Digite token dinámico"
                                 value={inputCode}
                                 onChange={(e) => setInputCode(e.target.value)}
                                 maxW="200px"
-                                mx="auto"
                             />
                             <Button
-                                mt={4}
                                 colorScheme="green"
                                 onClick={handleCerrarOrden}
                                 isDisabled={!allCantidadCorrecta()}
@@ -388,9 +394,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
             <ModalContent>
                 <ModalHeader>Actualizar Estado de la Orden de Compra</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody>
-                    {renderContent()}
-                </ModalBody>
+                <ModalBody>{renderContent()}</ModalBody>
                 <ModalFooter>
                     <Button colorScheme="blue" onClick={onClose}>Cerrar</Button>
                 </ModalFooter>
