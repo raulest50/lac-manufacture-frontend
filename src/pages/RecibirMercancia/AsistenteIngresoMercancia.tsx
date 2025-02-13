@@ -2,16 +2,18 @@
 import {
     Box,
     Container,
-    Flex, Heading,
-    Input,
-    Text,
+    Flex,
     StepDescription,
     StepNumber,
     StepSeparator,
     StepStatus,
-    useSteps, FormControl, FormLabel, Button
+    useSteps,
 } from "@chakra-ui/react";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
+import StepZeroComponent from "./StepZeroComponent.tsx";
+import {useState} from "react";
+import {OrdenCompra} from "../Compras/types.tsx";
+import StepOneComponent from "./StepOneComponent.tsx";
 
 
 
@@ -29,20 +31,17 @@ export default function AsistenteIngresoMercancia() {
         count: steps.length,
     });
 
+    const [selectedOrder, setSelectedOrder] = useState<OrdenCompra|null>(null);
+
     function ConditionalRenderStep() {
+        if (activeStep === 0) {
+            return(
+                <StepZeroComponent setActiveStep={setActiveStep} setSelectedOrder={setSelectedOrder}/>
+            );
+        }
         if (activeStep === 1) {
             return(
-                <Flex p={"1em"} direction={"column"} backgroundColor={"blue.50"} gap={4} alignItems={"center"}>
-                    <Heading fontFamily={'Comfortaa Variable'}>Identificar Orden de Compra</Heading>
-                    <Text fontFamily={'Comfortaa Variable'}>Ingrese el id de la factura para comprobar que esta asociada a una orden de compra</Text>
-                    <Flex w={"40%"} direction={"column"} gap={4}>
-                        <FormControl isRequired>
-                            <FormLabel >Id Factura</FormLabel>
-                            <Input />
-                        </FormControl>
-                        <Button variant={"solid"} colorScheme={"teal"}>Buscar</Button>
-                    </Flex>
-                </Flex>
+                <StepOneComponent setActiveStep={setActiveStep} orden={selectedOrder} />
             );
         }
         if (activeStep === 2) {
@@ -82,10 +81,6 @@ export default function AsistenteIngresoMercancia() {
                         </Step>
                     ))}
                 </Stepper>
-                <Input
-                    value={activeStep}
-                    onChange={(e) => {setActiveStep(Number(e.target.value))}}
-                />
                 <ConditionalRenderStep/>
             </Flex>
 

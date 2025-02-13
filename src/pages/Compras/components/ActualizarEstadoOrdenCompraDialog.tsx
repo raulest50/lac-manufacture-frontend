@@ -226,10 +226,10 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                                     <Tr key={item.itemOrdenId}>
                                         <Td>{item.itemOrdenId}</Td>
                                         <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre}` : '-'}</Td>
-                                        <Td hidden={orden.estado === 2}>{item.cantidad}</Td>
-                                        <Td hidden={orden.estado === 2}>{item.precioUnitario}</Td>
-                                        <Td hidden={orden.estado === 2}>{item.iva19}</Td>
-                                        <Td hidden={orden.estado === 2}>{item.subTotal}</Td>
+                                        <Td >{item.cantidad}</Td>
+                                        <Td >{item.precioUnitario}</Td>
+                                        <Td >{item.iva19}</Td>
+                                        <Td >{item.subTotal}</Td>
                                         <Td>
                                             <Button
                                                 hidden={orden.estado !== 1}
