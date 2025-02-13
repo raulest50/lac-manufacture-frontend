@@ -12,9 +12,10 @@ import {
 } from '@chakra-ui/react';
 import {getEstadoText, OrdenCompra} from '../types';
 import OrdenCompraDetails from './OrdenCompraDetails';
-import PdfGenerator from "../pdfGenerator";
+
 import CancelarOrdenDialog from './CancelarOrdenDialog';
 import ActualizarEstadoOrdenCompraDialog from "./ActualizarEstadoOrdenCompraDialog.tsx";
+import {ExcelOCGenerator} from "../ExcelOCGenerator.tsx";
 
 interface ListaOrdenesCompraProps {
     ordenes: OrdenCompra[];
@@ -52,9 +53,10 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
         });
     };
 
-    const handleGenerarPDF = () => {
+    const handleGenerarExcel = async () => {
         if (contextMenu) {
-            new PdfGenerator(contextMenu.orden);
+            const generator = new ExcelOCGenerator();
+            await generator.downloadExcel(contextMenu.orden as OrdenCompra);
         }
         setContextMenu(null);
     };
@@ -141,9 +143,9 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
                     <Box
                         p={1}
                         _hover={{ bg: 'gray.100', cursor: 'pointer' }}
-                        onClick={handleGenerarPDF}
+                        onClick={handleGenerarExcel}
                     >
-                        Generar PDF
+                        Generar Excel
                     </Box>
                     <Box
                         p={1}
