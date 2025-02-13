@@ -71,7 +71,7 @@ export class ExcelOCGenerator {
             name: 'Artifakt Element Medium',
             size: 24,
             bold: true,
-            color: { argb: 'FF00B050' }
+            color: { argb: 'FFE7268D' }
         };
         headerCell.alignment = { horizontal: 'center', vertical: 'middle' };
 
@@ -203,9 +203,9 @@ export class ExcelOCGenerator {
         cell.fill = {
             type: 'pattern',
             pattern: 'solid',
-            fgColor: { argb: 'FF00B050' }
+            fgColor: { argb: 'FFF2DCDB' }
         };
-        cell.font = { name: 'Artifakt Element Medium', size: 14, color: { argb: 'FFFFFFFF' } };
+        cell.font = { name: 'Artifakt Element Medium', size: 14, color: { argb: 'FF353434' } };
         cell.alignment = { horizontal: 'center', vertical: 'middle' }
     }
 

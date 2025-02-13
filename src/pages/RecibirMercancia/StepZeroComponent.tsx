@@ -10,8 +10,9 @@ import {
     Text,
     useToast,
 } from "@chakra-ui/react";
-import { OrdenCompra } from "./types.tsx";
-import EndPointsURL from "../../api/EndPointsURL.tsx";
+import axios from "axios";
+import { OrdenCompra } from "./types";
+import EndPointsURL from "../../api/EndPointsURL";
 
 interface StepZeroComponentProps {
     setActiveStep: (step: number) => void;
@@ -41,18 +42,15 @@ export default function StepZeroComponent({
         try {
             // Build the endpoint URL using your domain logic
             const endpoint = `${EndPointsURL.getDomain()}/compras/orden_by_factura?facturaCompraId=${facturaId}`;
-            const response = await fetch(endpoint);
-
-            if (!response.ok) {
-                throw new Error("Orden de compra no encontrada");
-            }
-
-            const data: OrdenCompra = await response.json();
+            const response = await axios.get<OrdenCompra>(endpoint, {
+                withCredentials: true, // ensure cookies/credentials are sent
+            });
 
             // Set the selected order and advance to the next step
-            setSelectedOrder(data);
+            setSelectedOrder(response.data);
             setActiveStep(1);
-        } catch (error) {
+        } catch (error: any) {
+            console.error("Error fetching order:", error);
             toast({
                 title: "Orden no encontrada",
                 description:
