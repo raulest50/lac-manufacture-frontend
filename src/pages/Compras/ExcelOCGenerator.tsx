@@ -1,6 +1,6 @@
 // ExcelOCGenerator.ts
 import ExcelJS from 'exceljs';
-import {getCondicionPagoText, getRegimenTributario, OrdenCompra} from './types'; // Adjust the path as needed
+import {getCondicionPagoText, getRegimenTributario, ItemOrdenCompra, OrdenCompra} from './types';
 
 export class ExcelOCGenerator {
     /**
@@ -20,10 +20,10 @@ export class ExcelOCGenerator {
         worksheet.getColumn('C').width = 12;
         worksheet.getColumn('D').width = 9;
         worksheet.getColumn('E').width = 14;
-        worksheet.getColumn('F').width = 12;
+        worksheet.getColumn('F').width = 14;
         worksheet.getColumn('G').width = 14;
         worksheet.getColumn('H').width = 14;
-        worksheet.getColumn('I').width = 30;
+        worksheet.getColumn('I').width = 32;
 
 
         const response = await fetch('/logo_exotic.png');
@@ -51,13 +51,17 @@ export class ExcelOCGenerator {
 
 
         worksheet.mergeCells('A8:B8'); // napolitana razon social
-        worksheet.getCell('A8').value = "Napolitana J.P S.A.S.";
+        this.setPjuFormat(worksheet.getCell('A8'), "Napolitana J.P S.A.S.");
+
         worksheet.mergeCells('A9:B9'); // napolitana nit
-        worksheet.getCell('A9').value = "Nit: 901751897-1";
+        this.setPjuFormat(worksheet.getCell('A9'), "Nit: 901751897-1");
+
+
         worksheet.mergeCells('A10:B10'); // napolitana tel
-        worksheet.getCell('A10').value = "Tel: 301 711 51 81";
+        this.setPjuFormat(worksheet.getCell('A10'), "Tel: 301 711 51 81");
+
         worksheet.mergeCells('A11:B11'); // napolitana email
-        worksheet.getCell('A11').value = "jorgerafaelpereiraosorio1@gmail.com";
+        this.setPjuFormat(worksheet.getCell('A11'), "jorgerafaelpereiraosorio1@gmail.com");
 
 
         worksheet.mergeCells('E1:I3');
@@ -127,14 +131,70 @@ export class ExcelOCGenerator {
         worksheet.mergeCells('A21:B21');
         this.setNormalFormat(worksheet.getCell('A21'), orden.proveedor.email);
 
+        this.setHeaderFormat(worksheet.getCell('A25'), "CODIGO");
+        worksheet.mergeCells('B25:D25');
+        this.setHeaderFormat(worksheet.getCell('B25'), "DESCRIPCION");
+        this.setHeaderFormat(worksheet.getCell('E25'), "CANTIDAD");
+        worksheet.mergeCells('F25:G25');
+        this.setHeaderFormat(worksheet.getCell('F25'), "PRECIO UNITARIO");
+        worksheet.mergeCells('H25:I25');
+        this.setHeaderFormat(worksheet.getCell('H25'), "SUBTOTAL");
+
+
+        for(let n = 0; n < orden.itemsOrdenCompra.length; n++){
+            this.insertItem( 26 + n, orden.itemsOrdenCompra[n], worksheet);
+        }
+
+        const N = orden.itemsOrdenCompra.length;
+
+        worksheet.mergeCells(`F${29+N}:G${29+N}`);
+        this.setNormalFormat(worksheet.getCell(`F${29+N}`), "Sub Total");
+
+        worksheet.mergeCells(`F${30+N}:G${30+N}`);
+        this.setNormalFormat(worksheet.getCell(`F${30+N}`), "Iva 19%");
+
+        worksheet.mergeCells(`F${31+N}:G${31+N}`);
+        this.setNormalFormat(worksheet.getCell(`F${31+N}`), "Total Pagar");
+
+        worksheet.mergeCells(`H${29+N}:I${29+N}`);
+        this.setNormalFormat(worksheet.getCell(`H${29+N}`), orden.subTotal);
+
+        worksheet.mergeCells(`H${30+N}:I${30+N}`);
+        this.setNormalFormat(worksheet.getCell(`H${30+N}`), orden.iva19);
+
+        worksheet.mergeCells(`H${31+N}:I${31+N}`);
+        this.setNormalFormat(worksheet.getCell(`H${31+N}`), orden.totalPagar);
+
+
+        worksheet.mergeCells(`A${31+N}:D${31+N}`);
+        this.setHeaderFormat(worksheet.getCell(`A${31+N}`), "OBSERVACIONES");
+        worksheet.mergeCells(`A${32+N}:D${39+N}`);
+
         // Convert the workbook buffer (an ArrayBuffer) into a Uint8Array
         const arrayBuffer = await workbook.xlsx.writeBuffer();
         return new Uint8Array(arrayBuffer);
     }
 
+    private insertItem(row: number, item:ItemOrdenCompra, worksheet: ExcelJS.Worksheet) {
+        worksheet.mergeCells(`B${row}:D${row}`);
+        worksheet.mergeCells(`F${row}:G${row}`);
+        worksheet.mergeCells(`H${row}:I${row}`);
+        this.setNormalFormat(worksheet.getCell(`A${row}`), item.materiaPrima.productoId);
+        this.setNormalFormat(worksheet.getCell(`B${row}`), item.materiaPrima.nombre);
+        this.setNormalFormat(worksheet.getCell(`E${row}`), item.cantidad);
+        this.setNormalFormat(worksheet.getCell(`F${row}`), item.precioUnitario);
+        this.setNormalFormat(worksheet.getCell(`H${row}`), item.subTotal);
+    }
+
     private setNormalFormat(cell: ExcelJS.Cell, value: string | (number|undefined)){
         cell.value = value;
         cell.font = { name: 'Artifakt Element Medium', size: 11 };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' }
+    }
+
+    private setPjuFormat(cell: ExcelJS.Cell, value: string | (number|undefined)){
+        cell.value = value;
+        cell.font = { name: 'Artifakt Element Medium', size: 9 };
         cell.alignment = { horizontal: 'center', vertical: 'middle' }
     }
 
@@ -145,7 +205,7 @@ export class ExcelOCGenerator {
             pattern: 'solid',
             fgColor: { argb: 'FF00B050' }
         };
-        cell.font = { name: 'Artifakt Element Medium', size: 14, color: { argb: '00000000' } };
+        cell.font = { name: 'Artifakt Element Medium', size: 14, color: { argb: 'FFFFFFFF' } };
         cell.alignment = { horizontal: 'center', vertical: 'middle' }
     }
 

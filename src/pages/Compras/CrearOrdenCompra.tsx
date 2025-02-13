@@ -29,20 +29,25 @@ export default function CrearOrdenCompra() {
     const [iva19, setIva19] = useState(0);
     const [totalPagar, setTotalPagar] = useState(0);
 
-    const updateTotales = () => {
-        setSubTotal(listaItemsOrdenCompra.reduce((sum, item) => sum + item.subTotal, 0));
-        setIva19(
-            Math.round(
-                listaItemsOrdenCompra.reduce((sum, item) => sum + item.subTotal * 0.19, 0)
-            )
+    const updateTotalesAndGetValues = () => {
+        const calculatedSubTotal = listaItemsOrdenCompra.reduce(
+            (sum, item) => sum + item.subTotal,
+            0
         );
-        setTotalPagar(subTotal + iva19);
-    }
+        const calculatedIva = Math.round(
+            listaItemsOrdenCompra.reduce((sum, item) => sum + item.subTotal * 0.19, 0)
+        );
+        const calculatedTotal = calculatedSubTotal + calculatedIva;
+        setSubTotal(calculatedSubTotal);
+        setIva19(calculatedIva);
+        setTotalPagar(calculatedTotal);
+        return { calculatedSubTotal, calculatedIva, calculatedTotal };
+    };
 
     const clearAll = () =>{
         setSelectedProveedor(null);
         setListaItemsOrdenCompra([]);
-        updateTotales();
+        updateTotalesAndGetValues();
     };
 
     // When a MateriaPrima is selected from the picker, create an ItemOrdenCompra with default numeric values.
@@ -81,7 +86,7 @@ export default function CrearOrdenCompra() {
         item.iva19 = Math.round(item.subTotal * 0.19);
         newList[index] = item;
         setListaItemsOrdenCompra(newList);
-        updateTotales();
+        updateTotalesAndGetValues();
     };
 
     // Called when the user clicks "Crear Orden de Compra"
@@ -107,22 +112,21 @@ export default function CrearOrdenCompra() {
             return;
         }
 
-        // Calculate subTotal, IVA (19%), and totalPagar
-        updateTotales();
+        // Calculate totals and get the latest values:
+        const { calculatedSubTotal, calculatedIva, calculatedTotal } = updateTotalesAndGetValues();
 
         const nuevaOrdenCompra: OrdenCompra = {
             proveedor: selectedProveedor,
             fechaVencimiento: fechaVencimiento + "T00:00:00",
             itemsOrdenCompra: listaItemsOrdenCompra,
-            subTotal: subTotal,
-            iva19: iva19,
-            totalPagar: totalPagar,
-            condicionPago: condicionPago,    // Adjust as needed
+            subTotal: calculatedSubTotal,      // Use the freshly computed values
+            iva19: calculatedIva,
+            totalPagar: calculatedTotal,
+            condicionPago: condicionPago,
             tiempoEntrega: tiempoEntrega,
             plazoPago: plazoPago,
-            estado: 0,            // 0 = pendiente aprobación proveedor
+            estado: 0, // 0 = pendiente aprobación proveedor
         };
-
         try {
             // Explicitly set the header to ensure JSON is sent.
             const response = await axios.post(
