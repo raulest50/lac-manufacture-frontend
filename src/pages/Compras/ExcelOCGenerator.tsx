@@ -23,19 +23,30 @@ export class ExcelOCGenerator {
         worksheet.getColumn('F').width = 12;
         worksheet.getColumn('G').width = 14;
         worksheet.getColumn('H').width = 14;
-        worksheet.getColumn('I').width = 20;
+        worksheet.getColumn('I').width = 30;
 
 
         const response = await fetch('/logo_exotic.png');
-        const svgText = await response.text();
-        const base64SVG = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgText)));
+        const blob = await response.blob();
+        const base64PNG = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (typeof reader.result === 'string') {
+                    resolve(reader.result);
+                } else {
+                    reject('Conversion to base64 failed');
+                }
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
         const imageId = workbook.addImage({
-            base64: base64SVG,
+            base64: base64PNG,
             extension: 'png',
         });
         worksheet.addImage(imageId, {
-            tl: { col: 1, row: 1 }, // top-left position (A1)
-            ext: { width: 200, height: 100 } // set image dimensions
+            tl: { col: 0.5, row: 0 }, // Position A1 (col: 0, row: 0)
+            ext: { width: 170, height: 130 } // Set image dimensions
         });
 
 
