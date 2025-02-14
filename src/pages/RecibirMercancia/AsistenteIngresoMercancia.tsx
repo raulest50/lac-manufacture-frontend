@@ -12,15 +12,16 @@ import {
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
 import StepZeroComponent from "./StepZeroComponent.tsx";
 import {useState} from "react";
-import {OrdenCompra} from "../Compras/types.tsx";
+import {OrdenCompra} from "./types.tsx";
 import StepOneComponent from "./StepOneComponent.tsx";
 
 
 
 const steps = [
     { title: 'Primero', description: 'Identificar Orden Compra' },
-    { title: 'Segundo', description: 'Revisar cantidades de cada Item' },
-    { title: 'Tercero', description: 'Confirmar o Rechazar Recepcion' },
+    { title: 'Segundo', description: 'Contar y verificar cantidades de cada Item' },
+    { title: 'Tercero', description: 'Tomar foto del documento soporte' },
+    { title: 'Cuarto', description: 'Confirmar o Rechazar Recepcion' },
 ]
 
 

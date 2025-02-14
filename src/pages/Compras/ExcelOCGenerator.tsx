@@ -94,7 +94,7 @@ export class ExcelOCGenerator {
         worksheet.mergeCells('F13:I13');
         this.setHeaderFormat(worksheet.getCell('F13'), "LUGAR DE ENTREGA Y CONDICIONES DE PAGO");
         worksheet.mergeCells('F14:I14');
-        this.setNormalFormat(worksheet.getCell('F14'), "Nombre Empresa: EXOTIC EXPERT");
+        this.setNormalFormat(worksheet.getCell('F14'), "Empresa: Napolitana JP S.A.S - EXOTIC EXPERT");
         worksheet.mergeCells('F15:I15');
         this.setNormalFormat(worksheet.getCell('F15'), "Direccion : vía 11, Juan Mina #4 100");
         worksheet.mergeCells('F16:I16');
