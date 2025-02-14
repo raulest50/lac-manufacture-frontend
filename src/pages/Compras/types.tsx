@@ -44,6 +44,7 @@ export interface MateriaPrima {
     tipo_producto: string;
     nombre: string;
     costo: number;
+    tipoUnidades: string;
     // add other properties if needed
 }
 

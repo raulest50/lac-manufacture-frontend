@@ -72,11 +72,7 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                                     {orden.itemsOrdenCompra.map((item) => (
                                         <Tr key={item.itemOrdenId}>
                                             <Td>{item.itemOrdenId}</Td>
-                                            <Td>
-                                                {item.materiaPrima
-                                                    ? `${item.materiaPrima.productoId} ${item.materiaPrima.nombre || ''}`
-                                                    : '-'}
-                                            </Td>
+                                            <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre} - (${item.materiaPrima.tipoUnidades}) ` : '-'}</Td>
                                             <Td>{item.cantidad}</Td>
                                             <Td>{item.precioUnitario}</Td>
                                             <Td>{item.iva19}</Td>

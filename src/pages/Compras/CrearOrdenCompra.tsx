@@ -1,6 +1,6 @@
 // ./CrearOrdenCompra.tsx
 import { useState } from 'react';
-import {Button, Container, Flex, FormControl, FormLabel, Input, Select, useToast, } from '@chakra-ui/react';
+import {Button, Container, Flex, FormControl, FormLabel, Input, Select, useToast, Text} from '@chakra-ui/react';
 import axios from 'axios';
 import { Proveedor, MateriaPrima, ItemOrdenCompra, OrdenCompra } from './types';
 import EndPointsURL from '../../api/EndPointsURL';
@@ -9,7 +9,7 @@ import ProveedorCard from './components/ProveedorCard.tsx';
 import MateriaPrimaPicker from './components/MateriaPrimaPicker.tsx';
 import ListaOrdenCompraItems from './components/ListaOrdenCompraItems.tsx';
 import MyDatePicker from "../../components/MyDatePicker.tsx";
-import {format} from "date-fns";
+import {format, addDays} from "date-fns";
 
 const endPoints = new EndPointsURL();
 
@@ -23,7 +23,7 @@ export default function CrearOrdenCompra() {
     const [plazoPago, setPlazoPago] = useState(30);
     const [condicionPago, setCondicionPago] = useState("0");
     const [tiempoEntrega, setTiempoEntrega] = useState("15");
-    const [fechaVencimiento, setFechaVencimiento] = useState(format(new Date(), "yyyy-MM-dd"));
+    const [fechaVencimiento, setFechaVencimiento] = useState(format(addDays(new Date(), 30), "yyyy-MM-dd"));
 
     const [subTotal, setSubTotal] = useState(0);
     const [iva19, setIva19] = useState(0);
@@ -213,7 +213,7 @@ export default function CrearOrdenCompra() {
                     </Flex>
 
                 </Flex>
-
+                <Text hidden={true}> Sub Total: {subTotal} - iva19: {iva19} - Total a Pagar: {totalPagar} </Text>
                 <Button onClick={() => setIsMateriaPrimaPickerOpen(true)}>
                     Agregar Materia Prima
                 </Button>

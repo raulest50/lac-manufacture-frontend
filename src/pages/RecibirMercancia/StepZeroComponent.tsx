@@ -24,11 +24,11 @@ export default function StepZeroComponent({
                                               setSelectedOrder,
                                           }: StepZeroComponentProps) {
     const toast = useToast();
-    const [facturaId, setFacturaId] = useState("");
+    const [ordenCompraId, setOrdenCompraId] = useState("");
 
     const handleOnClickBuscarOrdenByFacturaId = async () => {
         // Validate input
-        if (!facturaId) {
+        if (!ordenCompraId) {
             toast({
                 title: "Error",
                 description: "Ingrese un ID de Factura",
@@ -41,7 +41,7 @@ export default function StepZeroComponent({
 
         try {
             // Build the endpoint URL using your domain logic
-            const endpoint = `${EndPointsURL.getDomain()}/compras/orden_by_factura?facturaCompraId=${facturaId}`;
+            const endpoint = `${EndPointsURL.getDomain()}/compras/orden_by_id?ordenCompraId=${ordenCompraId}`;
             const response = await axios.get<OrdenCompra>(endpoint, {
                 withCredentials: true, // ensure cookies/credentials are sent
             });
@@ -74,15 +74,14 @@ export default function StepZeroComponent({
                 Identificar Orden de Compra
             </Heading>
             <Text fontFamily="Comfortaa Variable">
-                Ingrese el id de la factura para comprobar que está asociada a una orden
-                de compra
+                Ingrese el id de la orden de compra para verificar si se puede iniciar proceso de ingreso a almacen.
             </Text>
             <Flex w="40%" direction="column" gap={4}>
                 <FormControl isRequired>
-                    <FormLabel>Id Factura</FormLabel>
+                    <FormLabel>Id Orden de Compra</FormLabel>
                     <Input
-                        value={facturaId}
-                        onChange={(e) => setFacturaId(e.target.value)}
+                        value={ordenCompraId}
+                        onChange={(e) => setOrdenCompraId(e.target.value)}
                     />
                 </FormControl>
                 <Button

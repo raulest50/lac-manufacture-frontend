@@ -63,7 +63,7 @@ const ListaOrdenCompraItems: React.FC<OrdenCompraItemsProps> = ({
                         return (
                             <Tr key={index}>
                                 <Td>{item.materiaPrima.productoId}</Td>
-                                <Td>{item.materiaPrima.nombre}</Td>
+                                <Td>{item.materiaPrima.nombre} ({item.materiaPrima.tipoUnidades}) </Td>
                                 <Td isNumeric>
                                     <Input
                                         size="sm"

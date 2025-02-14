@@ -225,7 +225,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                                 {localItems && localItems.map((item, index) => (
                                     <Tr key={item.itemOrdenId}>
                                         <Td>{item.itemOrdenId}</Td>
-                                        <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre}` : '-'}</Td>
+                                        <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre} - (${item.materiaPrima.tipoUnidades}) ` : '-'}</Td>
                                         <Td >{item.cantidad}</Td>
                                         <Td >{item.precioUnitario}</Td>
                                         <Td >{item.iva19}</Td>
