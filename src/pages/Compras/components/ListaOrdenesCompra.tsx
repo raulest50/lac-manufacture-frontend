@@ -15,7 +15,8 @@ import OrdenCompraDetails from './OrdenCompraDetails';
 
 import CancelarOrdenDialog from './CancelarOrdenDialog';
 import ActualizarEstadoOrdenCompraDialog from "./ActualizarEstadoOrdenCompraDialog.tsx";
-import {ExcelOCGenerator} from "../ExcelOCGenerator.tsx";
+// import {ExcelOCGenerator} from "../ExcelOCGenerator.tsx";
+import PdfGenerator from "../pdfGenerator.tsx";
 
 interface ListaOrdenesCompraProps {
     ordenes: OrdenCompra[];
@@ -55,8 +56,10 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
 
     const handleGenerarExcel = async () => {
         if (contextMenu) {
-            const generator = new ExcelOCGenerator();
-            await generator.downloadExcel(contextMenu.orden as OrdenCompra);
+            // const generator = new ExcelOCGenerator();
+            // await generator.downloadExcel(contextMenu.orden as OrdenCompra);
+            const generator = new PdfGenerator();
+            await generator.generatePDF(contextMenu.orden as OrdenCompra);
         }
         setContextMenu(null);
     };

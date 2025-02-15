@@ -1,82 +1,181 @@
-// src/pdfGenerator.tsx
+// pdfGenerator.ts
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import {getCondicionPagoText, getEstadoText, OrdenCompra} from "./types";
+import {
+    getCondicionPagoText,
+    getRegimenTributario,
+    OrdenCompra,
+    ItemOrdenCompra,
+} from "./types";
 
-
-const detailsExotic = {
-    razon_social: "Exotic Expert",
-    direccion: "avenida 123",
-    telefono: "1234",
-    correo: "compras@exotic.com",
-    nit: "1243",
-    regimen_tributario: "simple",
-}
-
-
-// This class immediately generates and downloads the PDF when constructed.
 export default class PdfGenerator {
+    /**
+     * Generates the PDF file for the given OrdenCompra and triggers its download.
+     * @param orden the order data to populate the PDF with.
+     */
+    public async generatePDF(orden: OrdenCompra): Promise<void> {
+        // Create a new jsPDF instance (A4 size, mm units)
+        const doc = new jsPDF({ unit: "mm", format: "a4" });
+        const margin = 10;
+        let currentY = margin;
 
-    constructor(orden: OrdenCompra) {
-        this.generatePDF(orden);
-    }
+        // --- Logo Section ---
+        // Fetch logo image as base64 and add it at top-left (simulating merged cells A1:B7)
+        let logoBase64: string | null = null;
+        try {
+            logoBase64 = await this.getImageBase64("/logo_exotic.png");
+        } catch (error) {
+            console.error("Error fetching logo image", error);
+        }
+        if (logoBase64) {
+            // Adjust the width and height as needed (here: 50mm x 40mm)
+            doc.addImage(logoBase64, "PNG", margin, currentY, 50, 40);
+        }
 
+        // --- Header Title ---
+        // Place "ORDEN DE COMPRA" in a prominent position (simulating merged cells E1:I3)
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(24);
+        // Center the title at the top of the page (adjust x and y as needed)
+        doc.text("ORDEN DE COMPRA", 105, currentY + 20, { align: "center" });
 
-    generatePDF(orden: OrdenCompra) {
-        // Create a new jsPDF instance (portrait, A4 size)
-        const doc = new jsPDF();
+        // --- Napolitana Company Info ---
+        // (Simulating Excel cells A8:A11)
+        currentY += 45; // move below the logo
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        doc.text("Napolitana J.P S.A.S.", margin, currentY);
+        currentY += 7;
+        doc.text("Nit: 901751897-1", margin, currentY);
+        currentY += 7;
+        doc.text("Tel: 301 711 51 81", margin, currentY);
+        currentY += 7;
+        doc.text("jorgerafaelpereiraosorio1@gmail.com", margin, currentY);
 
-        // Set the title
-        doc.setFontSize(18);
-        doc.text("Orden de Compra", 14, 22);
+        // --- Order Details ---
+        // (Simulating details in cells F4:I6)
+        const detailX = 120; // starting x for details on the right side
+        let detailY = margin + 10; // starting y (adjust as needed)
+        doc.setFontSize(11);
+        doc.text("FECHA EMISION ORDEN DE COMPRA:", detailX, detailY);
+        doc.text(orden.fechaEmision ? orden.fechaEmision.toString() : "", detailX + 80, detailY);
+        detailY += 7;
+        doc.text("NUMERO DE ORDEN DE COMPRA:", detailX, detailY);
+        doc.text(orden.ordenCompraId ? orden.ordenCompraId.toString(): "" , detailX + 80, detailY);
+        detailY += 7;
+        doc.text("FECHA DE VENCIMIENTO DE LA ORDEN:", detailX, detailY);
+        doc.text(orden.fechaVencimiento ? orden.fechaVencimiento.toString() : "", detailX + 80, detailY);
 
-        // Set font for details
-        doc.setFontSize(12);
-        const details = [
-            { label: "Orden de Compra ID:", value: orden.ordenCompraId },
-            { label: "Fecha Emisión:", value: orden.fechaEmision ? new Date(orden.fechaEmision).toLocaleString() : "-" },
-            { label: "Fecha Vencimiento:", value: orden.fechaVencimiento ? new Date(orden.fechaVencimiento).toLocaleDateString() : "-" },
-            { label: "Proveedor:", value: orden.proveedor ? orden.proveedor.nombre : "-" },
-            { label: "Condición de Pago:", value: getCondicionPagoText(orden.condicionPago) },
-            { label: "Tiempo de Entrega:", value: orden.tiempoEntrega },
-            { label: "Plazo de Pago:", value: orden.plazoPago },
-            { label: "Estado:", value: getEstadoText(orden.estado) },
-            { label: "Total a Pagar:", value: orden.totalPagar }
-        ];
+        // --- Lugar de Entrega y Condiciones de Pago ---
+        // (Simulating merged cells F13:I21)
+        let entregaY = detailY + 10;
+        doc.setFont("helvetica", "bold");
+        doc.text("LUGAR DE ENTREGA Y CONDICIONES DE PAGO", detailX, entregaY);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        entregaY += 7;
+        doc.text("Empresa: Napolitana JP S.A.S - EXOTIC EXPERT", detailX, entregaY);
+        entregaY += 7;
+        doc.text("Direccion: vía 11, Juan Mina #4 100", detailX, entregaY);
+        entregaY += 7;
+        doc.text("Barranquilla, Atlántico", detailX, entregaY);
+        entregaY += 7;
+        doc.text("[TELEFONO PLANTA EXOTIC]", detailX, entregaY);
+        entregaY += 7;
+        doc.text(getCondicionPagoText(orden.condicionPago) ?? "", detailX, entregaY);
+        entregaY += 7;
+        doc.text(`PLAZO PAGO ${orden.plazoPago} DIAS`, detailX, entregaY);
+        entregaY += 7;
+        doc.text(`PLAZO ENTREGA ${orden.tiempoEntrega} DIAS`, detailX, entregaY);
+        entregaY += 7;
+        doc.text("CONDICION ENTREGA: PUESTA EN PLANTA", detailX, entregaY);
 
-        let startY = 30;
-        details.forEach(detail => {
-            doc.text(`${detail.label} ${detail.value}`, 14, startY);
-            startY += 7;
-        });
+        // --- Proveedor Information ---
+        // (Simulating merged cells A13:B21)
+        let proveedorY = currentY + 20; // start a bit lower than the Napolitana info
+        doc.setFont("helvetica", "bold");
+        doc.text("PROVEEDOR", margin, proveedorY);
+        doc.setFont("helvetica", "normal");
+        proveedorY += 7;
+        doc.text(orden.proveedor.nombre, margin, proveedorY);
+        proveedorY += 7;
+        doc.text(`NIT: ${orden.proveedor.id}`, margin, proveedorY);
+        proveedorY += 7;
+        doc.text(orden.proveedor.departamento, margin, proveedorY);
+        proveedorY += 7;
+        doc.text(orden.proveedor.direccion, margin, proveedorY);
+        proveedorY += 7;
+        doc.text(orden.proveedor.ciudad, margin, proveedorY);
+        proveedorY += 7;
+        doc.text(orden.proveedor.telefono, margin, proveedorY);
+        proveedorY += 7;
+        doc.text(getRegimenTributario(orden.proveedor.regimenTributario) ?? "", margin, proveedorY);
+        proveedorY += 7;
+        doc.text(orden.proveedor.email, margin, proveedorY);
 
-        // Prepare data for the items table
-        const items = orden.itemsOrdenCompra || [];
-        const tableColumn = ["ID", "Materia Prima", "Cantidad", "Precio Unitario", "IVA", "Subtotal"];
-        const tableRows = items.map(item => [
-            item.itemOrdenId,
-            item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre}` : "-",
+        // --- Items Table ---
+        // Determine the starting y-coordinate for the table based on previous sections
+        const tableStartY = Math.max(detailY, entregaY, proveedorY) + 10;
+
+        // Prepare table data similar to the Excel template header:
+        const tableColumns = ["CODIGO", "DESCRIPCION", "CANTIDAD", "PRECIO UNITARIO", "SUBTOTAL"];
+        const tableRows = orden.itemsOrdenCompra.map((item: ItemOrdenCompra) => [
+            item.materiaPrima.productoId,
+            item.materiaPrima.nombre,
             item.cantidad,
             item.precioUnitario,
-            item.iva19,
-            item.subTotal
+            item.subTotal,
         ]);
 
-        // Add the table to the PDF using autoTable
         autoTable(doc, {
-            head: [tableColumn],
+            head: [tableColumns],
             body: tableRows,
-            startY: startY + 5,
-            styles: { fontSize: 10 }
+            startY: tableStartY,
+            styles: { fontSize: 10 },
+            theme: "grid",
         });
 
-        // Add overall totals at the bottom (below the table)
-        const finalY = (doc as any).lastAutoTable.finalY || startY + 5;
-        doc.text(`Subtotal: ${orden.subTotal}`, 14, finalY + 10);
-        doc.text(`IVA (19%): ${orden.iva19}`, 14, finalY + 17);
-        doc.text(`Total a Pagar: ${orden.totalPagar}`, 14, finalY + 24);
+        // --- Totals ---
+        const finalY = (doc as any).lastAutoTable.finalY;
+        let totalsY = finalY + 10;
+        doc.setFont("helvetica", "normal");
+        doc.text(`Sub Total: ${orden.subTotal}`, margin, totalsY);
+        totalsY += 7;
+        doc.text(`IVA (19%): ${orden.iva19}`, margin, totalsY);
+        totalsY += 7;
+        doc.text(`Total Pagar: ${orden.totalPagar}`, margin, totalsY);
 
-        // Trigger the download of the PDF
-        doc.save(`OrdenCompra_${orden.ordenCompraId}.pdf`);
+        // --- Observaciones ---
+        totalsY += 10;
+        doc.setFont("helvetica", "bold");
+        doc.text("OBSERVACIONES", margin, totalsY);
+        totalsY += 7;
+        // Draw a rectangle to indicate an area for observations (adjust width/height as desired)
+        doc.rect(margin, totalsY, 190, 30);
+
+        // --- Trigger Download ---
+        doc.save(`orden-compra-${orden.ordenCompraId}.pdf`);
+    }
+
+    /**
+     * Helper method to fetch an image from a URL and convert it to a base64 string.
+     * @param url the URL of the image.
+     * @returns a Promise that resolves with the base64 string.
+     */
+    private async getImageBase64(url: string): Promise<string> {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (typeof reader.result === "string") {
+                    resolve(reader.result);
+                } else {
+                    reject("Error converting image to base64.");
+                }
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
     }
 }
