@@ -14,13 +14,14 @@ import StepZeroComponent from "./StepZeroComponent.tsx";
 import {useState} from "react";
 import {OrdenCompra} from "./types.tsx";
 import StepOneComponent from "./StepOneComponent.tsx";
+import StepTwoComponent from "./StepTwoComponent.tsx";
 
 
 
 const steps = [
     { title: 'Primero', description: 'Identificar Orden Compra' },
-    { title: 'Segundo', description: 'Contar y verificar cantidades de cada Item' },
-    { title: 'Tercero', description: 'Tomar foto del documento soporte' },
+    { title: 'Segundo', description: 'Verificar Cantidades' },
+    { title: 'Tercero', description: 'Foto doc. soporte' },
     { title: 'Cuarto', description: 'Confirmar o Rechazar Recepcion' },
 ]
 
@@ -47,8 +48,7 @@ export default function AsistenteIngresoMercancia() {
         }
         if (activeStep === 2) {
             return(
-                <>
-                </>
+                <StepTwoComponent />
             );
         }
         if (activeStep === 3) {

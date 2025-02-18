@@ -8,14 +8,23 @@ import {
     ItemOrdenCompra,
 } from "./types";
 
+// Extend jsPDF with properties added by jsPDF-AutoTable
+interface AutoTableProperties {
+    finalY: number;
+}
+
+interface jsPDFWithAutoTable extends jsPDF {
+    lastAutoTable?: AutoTableProperties;
+}
+
 export default class PdfGenerator {
     /**
      * Generates the PDF file for the given OrdenCompra and triggers its download.
      * @param orden the order data to populate the PDF with.
      */
     public async generatePDF(orden: OrdenCompra): Promise<void> {
-        // Create a new jsPDF instance (A4 size, mm units)
-        const doc = new jsPDF({ unit: "mm", format: "a4" });
+        // Create a new jsPDF instance (A4 size, mm units) and cast to our extended interface
+        const doc = new jsPDF({ unit: "mm", format: "a4" }) as jsPDFWithAutoTable;
         const margin = 10;
         let currentY = margin;
 
@@ -37,11 +46,11 @@ export default class PdfGenerator {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(24);
         // Center the title at the top of the page (adjust x and y as needed)
-        doc.text("ORDEN DE COMPRA", 105, currentY + 20, { align: "center" });
+        doc.text("ORDEN DE COMPRA", 115, currentY + 20, { align: "center" });
 
         // --- Napolitana Company Info ---
         // (Simulating Excel cells A8:A11)
-        currentY += 45; // move below the logo
+        currentY += 45 + 5; // move below the logo
         doc.setFont("helvetica", "normal");
         doc.setFontSize(11);
         doc.text("Napolitana J.P S.A.S.", margin, currentY);
@@ -54,17 +63,29 @@ export default class PdfGenerator {
 
         // --- Order Details ---
         // (Simulating details in cells F4:I6)
-        const detailX = 120; // starting x for details on the right side
-        let detailY = margin + 10; // starting y (adjust as needed)
+        const detailX = 90; // starting x for details on the right side
+        let detailY = margin + 10 + 30; // starting y (adjust as needed)
         doc.setFontSize(11);
         doc.text("FECHA EMISION ORDEN DE COMPRA:", detailX, detailY);
-        doc.text(orden.fechaEmision ? orden.fechaEmision.toString() : "", detailX + 80, detailY);
+        doc.text(
+            orden.fechaEmision ? orden.fechaEmision.toString().split("T")[0] : "",
+            detailX + 80,
+            detailY
+        );
         detailY += 7;
         doc.text("NUMERO DE ORDEN DE COMPRA:", detailX, detailY);
-        doc.text(orden.ordenCompraId ? orden.ordenCompraId.toString(): "" , detailX + 80, detailY);
+        doc.text(
+            orden.ordenCompraId ? orden.ordenCompraId.toString() : "",
+            detailX + 80,
+            detailY
+        );
         detailY += 7;
         doc.text("FECHA DE VENCIMIENTO DE LA ORDEN:", detailX, detailY);
-        doc.text(orden.fechaVencimiento ? orden.fechaVencimiento.toString() : "", detailX + 80, detailY);
+        doc.text(
+            orden.fechaVencimiento ? orden.fechaVencimiento.toString().split("T")[0] : "",
+            detailX + 80,
+            detailY
+        );
 
         // --- Lugar de Entrega y Condiciones de Pago ---
         // (Simulating merged cells F13:I21)
@@ -132,11 +153,13 @@ export default class PdfGenerator {
             body: tableRows,
             startY: tableStartY,
             styles: { fontSize: 10 },
+            headStyles: { fillColor: [255, 192, 203] }, // Soft pink header fill
             theme: "grid",
         });
 
         // --- Totals ---
-        const finalY = (doc as any).lastAutoTable.finalY;
+        // Use the properly typed lastAutoTable to get the final y-coordinate
+        const finalY = doc.lastAutoTable?.finalY ?? tableStartY;
         let totalsY = finalY + 10;
         doc.setFont("helvetica", "normal");
         doc.text(`Sub Total: ${orden.subTotal}`, margin, totalsY);
@@ -145,8 +168,17 @@ export default class PdfGenerator {
         totalsY += 7;
         doc.text(`Total Pagar: ${orden.totalPagar}`, margin, totalsY);
 
-        // --- Observaciones ---
+        // --- Leyenda ---
+        const leyenda =
+            "SEÑOR PROVEEDOR CUANDO ENTREGUE LOS MATERIALES SOLICITADOS ESTOS DEBEN IR CON UN DOCUMENTO QUE INDIQUE EL NUMERO DE ESTA ORDEN, ASI MISMO LAS CANTIDADES SOLICITDAS Y PRECIOS SON LOS QUE HAN SIDO APROBADOS Y ESTAN DESCRITOS EN ESE DOCUMENTO";
         totalsY += 10;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        const leyendaLines = doc.splitTextToSize(leyenda, 190);
+        doc.text(leyendaLines, margin, totalsY);
+        totalsY += leyendaLines.length * 7;
+
+        // --- Observaciones ---
         doc.setFont("helvetica", "bold");
         doc.text("OBSERVACIONES", margin, totalsY);
         totalsY += 7;

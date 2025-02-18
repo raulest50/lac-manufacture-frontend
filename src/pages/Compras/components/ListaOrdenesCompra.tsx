@@ -148,7 +148,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
                         _hover={{ bg: 'gray.100', cursor: 'pointer' }}
                         onClick={handleGenerarExcel}
                     >
-                        Generar Excel
+                        Generar PDF
                     </Box>
                     <Box
                         p={1}

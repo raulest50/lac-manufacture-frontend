@@ -43,8 +43,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     // Generate a random 7-digit code and hold the user input.
     const [randomCode, setRandomCode] = useState<string>('');
     const [inputCode, setInputCode] = useState<string>('');
-    // New state for storing the FacturaCompra id input (used when estado is 0).
-    const [facturaIdInput, setFacturaIdInput] = useState<string>('');
+
 
     // For estados 1 and 2, keep a local copy of the items (to update precioCorrecto or check cantidadCorrecta).
     const [localItems, setLocalItems] = useState(orden.itemsOrdenCompra);
@@ -70,7 +69,6 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
             const code = Math.floor(1000000 + Math.random() * 9000000).toString();
             setRandomCode(code);
             setInputCode('');
-            setFacturaIdInput('');
             // Clone the items array for local updates.
             setLocalItems(orden.itemsOrdenCompra);
         }
@@ -83,12 +81,9 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
 
     // Function to update order estado via backend.
     // When newEstado === 1 and a facturaId is provided, include it in the request.
-    const updateEstado = async (newEstado: number, facturaId?: string) => {
+    const updateEstado = async (newEstado: number) => {
         try {
             const requestBody:EstadoUpdate = { newEstado: newEstado };
-            if (newEstado === 1 && facturaId) {
-                requestBody.facturaCompraId = parseInt(facturaId, 10);
-            }
             const response = await axios.put(
                 `${EndPointsURL.getDomain()}/compras/orden_compra/${orden.ordenCompraId}/updateEstado`,
                 requestBody
@@ -117,7 +112,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     // It passes the facturaCompra id along with the confirmation token.
     const handleConfirmacionProveedor = () => {
         if (inputCode === randomCode) {
-            updateEstado(1, facturaIdInput);
+            updateEstado(1);
         } else {
             toast({
                 title: "Código incorrecto",
@@ -279,18 +274,6 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
 
                     <Box mt={4} textAlign="center" p="1em" >
                         <HStack justifyContent={"center"} alignItems="flex-start" mt={2} >
-                            <VStack alignItems="center" mt={2} >
-                                <FormControl isRequired>
-                                    <FormLabel>Id Factura Reportada por Proveedor</FormLabel>
-                                    <Input
-                                        placeholder="Digite ID de Factura"
-                                        value={facturaIdInput}
-                                        onChange={(e) => setFacturaIdInput(e.target.value)}
-                                        maxW="200px"
-                                    />
-                                </FormControl>
-                            </VStack>
-
                             <VStack alignItems="center" mt={2} >
                                 <Text fontWeight="bold">Token dinámico de confirmación: {randomCode}</Text>
                                 <FormControl isRequired>

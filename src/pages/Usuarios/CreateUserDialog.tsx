@@ -26,6 +26,7 @@ interface CreateUserDialogProps {
 
 const CreateUserDialog: React.FC<CreateUserDialogProps> = ({ isOpen, onClose, onUserCreated }) => {
     const [username, setUsername] = useState('');
+    const [nombreCompleto, setNombreCompleto] = useState('');
     const [password, setPassword] = useState('');
     const toast = useToast();
 
@@ -62,8 +63,12 @@ const CreateUserDialog: React.FC<CreateUserDialogProps> = ({ isOpen, onClose, on
                 <ModalHeader>Crear Nuevo Usuario</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
+                    <FormControl id="fullname" mb={4} isRequired>
+                        <FormLabel>Nombre Completo</FormLabel>
+                        <Input value={nombreCompleto} onChange={(e) => setNombreCompleto(e.target.value)} />
+                    </FormControl>
                     <FormControl id="username" mb={4} isRequired>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>Nombre de Usuario</FormLabel>
                         <Input value={username} onChange={(e) => setUsername(e.target.value)} />
                     </FormControl>
                     <FormControl id="password" mb={4} isRequired>

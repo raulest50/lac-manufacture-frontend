@@ -50,6 +50,14 @@ export default function CrearOrdenCompra() {
         updateTotalesAndGetValues();
     };
 
+    const checkCantidades = () => {
+        for(let i = 0; i < listaItemsOrdenCompra.length; i++) {
+            if(listaItemsOrdenCompra[i].cantidad < 0) return false;
+            if(listaItemsOrdenCompra[i].precioUnitario < 0 ) return false;
+        }
+        return true;
+    }
+
     // When a MateriaPrima is selected from the picker, create an ItemOrdenCompra with default numeric values.
     const handleAddMateriaPrima = (materia: MateriaPrima) => {
         const newItem: ItemOrdenCompra = {
@@ -105,6 +113,16 @@ export default function CrearOrdenCompra() {
             toast({
                 title: 'No hay items',
                 description: 'Agregue al menos un item a la orden de compra.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+        if (!checkCantidades()) {
+            toast({
+                title: 'Hay un Error en los Datos',
+                description: 'No se permiten valores negativos',
                 status: 'warning',
                 duration: 5000,
                 isClosable: true,
