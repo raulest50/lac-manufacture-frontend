@@ -49,6 +49,10 @@ export default function StepOneComponent({
         setActiveStep(2);
     };
 
+    const onClickReportarDiscrepancia = () => {
+
+    };
+
     // If no order is loaded, show a friendly message.
     if (!orden) {
         return <Text>No se ha seleccionado ninguna orden.</Text>;
@@ -145,8 +149,21 @@ export default function StepOneComponent({
                         colorScheme="teal"
                         isDisabled={!items.every((item) => item.cantidadCorrecta === 1)}
                         onClick={onClickContinuar}
+                        hidden={ items.some((item) => item.cantidadCorrecta === -1) }
                     >
                         Confirmar Las Cantidades Concuerdan
+                    </Button>
+                </Flex>
+                <Flex direction={"column"} gap={5} hidden={!items.some((item) => item.cantidadCorrecta === -1)}>
+                    <Text fontFamily={"Comfortaa Variable"} textAlign="center"> Si almenos una de las cantidades no coincide con la orden de compra, no se puede dar ingreso a almacen </Text>
+                    <Text fontFamily={"Comfortaa Variable"} textAlign="center"> termine de contar las otras cantidades y haga el reporte de que la mercancia no puede ser recibida </Text>
+                    <Button
+                        colorScheme={"red"}
+                        variant={"solid"}
+                        onClick={onClickReportarDiscrepancia}
+                        isDisabled={ items.some((item) => item.cantidadCorrecta === 0) }
+                    >
+                        Reportar Discrepancia
                     </Button>
                 </Flex>
             </Flex>
