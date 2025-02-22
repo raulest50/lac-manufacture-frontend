@@ -59,7 +59,7 @@ export default class PdfGenerator {
         currentY += 7;
         doc.text("Tel: 301 711 51 81", margin, currentY);
         currentY += 7;
-        doc.text("jorgerafaelpereiraosorio1@gmail.com", margin, currentY);
+        doc.text("produccion.exotic@gmail.com", margin, currentY);
 
         // --- Order Details ---
         // (Simulating details in cells F4:I6)
@@ -101,8 +101,8 @@ export default class PdfGenerator {
         entregaY += 7;
         doc.text("Barranquilla, Atlántico", detailX, entregaY);
         entregaY += 7;
-        doc.text("[TELEFONO PLANTA EXOTIC]", detailX, entregaY);
-        entregaY += 7;
+        //doc.text("301 499 38 08", detailX, entregaY);
+        //entregaY += 7;
         doc.text(getCondicionPagoText(orden.condicionPago) ?? "", detailX, entregaY);
         entregaY += 7;
         doc.text(`PLAZO PAGO ${orden.plazoPago} DIAS`, detailX, entregaY);
@@ -170,7 +170,7 @@ export default class PdfGenerator {
 
         // --- Leyenda ---
         const leyenda =
-            "SEÑOR PROVEEDOR CUANDO ENTREGUE LOS MATERIALES SOLICITADOS ESTOS DEBEN IR CON UN DOCUMENTO QUE INDIQUE EL NUMERO DE ESTA ORDEN, ASI MISMO LAS CANTIDADES SOLICITDAS Y PRECIOS SON LOS QUE HAN SIDO APROBADOS Y ESTAN DESCRITOS EN ESE DOCUMENTO";
+            "SEÑOR PROVEEDOR CUANDO ENTREGUE LOS MATERIALES SOLICITADOS ESTOS DEBEN IR ACOMPAÑADOS DE UN DOCUMENTO QUE INDIQUE EL NUMERO DE ESTA ORDEN. LAS CANTIDADES SOLICITDAS Y PRECIOS SON LOS QUE HAN SIDO APROBADOS Y DESCRITOS EN ESE DOCUMENTO.";
         totalsY += 10;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);

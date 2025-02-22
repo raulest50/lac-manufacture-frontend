@@ -93,3 +93,12 @@ export interface OrdenCompra {
      */
     estado: number;
 }
+
+
+export interface DocIngresoDTA{
+    ordenCompra: OrdenCompra;
+    nombreResponsable: string;
+    observaciones: string;
+}
+
+
