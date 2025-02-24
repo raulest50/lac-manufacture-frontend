@@ -34,6 +34,7 @@ const CreateUserDialog: React.FC<CreateUserDialogProps> = ({ isOpen, onClose, on
         try {
             await axios.post(`${EndPointsURL.getDomain()}/usuarios`, {
                 username,
+                nombreCompleto,
                 password
             });
             toast({

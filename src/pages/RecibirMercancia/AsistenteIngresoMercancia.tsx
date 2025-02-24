@@ -12,9 +12,10 @@ import {
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
 import StepZeroComponent from "./StepZeroComponent.tsx";
 import {useState} from "react";
-import {OrdenCompra} from "./types.tsx";
+import {DocIngresoDTA, OrdenCompra} from "./types.tsx";
 import StepOneComponent from "./StepOneComponent.tsx";
 import StepTwoComponent from "./StepTwoComponent.tsx";
+import StepThreeComponent from "./StepThreeComponent.tsx";
 
 
 
@@ -35,6 +36,8 @@ export default function AsistenteIngresoMercancia() {
 
     const [selectedOrder, setSelectedOrder] = useState<OrdenCompra|null>(null);
 
+    const [docIngresoDTA, setDocIngresoDTA] = useState<DocIngresoDTA | null>(null);
+
     function ConditionalRenderStep() {
         if (activeStep === 0) {
             return(
@@ -48,13 +51,17 @@ export default function AsistenteIngresoMercancia() {
         }
         if (activeStep === 2) {
             return(
-                <StepTwoComponent />
+                <StepTwoComponent setActiveStep={setActiveStep} orden={selectedOrder} setDocIngresoDTA={setDocIngresoDTA}/>
             );
         }
         if (activeStep === 3) {
             return(
-                <>
-                </>
+                <StepThreeComponent setActiveStep={setActiveStep} docIngresoDTA={docIngresoDTA} />
+            );
+        }
+        if (activeStep === 4){
+            return(
+                <></>
             );
         }
     }

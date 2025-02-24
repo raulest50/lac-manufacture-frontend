@@ -96,9 +96,10 @@ export interface OrdenCompra {
 
 
 export interface DocIngresoDTA{
-    ordenCompra: OrdenCompra;
-    nombreResponsable: string;
+    ordenCompra: OrdenCompra | null;
+    user: string | undefined; // responsable del ingreso a almacen
     observaciones: string;
+    file: File;
 }
 
 

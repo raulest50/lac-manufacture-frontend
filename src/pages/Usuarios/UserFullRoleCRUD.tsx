@@ -190,6 +190,7 @@ export default function UserFullRoleCRUD() {
                             <Tr>
                                 <Th>ID</Th>
                                 <Th>Username</Th>
+                                <Th>Nombre Completo</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -202,6 +203,7 @@ export default function UserFullRoleCRUD() {
                                 >
                                     <Td>{user.id}</Td>
                                     <Td>{user.username}</Td>
+                                    <Td>{user.nombreCompleto}</Td>
                                 </Tr>
                             ))}
                         </Tbody>

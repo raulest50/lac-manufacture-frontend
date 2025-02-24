@@ -7,6 +7,7 @@ export interface Role {
 export interface User {
     id: number;
     username: string;
+    nombreCompleto?: string;
     password?: string;
     roles: Role[];
 }

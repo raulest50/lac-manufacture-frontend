@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { OrdenCompra } from "./types.tsx";
+import {DocIngresoDTA, OrdenCompra} from "./types.tsx";
 import {
     Button,
     Divider,
@@ -14,17 +14,23 @@ import { MdAddAPhoto } from "react-icons/md";
 import { FaFolderOpen } from "react-icons/fa";
 import { FaFileCircleQuestion } from "react-icons/fa6";
 import { FaFileCircleCheck } from "react-icons/fa6";
-import axios from "axios";
+
+import { useAuth } from '../../context/AuthContext';
 
 interface StepTwoComponentProps {
     setActiveStep: (step: number) => void;
-    selectedOrder: OrdenCompra;
+    orden: OrdenCompra | null;
+    setDocIngresoDTA: (docIngresoDTA: DocIngresoDTA) => void;
 }
 
 export default function StepTwoComponent({
                                              setActiveStep,
-                                             selectedOrder,
+                                             orden,
+                                             setDocIngresoDTA,
                                          }: StepTwoComponentProps) {
+
+    const { user } = useAuth();
+
     const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -106,9 +112,15 @@ export default function StepTwoComponent({
             return;
         }
 
-        /**
-         * Here i want to put the code to complete this component
-         */
+
+        const docIngresoDTA:DocIngresoDTA = {
+            ordenCompra: orden,
+            user: user?.toString(),
+            observaciones: "",
+            file: file,
+        };
+
+        setDocIngresoDTA(docIngresoDTA);
 
         setActiveStep(3);
 
