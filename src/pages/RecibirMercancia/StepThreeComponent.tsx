@@ -21,12 +21,16 @@ import {
 } from "@chakra-ui/react";
 import { FaCheckCircle } from "react-icons/fa";
 import {useState} from "react";
+import axios from "axios";
+import EndPointsURL from "../../api/EndPointsURL.tsx";
 
 
 interface StepThreeComponentProps {
     setActiveStep: (step: number) => void;
     docIngresoDTA: DocIngresoDTA | null;
 }
+
+const endpoints = new EndPointsURL();
 
 export default function StepThreeComponent({
                                              setActiveStep,
@@ -35,9 +39,35 @@ export default function StepThreeComponent({
 
     const [observaciones, setObservaciones] = useState("");
 
-    const onClickEnviar = () => {
-        console.log(setActiveStep);
-        console.log(docIngresoDTA);
+    const onClickEnviar = async () => {
+        if (!docIngresoDTA || !docIngresoDTA.file) {
+            console.error("No document data or file provided");
+            return;
+        }
+
+        // Create a copy of the docIngresoDTA excluding the file property.
+        const { file, ...docData } = docIngresoDTA;
+
+        // Build FormData.
+        const formData = new FormData();
+        formData.append(
+            "docIngresoDTA",
+            new Blob([JSON.stringify(docData)], { type: "application/json" })
+        );
+        formData.append("file", file);
+
+        try {
+            const response = await axios.post(endpoints.save_doc_ingreso_oc, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            console.log("DocIngreso created successfully:", response.data);
+            // Optionally, proceed to the next step or update UI accordingly.
+            setActiveStep(4);
+        } catch (error) {
+            console.error("Error creating DocIngreso:", error);
+        }
     };
 
 
@@ -104,7 +134,11 @@ export default function StepThreeComponent({
                 <Textarea
                     placeholder='Escriba aqui sus observaciones si lo considera pertinente'
                     value={observaciones}
-                    onChange={(e) => setObservaciones(e.target.value)}
+                    onChange={(e) => {
+                        docIngresoDTA ? docIngresoDTA.observaciones = e.target.value : {};
+                        setObservaciones(e.target.value);
+                        }
+                    }
                 >
 
                 </Textarea>
