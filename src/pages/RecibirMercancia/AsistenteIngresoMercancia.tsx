@@ -16,14 +16,15 @@ import {DocIngresoDTA, OrdenCompra} from "./types.tsx";
 import StepOneComponent from "./StepOneComponent.tsx";
 import StepTwoComponent from "./StepTwoComponent.tsx";
 import StepThreeComponent from "./StepThreeComponent.tsx";
+import StepFourComponent from "./StepFourComponent.tsx";
 
 
 
 const steps = [
     { title: 'Primero', description: 'Identificar Orden Compra' },
     { title: 'Segundo', description: 'Verificar Cantidades' },
-    { title: 'Tercero', description: 'Foto doc. soporte' },
-    { title: 'Cuarto', description: 'Confirmar o Rechazar Recepcion' },
+    { title: 'Tercero', description: 'Subir soporte y Enviar' },
+    { title: 'Cuarto', description: 'Finalizacion' },
 ]
 
 
@@ -39,29 +40,29 @@ export default function AsistenteIngresoMercancia() {
     const [docIngresoDTA, setDocIngresoDTA] = useState<DocIngresoDTA | null>(null);
 
     function ConditionalRenderStep() {
-        if (activeStep === 0) {
+        if (activeStep === 0) { // identificar la orden de compra
             return(
                 <StepZeroComponent setActiveStep={setActiveStep} setSelectedOrder={setSelectedOrder}/>
             );
         }
-        if (activeStep === 1) {
+        if (activeStep === 1) { // verificar cantidades en el pedido
             return(
                 <StepOneComponent setActiveStep={setActiveStep} orden={selectedOrder} />
             );
         }
-        if (activeStep === 2) {
+        if (activeStep === 2) { // subir documento soporte
             return(
                 <StepTwoComponent setActiveStep={setActiveStep} orden={selectedOrder} setDocIngresoDTA={setDocIngresoDTA}/>
             );
         }
-        if (activeStep === 3) {
+        if (activeStep === 3) { // verificar los datos y enviar a backend
             return(
                 <StepThreeComponent setActiveStep={setActiveStep} docIngresoDTA={docIngresoDTA} />
             );
         }
-        if (activeStep === 4){
+        if (activeStep === 4){ // ventana de finalizacion, no se hace nada, solo notifica al usuario
             return(
-                <></>
+                <StepFourComponent setActiveStep={setActiveStep}/>
             );
         }
     }
