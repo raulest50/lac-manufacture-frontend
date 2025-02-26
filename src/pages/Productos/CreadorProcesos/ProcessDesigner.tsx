@@ -57,7 +57,7 @@ export default function ProcessDesigner(){
     };
 
     return(
-        <Flex direction={"column"} gap={8} p={"1em"}>
+        <Flex direction={"column"} gap={8} p={"1em"} >
             <Flex direction={"row"}></Flex>
             <HStack>
 
@@ -73,7 +73,7 @@ export default function ProcessDesigner(){
 
             </HStack>
 
-            <Box style={{ width: '50vw', height: '50vh', border:"1px solid black" }}>
+            <Box w={'fill'} style={{  height: '50vh', border:"1px solid black" }}>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}

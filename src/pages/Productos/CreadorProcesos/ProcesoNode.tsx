@@ -6,7 +6,8 @@ import {Handle, Position, NodeProps} from "@xyflow/react";
 import { TbTransform } from "react-icons/tb";
 
 const handleStyle = {
-    color:"green",
+    width:"0.8em",
+    height:"0.8em",
 }
 
 export default function ProcesoNode(props: NodeProps) {
@@ -14,19 +15,26 @@ export default function ProcesoNode(props: NodeProps) {
     const data = props.data;
 
     return(
-        <Box border={"1px solid black"} justifyContent={"center"} alignContent={"center"}>
+        <Box
+            border={"2px solid black"}
+            transition="box-shadow 0.1s ease"
+            _hover={{ boxShadow: "0 0 5px blue" }}
+        >
 
-            <Flex bgColor={"green.200"} gap={2} direction={"column"}>
+            <Flex
+                bgColor={"green.200"}
+                gap={2}
+                direction={"column"}
+                align={"center"}
+            >
 
-                <Box p={"0.5em"} flex={1} bgColor={"blue.400"}>
+                <Box w={"full"} p={"0.5em"} flex={1} bgColor={"blue.400"}>
                     <Text>
                         {String(data.label)}
                     </Text>
                 </Box>
 
-                <Icon fontSize={"3em"} color={"tomato"} >
-                    <TbTransform/>
-                </Icon>
+                <Icon mr={"1em"} ml={"1em"} as={TbTransform} w="4em" h="4em" color="tomato" />
 
                 <Handle
                     type={"target"}
@@ -44,8 +52,12 @@ export default function ProcesoNode(props: NodeProps) {
                     isConnectable={true}
                 />
 
-                <Box flex={1} bgColor={"blue.400"}>
-                    <Text> - </Text>
+                <Box
+                    flex={1}
+                    bgColor={"blue.400"}
+                    w={"full"}
+                >
+                    <Text> Proceso </Text>
                 </Box>
 
             </Flex>
