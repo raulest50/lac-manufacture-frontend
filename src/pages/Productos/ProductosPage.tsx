@@ -6,7 +6,7 @@ import { my_style_tab } from '../../styles/styles_general.tsx';
 
 import CodificarProducto from './CodificarProducto';
 import CrearReceta from './CrearReceta';
-import ProcessDesigner from "./CreadorProcesos/ProcessDesigner.tsx";
+import ProcessDesignTab from "./CreadorProcesos/ProcessDesignTab.tsx";
 
 function ProductosPage() {
     return (
@@ -30,7 +30,7 @@ function ProductosPage() {
                     </TabPanel>
 
                     <TabPanel p={0} height="100%">
-                        < ProcessDesigner/>
+                        < ProcessDesignTab/>
                     </TabPanel>
 
                 </TabPanels>

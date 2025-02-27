@@ -8,6 +8,9 @@ export default class EndPointsURL{
     public insumos_with_stock:string;
     public search_semiytermi:string;
 
+    public search_terminado_byname:string;
+    public search_semi_byname_4pd:string;
+
 
     // Proveedores resouce
     public save_proveedores:string;
@@ -67,6 +70,9 @@ export default class EndPointsURL{
         this.save_producto = `${domain}/${productos_res}/save`;
         this.insumos_with_stock = `${domain}/${productos_res}/{id}/insumos_with_stock`;
         this.search_semiytermi = `${domain}/${productos_res}/search_semiytermi`;
+
+        this.search_terminado_byname = `${domain}/${productos_res}/search_terminados`;
+        this.search_semi_byname_4pd = `${domain}/${productos_res}/search_semi_4pd`;
 
         // Proveedores endpoints
         this.save_proveedores = `${domain}/${proveedores_res}/save`;

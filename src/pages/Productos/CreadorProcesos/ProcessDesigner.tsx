@@ -1,6 +1,5 @@
-
 import {useCallback, useState} from "react";
-import {Box, Flex, Button, HStack, VStack} from "@chakra-ui/react";
+import {Box, Flex, Button} from "@chakra-ui/react";
 
 import {
     ReactFlow, Node, Edge,
@@ -8,8 +7,8 @@ import {
 }
     from "@xyflow/react";
 import '@xyflow/react/dist/style.css';
-import MaterialPrimarioNode from "./MaterialPrimarioNode.tsx";
-import ProcesoNode from "./ProcesoNode.tsx";
+import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
+import ProcesoNode from "./Nodos/ProcesoNode.tsx";
 
 
 const nodeTypes = {
@@ -52,26 +51,9 @@ export default function ProcessDesigner(){
         setLastNode(nextNode);
     };
 
-    const semiTermiPickerOnClick = () => {
-
-    };
-
     return(
         <Flex direction={"column"} gap={8} p={"1em"} >
             <Flex direction={"row"}></Flex>
-            <HStack>
-
-                <Button
-                    variant={"solid"}
-                    colorScheme={"green"}
-                    onClick={semiTermiPickerOnClick}
-                >{"Seleccionar Terminado/Semiterminado"}</Button>
-
-                <VStack>
-
-                </VStack>
-
-            </HStack>
 
             <Box w={'fill'} style={{  height: '50vh', border:"1px solid black" }}>
                 <ReactFlow

@@ -3,7 +3,7 @@
 import {Box, Flex, Text, Icon} from "@chakra-ui/react";
 import {Handle, Position, NodeProps} from "@xyflow/react";
 
-import { TbTransform } from "react-icons/tb";
+import { TbArrowsJoin } from "react-icons/tb";
 
 const handleStyle = {
     width:"0.8em",
@@ -34,7 +34,7 @@ export default function ProcesoNode(props: NodeProps) {
                     </Text>
                 </Box>
 
-                <Icon mr={"1em"} ml={"1em"} as={TbTransform} w="4em" h="4em" color="tomato" />
+                <Icon mr={"1em"} ml={"1em"} as={TbArrowsJoin} w="4em" h="4em" color="tomato" />
 
                 <Handle
                     type={"target"}
