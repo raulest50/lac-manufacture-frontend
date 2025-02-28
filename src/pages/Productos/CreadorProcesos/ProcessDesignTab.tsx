@@ -12,6 +12,8 @@ import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icon
 import Step1DefineSaveProc from "./Step1DefineSaveProc.tsx";
 import Step0SelectTarget from "./Step0SelectTarget.tsx";
 import Step2Finish from "./Step2Finish.tsx";
+import {useState} from "react";
+import {Target} from "./types.tsx";
 
 
 const steps = [
@@ -28,15 +30,17 @@ export default function ProcessDesignTab(){
         count: steps.length,
     });
 
+    const [selectedTarget, setSelectedTarget] = useState<Target>();
+
     const ConditionalRenderStep = () => {
         if (activeStep === 0){
             return(
-                <Step0SelectTarget setActiveStep={setActiveStep}/>
+                <Step0SelectTarget setActiveStep={setActiveStep} setSelectedTargetFather={setSelectedTarget}/>
             )
         }
         if (activeStep === 1){
             return(
-                <Step1DefineSaveProc setActiveStep={setActiveStep}/>
+                <Step1DefineSaveProc setActiveStep={setActiveStep} selectedTarget={selectedTarget!}/>
             )
         }
         if (activeStep === 2){

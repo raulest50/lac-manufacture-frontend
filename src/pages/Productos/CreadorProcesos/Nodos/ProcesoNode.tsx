@@ -18,18 +18,19 @@ export default function ProcesoNode(props: NodeProps) {
         <Box
             border={"2px solid black"}
             transition="box-shadow 0.1s ease"
-            _hover={{ boxShadow: "0 0 5px blue" }}
+            _hover={{ boxShadow: "0 0 10px blue" }}
+            w={"15em"}
         >
 
             <Flex
-                bgColor={"green.200"}
+                //bgColor={"green.200"}
                 gap={2}
                 direction={"column"}
                 align={"center"}
             >
 
                 <Box w={"full"} p={"0.5em"} flex={1} bgColor={"blue.400"}>
-                    <Text>
+                    <Text fontWeight={"bold"}>
                         {String(data.label)}
                     </Text>
                 </Box>
@@ -57,7 +58,7 @@ export default function ProcesoNode(props: NodeProps) {
                     bgColor={"blue.400"}
                     w={"full"}
                 >
-                    <Text> Proceso </Text>
+                    <Text fontWeight={"bold"} > Proceso </Text>
                 </Box>
 
             </Flex>

@@ -15,11 +15,12 @@ import EndPointsURL from "../../../api/EndPointsURL.tsx";
 
 interface Props {
     setActiveStep: (step: number) => void;
+    setSelectedTargetFather: (target: Target) => void;
 }
 
 const endpoints = new EndPointsURL();
 
-export default function Step0SelectTarget({setActiveStep}: Props) {
+export default function Step0SelectTarget({setActiveStep, setSelectedTargetFather}: Props) {
 
     const [search, setSearch] = useState("");
 
@@ -78,6 +79,7 @@ export default function Step0SelectTarget({setActiveStep}: Props) {
     }
 
     const onClickNextStep = () => {
+        setSelectedTargetFather(selectedTarget!);
         setActiveStep(1);
     }
 

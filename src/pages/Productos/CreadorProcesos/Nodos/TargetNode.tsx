@@ -1,7 +1,7 @@
 import {Handle, NodeProps, Position} from "@xyflow/react";
-import {Box, Flex, Text, Icon } from "@chakra-ui/react";
+import {Box, Flex, Icon, Text} from "@chakra-ui/react";
+import { GrCubes } from "react-icons/gr";
 
-import { PiCubeFocusThin } from "react-icons/pi";
 
 const handleStyle = {
     width:"0.8em",
@@ -9,7 +9,7 @@ const handleStyle = {
 }
 
 
-export default function MaterialPrimarioNode(props: NodeProps) {
+export default function TargetNode(props: NodeProps) {
 
     const data = props.data;
 
@@ -17,7 +17,7 @@ export default function MaterialPrimarioNode(props: NodeProps) {
         <Box
             border={"2px solid black"}
             transition="box-shadow 0.1s ease"
-            _hover={{ boxShadow: "0 0 10px green" }}
+            _hover={{ boxShadow: "0 0 10px red" }}
             w={"15em"}
         >
             <Flex
@@ -27,7 +27,7 @@ export default function MaterialPrimarioNode(props: NodeProps) {
             >
                 <Box
                     flex={1}
-                    bgColor={"green.300"}
+                    bgColor={"red.400"}
                     w={"full"}
                     p={"0.5em"}
                 >
@@ -36,37 +36,28 @@ export default function MaterialPrimarioNode(props: NodeProps) {
                     </Text>
                 </Box>
 
-                <Icon w="4em" h="4em" color={"tomato"} as={PiCubeFocusThin} />
+                <Icon w="4em" h="4em" color={"tomato"} as={GrCubes} />
 
-                <Box  w={"1em"} h={"1em"} flex={5}>
+                <Box w={"1em"} h={"1em"} flex={5}>
                     <Handle
-                        type={"source"}
-                        position={Position.Right}
+                        type={"target"}
+                        position={Position.Left}
                         id={"i1"}
                         style={handleStyle}
                         isConnectable={true}
+
                     />
                 </Box>
 
                 <Box
                     flex={1}
+                    bgColor={"red.400"}
                     w={"full"}
-                    borderTop={"2px solid black"}
-                    pt={"0.5em"}
                 >
-                    <Text fontWeight={"bold"}>
-                        {` ${data.cantidad} ${data.tipo_unidad}`}
-                    </Text>
+                    <Text fontWeight={"bold"}> {data.tipo_producto === "S" ? "Semiterminado" : "Terminado"} </Text>
                 </Box>
 
-                <Box
-                    flex={1}
-                    bgColor={"green.300"}
-                    w={"full"}
-                >
-                    <Text fontWeight={"bold"}> Material Primario </Text>
-                </Box>
             </Flex>
         </Box>
-    )
+    );
 }
