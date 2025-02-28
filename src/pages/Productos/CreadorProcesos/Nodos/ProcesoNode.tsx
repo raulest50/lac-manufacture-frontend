@@ -17,8 +17,9 @@ export default function ProcesoNode(props: NodeProps) {
     return(
         <Box
             border={"2px solid black"}
+            boxShadow={props.selected ? "0 0 10px gold" : ""}
             transition="box-shadow 0.1s ease"
-            _hover={{ boxShadow: "0 0 10px blue" }}
+            _hover={props.selected ? { boxShadow: "0 0 10px gold" } : { boxShadow: "0 0 10px blue" }}
             w={"15em"}
         >
 
