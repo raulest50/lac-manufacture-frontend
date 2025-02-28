@@ -16,8 +16,9 @@ import {
 import '@xyflow/react/dist/style.css';
 import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
 import ProcesoNode from "./Nodos/ProcesoNode.tsx";
-import { Target } from "./types.tsx";
+import {ProcesoNodeData, Target} from "./types.tsx";
 import TargetNode from "./Nodos/TargetNode.tsx";
+import EditProcesoNodeDialog from "./EditProcesoNodeDialog";
 
 const nodeTypes = {
     materialPrimarioNode: MaterialPrimarioNode,
@@ -60,7 +61,13 @@ export default function ProcessDesigner({ target }: Props) {
 
     const zeroProcesoNode = {
         id: "0",
-        data: { label: "Node 0" },
+        data: {
+            label: "Node 0",
+            unidadesTiempo:"",
+            tiempo: "",
+            nombreProceso:"",
+            instrucciones:"",
+        },
         position: { x: 200, y: 0 },
         type: "procesoNode",
     };
@@ -71,6 +78,9 @@ export default function ProcessDesigner({ target }: Props) {
 
     // Track the selected element (node or edge) from React Flow.
     const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null);
+
+    // State to control the edit dialog.
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -109,7 +119,13 @@ export default function ProcessDesigner({ target }: Props) {
     const agregarProcesoOnClick = () => {
         const nextNode = {
             id: String(Number(lastNode.id) + 1),
-            data: { label: `Node ${String(Number(lastNode.id) + 1)}` },
+            data: {
+                label: `Node ${String(Number(lastNode.id) + 1)}`,
+                unidadesTiempo:"",
+                tiempo: "",
+                nombreProceso:"",
+                instrucciones:"",
+            },
             position: { x: 200, y: lastNode.position.y + 50 },
             type: "procesoNode",
         };
@@ -230,10 +246,42 @@ export default function ProcessDesigner({ target }: Props) {
                     variant="solid"
                     colorScheme="blue"
                     isDisabled={!selectedElement || (("data" in selectedElement) && (selectedElement as Node).type !== "procesoNode")}
+                    onClick={() => {
+                        if (
+                            selectedElement &&
+                            "data" in selectedElement &&
+                            (selectedElement as Node).type === "procesoNode"
+                        ) {
+                            setIsEditDialogOpen(true);
+                        }
+                    }}
                 >
                     Editar
                 </Button>
             </Flex>
+
+            {isEditDialogOpen &&
+                selectedElement &&
+                "data" in selectedElement &&
+                (selectedElement as Node).type === "procesoNode" && (
+                    <EditProcesoNodeDialog<ProcesoNodeData>
+                        isOpen={isEditDialogOpen}
+                        onClose={() => setIsEditDialogOpen(false)}
+                        nodeData={(selectedElement as Node<ProcesoNodeData>).data}
+                        onSave={(newData) => {
+                            // Update the selected process node with the new data.
+                            setNodes((prevNodes) =>
+                                prevNodes.map((node) => {
+                                    if (node.id === selectedElement.id) {
+                                        return { ...node, data: { ...node.data, ...newData } };
+                                    }
+                                    return node;
+                                })
+                            );
+                        }}
+                    />
+                )}
+
         </Flex>
     );
 }
