@@ -13,7 +13,6 @@ import { GiWeight } from 'react-icons/gi';
 
 import axios from 'axios';
 
-import { TIPOS_PRODUCTOS, UNIDADES } from '../../api/constants.tsx';
 import { input_style, cardItem_style_sel_tray, cardItem_style_rcta } from '../../styles/styles_general.tsx';
 import { CrearProductoHelper, MiItem, Insumo } from './CrearProductoHelper.tsx';
 import EndPointsURL from '../../api/EndPointsURL.tsx';

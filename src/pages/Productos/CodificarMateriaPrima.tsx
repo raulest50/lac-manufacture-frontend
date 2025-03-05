@@ -16,9 +16,8 @@ import {
 } from '@chakra-ui/react';
 import axios, { AxiosError } from 'axios';
 
-import { UNIDADES, TIPOS_PRODUCTOS } from '../../api/constants';
 import { input_style } from "../../styles/styles_general";
-import { MateriaPrima } from "./types";
+import { MateriaPrima, UNIDADES, TIPOS_PRODUCTOS } from "./types";
 
 import { FaFileUpload } from "react-icons/fa";
 import EndPointsURL from "../../api/EndPointsURL";

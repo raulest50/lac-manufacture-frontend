@@ -6,7 +6,7 @@ import { my_style_tab } from '../../styles/styles_general.tsx';
 
 import CodificarMateriaPrima from './CodificarMateriaPrima.tsx';
 import ProcessDesignTab from "./CreadorProcesos/ProcessDesignTab.tsx";
-import CrearSemioTermi from "./CrearSemioTermi.tsx";
+import CodificarSemioTermi from "./CodificarSemioTermi.tsx";
 
 function ProductosPage() {
     return (
@@ -26,7 +26,7 @@ function ProductosPage() {
                     </TabPanel>
 
                     <TabPanel>
-                        <CrearSemioTermi />
+                        <CodificarSemioTermi />
                     </TabPanel>
 
                     <TabPanel p={0} height="100%">

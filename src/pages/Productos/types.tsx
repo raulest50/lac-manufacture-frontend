@@ -1,5 +1,6 @@
 
-
+export const TIPOS_PRODUCTOS = {materiaPrima: "M", semiTerminado:"S", Terminado:"T"};
+export const UNIDADES = {L:"L", KG:"KG", U:"U"};
 
 /**
  * interfaces para la codificacion de materias primas
@@ -51,12 +52,12 @@ export interface ProcesoProduccion{
 
 
 export interface ProductoSemiter {
-    productoId?: string;
+    productoId: string;
     nombre: string;
     observaciones: string;
-    costo: string;
+    costo?: string; // se determina a al momento de seleccinoar los insumos - step 2
     tipoUnidades: string;
     cantidadUnidad: string;
     tipo_producto: string;
-    procesoProduccion: ProcesoProduccion;
+    procesoProduccion?: ProcesoProduccion; // se determina a la hora de definir el proceso - step 3
 }

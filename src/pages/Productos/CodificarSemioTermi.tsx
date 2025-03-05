@@ -10,7 +10,6 @@ import {
     useSteps,
 } from "@chakra-ui/react";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
-import {useState} from "react";
 import StepOne from "./StepOne.tsx";
 
 
@@ -23,7 +22,7 @@ const steps = [
 ]
 
 
-export default function CrearSemioTermi() {
+export default function CodificarSemioTermi() {
 
     const { activeStep, setActiveStep } = useSteps({
         index: 0,
