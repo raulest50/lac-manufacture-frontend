@@ -4,9 +4,9 @@ import { Container, Tabs, TabList, TabPanels, TabPanel, Tab } from '@chakra-ui/r
 import MyHeader from '../../components/MyHeader.tsx';
 import { my_style_tab } from '../../styles/styles_general.tsx';
 
-import CodificarProducto from './CodificarProducto';
-import CrearReceta from './CrearReceta';
+import CodificarMateriaPrima from './CodificarMateriaPrima.tsx';
 import ProcessDesignTab from "./CreadorProcesos/ProcessDesignTab.tsx";
+import CrearSemioTermi from "./CrearSemioTermi.tsx";
 
 function ProductosPage() {
     return (
@@ -14,7 +14,7 @@ function ProductosPage() {
             <MyHeader title="Codificar Producto" />
             <Tabs isFitted gap="1em" variant="line">
                 <TabList>
-                    <Tab sx={my_style_tab}>Crear Materia Prima</Tab>
+                    <Tab sx={my_style_tab}>Codificar Material Primario</Tab>
                     <Tab sx={my_style_tab}>Crear Terminado/Semiterminado</Tab>
                     <Tab sx={my_style_tab}>Diseño De Procesos</Tab>
                 </TabList>
@@ -22,11 +22,11 @@ function ProductosPage() {
                 <TabPanels>
 
                     <TabPanel>
-                        <CodificarProducto />
+                        <CodificarMateriaPrima />
                     </TabPanel>
 
                     <TabPanel>
-                        <CrearReceta />
+                        <CrearSemioTermi />
                     </TabPanel>
 
                     <TabPanel p={0} height="100%">

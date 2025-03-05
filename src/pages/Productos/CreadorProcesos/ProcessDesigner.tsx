@@ -125,6 +125,7 @@ export default function ProcessDesigner({ target }: Props) {
                 tiempo: "",
                 nombreProceso:"",
                 instrucciones:"",
+                descripcionSalida:"",
             },
             position: { x: 200, y: lastNode.position.y + 50 },
             type: "procesoNode",

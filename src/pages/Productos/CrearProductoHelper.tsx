@@ -32,16 +32,7 @@ export interface SemiTermi {
     // Define properties as needed
 }
 
-export interface MateriaPrima {
-    productoId?: string;
-    nombre: string;
-    observaciones: string;
-    costo: string;
-    tipoUnidades: string;
-    cantidadUnidad: string;
-    tipo_producto: string;
-    // Removed proveedorId
-}
+
 
 const endPoints = new EndPointsURL();
 

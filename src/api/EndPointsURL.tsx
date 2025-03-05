@@ -11,6 +11,8 @@ export default class EndPointsURL{
     public search_terminado_byname:string;
     public search_semi_byname_4pd:string;
 
+    public save_mprima_v2: string;
+
 
     // Proveedores resouce
     public save_proveedores:string;
@@ -70,6 +72,8 @@ export default class EndPointsURL{
         this.save_producto = `${domain}/${productos_res}/save`;
         this.insumos_with_stock = `${domain}/${productos_res}/{id}/insumos_with_stock`;
         this.search_semiytermi = `${domain}/${productos_res}/search_semiytermi`;
+
+        this.save_mprima_v2 = `${domain}/${productos_res}/save_mprima_v2`;
 
         this.search_terminado_byname = `${domain}/${productos_res}/search_terminados`;
         this.search_semi_byname_4pd = `${domain}/${productos_res}/search_semi_4pd`;
