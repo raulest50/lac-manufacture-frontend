@@ -18,6 +18,20 @@ export interface MateriaPrima {
 }
 
 
+export interface Insumo {
+    cantidadRequerida: string;
+    producto: {
+        productoId: number;
+        tipo_producto: string;
+        nombre: string;
+        observaciones: string;
+        costo: number;
+        tipoUnidades: string;
+        cantidadUnidad: string;
+        fechaCreacion: string;
+    };
+}
+
 
 
 
@@ -56,6 +70,7 @@ export interface ProductoSemiter {
     nombre: string;
     observaciones: string;
     costo?: string; // se determina a al momento de seleccinoar los insumos - step 2
+    insumos?: Insumo[]; // se determina tambien en - step 2
     tipoUnidades: string;
     cantidadUnidad: string;
     tipo_producto: string;

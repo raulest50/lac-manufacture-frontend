@@ -1,7 +1,7 @@
 // StepOneComponent.tsx
 import {
     Button,
-    Flex, FormControl, FormLabel, GridItem, HStack, Input, Select, SimpleGrid, Textarea,
+    Flex, FormControl, FormLabel, GridItem, HStack, Input, Select, SimpleGrid, Textarea, useToast,
 } from "@chakra-ui/react";
 import {useState} from "react";
 import {ProductoSemiter, UNIDADES, TIPOS_PRODUCTOS} from "./types.tsx";
@@ -9,35 +9,113 @@ import {ProductoSemiter, UNIDADES, TIPOS_PRODUCTOS} from "./types.tsx";
 
 interface props {
     setActiveStep: (step: number) => void;
+    setSemioter: (semioter: ProductoSemiter) => void;
 }
 
-export default function StepOne({setActiveStep}: props) {
+export default function StepOne({setActiveStep, setSemioter}: props) {
     // Local copy of the order's items to track verification state.
-
-    const [semioter, setSemioter] = useState<ProductoSemiter>();
 
     const [productoId, setProductoId] = useState<string>();
     const [nombre, setNombre] = useState<string>();
-    const [costo, setCosto] = useState<string>();
-    const [tipoUnidades, setTipoUnidades] = useState<string>();
+    const [tipoUnidades, setTipoUnidades] = useState<string>(UNIDADES.L);
     const [cantidadUnidad, setCantidadUnidad] = useState<string>();
     const [observaciones, setObservaciones] = useState<string>();
-    const [tipo_producto, setTipo_producto] = useState<string>();
+    const [tipo_producto, setTipo_producto] = useState<string>(TIPOS_PRODUCTOS.Terminado);
 
 
     const onClickBorrarCampos = () => {
-
+        setProductoId("");
+        setNombre("");
+        setCantidadUnidad("");
+        setObservaciones("");
     }
 
-    const ValidarDatos = (): boolean => {
+    const toast = useToast();
 
+    const ValidarDatos = (): boolean => {
+        // Check if productoId is empty
+        if (!productoId || productoId.trim() === "") {
+            toast({
+                title: "Validación",
+                description: "El campo 'Código Id' es requerido.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return false;
+        }
+        // Check if productoId contains only numbers
+        if (!/^\d+$/.test(productoId)) {
+            toast({
+                title: "Validación",
+                description: "El 'Código Id' debe ser numérico.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return false;
+        }
+        // Check if nombre is empty
+        if (!nombre || nombre.trim() === "") {
+            toast({
+                title: "Validación",
+                description: "El campo 'Nombre' es requerido.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return false;
+        }
+        // Check if cantidadUnidad is empty
+        if (!cantidadUnidad || cantidadUnidad.trim() === "") {
+            toast({
+                title: "Validación",
+                description: "El campo 'Contenido por envase' es requerido.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return false;
+        }
+        // Check if cantidadUnidad is a valid number
+        if (isNaN(Number(cantidadUnidad))) {
+            toast({
+                title: "Validación",
+                description: "El 'Contenido por envase' debe ser un número válido.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return false;
+        }
+        // Check if observaciones is empty
+        if (!observaciones || observaciones.trim() === "") {
+            toast({
+                title: "Validación",
+                description: "El campo 'Observaciones' es requerido.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return false;
+        }
+        return true;
     };
 
     const onClickSiguiente = () => {
-
-
-        setActiveStep(1);
-    }
+        if(ValidarDatos()){
+            const semioter: ProductoSemiter = {
+                productoId: productoId!,
+                nombre: nombre!,
+                observaciones: observaciones!,
+                tipoUnidades: tipoUnidades,
+                cantidadUnidad: cantidadUnidad!,
+                tipo_producto: tipo_producto
+            };
+            setSemioter(semioter);
+            setActiveStep(1);
+        }
+    };
 
     return (
         <Flex direction="column" gap={4} align="center">

@@ -11,6 +11,8 @@ import {
 } from "@chakra-ui/react";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
 import StepOne from "./StepOne.tsx";
+import {useState} from "react";
+import {ProductoSemiter} from "./types.tsx";
 
 
 
@@ -29,10 +31,15 @@ export default function CodificarSemioTermi() {
         count: steps.length,
     });
 
+
+    const [semioter, setSemioter] = useState<ProductoSemiter>();
+
+
+
     function ConditionalRenderStep() {
         if (activeStep === 0) { // identificar la orden de compra
             return(
-                <StepOne setActiveStep={setActiveStep} />
+                <StepOne setActiveStep={setActiveStep} setSemioter={setSemioter} />
             );
         }
         if (activeStep === 1) { // verificar cantidades en el pedido
