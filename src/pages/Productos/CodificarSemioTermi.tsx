@@ -13,6 +13,7 @@ import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icon
 import StepOne from "./StepOne.tsx";
 import {useState} from "react";
 import {ProductoSemiter} from "./types.tsx";
+import StepTwo from "./StepTwo.tsx";
 
 
 
@@ -44,7 +45,7 @@ export default function CodificarSemioTermi() {
         }
         if (activeStep === 1) { // verificar cantidades en el pedido
             return(
-                <></>
+                <StepTwo setActiveStep={setActiveStep} semioter={semioter!}/>
             );
         }
         if (activeStep === 2) { // subir documento soporte

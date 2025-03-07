@@ -17,6 +17,20 @@ export interface MateriaPrima {
     tipo_producto: string;
 }
 
+/**
+ * para uso principalmente en step 2 creacion de semiterminado o temrinado
+ */
+export interface Producto{
+    productoId: number;
+    tipo_producto: string;
+    nombre: string;
+    observaciones: string;
+    costo: number;
+    tipoUnidades: string;
+    cantidadUnidad: string;
+    fechaCreacion: string;
+}
+
 
 export interface Insumo {
     cantidadRequerida: string;
@@ -30,6 +44,21 @@ export interface Insumo {
         cantidadUnidad: string;
         fechaCreacion: string;
     };
+}
+
+
+/**
+ * para usar exclusivamente en la bandeja de seleccion de insumos.
+ */
+export interface Semiterminado {
+    productoId: string;
+    nombre: string;
+    observaciones: string;
+    costo: string;
+    tipoUnidades: string;
+    cantidadUnidad: string;
+    tipo_producto: string;
+    insumos: Insumo[]
 }
 
 
