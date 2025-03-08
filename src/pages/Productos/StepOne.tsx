@@ -20,7 +20,7 @@ export default function StepOne({setActiveStep, setSemioter}: props) {
     const [tipoUnidades, setTipoUnidades] = useState<string>(UNIDADES.L);
     const [cantidadUnidad, setCantidadUnidad] = useState<string>();
     const [observaciones, setObservaciones] = useState<string>();
-    const [tipo_producto, setTipo_producto] = useState<string>(TIPOS_PRODUCTOS.Terminado);
+    const [tipo_producto, setTipo_producto] = useState<string>(TIPOS_PRODUCTOS.terminado);
 
 
     const onClickBorrarCampos = () => {
@@ -175,7 +175,7 @@ export default function StepOne({setActiveStep, setSemioter}: props) {
                                 onChange={(e) => setTipo_producto(e.target.value)}
                             >
                                 <option value={TIPOS_PRODUCTOS.semiTerminado}>Semiterminado</option>
-                                <option value={TIPOS_PRODUCTOS.Terminado}>Terminado</option>
+                                <option value={TIPOS_PRODUCTOS.terminado}>Terminado</option>
                             </Select>
                         </FormControl>
                     </Flex>

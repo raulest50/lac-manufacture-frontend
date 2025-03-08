@@ -13,6 +13,8 @@ export default class EndPointsURL{
 
     public save_mprima_v2: string;
 
+    public search_p4_receta_v2: string;
+
 
     // Proveedores resouce
     public save_proveedores:string;
@@ -45,6 +47,7 @@ export default class EndPointsURL{
     public save_doc_ingreso_oc: string;
 
 
+
     // user resources (solo autenticacion)
     public whoami:string;
 
@@ -72,6 +75,7 @@ export default class EndPointsURL{
         this.save_producto = `${domain}/${productos_res}/save`;
         this.insumos_with_stock = `${domain}/${productos_res}/{id}/insumos_with_stock`;
         this.search_semiytermi = `${domain}/${productos_res}/search_semiytermi`;
+        this.search_p4_receta_v2 = `${domain}/${productos_res}/search_p4_receta_v2`;
 
         this.save_mprima_v2 = `${domain}/${productos_res}/save_mprima_v2`;
 

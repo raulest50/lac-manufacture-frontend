@@ -20,7 +20,7 @@ export default function SemioterBriefCard({semioter}:props) {
                         Nombre: {semioter.nombre}
                     </Heading>
                     <Heading pt="2" fontSize="sm">
-                        Tipo Producto: {semioter.tipo_producto === TIPOS_PRODUCTOS.Terminado ? "Terminado" : "Semiterminado"}
+                        Tipo Producto: {semioter.tipo_producto === TIPOS_PRODUCTOS.terminado ? "Terminado" : "Semiterminado"}
                     </Heading>
                 </VStack>
             </CardHeader>

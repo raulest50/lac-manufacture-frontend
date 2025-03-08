@@ -1,5 +1,5 @@
 
-export const TIPOS_PRODUCTOS = {materiaPrima: "M", semiTerminado:"S", Terminado:"T"};
+export const TIPOS_PRODUCTOS = {materiaPrima: "M", semiTerminado:"S", terminado:"T"};
 export const UNIDADES = {L:"L", KG:"KG", U:"U"};
 
 /**
@@ -33,17 +33,9 @@ export interface Producto{
 
 
 export interface Insumo {
-    cantidadRequerida: string;
-    producto: {
-        productoId: number;
-        tipo_producto: string;
-        nombre: string;
-        observaciones: string;
-        costo: number;
-        tipoUnidades: string;
-        cantidadUnidad: string;
-        fechaCreacion: string;
-    };
+    cantidadRequerida: number;
+    producto: Producto;
+    subtotal?: number; // this is not part of the model at backend, but useful for frontend
 }
 
 
