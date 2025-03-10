@@ -22,7 +22,7 @@ import { MateriaPrima, UNIDADES, TIPOS_PRODUCTOS } from "./types";
 import { FaFileUpload } from "react-icons/fa";
 import EndPointsURL from "../../api/EndPointsURL";
 
-function CodificarMateriaPrima() {
+function CodificarMateriaPrimaTab() {
     const [nombre, setNombre] = useState('');
     const [observaciones, setObservaciones] = useState('');
     const [tipo_unidad, setTipo_unidad] = useState(UNIDADES.KG);
@@ -313,4 +313,4 @@ function CodificarMateriaPrima() {
     );
 }
 
-export default CodificarMateriaPrima;
+export default CodificarMateriaPrimaTab;

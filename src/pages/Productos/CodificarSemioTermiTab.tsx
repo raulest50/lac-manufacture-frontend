@@ -25,7 +25,7 @@ const steps = [
 ]
 
 
-export default function CodificarSemioTermi() {
+export default function CodificarSemioTermiTab() {
 
     const { activeStep, setActiveStep } = useSteps({
         index: 0,

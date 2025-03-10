@@ -4,8 +4,8 @@ import { Container, Tabs, TabList, TabPanels, TabPanel, Tab } from '@chakra-ui/r
 import MyHeader from '../../components/MyHeader.tsx';
 import { my_style_tab } from '../../styles/styles_general.tsx';
 
-import CodificarMateriaPrima from './CodificarMateriaPrima.tsx';
-import CodificarSemioTermi from "./CodificarSemioTermi.tsx";
+import CodificarMateriaPrimaTab from './CodificarMateriaPrimaTab.tsx';
+import CodificarSemioTermiTab from "./CodificarSemioTermiTab.tsx";
 
 function ProductosPage() {
     return (
@@ -21,11 +21,11 @@ function ProductosPage() {
                 <TabPanels>
 
                     <TabPanel>
-                        <CodificarMateriaPrima />
+                        <CodificarMateriaPrimaTab />
                     </TabPanel>
 
                     <TabPanel>
-                        <CodificarSemioTermi />
+                        <CodificarSemioTermiTab />
                     </TabPanel>
 
                 </TabPanels>
