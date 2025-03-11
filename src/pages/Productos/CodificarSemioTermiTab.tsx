@@ -14,6 +14,7 @@ import StepOne from "./StepOne.tsx";
 import {useState} from "react";
 import {ProductoSemiter} from "./types.tsx";
 import StepTwo from "./StepTwo.tsx";
+import StepThree from "./StepThree.tsx";
 
 
 
@@ -34,6 +35,8 @@ export default function CodificarSemioTermiTab() {
 
 
     const [semioter, setSemioter] = useState<ProductoSemiter>();
+    const [semioter2, setSemioter2] = useState<ProductoSemiter>();
+    const [semioter3, setSemioter3] = useState<ProductoSemiter>();
 
 
 
@@ -45,12 +48,12 @@ export default function CodificarSemioTermiTab() {
         }
         if (activeStep === 1) { // verificar cantidades en el pedido
             return(
-                <StepTwo setActiveStep={setActiveStep} semioter={semioter!}/>
+                <StepTwo setActiveStep={setActiveStep} semioter={semioter!} setSemioter2={setSemioter2}/>
             );
         }
         if (activeStep === 2) { // subir documento soporte
             return(
-                <></>
+                <StepThree setActiveStep={setActiveStep} semioter2={semioter2!} setSemioter3={setSemioter3}/>
             );
         }
         if (activeStep === 3) { // verificar los datos y enviar a backend

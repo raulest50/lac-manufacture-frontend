@@ -1,24 +1,26 @@
+import {ProductoSemiter} from "./types.tsx";
+import ProcessDesigner from "./CreadorProcesos/ProcessDesigner.tsx";
 import {Button, Flex} from "@chakra-ui/react";
-import ProcessDesigner from "./ProcessDesigner.tsx";
-import {Target} from "./types.tsx";
 
 
 
-interface Props {
+interface props{
     setActiveStep: (step: number) => void;
-    selectedTarget: Target;
+    semioter2: ProductoSemiter;
+    setSemioter3: (semioter3: ProductoSemiter) => void;
 }
 
-export default function Step1DefineSaveProc({setActiveStep, selectedTarget}: Props): React.ReactElement {
+export default function StepThree({setActiveStep, semioter2, setSemioter3}: props) {
+
 
     const onClickFinalizar = () => {
         setActiveStep(2);
-    }
+    };
 
     return(
         <Flex direction={"column"}>
 
-            <ProcessDesigner target={selectedTarget}/>
+            <ProcessDesigner semioter2={semioter2}/>
 
             <Button
                 colorScheme={"teal"}
@@ -28,5 +30,5 @@ export default function Step1DefineSaveProc({setActiveStep, selectedTarget}: Pro
                 Guardar Proceso
             </Button>
         </Flex>
-    );
+    )
 }

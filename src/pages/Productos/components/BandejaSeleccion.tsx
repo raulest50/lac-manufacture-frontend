@@ -23,7 +23,7 @@ const BandejaSeleccion: React.FC<BandejaSeleccionProps> = ({
                                                                onRemoveInsumo,
                                                            }) => {
     return (
-        <Box p={4} border="1px solid black" w="full">
+        <Box p={4} boxShadow={"md"} w="full">
             <Text fontSize="xl" mb={4}>
                 Bandeja de Selección
             </Text>

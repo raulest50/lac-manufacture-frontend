@@ -24,10 +24,9 @@ export interface Target{
     nombre: string;
     observaciones: string;
     costo: number;
-    fechaCreacion: string;
+    insumos:Insumo[];
     tipoUnidades: string;
     cantidadUnidad: number;
-    insumos:Insumo[];
     tipo_producto: string;
 }
 

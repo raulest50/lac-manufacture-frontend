@@ -1,3 +1,4 @@
+// ProcessDesigner.tsx
 import { useCallback, useEffect, useState } from "react";
 import { Box, Flex, Button, Heading, Divider } from "@chakra-ui/react";
 import {
@@ -13,11 +14,12 @@ import {
     Connection,
     addEdge,
 } from "@xyflow/react";
-import '@xyflow/react/dist/style.css';
-import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
-import ProcesoNode from "./Nodos/ProcesoNode.tsx";
-import {ProcesoNodeData, Target} from "./types.tsx";
-import TargetNode from "./Nodos/TargetNode.tsx";
+import "@xyflow/react/dist/style.css";
+import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode";
+import ProcesoNode from "./Nodos/ProcesoNode";
+import { ProcesoNodeData } from "./types";
+import {ProductoSemiter} from "../types.tsx";
+import TargetNode from "./Nodos/TargetNode";
 import EditProcesoNodeDialog from "./EditProcesoNodeDialog";
 
 const nodeTypes = {
@@ -27,13 +29,14 @@ const nodeTypes = {
 };
 
 interface Props {
-    target: Target;
+    semioter2: ProductoSemiter;
 }
 
-export default function ProcessDesigner({ target }: Props) {
-    // Create nodes for each material (insumo)
-    const getMatPrimasNodes = (target: Target): Node[] =>
-        target.insumos.map((insumo, index) => ({
+export default function ProcessDesigner({ semioter2 }: Props) {
+    // Create nodes for each material (insumo) from ProductoSemiter.
+    // Use a fallback empty array if insumos is undefined.
+    const getMatPrimasNodes = (semi: ProductoSemiter): Node[] =>
+        (semi.insumos || []).map((insumo, index) => ({
             id: `mp-${insumo.producto.productoId}`, // unique id for each node
             data: {
                 label: insumo.producto.nombre,
@@ -44,29 +47,31 @@ export default function ProcessDesigner({ target }: Props) {
             type: "materialPrimarioNode",
         }));
 
-    // Create the target node
-    const getTargetNode = (target: Target): Node => ({
+    // Create the target node using ProductoSemiter information.
+    const getTargetNode = (semi: ProductoSemiter): Node => ({
         id: "tg",
         data: {
-            label: target.nombre,
-            tipo_unidad: target.tipoUnidades,
-            tipo_producto: target.tipo_producto,
+            label: semi.nombre,
+            tipo_unidad: semi.tipoUnidades,
+            tipo_producto: semi.tipo_producto,
         },
         position: { x: 500, y: 210 },
         type: "targetNode",
     });
 
-    const initialNodes: Node[] = [...getMatPrimasNodes(target), getTargetNode(target)];
+    // Initial nodes are the material nodes plus the target node.
+    const initialNodes: Node[] = [...getMatPrimasNodes(semioter2), getTargetNode(semioter2)];
     const initialEdges: Edge[] = [];
 
     const zeroProcesoNode = {
         id: "0",
         data: {
             label: "Node 0",
-            unidadesTiempo:"",
+            unidadesTiempo: "",
             tiempo: "",
-            nombreProceso:"",
-            instrucciones:"",
+            nombreProceso: "",
+            instrucciones: "",
+            descripcionSalida: "",
         },
         position: { x: 200, y: 0 },
         type: "procesoNode",
@@ -87,10 +92,7 @@ export default function ProcessDesigner({ target }: Props) {
         [setEdges]
     );
 
-    // Connection validation function.
-    // Rules:
-    // • From materialPrimarioNode: valid only if target is procesoNode AND the source has no existing outgoing edge.
-    // • From procesoNode: valid only if target is procesoNode or targetNode, and only if the source has no outgoing edge.
+    // Validate connection rules.
     const isValidConnection = useCallback(
         (connection: Connection | Edge): boolean => {
             const conn = connection as Connection; // assume it's a Connection
@@ -110,22 +112,22 @@ export default function ProcessDesigner({ target }: Props) {
                 return targetNode.type === "procesoNode" || targetNode.type === "targetNode";
             }
 
-            // Other cases (e.g. starting from a target node) are invalid.
             return false;
         },
         [nodes, edges]
     );
 
     const agregarProcesoOnClick = () => {
+        const nextId = String(Number(lastNode.id) + 1);
         const nextNode = {
-            id: String(Number(lastNode.id) + 1),
+            id: nextId,
             data: {
-                label: `Node ${String(Number(lastNode.id) + 1)}`,
-                unidadesTiempo:"",
+                label: `Node ${nextId}`,
+                unidadesTiempo: "",
                 tiempo: "",
-                nombreProceso:"",
-                instrucciones:"",
-                descripcionSalida:"",
+                nombreProceso: "",
+                instrucciones: "",
+                descripcionSalida: "",
             },
             position: { x: 200, y: lastNode.position.y + 50 },
             type: "procesoNode",
@@ -139,17 +141,15 @@ export default function ProcessDesigner({ target }: Props) {
         setEdges((prevEdges) =>
             prevEdges.filter((edge) => edge.source !== id && edge.target !== id)
         );
-        if ("id" in (selectedElement || {}) && selectedElement?.id === id)
-            setSelectedElement(null);
+        if (selectedElement && selectedElement.id === id) setSelectedElement(null);
     };
 
     const deleteEdgeById = (id: string) => {
         setEdges((prevEdges) => prevEdges.filter((edge) => edge.id !== id));
-        if ("id" in (selectedElement || {}) && selectedElement?.id === id)
-            setSelectedElement(null);
+        if (selectedElement && selectedElement.id === id) setSelectedElement(null);
     };
 
-    // Remove all process nodes and reset edges to initial state.
+    // Remove all process nodes and reset edges.
     const removeAllProcessNodes = () => {
         setNodes(initialNodes);
         setEdges(initialEdges);
@@ -162,12 +162,9 @@ export default function ProcessDesigner({ target }: Props) {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Delete" || event.key === "Supr") {
                 if (selectedElement) {
-                    // If selected element is a node and it's a process node.
                     if ("data" in selectedElement && (selectedElement as Node).type === "procesoNode") {
                         deleteNodeById(selectedElement.id);
-                    }
-                    // If selected element is an edge.
-                    else if (!("data" in selectedElement)) {
+                    } else if (!("data" in selectedElement)) {
                         deleteEdgeById(selectedElement.id);
                     }
                 }
@@ -195,7 +192,6 @@ export default function ProcessDesigner({ target }: Props) {
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
                     nodeTypes={nodeTypes}
-                    // Use onSelectionChange to update our selected element state.
                     onSelectionChange={({ nodes: selectedNodes, edges: selectedEdges }) => {
                         if (selectedNodes.length > 0) setSelectedElement(selectedNodes[0]);
                         else if (selectedEdges.length > 0) setSelectedElement(selectedEdges[0]);
@@ -213,32 +209,26 @@ export default function ProcessDesigner({ target }: Props) {
                     Agregar Proceso
                 </Button>
 
-                <Button
-                    variant="solid"
-                    colorScheme="red"
-                    onClick={removeAllProcessNodes}
-                >
+                <Button variant="solid" colorScheme="red" onClick={removeAllProcessNodes}>
                     Reset
                 </Button>
 
-                {/* Delete Selection button: works for a process node or an edge */}
                 <Button
                     variant="solid"
                     colorScheme="red"
                     onClick={() => {
                         if (selectedElement) {
-                            // If it's a node and is a process node.
                             if ("data" in selectedElement && (selectedElement as Node).type === "procesoNode") {
                                 deleteNodeById(selectedElement.id);
-                            }
-                            // Else, if it's an edge.
-                            else if (!("data" in selectedElement)) {
+                            } else if (!("data" in selectedElement)) {
                                 deleteEdgeById(selectedElement.id);
                             }
                         }
                     }}
-                    isDisabled={!selectedElement ||
-                        (("data" in selectedElement) && (selectedElement as Node).type !== "procesoNode")}
+                    isDisabled={
+                        !selectedElement ||
+                        (("data" in selectedElement) && (selectedElement as Node).type !== "procesoNode")
+                    }
                 >
                     Eliminar Seleccion
                 </Button>
@@ -246,7 +236,10 @@ export default function ProcessDesigner({ target }: Props) {
                 <Button
                     variant="solid"
                     colorScheme="blue"
-                    isDisabled={!selectedElement || (("data" in selectedElement) && (selectedElement as Node).type !== "procesoNode")}
+                    isDisabled={
+                        !selectedElement ||
+                        (("data" in selectedElement) && (selectedElement as Node).type !== "procesoNode")
+                    }
                     onClick={() => {
                         if (
                             selectedElement &&
@@ -270,7 +263,6 @@ export default function ProcessDesigner({ target }: Props) {
                         onClose={() => setIsEditDialogOpen(false)}
                         nodeData={(selectedElement as Node<ProcesoNodeData>).data}
                         onSave={(newData) => {
-                            // Update the selected process node with the new data.
                             setNodes((prevNodes) =>
                                 prevNodes.map((node) => {
                                     if (node.id === selectedElement.id) {
@@ -282,7 +274,6 @@ export default function ProcessDesigner({ target }: Props) {
                         }}
                     />
                 )}
-
         </Flex>
     );
 }

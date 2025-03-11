@@ -53,7 +53,7 @@ const BandejaBusqueda: React.FC<BandejaBusquedaProps> = ({ onAddInsumo }) => {
     };
 
     return (
-        <Box p={4} border="1px solid black" w="full">
+        <Box p={4} boxShadow={"md"} w="full">
             {/* Search Controls */}
             <Flex mb={4} gap={4} alignItems="center" direction="column">
                 <Flex direction="row" gap={4} alignItems="center" w="full">

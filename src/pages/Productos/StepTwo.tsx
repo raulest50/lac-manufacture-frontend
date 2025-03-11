@@ -1,19 +1,43 @@
 // StepTwo.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Producto, Insumo, ProductoSemiter } from "./types";
-import { Button, Flex, HStack, useToast } from "@chakra-ui/react";
+import {Button, Flex, HStack, StatHelpText, useToast, VStack} from "@chakra-ui/react";
 import SemioterBriefCard from "./components/SemioterBriefCard";
 import BandejaBusqueda from "./components/BandejaBusqueda";
 import BandejaSeleccion from "./components/BandejaSeleccion";
+import cloneDeep from "lodash/cloneDeep";
+import {Stat, StatLabel, StatNumber} from "@chakra-ui/icons";
 
 interface Props {
     setActiveStep: (step: number) => void;
     semioter: ProductoSemiter;
+    setSemioter2: (semioter: ProductoSemiter) => void;
 }
 
-const StepTwo: React.FC<Props> = ({ setActiveStep, semioter }) => {
+const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => {
     const toast = useToast();
     const [selectedInsumos, setSelectedInsumos] = useState<Insumo[]>([]);
+    const [costo, setCosto] = useState(0);
+
+    // Update total cost whenever selectedInsumos changes
+    useEffect(() => {
+        const totalCost = selectedInsumos.reduce(
+            (sum, insumo) => sum + insumo.producto.costo * insumo.cantidadRequerida,
+            0
+        );
+        setCosto(totalCost);
+    }, [selectedInsumos]);
+
+    // Validate if we can continue: at least 2 insumos and each with cantidadRequerida > 1
+    const validoContinuar = (): boolean => {
+        if (selectedInsumos.length < 2) return false;
+        for (const insumo of selectedInsumos) {
+            if (isNaN(insumo.cantidadRequerida) || insumo.cantidadRequerida <= 1) {
+                return false;
+            }
+        }
+        return true;
+    };
 
     // Function to add a new insumo if not already added
     const handleAddInsumo = (producto: Producto) => {
@@ -61,7 +85,28 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter }) => {
     };
 
     const onClickSiguiente = () => {
+        if (!validoContinuar()) {
+            toast({
+                title: "Validación fallida",
+                description:
+                    "Debe seleccionar al menos 2 insumos y cada uno debe tener una cantidad requerida mayor a 1.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+            return;
+        }
+        // Create a deep copy of semioter and update its insumos and cost
+        const semioter2 = cloneDeep(semioter);
+        semioter2.insumos = cloneDeep(selectedInsumos);
+        // Assuming you want to store cost as a string in semioter2
+        semioter2.costo = String(costo);
+        setSemioter2(semioter2);
         setActiveStep(2);
+    };
+
+    const onClickAtras = () => {
+        setActiveStep(0);
     };
 
     const onClickCleanLists = () => {
@@ -69,20 +114,36 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter }) => {
     };
 
     return (
-        <Flex direction="column" gap={4} align="center" w="full" border="1px solid blue">
+        <Flex direction="column" gap={4} align="center" w="full" >
             <SemioterBriefCard semioter={semioter} />
 
-            <HStack gap={8} w="full">
+            <HStack gap={8} w="full" align="flex-start">
                 <BandejaBusqueda onAddInsumo={handleAddInsumo} />
-                <BandejaSeleccion
-                    selectedInsumos={selectedInsumos}
-                    onUpdateCantidad={handleUpdateCantidad}
-                    onRemoveInsumo={handleRemoveInsumo}
-                />
+                <VStack w={"full"}>
+                    <Stat backgroundColor={"gray.50"} p={"1em"} boxShadow={"md"} w={"full"}>
+                        <StatLabel>Total Costo: </StatLabel>
+                        <StatNumber>{costo} ( $ COP)</StatNumber>
+                        <StatHelpText>Costo total sumando todos los insumos</StatHelpText>
+                    </Stat>
+                    <BandejaSeleccion
+                        selectedInsumos={selectedInsumos}
+                        onUpdateCantidad={handleUpdateCantidad}
+                        onRemoveInsumo={handleRemoveInsumo}
+                    />
+                </VStack>
+
             </HStack>
 
             <Flex direction="row" gap={10}>
-                <Button variant="solid" colorScheme="teal" onClick={onClickSiguiente}>
+                <Button variant="solid" colorScheme="yellow" onClick={onClickAtras}>
+                    Atras
+                </Button>
+                <Button
+                    variant="solid"
+                    colorScheme="teal"
+                    onClick={onClickSiguiente}
+                    isDisabled={!validoContinuar()}
+                >
                     Siguiente
                 </Button>
                 <Button variant="solid" colorScheme="red" onClick={onClickCleanLists}>
