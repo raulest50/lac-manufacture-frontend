@@ -1,9 +1,12 @@
 
 
-import {Box, Flex, Text, Icon} from "@chakra-ui/react";
+import {Box, Flex, Text, Icon, VStack, HStack} from "@chakra-ui/react";
 import {Handle, Position, NodeProps} from "@xyflow/react";
 
 import { TbArrowsJoin } from "react-icons/tb";
+
+import { BiRename } from "react-icons/bi";
+import { PiClockCountdownFill } from "react-icons/pi";
 
 const handleStyle = {
     width:"0.8em",
@@ -14,7 +17,7 @@ export default function ProcesoNode(props: NodeProps) {
 
     const data = props.data;
 
-    return(
+    return (
         <Box
             border={"2px solid black"}
             boxShadow={props.selected ? "0 0 10px gold" : ""}
@@ -25,7 +28,6 @@ export default function ProcesoNode(props: NodeProps) {
 
             <Flex
                 //bgColor={"green.200"}
-                gap={2}
                 direction={"column"}
                 align={"center"}
             >
@@ -53,6 +55,23 @@ export default function ProcesoNode(props: NodeProps) {
                     style={handleStyle}
                     isConnectable={true}
                 />
+
+                <VStack w={"full"} borderTop={"2px solid gray"} background={"gray.50"} pt={"1em"}>
+                    {String(data.nombreProceso).trim() !== "" && (
+                        <HStack w="full">
+                            <Icon mr="1em" ml="1em" as={BiRename} w="2em" h="2em" color="teal" />
+                            <Text fontWeight="bold">{String(data.nombreProceso)}</Text>
+                        </HStack>
+                    )}
+
+                    {String(data.tiempo).trim() !== "" && (
+                        <HStack w="full">
+                            <Icon mr="1em" ml="1em" as={PiClockCountdownFill} w="2em" h="2em" color="teal" />
+                            <Text fontWeight="bold">{String(data.tiempo)}</Text>
+                            <Text fontWeight="bold"> { Number(data.unidadesTiempo) === 1 ? "Mins" : "Horas" }</Text>
+                        </HStack>
+                    )}
+                </VStack>
 
                 <Box
                     flex={1}

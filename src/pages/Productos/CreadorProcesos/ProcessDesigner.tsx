@@ -1,6 +1,5 @@
-// ProcessDesigner.tsx
 import { useCallback, useEffect, useState } from "react";
-import { Box, Flex, Button, Heading, Divider } from "@chakra-ui/react";
+import {Box, Flex, Button, Heading, Divider, Center} from "@chakra-ui/react";
 import {
     ReactFlow,
     Node,
@@ -18,9 +17,11 @@ import "@xyflow/react/dist/style.css";
 import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode";
 import ProcesoNode from "./Nodos/ProcesoNode";
 import { ProcesoNodeData } from "./types";
-import {ProductoSemiter} from "../types.tsx";
+import { ProductoSemiter } from "../types";
 import TargetNode from "./Nodos/TargetNode";
 import EditProcesoNodeDialog from "./EditProcesoNodeDialog";
+import { Stat, StatLabel, StatNumber } from "@chakra-ui/icons";
+
 
 const nodeTypes = {
     materialPrimarioNode: MaterialPrimarioNode,
@@ -30,9 +31,11 @@ const nodeTypes = {
 
 interface Props {
     semioter2: ProductoSemiter;
+    setSemiter3: (semioter3: ProductoSemiter) => void;
+    onValidityChange?: (isValid: boolean) => void;
 }
 
-export default function ProcessDesigner({ semioter2 }: Props) {
+export default function ProcessDesigner({ semioter2, setSemiter3, onValidityChange }: Props) {
     // Create nodes for each material (insumo) from ProductoSemiter.
     // Use a fallback empty array if insumos is undefined.
     const getMatPrimasNodes = (semi: ProductoSemiter): Node[] =>
@@ -62,6 +65,8 @@ export default function ProcessDesigner({ semioter2 }: Props) {
     // Initial nodes are the material nodes plus the target node.
     const initialNodes: Node[] = [...getMatPrimasNodes(semioter2), getTargetNode(semioter2)];
     const initialEdges: Edge[] = [];
+
+    //const toast = useToast();
 
     const zeroProcesoNode = {
         id: "0",
@@ -123,7 +128,7 @@ export default function ProcessDesigner({ semioter2 }: Props) {
             id: nextId,
             data: {
                 label: `Node ${nextId}`,
-                unidadesTiempo: "",
+                unidadesTiempo: "1",
                 tiempo: "",
                 nombreProceso: "",
                 instrucciones: "",
@@ -156,6 +161,55 @@ export default function ProcessDesigner({ semioter2 }: Props) {
         setLastNode(zeroProcesoNode);
         setSelectedElement(null);
     };
+
+    // --- New: Compute process validity without showing toast ---
+    const computeValidity = (nodes: Node[], edges: Edge[]): boolean => {
+        let valid = true;
+        // Check Material Prima nodes: must have at least one outgoing edge.
+        const materialNodes = nodes.filter((node) => node.type === "materialPrimarioNode");
+        for (const node of materialNodes) {
+            if (!edges.some((edge) => edge.source === node.id)) {
+                valid = false;
+            }
+        }
+        // Check Target nodes: must have at least one incoming edge.
+        const targetNodes = nodes.filter((node) => node.type === "targetNode");
+        for (const node of targetNodes) {
+            if (!edges.some((edge) => edge.target === node.id)) {
+                valid = false;
+            }
+        }
+        // Check Process nodes: must have one incoming, one outgoing, and non-empty fields.
+        const processNodes = nodes.filter((node) => node.type === "procesoNode");
+        for (const node of processNodes) {
+            if (
+                !edges.some((edge) => edge.target === node.id) ||
+                !edges.some((edge) => edge.source === node.id)
+            ) {
+                valid = false;
+            }
+            const processData = node.data as { nombreProceso?: string; tiempo?: string; instrucciones?: string };
+            if (
+                !processData.nombreProceso ||
+                processData.nombreProceso.trim() === "" ||
+                !processData.tiempo ||
+                processData.tiempo.trim() === "" ||
+                !processData.instrucciones ||
+                processData.instrucciones.trim() === ""
+            ) {
+                valid = false;
+            }
+        }
+        return valid;
+    };
+
+    // --- New: useEffect to call onValidityChange whenever nodes or edges change ---
+    useEffect(() => {
+        if (onValidityChange) {
+            const valid = computeValidity(nodes, edges);
+            onValidityChange(valid);
+        }
+    }, [nodes, edges, onValidityChange]);
 
     // Listen for Delete key events to remove the selected element.
     useEffect(() => {
@@ -204,7 +258,7 @@ export default function ProcessDesigner({ semioter2 }: Props) {
                     <Background variant={BackgroundVariant.Lines} gap={12} size={1} />
                 </ReactFlow>
             </Box>
-            <Flex direction="row" gap={5}>
+            <Flex direction="row" gap={5} alignItems={"center"}>
                 <Button variant="solid" colorScheme="teal" onClick={agregarProcesoOnClick}>
                     Agregar Proceso
                 </Button>
@@ -252,6 +306,15 @@ export default function ProcessDesigner({ semioter2 }: Props) {
                 >
                     Editar
                 </Button>
+
+                <Center height="50px">
+                    <Divider orientation="vertical" />
+                </Center>
+
+                <Stat backgroundColor={"gray.50"} p={"1em"} boxShadow={"md"} w={"full"}>
+                    <StatLabel>Total Costo Insumos: </StatLabel>
+                    <StatNumber>{semioter2.costo} ( $ COP)</StatNumber>
+                </Stat>
             </Flex>
 
             {isEditDialogOpen &&
