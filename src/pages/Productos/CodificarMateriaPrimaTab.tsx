@@ -29,6 +29,7 @@ function CodificarMateriaPrimaTab() {
     const [cantidad_unidad, setCantidad_unidad] = useState('');
     const [codigo, setCodigo] = useState('');
     const [url_ftecnica, setUrl_ftecnica] = useState('');
+    const [tipoMateriaPrima, setTipoMateriaPrima] = useState('1');
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -278,6 +279,22 @@ function CodificarMateriaPrimaTab() {
                                     onChange={(e) => setCantidad_unidad(e.target.value)}
                                     variant="filled"
                                 />
+                            </FormControl>
+                        </Flex>
+                    </GridItem>
+
+                    <GridItem colSpan={1}>
+                        <Flex w="full" direction="row" align="flex-end" justify="space-around" gap={4}>
+                            <FormControl>
+                                <FormLabel>Tipo:</FormLabel>
+                                <Select
+                                    flex="1"
+                                    value={tipoMateriaPrima}
+                                    onChange={(e) => setTipoMateriaPrima(e.target.value)}
+                                >
+                                    <option value={'1'}>Materia Prima</option>
+                                    <option value={'2'}>Material Empaque</option>
+                                </Select>
                             </FormControl>
                         </Flex>
                     </GridItem>

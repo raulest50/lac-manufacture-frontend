@@ -127,7 +127,7 @@ function RegistrarProveedor() {
                 align="stretch"
             >
                 <FormControl isRequired>
-                    <FormLabel>Nit</FormLabel>
+                    <FormLabel> Nit </FormLabel>
                     <Input
                         value={id}
                         onChange={(e) => setId(e.target.value)}

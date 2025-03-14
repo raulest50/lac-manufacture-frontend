@@ -23,6 +23,7 @@ import UsuariosPage from "./pages/Usuarios/UsuariosPage.tsx";
 import MultiRoleProtectedRoute from "./components/MultiRoleProtectedRoute.tsx";
 
 import {role_master, role_jefe_prod, role_compras, role_asist_prod, role_almacen} from "./pages/Usuarios/types.tsx";
+import CargaMasivaPage from "./pages/CargaMasiva/CargaMasivaPage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -115,6 +116,15 @@ const router = createBrowserRouter(
                     element={
                         <ProtectedRoute requiredRole={role_master}>
                             <UsuariosPage/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="carga_masiva"
+                    element={
+                        <ProtectedRoute requiredRole={role_master}>
+                            <CargaMasivaPage/>
                         </ProtectedRoute>
                     }
                 />

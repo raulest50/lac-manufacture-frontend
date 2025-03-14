@@ -10,6 +10,7 @@ import { GiBuyCard } from "react-icons/gi";
 import { TbReportSearch } from "react-icons/tb";
 import { FaTruckRampBox } from "react-icons/fa6";
 import { FaUsersGear } from "react-icons/fa6";
+import { FaFileUpload } from "react-icons/fa";
 
 import '@fontsource-variable/comfortaa'
 
@@ -65,6 +66,7 @@ export default function Home(){
                 <SectionCard to={'/informes'}         name={'Informes'}             icon={TbReportSearch}       supportedRoles={[role_master, role_compras, role_jefe_prod]} currentRoles={roles}/>
                 <SectionCard to={'/asistente_produccion'}    name={'Reporte Progreso en Procesos de Produccion'} icon={GiChemicalDrop}     supportedRoles={[role_master, role_asist_prod]} currentRoles={roles}/>
                 <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
+                <SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload}          supportedRoles={[role_master]} currentRoles={roles}/>
             </SimpleGrid>
         </Container>
     );
