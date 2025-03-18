@@ -1,10 +1,10 @@
 // StepTwo.tsx
 import React, { useState, useEffect } from "react";
-import { Producto, Insumo, ProductoSemiter } from "./types";
+import { Producto, Insumo, ProductoSemiter } from "../types.tsx";
 import {Button, Flex, HStack, StatHelpText, useToast, VStack} from "@chakra-ui/react";
-import SemioterBriefCard from "./components/SemioterBriefCard";
-import BandejaBusqueda from "./components/BandejaBusqueda";
-import BandejaSeleccion from "./components/BandejaSeleccion";
+import SemioterBriefCard from "../components/SemioterBriefCard.tsx";
+import BandejaBusqueda from "../components/BandejaBusqueda.tsx";
+import BandejaSeleccion from "../components/BandejaSeleccion.tsx";
 import cloneDeep from "lodash/cloneDeep";
 import {Stat, StatLabel, StatNumber} from "@chakra-ui/icons";
 

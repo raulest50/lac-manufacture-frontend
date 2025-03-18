@@ -4,7 +4,7 @@ import {
     Flex, FormControl, FormLabel, GridItem, HStack, Input, Select, SimpleGrid, Textarea, useToast,
 } from "@chakra-ui/react";
 import {useState} from "react";
-import {ProductoSemiter, UNIDADES, TIPOS_PRODUCTOS} from "./types.tsx";
+import {ProductoSemiter, UNIDADES, TIPOS_PRODUCTOS} from "../types.tsx";
 
 
 interface props {

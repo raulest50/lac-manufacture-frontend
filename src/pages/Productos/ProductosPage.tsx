@@ -5,7 +5,8 @@ import MyHeader from '../../components/MyHeader.tsx';
 import { my_style_tab } from '../../styles/styles_general.tsx';
 
 import CodificarMateriaPrimaTab from './CodificarMateriaPrimaTab.tsx';
-import CodificarSemioTermiTab from "./CodificarSemioTermiTab.tsx";
+import CodificarSemioTermiTab from "./CodificarSemioTermiTab/CodificarSemioTermiTab.tsx";
+import InformeProductosTab from './InformeProductosTab.tsx';
 
 function ProductosPage() {
     return (
@@ -14,6 +15,7 @@ function ProductosPage() {
             <Tabs isFitted gap="1em" variant="line">
                 <TabList>
                     <Tab sx={my_style_tab}>Codificar Material Primario</Tab>
+                    <Tab sx={my_style_tab}> Consulta </Tab>
                     <Tab sx={my_style_tab}>Crear Terminado/Semiterminado</Tab>
 
                 </TabList>
@@ -22,6 +24,10 @@ function ProductosPage() {
 
                     <TabPanel>
                         <CodificarMateriaPrimaTab />
+                    </TabPanel>
+
+                    <TabPanel>
+                        <InformeProductosTab />
                     </TabPanel>
 
                     <TabPanel>

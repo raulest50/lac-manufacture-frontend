@@ -17,6 +17,7 @@ export interface MateriaPrima {
     tipo_producto: string;
 }
 
+
 /**
  * para uso principalmente en step 2 creacion de semiterminado o temrinado
  */

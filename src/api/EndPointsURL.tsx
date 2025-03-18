@@ -15,6 +15,9 @@ export default class EndPointsURL{
 
     public search_p4_receta_v2: string;
 
+    public carga_masiva_mprims: string; // el primer endpoint para carga masiva
+    public consulta_productos:string; // para buscar por categorias
+
 
     // Proveedores resouce
     public save_proveedores:string;
@@ -81,6 +84,10 @@ export default class EndPointsURL{
 
         this.search_terminado_byname = `${domain}/${productos_res}/search_terminados`;
         this.search_semi_byname_4pd = `${domain}/${productos_res}/search_semi_4pd`;
+
+        this.carga_masiva_mprims = `${domain}/${productos_res}/bulk_upload_excel`;
+        this.consulta_productos = `${domain}/${productos_res}/consulta1`;
+
 
         // Proveedores endpoints
         this.save_proveedores = `${domain}/${proveedores_res}/save`;

@@ -1,5 +1,5 @@
-import { ProductoSemiter } from "./types";
-import ProcessDesigner from "./CreadorProcesos/ProcessDesigner";
+import { ProductoSemiter } from "../types.tsx";
+import ProcessDesigner from "../CreadorProcesos/ProcessDesigner.tsx";
 import { Button, Flex } from "@chakra-ui/react";
 import { useState } from "react";
 

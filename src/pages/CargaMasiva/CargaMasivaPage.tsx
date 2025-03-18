@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Container, Button, Input, useToast } from "@chakra-ui/react";
 import MyHeader from "../../components/MyHeader";
-import {AxiosError} from "axios";
+import axios, {AxiosError} from "axios";
+import EndPointsURL from "../../api/EndPointsURL.tsx";
+
+const endpoints = new EndPointsURL();
 
 export default function CargaMasivaPage() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -38,23 +41,18 @@ export default function CargaMasivaPage() {
         formData.append("file", selectedFile);
 
         try {
-            const response = await fetch("/productos/bulk_upload_excel", {
-                method: "POST",
-                body: formData,
+            const response = await axios.post(endpoints.carga_masiva_mprims, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
-            const message = await response.text();
-            if (response.ok) {
-                toast({
-                    title: "Upload successful",
-                    description: message,
-                    status: "success",
-                    duration: 4000,
-                    isClosable: true,
-                });
-                setSelectedFile(null);
-            } else {
-                throw new Error(message);
-            }
+            // Assuming the response data contains the success message
+            toast({
+                title: "Upload successful",
+                description: response.data,
+                status: "success",
+                duration: 4000,
+                isClosable: true,
+            });
+            setSelectedFile(null);
         } catch (error) {
             const e = error as AxiosError;
             toast({
