@@ -17,7 +17,7 @@ import {
 import axios, { AxiosError } from 'axios';
 
 import { input_style } from "../../styles/styles_general";
-import { MateriaPrima, UNIDADES, TIPOS_PRODUCTOS } from "./types";
+import { Material, UNIDADES, TIPOS_PRODUCTOS } from "./types";
 
 import { FaFileUpload } from "react-icons/fa";
 import EndPointsURL from "../../api/EndPointsURL";
@@ -153,7 +153,7 @@ function CodificarMateriaPrimaTab() {
     const saveMateriaPrimSubmit = async () => {
         if (!validateData()) return;
 
-        const materiaPrima: MateriaPrima = {
+        const materiaPrima: Material = {
             productoId: codigo,
             nombre,
             observaciones,

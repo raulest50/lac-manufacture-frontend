@@ -7,16 +7,6 @@ export const UNIDADES = {L:"L", KG:"KG", U:"U"};
  */
 
 
-export interface MateriaPrima {
-    productoId?: string;
-    nombre: string;
-    observaciones: string;
-    costo: string;
-    tipoUnidades: string;
-    cantidadUnidad: string;
-    tipo_producto: string;
-}
-
 
 /**
  * para uso principalmente en step 2 creacion de semiterminado o temrinado
@@ -29,9 +19,13 @@ export interface Producto{
     costo: number;
     tipoUnidades: string;
     cantidadUnidad: string;
-    fechaCreacion: string;
+    fechaCreacion?: string;
 }
 
+export interface Material extends Producto{
+    fichaTecnicaUrl?: string;
+    tipoMaterial?: number; // 1: materia prima, 2: material de empaque
+}
 
 export interface Insumo {
     cantidadRequerida: number;
@@ -43,14 +37,7 @@ export interface Insumo {
 /**
  * para usar exclusivamente en la bandeja de seleccion de insumos.
  */
-export interface Semiterminado {
-    productoId: string;
-    nombre: string;
-    observaciones: string;
-    costo: string;
-    tipoUnidades: string;
-    cantidadUnidad: string;
-    tipo_producto: string;
+export interface Semiterminado extends Producto{
     insumos: Insumo[]
 }
 

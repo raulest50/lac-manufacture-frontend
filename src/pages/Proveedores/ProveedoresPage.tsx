@@ -6,7 +6,8 @@ import {
 
 import MyHeader from "../../components/MyHeader.tsx";
 import {my_style_tab} from "../../styles/styles_general.tsx";
-import RegistrarProveedor from "./RegistrarProveedor.tsx";
+import CodificarProveedor from "./CodificarProveedor.tsx";
+import ConsultarProveedores from "./ConsultarProveedores.tsx";
 
 
 function ProveedoresPage() {
@@ -18,12 +19,18 @@ function ProveedoresPage() {
 
             <Tabs>
                 <TabList>
-                    <Tab sx={my_style_tab}> Modulo Proveedores</Tab>
+                    <Tab sx={my_style_tab}> Codificar Proveedor </Tab>
+                    <Tab sx={my_style_tab}> Consultar Proveedores </Tab>
                 </TabList>
 
                 <TabPanels>
+
                     <TabPanel>
-                        <RegistrarProveedor/>
+                        <CodificarProveedor/>
+                    </TabPanel>
+
+                    <TabPanel>
+                        <ConsultarProveedores />
                     </TabPanel>
 
                 </TabPanels>
