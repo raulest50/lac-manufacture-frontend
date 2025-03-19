@@ -35,7 +35,6 @@ export default class EndPointsURL{
 
 
     // compras resource
-    public save_compra:string;
     public byProveedorAndDate:string;
     public get_compra_items_by_compra_id:string
     public search_ordenc_date_estado:string;
@@ -95,7 +94,6 @@ export default class EndPointsURL{
         this.search_proveedores_pag = `${domain}/${proveedores_res}/search_pag`;
 
         // compras endpoints
-        this.save_compra = `${domain}/${compras_res}/save`;
         this.byProveedorAndDate = `${domain}/${compras_res}/byProveedorAndDate`;
         this.get_compra_items_by_compra_id = `${domain}/${compras_res}/{compraId}/items`;
         this.save_orden_compra = `${domain}/${compras_res}/save_orden_compra`;
