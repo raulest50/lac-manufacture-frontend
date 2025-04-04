@@ -22,7 +22,7 @@ import { Material, UNIDADES, TIPOS_PRODUCTOS } from "./types";
 import { FaFileUpload } from "react-icons/fa";
 import EndPointsURL from "../../api/EndPointsURL";
 
-function CodificarMateriaPrimaTab() {
+function CodificarMaterialesTab() {
     const [nombre, setNombre] = useState('');
     const [observaciones, setObservaciones] = useState('');
     const [tipo_unidad, setTipo_unidad] = useState(UNIDADES.KG);
@@ -154,10 +154,10 @@ function CodificarMateriaPrimaTab() {
         if (!validateData()) return;
 
         const materiaPrima: Material = {
-            productoId: codigo,
+            productoId: Number(codigo),
             nombre,
             observaciones,
-            costo: '0',
+            costo: 0,
             tipoUnidades: tipo_unidad,
             cantidadUnidad: cantidad_unidad,
             tipo_producto: TIPOS_PRODUCTOS.materiaPrima,
@@ -312,7 +312,7 @@ function CodificarMateriaPrimaTab() {
                 </SimpleGrid>
             </VStack>
             <Button m={5} colorScheme="teal" onClick={saveMateriaPrimSubmit}>
-                Codificar Materia Prima
+                Codificar Material
             </Button>
             <Button m={5} colorScheme="orange" onClick={clearMP_Cod_Fields}>
                 Borrar Campos
@@ -330,4 +330,4 @@ function CodificarMateriaPrimaTab() {
     );
 }
 
-export default CodificarMateriaPrimaTab;
+export default CodificarMaterialesTab;
