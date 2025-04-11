@@ -31,6 +31,10 @@ function CodificarMaterialesTab() {
     const [url_ftecnica, setUrl_ftecnica] = useState('');
     const [tipoMateriaPrima, setTipoMateriaPrima] = useState('1');
 
+    const [ivaPercentage, setIvaPercentage] = useState(0);
+
+    const IVA_VALUES = {'iva_0':0, 'iva_5':5,'iva_19':19, };
+
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const toast = useToast();
@@ -294,6 +298,24 @@ function CodificarMaterialesTab() {
                                 >
                                     <option value={'1'}>Materia Prima</option>
                                     <option value={'2'}>Material Empaque</option>
+                                </Select>
+                            </FormControl>
+                        </Flex>
+                    </GridItem>
+
+                    <GridItem colSpan={1}>
+                        <Flex w="full" direction="row" align="flex-end" justify="space-around" gap={4}>
+                            <FormControl>
+                                <FormLabel>Iva (%):</FormLabel>
+                                <Select
+                                    flex="1"
+                                    value={ivaPercentage}
+                                    onChange={(e) => setIvaPercentage(Number(e.target.value))}
+                                >
+                                    <option value={IVA_VALUES.iva_0}> No tiene </option>
+                                    <option value={IVA_VALUES.iva_5}> 5 %</option>
+                                    <option value={IVA_VALUES.iva_19}> 19 %</option>
+
                                 </Select>
                             </FormControl>
                         </Flex>

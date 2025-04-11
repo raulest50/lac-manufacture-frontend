@@ -6,7 +6,8 @@ export interface Contacto {
 }
 
 export interface Proveedor {
-    id: number;
+    id: string;
+    tipoIdentificacion: number;
     nombre: string;
     direccion?: string;
     regimenTributario: number;

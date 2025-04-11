@@ -24,9 +24,12 @@ import { FaFileCircleQuestion, FaFileCircleCheck } from "react-icons/fa6";
 
 const endPoints = new EndPointsURL();
 
+const TIPOS_ID = {cc:0, nit:1};
+
 function CodificarProveedor() {
     // Basic proveedor fields
     const [id, setId] = useState('');
+    const [tipoIdentificacion, setTipoIdentificacion] = useState(TIPOS_ID.nit);
     const [nombre, setNombre] = useState('');
     const [direccion, setDireccion] = useState('');
     const [regimenTributario, setRegimenTributario] = useState(0);
@@ -238,7 +241,8 @@ function CodificarProveedor() {
 
         // Build the Proveedor object (without file objects)
         const nuevoProveedor: Proveedor = {
-            id: parseInt(id),
+            id,
+            tipoIdentificacion,
             nombre,
             direccion,
             regimenTributario,
@@ -324,7 +328,7 @@ function CodificarProveedor() {
                 <Grid templateColumns={['1fr', 'repeat(2, 1fr)']} gap={4} p="1em" boxShadow="base">
                     <GridItem>
                         <FormControl isRequired>
-                            <FormLabel>Nit</FormLabel>
+                            <FormLabel>Identificacion</FormLabel>
                             <Input
                                 value={id}
                                 onChange={(e) => setId(e.target.value)}
@@ -332,6 +336,16 @@ function CodificarProveedor() {
                             />
                         </FormControl>
                     </GridItem>
+                    <FormControl>
+                        <FormLabel>Tipo Identificacion</FormLabel>
+                        <Select
+                            value={tipoIdentificacion}
+                            onChange={(e) => setTipoIdentificacion(Number(e.target.value))}
+                        >
+                            <option value={TIPOS_ID.cc}>Cedula de ciudadania</option>
+                            <option value={TIPOS_ID.nit}>Nit</option>
+                        </Select>
+                    </FormControl>
                     <GridItem>
                         <FormControl isRequired>
                             <FormLabel>Nombre</FormLabel>
@@ -384,12 +398,21 @@ function CodificarProveedor() {
                         </FormControl>
                     </GridItem>
                     <GridItem colSpan={[1, 2]}>
-                        <FormControl isRequired>
+                        <FormControl >
                             <FormLabel>Categorías</FormLabel>
                             <CheckboxGroup
                                 colorScheme="green"
                                 value={categorias.map(String)}
-                                onChange={(vals: string[]) => setCategorias(vals.map(Number))}
+                                onChange={
+                                    (vals: string[]) => {
+                                        setCategorias(vals.map(Number));
+                                        // only for debuging:
+                                        //console.log('Selected categories (as strings):', vals);
+                                        //const numericValues = vals.map(Number);
+                                        //console.log('Converted to numbers:', numericValues);
+                                        //setCategorias(numericValues);
+                                    }
+                                }
                             >
                                 <VStack align="start">
                                     <Checkbox value="0">Servicios Operativos</Checkbox>
@@ -449,6 +472,22 @@ function CodificarProveedor() {
                                         placeholder="Email"
                                     />
                                 </FormControl>
+                                <Button
+                                    mt={"1em"}
+                                    variant={"ghost"}
+                                    colorScheme="red"
+                                    isDisabled={ !(
+                                        !contacto.fullName.trim() &&
+                                        !contacto.cel.trim() &&
+                                        !contacto.cargo.trim() &&
+                                        !contacto.email.trim()
+                                    )}
+                                    onClick={ () => {
+                                        // Remove the contact at the current index
+                                        const updatedContactos = contactos.filter((_, i) => i !== index);
+                                        setContactos(updatedContactos);
+                                    }}
+                                > Remover </Button>
                             </GridItem>
                         ))}
                     </Grid>
