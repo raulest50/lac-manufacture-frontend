@@ -42,7 +42,7 @@ const ProveedorPicker: React.FC<ProveedorPickerProps> = ({
                                                          }) => {
     const [searchText, setSearchText] = useState('');
     const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-    const [selectedProveedorId, setSelectedProveedorId] = useState<number | null>(null);
+    const [selectedProveedorId, setSelectedProveedorId] = useState<string | null>(null);
     const toast = useToast();
 
     const handleSearch = async () => {
@@ -66,13 +66,17 @@ const ProveedorPicker: React.FC<ProveedorPickerProps> = ({
 
     const handleConfirm = () => {
         if (selectedProveedorId !== null) {
-            const proveedor = proveedores.find((p) => p.id === selectedProveedorId);
+            // Make sure to compare both IDs as strings
+            const proveedor = proveedores.find((p) => p.id.toString() === selectedProveedorId);
+            console.log("proveedor:", proveedor);
+            console.log(proveedores)
             if (proveedor) {
                 onSelectProveedor(proveedor); // Pass the full proveedor object
             }
         }
         onClose();
     };
+
 
     const handleCancel = () => {
         onClose();
@@ -104,7 +108,11 @@ const ProveedorPicker: React.FC<ProveedorPickerProps> = ({
                         <Box w="full">
                             <RadioGroup
                                 value={selectedProveedorId !== null ? selectedProveedorId.toString() : ''}
-                                onChange={(value) => setSelectedProveedorId(parseInt(value))}
+                                onChange={(value) => {
+                                    setSelectedProveedorId(value)
+                                    console.log(value);
+                                    }
+                                }
                             >
                                 <List spacing={2}>
                                     {proveedores.map((proveedor) => (

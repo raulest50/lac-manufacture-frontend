@@ -1,4 +1,3 @@
-// pdfGenerator.ts
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {
@@ -29,7 +28,7 @@ export default class PdfGenerator {
         let currentY = margin;
 
         // --- Logo Section ---
-        // Fetch logo image as base64 and add it at top-left (simulating merged cells A1:B7)
+        // Fetch logo image as base64 and add it at top-left
         let logoBase64: string | null = null;
         try {
             logoBase64 = await this.getImageBase64("/logo_exotic.png");
@@ -37,153 +36,143 @@ export default class PdfGenerator {
             console.error("Error fetching logo image", error);
         }
         if (logoBase64) {
-            // Adjust the width and height as needed (here: 50mm x 40mm)
-            doc.addImage(logoBase64, "PNG", margin, currentY, 50, 40);
+            // Reduce the size of the logo; here it is set to half the original size (25mm x 20mm)
+            doc.addImage(logoBase64, "PNG", margin, currentY, 25, 20);
         }
 
         // --- Header Title ---
-        // Place "ORDEN DE COMPRA" in a prominent position (simulating merged cells E1:I3)
+        // Place "ORDEN DE COMPRA" in a prominent position
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(24);
-        // Center the title at the top of the page (adjust x and y as needed)
-        doc.text("ORDEN DE COMPRA", 115, currentY + 20, { align: "center" });
+        doc.setFontSize(14); // Reduced font size
+        // Center the title (adjust x and y as needed)
+        doc.text("ORDEN DE COMPRA", 90, currentY + 5, { align: "center" });
 
         // --- Napolitana Company Info ---
-        // (Simulating Excel cells A8:A11)
-        currentY += 45 + 5; // move below the logo
+        // Reduce vertical spacing and font sizes in this section
+        currentY += 25; // reduced spacing below the logo
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(11);
+        doc.setFontSize(7); // smaller font size
         doc.text("Napolitana J.P S.A.S.", margin, currentY);
-        currentY += 7;
+        currentY += 4;
         doc.text("Nit: 901751897-1", margin, currentY);
-        currentY += 7;
+        currentY += 4;
         doc.text("Tel: 301 711 51 81", margin, currentY);
-        currentY += 7;
+        currentY += 4;
         doc.text("produccion.exotic@gmail.com", margin, currentY);
 
         // --- Order Details ---
-        // (Simulating details in cells F4:I6)
-        const detailX = 90; // starting x for details on the right side
-        let detailY = margin + 10 + 30; // starting y (adjust as needed)
-        doc.setFontSize(11);
+        const detailX = 130; // starting x for details on the right side
+        let detailY = margin + 5 ; // starting y for details; reduced spacing
+        doc.setFontSize(6);
         doc.text("FECHA EMISION ORDEN DE COMPRA:", detailX, detailY);
         doc.text(
             orden.fechaEmision ? orden.fechaEmision.toString().split("T")[0] : "",
-            detailX + 80,
+            detailX + 50,
             detailY
         );
-        detailY += 7;
+        detailY += 4;
         doc.text("NUMERO DE ORDEN DE COMPRA:", detailX, detailY);
         doc.text(
             orden.ordenCompraId ? orden.ordenCompraId.toString() : "",
-            detailX + 80,
+            detailX + 50,
             detailY
         );
-        detailY += 7;
+        detailY += 4;
         doc.text("FECHA DE VENCIMIENTO DE LA ORDEN:", detailX, detailY);
         doc.text(
             orden.fechaVencimiento ? orden.fechaVencimiento.toString().split("T")[0] : "",
-            detailX + 80,
+            detailX + 50,
             detailY
         );
 
         // --- Lugar de Entrega y Condiciones de Pago ---
-        // (Simulating merged cells F13:I21)
-        let entregaY = detailY + 10;
+        let entregaY = detailY + 7;
         doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
         doc.text("LUGAR DE ENTREGA Y CONDICIONES DE PAGO", detailX, entregaY);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(11);
-        entregaY += 7;
+        doc.setFontSize(6);
+        entregaY += 4;
         doc.text("Empresa: Napolitana JP S.A.S - EXOTIC EXPERT", detailX, entregaY);
-        entregaY += 7;
+        entregaY += 4;
         doc.text("Direccion: vía 11, Juan Mina #4 100", detailX, entregaY);
-        entregaY += 7;
+        entregaY += 5;
         doc.text("Barranquilla, Atlántico", detailX, entregaY);
-        entregaY += 7;
-        //doc.text("301 499 38 08", detailX, entregaY);
-        //entregaY += 7;
+        entregaY += 4;
         doc.text(getCondicionPagoText(orden.condicionPago) ?? "", detailX, entregaY);
-        entregaY += 7;
+        entregaY += 4;
         doc.text(`PLAZO PAGO ${orden.plazoPago} DIAS`, detailX, entregaY);
-        entregaY += 7;
+        entregaY += 4;
         doc.text(`PLAZO ENTREGA ${orden.tiempoEntrega} DIAS`, detailX, entregaY);
-        entregaY += 7;
+        entregaY += 4;
         doc.text("CONDICION ENTREGA: PUESTA EN PLANTA", detailX, entregaY);
 
+
+
         // --- Proveedor Information ---
-        // (Simulating merged cells A13:B21)
-        let proveedorY = currentY + 20; // start a bit lower than the Napolitana info
+        let proveedorY = currentY + 10 - 25; // start a bit lower than the Napolitana info
+        const proveedorX = margin + 50;
         doc.setFont("helvetica", "bold");
-        doc.text("PROVEEDOR", margin, proveedorY);
+        doc.text("INFORMACION PROVEEDOR", proveedorX, proveedorY);
         doc.setFont("helvetica", "normal");
-        proveedorY += 7;
-        doc.text(orden.proveedor.nombre, margin, proveedorY);
-        proveedorY += 7;
-        doc.text(`NIT: ${orden.proveedor.id}`, margin, proveedorY);
-        proveedorY += 7;
-        doc.text(orden.proveedor.departamento, margin, proveedorY);
-        proveedorY += 7;
-        doc.text(orden.proveedor.direccion, margin, proveedorY);
-        proveedorY += 7;
-        doc.text(orden.proveedor.ciudad, margin, proveedorY);
-        proveedorY += 7;
-        doc.text(orden.proveedor.telefono, margin, proveedorY);
-        proveedorY += 7;
+        proveedorY += 3;
+        doc.text(orden.proveedor.nombre, proveedorX, proveedorY);
+        proveedorY += 3;
+        doc.text(`NIT: ${orden.proveedor.id}`, proveedorX, proveedorY);
+        proveedorY += 3;
+        doc.text(orden.proveedor.departamento, proveedorX, proveedorY);
+        proveedorY += 3;
+        doc.text(orden.proveedor.direccion, proveedorX, proveedorY);
+        proveedorY += 3;
+        doc.text(orden.proveedor.ciudad, proveedorX, proveedorY);
+        proveedorY += 3;
         doc.text(getRegimenTributario(orden.proveedor.regimenTributario) ?? "", margin, proveedorY);
-        proveedorY += 7;
-        doc.text(orden.proveedor.email, margin, proveedorY);
 
         // --- Items Table ---
-        // Determine the starting y-coordinate for the table based on previous sections
-        const tableStartY = Math.max(detailY, entregaY, proveedorY) + 10;
-
-        // Prepare table data similar to the Excel template header:
+        // Determine the starting y-coordinate for the table
+        const tableStartY = Math.max(detailY, entregaY, proveedorY) + 5;
         const tableColumns = ["CODIGO", "DESCRIPCION", "CANTIDAD", "PRECIO UNITARIO", "SUBTOTAL"];
         const tableRows = orden.itemsOrdenCompra.map((item: ItemOrdenCompra) => [
-            item.materiaPrima.productoId,
-            item.materiaPrima.nombre,
+            item.material.productoId,
+            item.material.nombre,
             item.cantidad,
             item.precioUnitario,
             item.subTotal,
         ]);
-
         autoTable(doc, {
             head: [tableColumns],
             body: tableRows,
             startY: tableStartY,
-            styles: { fontSize: 10 },
+            styles: { fontSize: 9 },
             headStyles: { fillColor: [255, 192, 203] }, // Soft pink header fill
             theme: "grid",
         });
 
         // --- Totals ---
-        // Use the properly typed lastAutoTable to get the final y-coordinate
         const finalY = doc.lastAutoTable?.finalY ?? tableStartY;
-        let totalsY = finalY + 10;
+        let totalsY = finalY + 5;
         doc.setFont("helvetica", "normal");
         doc.text(`Sub Total: ${orden.subTotal}`, margin, totalsY);
-        totalsY += 7;
+        totalsY += 5;
         doc.text(`IVA (19%): ${orden.iva19}`, margin, totalsY);
-        totalsY += 7;
+        totalsY += 5;
         doc.text(`Total Pagar: ${orden.totalPagar}`, margin, totalsY);
 
         // --- Leyenda ---
         const leyenda =
             "SEÑOR PROVEEDOR CUANDO ENTREGUE LOS MATERIALES SOLICITADOS ESTOS DEBEN IR ACOMPAÑADOS DE UN DOCUMENTO QUE INDIQUE EL NUMERO DE ESTA ORDEN. LAS CANTIDADES SOLICITDAS Y PRECIOS SON LOS QUE HAN SIDO APROBADOS Y DESCRITOS EN ESE DOCUMENTO.";
-        totalsY += 10;
+        totalsY += 5;
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
+        doc.setFontSize(8);
         const leyendaLines = doc.splitTextToSize(leyenda, 190);
         doc.text(leyendaLines, margin, totalsY);
-        totalsY += leyendaLines.length * 7;
+        totalsY += leyendaLines.length * 4;
 
         // --- Observaciones ---
         doc.setFont("helvetica", "bold");
         doc.text("OBSERVACIONES", margin, totalsY);
-        totalsY += 7;
-        // Draw a rectangle to indicate an area for observations (adjust width/height as desired)
-        doc.rect(margin, totalsY, 190, 30);
+        totalsY += 5;
+        doc.rect(margin, totalsY, 190, 20); // a smaller rectangle for observations
 
         // --- Trigger Download ---
         doc.save(`orden-compra-${orden.ordenCompraId}.pdf`);

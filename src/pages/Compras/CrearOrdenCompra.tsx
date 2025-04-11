@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import {Button, Container, Flex, FormControl, FormLabel, Input, Select, useToast, Text} from '@chakra-ui/react';
 import axios from 'axios';
-import { Proveedor, MateriaPrima, ItemOrdenCompra, OrdenCompra } from './types';
+import { Proveedor, Material, ItemOrdenCompra, OrdenCompra } from './types';
 import EndPointsURL from '../../api/EndPointsURL';
 import ProveedorPicker from './components/ProveedorPicker.tsx';
 import ProveedorCard from './components/ProveedorCard.tsx';
@@ -59,11 +59,11 @@ export default function CrearOrdenCompra() {
     }
 
     // When a MateriaPrima is selected from the picker, create an ItemOrdenCompra with default numeric values.
-    const handleAddMateriaPrima = (materia: MateriaPrima) => {
+    const handleAddMateriaPrima = (material: Material) => {
         const newItem: ItemOrdenCompra = {
-            materiaPrima: materia,
+            material: material,
             cantidad: 0,
-            precioUnitario: materia.costo,
+            precioUnitario: material.costo,
             iva19: 0,
             subTotal: 0,
             cantidadCorrecta: 0,
@@ -258,8 +258,8 @@ export default function CrearOrdenCompra() {
             <MateriaPrimaPicker
                 isOpen={isMateriaPrimaPickerOpen}
                 onClose={() => setIsMateriaPrimaPickerOpen(false)}
-                onSelectMateriaPrima={ (materia: MateriaPrima) => {
-                    handleAddMateriaPrima(materia);
+                onSelectMateriaPrima={ (material: Material) => {
+                    handleAddMateriaPrima(material);
                     }
                 }
             />

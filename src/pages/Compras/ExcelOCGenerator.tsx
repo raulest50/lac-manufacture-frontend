@@ -179,8 +179,8 @@ export class ExcelOCGenerator {
         worksheet.mergeCells(`B${row}:D${row}`);
         worksheet.mergeCells(`F${row}:G${row}`);
         worksheet.mergeCells(`H${row}:I${row}`);
-        this.setNormalFormat(worksheet.getCell(`A${row}`), item.materiaPrima.productoId);
-        this.setNormalFormat(worksheet.getCell(`B${row}`), item.materiaPrima.nombre);
+        this.setNormalFormat(worksheet.getCell(`A${row}`), item.material.productoId);
+        this.setNormalFormat(worksheet.getCell(`B${row}`), item.material.nombre);
         this.setNormalFormat(worksheet.getCell(`E${row}`), item.cantidad);
         this.setNormalFormat(worksheet.getCell(`F${row}`), item.precioUnitario);
         this.setNormalFormat(worksheet.getCell(`H${row}`), item.subTotal);

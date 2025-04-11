@@ -62,8 +62,8 @@ const ListaOrdenCompraItems: React.FC<OrdenCompraItemsProps> = ({
                         const itemIVA = Math.round(itemSubtotal * 0.19);
                         return (
                             <Tr key={index}>
-                                <Td>{item.materiaPrima.productoId}</Td>
-                                <Td>{item.materiaPrima.nombre} ({item.materiaPrima.tipoUnidades}) </Td>
+                                <Td>{item.material.productoId}</Td>
+                                <Td>{item.material.nombre} ({item.material.tipoUnidades}) </Td>
                                 <Td isNumeric>
                                     <Input
                                         size="sm"
