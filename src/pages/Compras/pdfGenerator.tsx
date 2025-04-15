@@ -45,7 +45,9 @@ export default class PdfGenerator {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14); // Reduced font size
         // Center the title (adjust x and y as needed)
-        doc.text("ORDEN DE COMPRA", 90, currentY + 5, { align: "center" });
+        doc.text("ORDEN DE COMPRA NUMERO: ", 90, currentY + 6, { align: "center" });
+        doc.text(orden.ordenCompraId ? orden.ordenCompraId.toString() : "", 130, currentY + 6);
+
 
         // --- Napolitana Company Info ---
         // Reduce vertical spacing and font sizes in this section
@@ -61,29 +63,30 @@ export default class PdfGenerator {
         doc.text("produccion.exotic@gmail.com", margin, currentY);
 
         // --- Order Details ---
-        const detailX = 130; // starting x for details on the right side
+        const detailX = 140; // starting x for details on the right side
         let detailY = margin + 5 ; // starting y for details; reduced spacing
         doc.setFontSize(6);
-        doc.text("FECHA EMISION ORDEN DE COMPRA:", detailX, detailY);
+        doc.text("FECHA EMISION:", detailX, detailY-10);
         doc.text(
             orden.fechaEmision ? orden.fechaEmision.toString().split("T")[0] : "",
-            detailX + 50,
-            detailY
+            detailX + 30,
+            detailY - 10
         );
-        detailY += 4;
-        doc.text("NUMERO DE ORDEN DE COMPRA:", detailX, detailY);
-        doc.text(
-            orden.ordenCompraId ? orden.ordenCompraId.toString() : "",
-            detailX + 50,
-            detailY
-        );
-        detailY += 4;
-        doc.text("FECHA DE VENCIMIENTO DE LA ORDEN:", detailX, detailY);
+        detailY += 3;
+        doc.text("FECHA DE VENCIMIENTO:", detailX, detailY-10);
         doc.text(
             orden.fechaVencimiento ? orden.fechaVencimiento.toString().split("T")[0] : "",
-            detailX + 50,
-            detailY
+            detailX + 30,
+            detailY - 10
         );
+
+        // detailY += 3;
+        // doc.text("NUMERO DE ORDEN DE COMPRA:", detailX, detailY);
+        // doc.text(
+        //     orden.ordenCompraId ? orden.ordenCompraId.toString() : "",
+        //     detailX + 40,
+        //     detailY
+        // );
 
         // --- Lugar de Entrega y Condiciones de Pago ---
         let entregaY = detailY + 7;
@@ -94,23 +97,23 @@ export default class PdfGenerator {
         doc.setFontSize(6);
         entregaY += 4;
         doc.text("Empresa: Napolitana JP S.A.S - EXOTIC EXPERT", detailX, entregaY);
-        entregaY += 4;
+        entregaY += 3;
         doc.text("Direccion: vía 11, Juan Mina #4 100", detailX, entregaY);
-        entregaY += 5;
+        entregaY += 3;
         doc.text("Barranquilla, Atlántico", detailX, entregaY);
-        entregaY += 4;
+        entregaY += 3;
         doc.text(getCondicionPagoText(orden.condicionPago) ?? "", detailX, entregaY);
-        entregaY += 4;
+        entregaY += 3;
         doc.text(`PLAZO PAGO ${orden.plazoPago} DIAS`, detailX, entregaY);
-        entregaY += 4;
+        entregaY += 3;
         doc.text(`PLAZO ENTREGA ${orden.tiempoEntrega} DIAS`, detailX, entregaY);
-        entregaY += 4;
+        entregaY += 3;
         doc.text("CONDICION ENTREGA: PUESTA EN PLANTA", detailX, entregaY);
 
 
 
         // --- Proveedor Information ---
-        let proveedorY = currentY + 10 - 25; // start a bit lower than the Napolitana info
+        let proveedorY = currentY + 10 - 32; // start a bit lower than the Napolitana info
         const proveedorX = margin + 50;
         doc.setFont("helvetica", "bold");
         doc.text("INFORMACION PROVEEDOR", proveedorX, proveedorY);
@@ -126,11 +129,43 @@ export default class PdfGenerator {
         proveedorY += 3;
         doc.text(orden.proveedor.ciudad, proveedorX, proveedorY);
         proveedorY += 3;
-        doc.text(getRegimenTributario(orden.proveedor.regimenTributario) ?? "", margin, proveedorY);
+        doc.text(getRegimenTributario(orden.proveedor.regimenTributario) ?? "", proveedorX, proveedorY);
 
         // --- Items Table ---
         // Determine the starting y-coordinate for the table
-        const tableStartY = Math.max(detailY, entregaY, proveedorY) + 5;
+        //const tableStartY = Math.max(detailY, entregaY, proveedorY) + 5;
+        let topNotesStartY = Math.max(detailY, entregaY, proveedorY) + 10;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
+        doc.text("INFORMACION IMPORTANTE:", 10, topNotesStartY);
+        doc.setFont("helvetica", "normal");
+        topNotesStartY += 4;
+        doc.text("- los materiales entregados estarán sujetos a inspección y verificación por parte del personal designado de la empresa antes de ser aceptados.", 10, topNotesStartY);
+        topNotesStartY += 4;
+        doc.text("- los matriales deben ser entregados en la direcccion vía 11, Juan Mina #4 100", 10, topNotesStartY);
+        topNotesStartY += 4;
+        doc.text("- Horario de entrega: lunes a viernes de 9:00 a 11:00. y de 14:00 a 15:30", 10, topNotesStartY);
+        topNotesStartY += 4;
+        doc.text("- Cualquier material que no cumpla con las especificaciones será rechazado.", 10, topNotesStartY);
+        topNotesStartY += 4;
+        doc.text("- El proveedor será responsablede los costos de devolucion", 10, topNotesStartY);
+        topNotesStartY += 4;
+        doc.text("- No se aceptarán entregas parciales", 10, topNotesStartY);
+        topNotesStartY += 4;
+        doc.text("- El proveedor debe notificar el horario de entrega de los materiales solicitados  y enviar la guía de despacho correspondiente", 10, topNotesStartY);
+
+
+        const tableStartY = topNotesStartY + 10;
+
+        // const topNote = "los materiales entregados estarán sujetos a inspección y verificación por parte del personal designado de la empresa antes de ser aceptados.";
+        // let topNotesTotalsY = 5;
+        // const topNoteLines = doc.splitTextToSize(topNote, 190);
+        // doc.text(topNoteLines, margin, topNotesTotalsY);
+        // topNotesTotalsY += topNoteLines.length * 4;
+
+
+
         const tableColumns = ["CODIGO", "DESCRIPCION", "CANTIDAD", "PRECIO UNITARIO", "SUBTOTAL"];
         const tableRows = orden.itemsOrdenCompra.map((item: ItemOrdenCompra) => [
             item.material.productoId,
@@ -169,10 +204,11 @@ export default class PdfGenerator {
         totalsY += leyendaLines.length * 4;
 
         // --- Observaciones ---
-        doc.setFont("helvetica", "bold");
-        doc.text("OBSERVACIONES", margin, totalsY);
-        totalsY += 5;
-        doc.rect(margin, totalsY, 190, 20); // a smaller rectangle for observations
+        // doc.setFont("helvetica", "bold");
+        // doc.text("OBSERVACIONES", margin, totalsY);
+        // totalsY += 5;
+        // doc.rect(margin, totalsY, 190, 20); // a smaller rectangle for observations
+        //
 
         // --- Trigger Download ---
         doc.save(`orden-compra-${orden.ordenCompraId}.pdf`);
