@@ -6,8 +6,9 @@ import {
 
 import MyHeader from '../../components/MyHeader';
 import {my_style_tab} from "../../styles/styles_general.tsx";
-import CrearOrdenCompra from "./CrearOrdenCompra.tsx";
+import CrearOrdenCompraMateriales from "./CrearOrdenCompraMateriales.tsx";
 import ReporteOrdenesCompras from "./ReporteOrdenesCompras.tsx";
+import CrearOrdenCompraActivos from "./CrearOrdenCompraActivos.tsx";
 
 function ComprasPage() {
 
@@ -18,13 +19,18 @@ function ComprasPage() {
 
             <Tabs>
                 <TabList>
-                    <Tab sx={my_style_tab}>Generar Orden de Compra</Tab>
+                    <Tab sx={my_style_tab}>Crear Orden de Compra para Materiales</Tab>
+                    <Tab sx={my_style_tab}>Crear Orden de Compra para Activos</Tab>
                     <Tab sx={my_style_tab}>Reportes Ordenes de Compra</Tab>
                 </TabList>
 
                 <TabPanels>
                     <TabPanel>
-                        <CrearOrdenCompra/>
+                        <CrearOrdenCompraMateriales/>
+                    </TabPanel>
+
+                    <TabPanel>
+                        <CrearOrdenCompraActivos/>
                     </TabPanel>
 
                     <TabPanel>

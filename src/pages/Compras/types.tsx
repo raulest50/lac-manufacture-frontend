@@ -104,3 +104,27 @@ export interface OrdenCompra {
      */
     estado: number;
 }
+
+export interface OrdenCompraActivos{
+    ordenCompraId: string;
+    fechaEmision: string;
+    fechaVencimiento: string;
+    proveedor: Proveedor;
+    itemsOrdenCompra: ItemOCActivo[];
+    subTotal: number;
+    ivaValue: number;
+}
+
+export interface ItemOCActivo{
+    itemOrdenId: number;
+    activo: Activo;
+    cantidad: number;
+    subTotal: number;
+}
+
+export interface Activo{
+    descripcion: string;
+    precio: number;
+    ivaValue: number;
+
+}

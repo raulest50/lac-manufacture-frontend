@@ -13,7 +13,7 @@ import {format, addDays} from "date-fns";
 
 const endPoints = new EndPointsURL();
 
-export default function CrearOrdenCompra() {
+export default function CrearOrdenCompraMateriales() {
     const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);
     const [isProveedorPickerOpen, setIsProveedorPickerOpen] = useState(false);
     const [isMateriaPrimaPickerOpen, setIsMateriaPrimaPickerOpen] = useState(false);
@@ -231,6 +231,7 @@ export default function CrearOrdenCompra() {
                     </Flex>
 
                 </Flex>
+
                 <Text hidden={true}> Sub Total: {subTotal} - iva19: {iva19} - Total a Pagar: {totalPagar} </Text>
                 <Button onClick={() => setIsMateriaPrimaPickerOpen(true)}>
                     Agregar Materia Prima

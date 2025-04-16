@@ -14,7 +14,7 @@ function ProductosPage() {
             <MyHeader title="Codificar Producto" />
             <Tabs isFitted gap="1em" variant="line">
                 <TabList>
-                    <Tab sx={my_style_tab}>Codificar Material Primario</Tab>
+                    <Tab sx={my_style_tab}>Codificar Material</Tab>
                     <Tab sx={my_style_tab}> Consulta </Tab>
                     <Tab sx={my_style_tab}>Crear Terminado/Semiterminado</Tab>
 
