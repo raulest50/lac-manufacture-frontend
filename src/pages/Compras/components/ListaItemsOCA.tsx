@@ -2,18 +2,18 @@
 import {
     Table, Thead, Tbody, Tr, Th, Td,
     Input, NumberInput, NumberInputField,
-    Button, IconButton, Flex, Text
+    Button, IconButton, Flex, Text, Tfoot
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { ItemOCActivo } from "../types.tsx";
-import { Dispatch, FC, SetStateAction } from "react";
+import {Dispatch, FC, SetStateAction, useMemo} from "react";
 
 interface Props {
     items: ItemOCActivo[];
     setItems: Dispatch<SetStateAction<ItemOCActivo[]>>;
 }
 
-const ListaItemsActivos: FC<Props> = ({ items, setItems }) => {
+const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
     // add empty row
     const addRow = () => {
         setItems([
@@ -21,6 +21,7 @@ const ListaItemsActivos: FC<Props> = ({ items, setItems }) => {
             {
                 itemOrdenId: Date.now(),
                 activo: {
+                    idActivo: "",
                     descripcion: "",
                     precio: 0,
                     ivaValue: 0,
@@ -62,6 +63,18 @@ const ListaItemsActivos: FC<Props> = ({ items, setItems }) => {
         setItems(newItems);
     };
 
+    // 1. Totals
+    const { totalIva, totalBeforeIva, totalAfterIva } = useMemo(() => {
+        const totIva   = items.reduce((sum, row) => sum + row.activo.ivaValue * row.cantidad, 0);
+        const totBase  = items.reduce((sum, row) => sum + row.activo.precio    * row.cantidad, 0);
+        const totAll   = items.reduce((sum, row) => sum + row.subTotal, 0);
+        return {
+            totalIva:     totIva,
+            totalBeforeIva: totBase,
+            totalAfterIva:  totAll,
+        };
+    }, [items]);
+
     return (
         <Flex direction="column" p="1em" boxShadow="sm" mb="4">
             <Flex justify="space-between" mb="2">
@@ -74,18 +87,28 @@ const ListaItemsActivos: FC<Props> = ({ items, setItems }) => {
             <Table variant="striped" size="sm">
                 <Thead>
                     <Tr>
-                        <Th>Descripción</Th>
-                        <Th isNumeric>Precio</Th>
-                        <Th isNumeric>% IVA</Th>
-                        <Th isNumeric>Valor IVA</Th>
-                        <Th isNumeric>Cantidad</Th>
-                        <Th isNumeric>Subtotal</Th>
-                        <Th>Acción</Th>
+                        <Th w={"15%"}>Id Activo</Th>
+                        <Th w={"30%"}>Descripción</Th>
+                        <Th w={"15%"} isNumeric>Precio</Th>
+                        <Th w={"10%"} isNumeric>% IVA</Th>
+                        <Th w={"10%"} isNumeric>Valor IVA</Th>
+                        <Th w={"5%"} isNumeric>Cantidad</Th>
+                        <Th w={"10%"} isNumeric>Subtotal</Th>
+                        <Th w={"5%"}>Acción</Th>
                     </Tr>
                 </Thead>
                 <Tbody>
                     {items.map((item, idx) => (
                         <Tr key={item.itemOrdenId}>
+                            <Td>
+                                <Input
+                                    size="sm"
+                                    value={item.activo.idActivo}
+                                    onChange={e =>
+                                        updateRow(idx, "idActivo", e.target.value)
+                                    }
+                                />
+                            </Td>
                             <Td>
                                 <Input
                                     size="sm"
@@ -142,9 +165,40 @@ const ListaItemsActivos: FC<Props> = ({ items, setItems }) => {
                         </Tr>
                     ))}
                 </Tbody>
+
+                <Tfoot>
+                    {/* Total before IVA */}
+                    <Tr>
+                        <Td colSpan={6} textAlign="right">
+                            <strong>Total antes de IVA</strong>
+                        </Td>
+                        <Td isNumeric fontWeight="bold">
+                            {totalBeforeIva.toFixed(2)}
+                        </Td>
+                        <Td />
+                    </Tr>
+                    {/* Total IVA row */}
+                    <Tr>
+                        <Td colSpan={6} textAlign={"right"}>
+                            <strong>Total IVA</strong>
+                        </Td>
+                        <Td isNumeric fontWeight="bold">
+                            {totalIva.toFixed(2)}
+                        </Td>
+                    </Tr>
+                    {/* Total with IVA */}
+                    <Tr>
+                        <Td colSpan={6} textAlign={"right"}>
+                            <strong>Total despues de IVA</strong>
+                        </Td>
+                        <Td isNumeric fontWeight="bold">{totalAfterIva.toFixed(2)}</Td>
+                        <Td />
+                    </Tr>
+                </Tfoot>
+
             </Table>
         </Flex>
     );
 };
 
-export default ListaItemsActivos;
+export default ListaItemsOCA;

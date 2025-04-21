@@ -102,7 +102,7 @@ export default class PdfGenerator {
         entregaY += 3;
         doc.text("Barranquilla, Atlántico", detailX, entregaY);
         entregaY += 3;
-        doc.text(getCondicionPagoText(orden.condicionPago) ?? "", detailX, entregaY);
+        doc.text(`CONDICION PAGO: ${getCondicionPagoText(orden.condicionPago)}` ?? "", detailX, entregaY);
         entregaY += 3;
         doc.text(`PLAZO PAGO ${orden.plazoPago} DIAS`, detailX, entregaY);
         entregaY += 3;
@@ -299,11 +299,11 @@ export default class PdfGenerator {
         entregaY += 3;
         doc.text("Barranquilla, Atlántico", detailX, entregaY);
         entregaY += 3;
-        doc.text(getCondicionPagoText(orden.condicionPago) ?? "", detailX, entregaY);
+        doc.text(`CONDICION PAGO: ${getCondicionPagoText(orden.condicionPago)}` ?? "", detailX, entregaY);
         entregaY += 3;
-        doc.text(`PLAZO PAGO ${orden.plazoPago} DIAS`, detailX, entregaY);
+        doc.text(`PLAZO PAGO: ${orden.plazoPago} DIAS`, detailX, entregaY);
         entregaY += 3;
-        doc.text(`PLAZO ENTREGA ${orden.tiempoEntrega} DIAS`, detailX, entregaY);
+        doc.text(`PLAZO ENTREGA: ${orden.tiempoEntrega} DIAS`, detailX, entregaY);
         entregaY += 3;
         doc.text("CONDICION ENTREGA: PUESTA EN PLANTA", detailX, entregaY);
 

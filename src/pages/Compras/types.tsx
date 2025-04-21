@@ -35,6 +35,7 @@ export function getEstadoText(estado: number){
 export function getCondicionPagoText(condicion: string){
     if(condicion == "0") return "Credito";
     if(condicion == "1") return "Contado";
+    if(condicion == "2") return "Mixta";
 }
 
 export function getCantidadCorrectaText(cantidadCorrecta: number){
@@ -127,7 +128,8 @@ export interface ItemOCActivo{
 }
 
 export interface Activo{
-    idActivo?: number;
+    [key: string]: string | number;    // ← index signature
+    idActivo: string;
     descripcion: string;
     precio: number;
     ivaValue: number;

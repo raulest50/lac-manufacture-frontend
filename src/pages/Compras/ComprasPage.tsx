@@ -6,9 +6,9 @@ import {
 
 import MyHeader from '../../components/MyHeader';
 import {my_style_tab} from "../../styles/styles_general.tsx";
-import CrearOrdenCompraMateriales from "./CrearOrdenCompraMateriales.tsx";
+import CrearOCM from "./CrearOCM.tsx";
 import ReporteOrdenesCompras from "./ReporteOrdenesCompras.tsx";
-import CrearOrdenCompraActivos from "./CrearOrdenCompraActivos.tsx";
+import CrearOCA from "./CrearOCA.tsx";
 
 function ComprasPage() {
 
@@ -26,11 +26,11 @@ function ComprasPage() {
 
                 <TabPanels>
                     <TabPanel>
-                        <CrearOrdenCompraMateriales/>
+                        <CrearOCM/>
                     </TabPanel>
 
                     <TabPanel>
-                        <CrearOrdenCompraActivos/>
+                        <CrearOCA/>
                     </TabPanel>
 
                     <TabPanel>

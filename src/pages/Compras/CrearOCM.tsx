@@ -7,13 +7,13 @@ import EndPointsURL from '../../api/EndPointsURL';
 import ProveedorPicker from './components/ProveedorPicker.tsx';
 import ProveedorCard from './components/ProveedorCard.tsx';
 import MateriaPrimaPicker from './components/MateriaPrimaPicker.tsx';
-import ListaOrdenCompraItems from './components/ListaOrdenCompraItems.tsx';
+import ListaItemsOCM from './components/ListaItemsOCM.tsx';
 import MyDatePicker from "../../components/MyDatePicker.tsx";
 import {format, addDays} from "date-fns";
 
 const endPoints = new EndPointsURL();
 
-export default function CrearOrdenCompraMateriales() {
+export default function CrearOCM() {
     const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);
     const [isProveedorPickerOpen, setIsProveedorPickerOpen] = useState(false);
     const [isMateriaPrimaPickerOpen, setIsMateriaPrimaPickerOpen] = useState(false);
@@ -237,7 +237,7 @@ export default function CrearOrdenCompraMateriales() {
                     Agregar Materia Prima
                 </Button>
 
-                <ListaOrdenCompraItems
+                <ListaItemsOCM
                     items={listaItemsOrdenCompra}
                     onRemoveItem={handleRemoveItem}
                     onUpdateItem={handleUpdateItem}

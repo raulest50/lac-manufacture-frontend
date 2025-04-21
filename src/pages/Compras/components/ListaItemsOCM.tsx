@@ -24,7 +24,7 @@ interface OrdenCompraItemsProps {
     ) => void;
 }
 
-const ListaOrdenCompraItems: React.FC<OrdenCompraItemsProps> = ({
+const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                                                                items,
                                                                onRemoveItem,
                                                                onUpdateItem,
@@ -138,4 +138,4 @@ const ListaOrdenCompraItems: React.FC<OrdenCompraItemsProps> = ({
     );
 };
 
-export default ListaOrdenCompraItems;
+export default ListaItemsOCM;
