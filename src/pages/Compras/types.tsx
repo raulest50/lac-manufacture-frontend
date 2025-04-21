@@ -113,6 +113,10 @@ export interface OrdenCompraActivos{
     itemsOrdenCompra: ItemOCActivo[];
     subTotal: number;
     ivaValue: number;
+    totalPagar: number;
+    condicionPago: string;
+    tiempoEntrega: string;
+    plazoPago: number;
 }
 
 export interface ItemOCActivo{
@@ -123,8 +127,9 @@ export interface ItemOCActivo{
 }
 
 export interface Activo{
+    idActivo?: number;
     descripcion: string;
     precio: number;
     ivaValue: number;
-
+    ivaPercentage: number;
 }
