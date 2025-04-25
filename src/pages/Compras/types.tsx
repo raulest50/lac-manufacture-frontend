@@ -26,9 +26,9 @@ export function getRegimenTributario(regimen: number) {
 
 export function getEstadoText(estado: number){
     if(estado == -1) return "Cancelada";
-    if(estado == 0) return "Pendiente confirmacion proveedor";
-    if(estado == 1) return "Pendiente recepcion y verificacion precios";
-    if(estado == 2) return "Pendiente recepcion y verificacion cantidades";
+    if(estado == 0) return "Pendiente liberacion";
+    if(estado == 1) return "Pendiente envio a proveedor";
+    if(estado == 2) return "Pendiente recepcion en almacen";
     if(estado == 3) return "Cerrada exitosamente";
 }
 
@@ -98,9 +98,9 @@ export interface OrdenCompra {
     plazoPago: number;
     /**
      * -1: cancelada
-     *  0: pendiente aprobación proveedor
-     *  1: pendiente revisión precio
-     *  2: pendiente conteo
+     *  0: pendiente liberacion
+     *  1: pendiente envio a proveedor
+     *  2: pendiente recepcion en almacen
      *  3: cerrada con éxito
      */
     estado: number;

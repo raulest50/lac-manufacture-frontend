@@ -1,17 +1,21 @@
-// ./types.tsx
+// RecibirMercancia/types.tsx
+import {Contacto} from "../Proveedores/types.tsx";
+
 export interface Proveedor {
-    id: number;
+    id: string;
+    tipoIdentificacion: number;
     nombre: string;
-    direccion: string;
+    direccion?: string;
     regimenTributario: number;
-    ciudad: string;
-    departamento: string;
-    nombreContacto: string;
-    telefono: string;
-    email: string;
-    url: string;
-    observacion: string;
-    fechaRegistro: string;
+    ciudad?: string;
+    departamento?: string;
+    contactos: Contacto[];
+    url?: string;
+    observacion?: string;
+    categorias:number[];
+    condicionPago: string;
+    rutFile?: File;         // Optional file for RUT
+    camaraFile?: File;      // Optional file for Cámara y Comercio
 }
 
 export function getRegimenTributario(regimen: number) {
@@ -39,19 +43,26 @@ export function getCantidadCorrectaText(cantidadCorrecta: number){
     if(cantidadCorrecta == -1) return "Cantidad Incorrecta";
 }
 
-export interface MateriaPrima {
+export interface Producto{
     productoId: number;
     tipo_producto: string;
     nombre: string;
+    observaciones: string;
     costo: number;
     tipoUnidades: string;
-    // add other properties if needed
+    cantidadUnidad: string;
+    fechaCreacion?: string;
+}
+
+export interface Material extends Producto{
+    fichaTecnicaUrl?: string;
+    tipoMaterial?: number; // 1: materia prima, 2: material de empaque
 }
 
 export interface ItemOrdenCompra {
     itemOrdenId?: number;
     // The selected MateriaPrima is wrapped here.
-    materiaPrima: MateriaPrima;
+    material: Material;
     cantidad: number;
     precioUnitario: number;
     iva19: number;
@@ -86,9 +97,9 @@ export interface OrdenCompra {
     plazoPago: number;
     /**
      * -1: cancelada
-     *  0: pendiente aprobación proveedor
-     *  1: pendiente revisión precio
-     *  2: pendiente conteo
+     *  0: pendiente liberacion
+     *  1: pendiente envio a proveedor
+     *  2: pendiente recepcion en almacen
      *  3: cerrada con éxito
      */
     estado: number;

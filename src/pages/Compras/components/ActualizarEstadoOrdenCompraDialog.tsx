@@ -66,7 +66,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     useEffect(() => {
         checkVerificacionFisica();
         if (isOpen) {
-            const code = Math.floor(1000000 + Math.random() * 9000000).toString();
+            const code = Math.floor(1000 + Math.random() * 9000).toString();
             setRandomCode(code);
             setInputCode('');
             // Clone the items array for local updates.
@@ -110,7 +110,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
 
     // Handler for confirmar proveedor (estado transition from 0 to 1).
     // It passes the facturaCompra id along with the confirmation token.
-    const handleConfirmacionProveedor = () => {
+    const handleLiberacion = () => {
         if (inputCode === randomCode) {
             updateEstado(1);
         } else {
@@ -126,7 +126,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     };
 
     // Handler for confirming precios (estado 1 -> 2).
-    const handleConfirmarPrecios = () => {
+    const handleEnviarProveedor = () => {
         if (inputCode === randomCode) {
             updateEstado(2);
         } else {
@@ -157,26 +157,12 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
         }
     };
 
-    // For estado 1: Mark precioCorrecto for an item.
-    const markPrecioCorrecto = (index: number) => {
-        const updatedItems = localItems?.map((item, idx) => {
-            if (idx === index) {
-                return { ...item, precioCorrecto: 1 };
-            }
-            return item;
-        });
-        setLocalItems(updatedItems);
-    };
 
     // For estado 2: Check that all items have cantidadCorrecta === 1.
     const allCantidadCorrecta = () => {
         return localItems?.every(item => item.cantidadCorrecta === 1);
     };
 
-    // For estado 1: Check that all items have precioCorrecto === 1.
-    const allPrecioCorrecto = () => {
-        return localItems?.every(item => item.precioCorrecto === 1);
-    };
 
     function OrdenDetailsComponent(){
         return(
@@ -185,7 +171,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                     <Text><strong>ID:</strong> {orden.ordenCompraId}</Text>
                     <Text><strong>Fecha Emisión:</strong> {orden.fechaEmision ? new Date(orden.fechaEmision).toLocaleString() : '-'}</Text>
                     <Text><strong>Fecha Vencimiento:</strong> {orden.fechaVencimiento ? new Date(orden.fechaVencimiento).toLocaleDateString() : '-'}</Text>
-                    <Text><strong>Id Factura Correspondiente:</strong> {orden.facturaCompraId ? orden.facturaCompraId : 'Pendiente por asignacion proveedor'}</Text>
+                    <Text><strong>Id Factura Correspondiente:</strong> {orden.facturaCompraId ? orden.facturaCompraId : 'Pendiente por relacionar'}</Text>
                     <Text><strong>Proveedor:</strong> {orden.proveedor ? orden.proveedor.nombre : '-'}</Text>
                     <Text><strong>Total a Pagar:</strong> {orden.totalPagar}</Text>
                     <Text><strong>Estado:</strong> {getEstadoText(orden.estado)}</Text>
@@ -213,29 +199,17 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                                     <Th>Precio Unitario</Th>
                                     <Th>IVA</Th>
                                     <Th>Subtotal</Th>
-                                    <Th hidden={orden.estado !== 1}>Confirmar Precio</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {localItems && localItems.map((item, index) => (
+                                {localItems && localItems.map((item) => (
                                     <Tr key={item.itemOrdenId}>
                                         <Td>{item.itemOrdenId}</Td>
-                                        <Td>{item.materiaPrima ? `${item.materiaPrima.productoId} - ${item.materiaPrima.nombre} - (${item.materiaPrima.tipoUnidades}) ` : '-'}</Td>
+                                        <Td>{item.material ? `${item.material.productoId} - ${item.material.nombre} - (${item.material.tipoUnidades}) ` : '-'}</Td>
                                         <Td >{item.cantidad}</Td>
                                         <Td >{item.precioUnitario}</Td>
                                         <Td >{item.iva19}</Td>
                                         <Td >{item.subTotal}</Td>
-                                        <Td>
-                                            <Button
-                                                hidden={orden.estado !== 1}
-                                                size="xs"
-                                                colorScheme="blue"
-                                                isDisabled={item.precioCorrecto === 1}
-                                                onClick={() => markPrecioCorrecto(index)}
-                                            >
-                                                {item.precioCorrecto === 1 ? "Correcto" : "OK"}
-                                            </Button>
-                                        </Td>
                                         <Td hidden={orden.estado!=2}>{getCantidadCorrectaText(item.cantidadCorrecta)}</Td>
                                     </Tr>
                                 ))}
@@ -285,8 +259,8 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                                         maxW="200px"
                                     />
                                 </FormControl>
-                                <Button colorScheme="green" onClick={handleConfirmacionProveedor}>
-                                    Confirmación Proveedor
+                                <Button colorScheme="green" onClick={handleLiberacion}>
+                                    Liberar Orden
                                 </Button>
                             </VStack>
                         </HStack>
@@ -311,10 +285,9 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                             />
                             <Button
                                 colorScheme="green"
-                                onClick={handleConfirmarPrecios}
-                                isDisabled={!allPrecioCorrecto()}
+                                onClick={handleEnviarProveedor}
                             >
-                                Confirmar Precios Concuerdan
+                                Enviar a Proveedor
                             </Button>
                         </HStack>
                     </Box>

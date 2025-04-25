@@ -1,9 +1,12 @@
-// StepOneComponent.tsx
+// RecibirMercancia/StepOneComponent.tsx
 import {
     Box,
     Button,
     Flex,
+    FormControl,
+    FormLabel,
     Heading,
+    Input,
     Table,
     Tbody,
     Td,
@@ -11,9 +14,12 @@ import {
     Thead,
     Tr,
     Text,
+    useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { OrdenCompra, ItemOrdenCompra } from "./types.tsx";
+
+type LocalItem = ItemOrdenCompra & { entrada: number };
 
 interface StepOneComponentProps {
     setActiveStep: (step: number) => void;
@@ -24,46 +30,82 @@ export default function StepOneComponent({
                                              setActiveStep,
                                              orden,
                                          }: StepOneComponentProps) {
-    // Local copy of the order's items to track verification state.
-    const [items, setItems] = useState<ItemOrdenCompra[]>([]);
+    const toast = useToast();
 
-    // When the order is received (or changes), initialize local items state.
+    // Local items with an extra `entrada` field
+    const [items, setItems] = useState<LocalItem[]>([]);
+
+    // Token management
+    const [token, setToken] = useState<string>("");
+    const [inputToken, setInputToken] = useState<string>("");
+
+    // Initialize items & token whenever `orden` changes
     useEffect(() => {
-        if (orden && orden.itemsOrdenCompra) {
-            // Make a shallow copy so that changes here don’t affect the original object.
-            setItems(orden.itemsOrdenCompra.map((item) => ({ ...item })));
+        if (orden?.itemsOrdenCompra) {
+            setItems(
+                orden.itemsOrdenCompra.map((it) => ({
+                    ...it,
+                    entrada: it.cantidad,
+                }))
+            );
         }
+        // generate a new 4-digit token
+        const newTok = Math.floor(1000 + Math.random() * 9000).toString();
+        setToken(newTok);
+        setInputToken("");
     }, [orden]);
 
-    // When a user verifies an item (1: concuerda, -1: no concuerda)
-    const handleVerify = (index: number, result: number) => {
+    // Handle changes to the entrada field
+    const handleEntradaChange = (
+        idx: number,
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const val = parseInt(e.target.value, 10);
         setItems((prev) => {
-            const updated = [...prev];
-            updated[index] = { ...updated[index], cantidadCorrecta: result };
-            return updated;
+            const upd = [...prev];
+            upd[idx] = { ...upd[idx], entrada: isNaN(val) ? 0 : val };
+            return upd;
+        });
+    };
+
+    // Check that all cantidades are valid:
+    // - integer
+    // - ≥ 0
+    // - ≤ the corresponding original purchase-order cantidad
+    const cantidades_validas = () => {
+        if (!orden) return false;
+        return items.every((it, idx) => {
+            const originalQty = orden.itemsOrdenCompra[idx].cantidad;
+            return (
+                Number.isInteger(it.entrada) &&
+                it.entrada > 0 &&
+                it.entrada <= originalQty
+            );
         });
     };
 
     const onClickContinuar = () => {
-        // Proceed to the next step.
+        if (!cantidades_validas()) return;
+
+        if (inputToken !== token) {
+            toast({
+                title: "Token incorrecto",
+                description: "El token ingresado no coincide.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+            return;
+        }
+
         setActiveStep(2);
     };
 
-    const onClickReportarDiscrepancia = () => {
-
-    };
-
-    // If no order is loaded, show a friendly message.
     if (!orden) {
         return <Text>No se ha seleccionado ninguna orden.</Text>;
     }
 
-    // Helper function to format date strings.
-    const formatDate = (dateStr?: string) => {
-        if (!dateStr) return "";
-        const date = new Date(dateStr);
-        return date.toLocaleDateString();
-    };
+    const formatDate = (d?: string) => (d ? new Date(d).toLocaleDateString() : "");
 
     return (
         <Box p="1em" bg="blue.50">
@@ -71,7 +113,8 @@ export default function StepOneComponent({
                 <Heading fontFamily="Comfortaa Variable">
                     Verificar Cantidades
                 </Heading>
-                {/* Top Section: Proveedor & Order Dates */}
+
+                {/* Proveedor & fechas */}
                 <Flex direction="column" align="center" gap={2}>
                     <Text fontFamily="Comfortaa Variable">
                         <strong>Proveedor:</strong> {orden.proveedor.nombre}
@@ -80,90 +123,70 @@ export default function StepOneComponent({
                         <strong>Fecha Emisión:</strong> {formatDate(orden.fechaEmision)}
                     </Text>
                     <Text fontFamily="Comfortaa Variable">
-                        <strong>Fecha Vencimiento:</strong> {formatDate(orden.fechaVencimiento)}
+                        <strong>Fecha Vencimiento:</strong>{" "}
+                        {formatDate(orden.fechaVencimiento)}
                     </Text>
                 </Flex>
+
                 <Text fontFamily="Comfortaa Variable" textAlign="center">
-                    Para cada item, verifique que las cantidades concuerdan. Si alguna no
-                    coincide, deberá indicarlo para poder generar correctamente el ingreso
-                    a almacén.
+                    Ajuste la “Cantidad” según lo realmente recibido. Sólo podrá
+                    continuar si todas las cantidades son enteros, entre 0 y lo ordenado
+                    (inclusive).
                 </Text>
-                {/* Table with Order Items */}
+
+                {/* Tabla editable */}
                 <Box w="full" overflowX="auto">
                     <Table variant="striped">
                         <Thead>
                             <Tr>
                                 <Th>Producto ID</Th>
                                 <Th>Nombre</Th>
-                                <Th isNumeric>Cantidad</Th>
-                                <Th>Verificar</Th>
+                                <Th isNumeric>Cantidad Recibida</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {items.map((item, index) => (
-                                <Tr key={index}>
-                                    <Td>{item.materiaPrima.productoId}</Td>
-                                    <Td>{item.materiaPrima.nombre}</Td>
-                                    <Td isNumeric>{item.cantidad}</Td>
-                                    <Td>
-                                        {item.cantidadCorrecta === 0 ? (
-                                            <Flex gap={2}>
-                                                <Button
-                                                    size="sm"
-                                                    colorScheme="green"
-                                                    onClick={() => handleVerify(index, 1)}
-                                                >
-                                                    Sí
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    colorScheme="red"
-                                                    onClick={() => handleVerify(index, -1)}
-                                                >
-                                                    No
-                                                </Button>
-                                            </Flex>
-                                        ) : (
-                                            <Button
-                                                size="sm"
-                                                isDisabled
-                                                colorScheme={
-                                                    item.cantidadCorrecta === 1 ? "green" : "red"
-                                                }
-                                            >
-                                                {item.cantidadCorrecta === 1
-                                                    ? "Concuerda"
-                                                    : "No Concuerda"}
-                                            </Button>
-                                        )}
+                            {items.map((it, idx) => (
+                                <Tr key={idx}>
+                                    <Td>{it.material.productoId}</Td>
+                                    <Td>{it.material.nombre}</Td>
+                                    <Td isNumeric>
+                                        <Input
+                                            type="number"
+                                            value={it.entrada}
+                                            onChange={(e) => handleEntradaChange(idx, e)}
+                                            min={0}
+                                        />
                                     </Td>
                                 </Tr>
                             ))}
                         </Tbody>
                     </Table>
                 </Box>
-                {/* Global Confirm Button */}
-                <Flex w="40%" direction="column" gap={4}>
+
+                {/* Token Input */}
+                <FormControl w="40%" isRequired>
+                    <FormLabel>Token de verificación</FormLabel>
+                    <Input
+                        placeholder="Ingrese el token"
+                        value={inputToken}
+                        onChange={(e) => setInputToken(e.target.value)}
+                    />
+                </FormControl>
+
+                {/* Display the token as text */}
+                <Text fontFamily="Comfortaa Variable">
+                    Token: <strong>{token}</strong>
+                </Text>
+
+                {/* Continuar */}
+                <Flex w="40%">
                     <Button
-                        variant="solid"
                         colorScheme="teal"
-                        isDisabled={!items.every((item) => item.cantidadCorrecta === 1)}
+                        w="full"
+                        isDisabled={!cantidades_validas()}
                         onClick={onClickContinuar}
-                        hidden={ items.some((item) => item.cantidadCorrecta === -1) }
                     >
-                        Confirmar Las Cantidades Concuerdan
-                    </Button>
-                </Flex>
-                <Flex direction={"column"} gap={5} hidden={!items.some((item) => item.cantidadCorrecta === -1)}>
-                    <Text fontFamily={"Comfortaa Variable"} textAlign="center"> Si almenos una de las cantidades no coincide con la orden de compra, no se puede dar ingreso a almacen </Text>
-                    <Text fontFamily={"Comfortaa Variable"} textAlign="center"> termine de contar las otras cantidades y haga el reporte de que la mercancia no puede ser recibida </Text>
-                    <Button
-                        colorScheme={"red"}
-                        variant={"solid"}
-                        onClick={onClickReportarDiscrepancia}
-                        isDisabled={ items.some((item) => item.cantidadCorrecta === 0) }
-                    >
-                        Reportar Discrepancia
+                        Continuar
                     </Button>
                 </Flex>
             </Flex>

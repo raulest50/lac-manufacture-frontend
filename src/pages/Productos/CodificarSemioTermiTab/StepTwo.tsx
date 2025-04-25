@@ -32,7 +32,7 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => 
     const validoContinuar = (): boolean => {
         if (selectedInsumos.length < 2) return false;
         for (const insumo of selectedInsumos) {
-            if (isNaN(insumo.cantidadRequerida) || insumo.cantidadRequerida <= 1) {
+            if (isNaN(insumo.cantidadRequerida) || insumo.cantidadRequerida < 1) {
                 return false;
             }
         }

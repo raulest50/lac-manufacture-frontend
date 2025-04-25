@@ -171,14 +171,18 @@ export default class PdfGenerator {
             item.material.productoId,
             item.material.nombre,
             item.cantidad,
-            item.precioUnitario,
-            item.subTotal,
+            `$ ${item.precioUnitario.toFixed(2)}`,
+            `$ ${item.subTotal.toFixed(2)}`
         ]);
         autoTable(doc, {
             head: [tableColumns],
             body: tableRows,
             startY: tableStartY,
-            styles: { fontSize: 9 },
+            styles: {
+                fontSize: 9,
+                halign: 'center',
+                valign: 'middle',
+            },
             headStyles: { fillColor: [255, 192, 203] }, // Soft pink header fill
             theme: "grid",
         });
@@ -187,11 +191,12 @@ export default class PdfGenerator {
         const finalY = doc.lastAutoTable?.finalY ?? tableStartY;
         let totalsY = finalY + 5;
         doc.setFont("helvetica", "normal");
-        doc.text(`Sub Total: ${orden.subTotal}`, margin, totalsY);
+        doc.text(`Sub Total: $ ${orden.subTotal.toFixed(2)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`IVA (19%): ${orden.iva19}`, margin, totalsY);
+        doc.text(`IVA : $ ${orden.iva19.toFixed(2)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`Total Pagar: ${orden.totalPagar}`, margin, totalsY);
+        doc.text(`Total Pagar: $ ${orden.totalPagar.toFixed(2)}`, margin, totalsY);
+
 
         // --- Leyenda ---
         const leyenda =
@@ -368,14 +373,18 @@ export default class PdfGenerator {
             item.activo.idActivo,
             item.activo.descripcion,
             item.cantidad,
-            item.activo.precio,
-            item.subTotal,
+            `$ ${item.activo.precio.toFixed(2)}`,
+            `$ ${item.subTotal.toFixed(2)}`
         ]);
         autoTable(doc, {
             head: [tableColumns],
             body: tableRows,
             startY: tableStartY,
-            styles: { fontSize: 9 },
+            styles: {
+                fontSize: 9,
+                halign: 'center',
+                valign: 'middle',
+            },
             headStyles: { fillColor: [255, 192, 203] }, // Soft pink header fill
             theme: "grid",
         });
@@ -384,11 +393,12 @@ export default class PdfGenerator {
         const finalY = doc.lastAutoTable?.finalY ?? tableStartY;
         let totalsY = finalY + 5;
         doc.setFont("helvetica", "normal");
-        doc.text(`Sub Total: ${orden.subTotal}`, margin, totalsY);
+        doc.text(`Sub Total: $ ${orden.subTotal.toFixed(2)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`IVA (19%): ${orden.ivaValue}`, margin, totalsY);
+        doc.text(`IVA: $ ${orden.ivaValue.toFixed(2)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`Total Pagar: ${orden.totalPagar}`, margin, totalsY);
+        doc.text(`Total Pagar: $ ${orden.totalPagar.toFixed(2)}`, margin, totalsY);
+
 
         // --- Leyenda ---
         const leyenda =
