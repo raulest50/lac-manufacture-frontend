@@ -6,9 +6,14 @@ export interface Role {
 
 export interface User {
     id: number;
+    cedula: number;
     username: string;
     nombreCompleto?: string;
     password?: string;
+    cel?: string;
+    direccion?: string;
+    fechaNacimiento?: string; // ISO format, e.g., '2025-05-06'
+    estado: number;
     roles: Role[];
 }
 
