@@ -36,6 +36,8 @@ export default function ConsultarProveedores() {
                 </FormControl>
             </Flex>
 
+            <></>
+
             <MyPagination
                 page={page}
                 totalPages={totalPages}
