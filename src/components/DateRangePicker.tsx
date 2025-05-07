@@ -15,16 +15,18 @@ function DateRangePicker({date1, setDate1, date2, setDate2, flex_direction}:Date
     const today = format(new Date(), 'yyyy-MM-dd');
 
     return(
-        <Flex direction={flex_direction}>
+        <Flex direction={flex_direction} gap={4}>
             <MyDatePicker
                 date={date1}
                 setDate={setDate1}
                 defaultDate={today}
+                label="Fecha inicial"
             />
             <MyDatePicker
                 date={date2}
                 setDate={setDate2}
                 defaultDate={today}
+                label="Fecha final"
             />
         </Flex>
     );

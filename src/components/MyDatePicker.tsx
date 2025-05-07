@@ -1,64 +1,40 @@
 // DatePicker.tsx
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Input, FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react';
-import { parse, isValid, format } from 'date-fns';
+import React from 'react';
+import { Input, FormControl, FormLabel } from '@chakra-ui/react';
 
 interface DatePickerProps {
     date: string;
     setDate: (date: string) => void;
     defaultDate: string;
     label?: string;
-    placeholder?: string;
 }
 
 const DatePicker: React.FC<DatePickerProps> = ({
-                                                   date,
-                                                   setDate,
-                                                   defaultDate,
-                                                   label,
-                                                   placeholder = 'YYYY-MM-DD',
-                                               }) => {
-    const [inputValue, setInputValue] = useState<string>(date);
-    const [isError, setIsError] = useState<boolean>(false);
-
-    useEffect(() => {
-        setInputValue(date);
-    }, [date]);
+    date,
+    setDate,
+    defaultDate,
+    label,
+}) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDate(e.target.value);
+    };
 
     const handleBlur = () => {
-        if (isValidDate(inputValue)) {
-            setDate(inputValue);
-            setIsError(false);
-        } else {
+        // If date is empty, set to default date
+        if (!date) {
             setDate(defaultDate);
-            setInputValue(defaultDate);
-            setIsError(true);
         }
     };
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
-        setIsError(false);
-    };
-
-    const isValidDate = (dateString: string): boolean => {
-        const parsedDate = parse(dateString, 'yyyy-MM-dd', new Date());
-        return isValid(parsedDate) && dateString === format(parsedDate, 'yyyy-MM-dd');
-    };
-
     return (
-        <FormControl isInvalid={isError}>
+        <FormControl>
             {label && <FormLabel>{label}</FormLabel>}
             <Input
-                type="text"
-                value={inputValue}
+                type="date"
+                value={date}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder={placeholder}
             />
-            {isError && (
-                <FormErrorMessage>Invalid date format. Reverted to default date.</FormErrorMessage>
-            )}
         </FormControl>
     );
 };
