@@ -1,18 +1,12 @@
 import { useState, useEffect } from "react";
-import { Proveedor, DTO_SearchProveedor } from "./types.tsx";
+import { Proveedor, DTO_SearchProveedor, TIPO_BUSQUEDA } from "./types.tsx";
 import {
-    Flex,
-    FormControl,
-    FormLabel,
-    Input,
-    Stack,
-    CheckboxGroup,
-    Checkbox,
-    Button,
-    Heading,
-    Box,
-    useToast, Select
+    Flex, FormControl, FormLabel, Input,
+    Stack, CheckboxGroup, Checkbox,
+    Button, Box, Select,
+    useToast
 } from "@chakra-ui/react";
+
 import MyPagination from "../../components/MyPagination.tsx";
 import { ListaSearchProveedores } from "./components/ListaSearchProveedores.tsx";
 import axios from "axios";
@@ -23,7 +17,7 @@ export default function ConsultarProveedores() {
     const endpoints = new EndPointsURL();
 
     // Search states
-    const [searchType, setSearchType] = useState<'ID' | 'COMBINED'>('ID');
+    const [searchType, setSearchType] = useState(TIPO_BUSQUEDA.ID);
     const [searchText, setSearchText] = useState("");
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
     const [proveedores, setProveedores] = useState<Proveedor[]>([]);
@@ -66,18 +60,17 @@ export default function ConsultarProveedores() {
 
         try {
             const searchDTO: DTO_SearchProveedor = {
-                searchType: searchType,
-                searchText: searchText,
-                categories: searchType === 'COMBINED' ? selectedCategories : []
+                id: searchType === TIPO_BUSQUEDA.ID ? searchText : '',
+                nombre: searchType === TIPO_BUSQUEDA.ID ? '' : searchText,
+                categorias: selectedCategories,
+                searchType: searchType
             };
 
-            const response = await axios.post(
-                `${endpoints.search_proveedores_pag}?page=${pageNumber}&size=${pageSize}`,
-                searchDTO,
+            const response = await axios.post(endpoints.search_proveedores_pag,
                 {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    page: pageNumber,
+                    size: pageSize,
+                    ...searchDTO
                 }
             );
 
@@ -116,56 +109,66 @@ export default function ConsultarProveedores() {
 
     return (
         <Flex direction={"column"} p={4}>
-            <Heading size="md" mb={4}>Consulta de Proveedores</Heading>
-
             <Box p={4} borderWidth="1px" borderRadius="lg" mb={4}>
-                <Flex direction={"row"} mb={4} gap={2}>
-                    <FormControl mb={4} >
-                        <FormLabel>Tipo de Búsqueda</FormLabel>
-                        <Select value={searchType} onChange={(e) => setSearchType(e.target.value as 'ID' | 'COMBINED')}>
-                            <option value="ID">Búsqueda por ID</option>
-                            <option value="COMBINED">Búsqueda por Nombre y Categorías</option>
-                        </Select>
-                    </FormControl>
 
-                    <FormControl mb={4}>
-                        <FormLabel>{searchType === 'ID' ? 'ID del Proveedor' : 'Nombre del Proveedor'}</FormLabel>
-                        <Input 
-                            placeholder={searchType === 'ID' ? "Ingrese el ID del proveedor" : "Ingrese el nombre del proveedor"} 
-                            value={searchText} 
-                            onChange={(e) => setSearchText(e.target.value)}
-                        />
-                    </FormControl>
+                <Flex direction={"row"} gap={5}>
 
-                    {searchType === 'COMBINED' && (
-                        <FormControl mb={4}>
-                            <FormLabel>Categorías</FormLabel>
-                            <CheckboxGroup 
-                                colorScheme="green" 
-                                value={selectedCategories.map(String)} 
-                                onChange={handleCategoryChange}
-                            >
-                                <Stack spacing={2}>
-                                    {categoryOptions.map(category => (
-                                        <Checkbox key={category.id} value={category.id.toString()}>
-                                            {category.name}
-                                        </Checkbox>
-                                    ))}
-                                </Stack>
-                            </CheckboxGroup>
+                    <Flex direction={"column"} flex={2} mb={4} gap={2}>
+
+                        <FormControl mb={4} >
+                            <FormLabel>{searchType === 'ID' ? 'ID del Proveedor' : 'Nombre del Proveedor'}</FormLabel>
+                            <Input
+                                placeholder={searchType === 'ID' ? "Ingrese el ID del proveedor" : "Ingrese el nombre del proveedor"}
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                            />
                         </FormControl>
-                    )}
 
-                    <Button 
-                        colorScheme="blue" 
-                        onClick={handleSearch} 
-                        isLoading={loading}
-                        alignSelf="flex-start"
-                        mt={2}
-                    >
-                        Buscar
-                    </Button>
+                        <Flex direction={"row"} gap={5} alignItems="center">
+
+                            <FormControl mb={4} flex={1} >
+                                <FormLabel>Tipo de Búsqueda</FormLabel>
+                                <Select
+                                    value={searchType}
+                                    onChange={(e) => setSearchType(e.target.value)}
+                                >
+                                    <option value={TIPO_BUSQUEDA.ID}>ID</option>
+                                    <option value={TIPO_BUSQUEDA.NOMBRE_Y_CATEGORIA}>Nombre y Categorías</option>
+                                </Select>
+                            </FormControl>
+
+                            <Button
+                                colorScheme="blue"
+                                onClick={handleSearch}
+                                isLoading={loading}
+                                mt={2}
+                                flex={1}
+                            >
+                                Buscar
+                            </Button>
+                        </Flex>
+
+                    </Flex>
+
+                    <FormControl mb={4} flex={1} isDisabled={searchType === TIPO_BUSQUEDA.ID} >
+                        <FormLabel>Categorías</FormLabel>
+                        <CheckboxGroup
+                            colorScheme="green"
+                            value={selectedCategories.map(String)}
+                            onChange={handleCategoryChange}
+                        >
+                            <Stack spacing={2}>
+                                {categoryOptions.map(category => (
+                                    <Checkbox key={category.id} value={category.id.toString()}>
+                                        {category.name}
+                                    </Checkbox>
+                                ))}
+                            </Stack>
+                        </CheckboxGroup>
+                    </FormControl>
+
                 </Flex>
+
             </Box>
 
             {proveedores.length > 0 && (

@@ -23,7 +23,13 @@ export interface Proveedor {
 }
 
 export interface DTO_SearchProveedor {
-    searchType: 'ID' | 'COMBINED';
-    searchText: string;
-    categories: number[];
+    id:string;
+    nombre:string;
+    categorias: number[];
+    searchType: string; // "id" or "combined"
+}
+
+export const TIPO_BUSQUEDA = {
+    ID: 'ID',
+    NOMBRE_Y_CATEGORIA: 'NOMBRE_Y_CATEGORIA'
 }
