@@ -21,3 +21,9 @@ export interface Proveedor {
     rutFile?: File;         // Optional file for RUT
     camaraFile?: File;      // Optional file for Cámara y Comercio
 }
+
+export interface DTO_SearchProveedor {
+    searchType: 'ID' | 'COMBINED';
+    searchText: string;
+    categories: number[];
+}

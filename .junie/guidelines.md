@@ -1,14 +1,18 @@
 # Guías de Junie
 
-# Guía para Usar los Endpoints de Información del Backend
+# Tech Stack and Coding Style
+- Usar siempre axios para los request
+- usar chakra ui v2 para ui
+- cada modulo esta separado por pages. y cada page tiene su propio types.tsx
+   procurar definir cualquier interface en los correspondientes types.tsx
 
+# Guía para obtener Información de los Endpoints del Backend
 Cuando estés desarrollando localmente, puedes utilizar los siguientes endpoints para 
 obtener información sobre la estructura del backend. Todos estos endpoints están 
 disponibles en `http://localhost:8080/api/backend-info`.
 
 ## Exploración de Endpoints
-
-### Listar Todos los Endpoints
+El spring backend esta corre de manera local en http://localhost:8080/
 
 http GET /api/backend-info/endpoints
 
