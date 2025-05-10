@@ -1,4 +1,5 @@
-// src/components/types.tsx
+// src/pages/Usuarios/types.tsx
+
 export interface Role {
     id: number;
     name: string;
