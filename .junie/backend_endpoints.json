@@ -1,0 +1,1098 @@
+[
+  {
+    "path": "/proveedores/search_pag",
+    "controller": "ProveedorResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "searchProveedores",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "searchDTO",
+        "annotations": [
+          "RequestBody"
+        ],
+        "type": "DTO_SearchProveedor"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/search_semiytermi",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "searchProductos",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "searchTerm",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "tipoBusqueda",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/compras/save_orden_compra",
+    "controller": "ComprasResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "saveOrdenCompra",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "ordenCompraMateriales",
+        "annotations": [
+          "RequestBody"
+        ],
+        "type": "OrdenCompraMateriales"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/bulk_upload_excel",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "bulkUploadExcel",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "file",
+        "annotations": [
+          "RequestPart"
+        ],
+        "type": "MultipartFile"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/save_mprima_v2",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "saveMateriaPrimaV2",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "material",
+        "annotations": [
+          "RequestPart"
+        ],
+        "type": "Material"
+      },
+      {
+        "name": "file",
+        "annotations": [
+          "RequestPart"
+        ],
+        "type": "MultipartFile"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/usuarios/{userId}/roles",
+    "controller": "UserManagementResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "addRoleToUser",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "userId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "Long"
+      },
+      {
+        "name": "roleName",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/usuarios",
+    "controller": "UserManagementResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "createUser",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "user",
+        "annotations": [
+          "RequestBody"
+        ],
+        "type": "User"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/proveedores/search",
+    "controller": "ProveedorResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "searchProveedores",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "searchText",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/produccion/inventario_en_transito",
+    "controller": "ProduccionResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "getInventarioEnTransito",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/produccion/search_within_range",
+    "controller": "ProduccionResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "searchOrdenesProduccion",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "startDate",
+        "annotations": [
+          "RequestParam",
+          "DateTimeFormat"
+        ],
+        "type": "LocalDateTime"
+      },
+      {
+        "name": "endDate",
+        "annotations": [
+          "RequestParam",
+          "DateTimeFormat"
+        ],
+        "type": "LocalDateTime"
+      },
+      {
+        "name": "estadoOrden",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/movimientos/get_movimientos_by_producto",
+    "controller": "MovimientosResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "getMovimientosByProducto",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "productoId",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/compras/search_ordenes_by_date_estado",
+    "controller": "ComprasResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "getOrdenesCompra",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "date1",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "date2",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "estados",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/movimientos/save_doc_ingreso_oc",
+    "controller": "MovimientosResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "createDocIngreso",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "docIngresoDTO",
+        "annotations": [
+          "RequestPart"
+        ],
+        "type": "IngresoOCM_DTA"
+      },
+      {
+        "name": "file",
+        "annotations": [
+          "RequestPart"
+        ],
+        "type": "MultipartFile"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/usuarios/{userId}",
+    "controller": "UserManagementResource",
+    "methodAnnotations": [
+      "PutMapping"
+    ],
+    "methodName": "updateUser",
+    "httpMethod": "PUT",
+    "parameters": [
+      {
+        "name": "userId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "Long"
+      },
+      {
+        "name": "user",
+        "annotations": [
+          "RequestBody"
+        ],
+        "type": "User"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/movimientos/search_products_with_stock",
+    "controller": "MovimientosResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "searchProductsWithStock",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "searchTerm",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "tipoBusqueda",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/usuarios/{userId}/roles/{roleId}",
+    "controller": "UserManagementResource",
+    "methodAnnotations": [
+      "DeleteMapping"
+    ],
+    "methodName": "removeRoleFromUser",
+    "httpMethod": "DELETE",
+    "parameters": [
+      {
+        "name": "userId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "Long"
+      },
+      {
+        "name": "roleId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "Long"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/compras/orden_by_id",
+    "controller": "ComprasResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "getOrdenCompraByOrdenCompraId",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "ordenCompraId",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "Integer"
+      },
+      {
+        "name": "estado",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/search_semi_4pd",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "searchSemiterminados",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "search",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "tipoBusqueda",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/search_p4_receta_v2",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "searchP4RecetaV2",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "searchTerm",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "tipoBusqueda",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "clasificacion",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/search_semi",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "search_semi",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "search",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "tipoBusqueda",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/user/whoami",
+    "controller": "UserResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "whoAmI",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "authentication",
+        "annotations": [],
+        "type": "Authentication"
+      }
+    ],
+    "returnType": "Object",
+    "models": {}
+  },
+  {
+    "path": "/usuarios",
+    "controller": "UserManagementResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "getAllUsers",
+    "httpMethod": "GET",
+    "parameters": [],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/produccion/save",
+    "controller": "ProduccionResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "saveOrdenProduccion",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "ordenProduccionDTO",
+        "annotations": [
+          "RequestBody"
+        ],
+        "type": "OrdenProduccionDTO_save"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/save",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "saveProducto",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "producto",
+        "annotations": [
+          "RequestBody"
+        ],
+        "type": "Producto"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/proveedores/save",
+    "controller": "ProveedorResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "saveProveedor",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "proveedorJson",
+        "annotations": [
+          "RequestPart"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "rutFile",
+        "annotations": [
+          "RequestPart"
+        ],
+        "type": "MultipartFile"
+      },
+      {
+        "name": "camaraFile",
+        "annotations": [
+          "RequestPart"
+        ],
+        "type": "MultipartFile"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/produccion/ordenes_produccion/responsable/{responsableId}",
+    "controller": "ProduccionResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "getOrdenesProduccionByResponsable",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "responsableId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/{productoId}/insumos_with_stock",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "getInsumosWithStock",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "productoId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/produccion/orden_produccion/{id}/update_estado",
+    "controller": "ProduccionResource",
+    "methodAnnotations": [
+      "PutMapping"
+    ],
+    "methodName": "updateEstadoOrdenProduccion",
+    "httpMethod": "PUT",
+    "parameters": [
+      {
+        "name": "id",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "estadoOrden",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/compras/byProveedorAndDate",
+    "controller": "ComprasResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "getComprasByProveedorAndDate",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "proveedorId",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "date1",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "date2",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/compras/orden_compra/{ordenCompraId}/cancel",
+    "controller": "ComprasResource",
+    "methodAnnotations": [
+      "PutMapping"
+    ],
+    "methodName": "cancelOrdenCompra",
+    "httpMethod": "PUT",
+    "parameters": [
+      {
+        "name": "ordenCompraId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/consulta1",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "PostMapping"
+    ],
+    "methodName": "searchProductos",
+    "httpMethod": "POST",
+    "parameters": [
+      {
+        "name": "criteria",
+        "annotations": [
+          "RequestBody"
+        ],
+        "type": "ProductoSearchCriteria"
+      }
+    ],
+    "returnType": "Page",
+    "models": {}
+  },
+  {
+    "path": "/usuarios/{userId}",
+    "controller": "UserManagementResource",
+    "methodAnnotations": [
+      "DeleteMapping"
+    ],
+    "methodName": "deleteUser",
+    "httpMethod": "DELETE",
+    "parameters": [
+      {
+        "name": "userId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "Long"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/produccion/orden_seguimiento/{id}/update_estado",
+    "controller": "ProduccionResource",
+    "methodAnnotations": [
+      "PutMapping"
+    ],
+    "methodName": "updateEstadoOrdenSeguimiento",
+    "httpMethod": "PUT",
+    "parameters": [
+      {
+        "name": "id",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "estado",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/compras/{compraId}/items",
+    "controller": "ComprasResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "getItemsCompra",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "compraId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/search_mprima",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "search_mprima",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "search",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "tipoBusqueda",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/productos/search_terminados",
+    "controller": "ProductoResource",
+    "methodAnnotations": [
+      "GetMapping"
+    ],
+    "methodName": "searchTerminados",
+    "httpMethod": "GET",
+    "parameters": [
+      {
+        "name": "searchTerm",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "tipoBusqueda",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "String"
+      },
+      {
+        "name": "page",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "size",
+        "annotations": [
+          "RequestParam"
+        ],
+        "type": "int"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  },
+  {
+    "path": "/compras/orden_compra/{ordenCompraId}/updateEstado",
+    "controller": "ComprasResource",
+    "methodAnnotations": [
+      "PutMapping"
+    ],
+    "methodName": "updateEstadoOrdenCompra",
+    "httpMethod": "PUT",
+    "parameters": [
+      {
+        "name": "ordenCompraId",
+        "annotations": [
+          "PathVariable"
+        ],
+        "type": "int"
+      },
+      {
+        "name": "request",
+        "annotations": [
+          "RequestBody"
+        ],
+        "type": "UpdateEstadoOrdenCompraRequest"
+      }
+    ],
+    "returnType": "ResponseEntity",
+    "models": {}
+  }
+]

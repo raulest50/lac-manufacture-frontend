@@ -24,6 +24,10 @@ import MultiRoleProtectedRoute from "./components/MultiRoleProtectedRoute.tsx";
 
 import {role_master, role_jefe_prod, role_compras, role_asist_prod, role_almacen} from "./pages/Usuarios/types.tsx";
 import CargaMasivaPage from "./pages/CargaMasiva/CargaMasivaPage.tsx";
+import ActivosPage from "./pages/activos/ActivosPage.tsx";
+import ContabilidadPage from "./pages/contabilidad/ContabilidadPage.tsx";
+import PersonalPage from "./pages/personal/PersonalPage.tsx";
+import BintelligencePage from "./pages/bintelligence/BintelligencePage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -129,6 +133,41 @@ const router = createBrowserRouter(
                     }
                 />
 
+                <Route
+                    path="activos"
+                    element={
+                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_almacen]}>
+                            <ActivosPage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="contabilidad"
+                    element={
+                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_almacen]}>
+                            <ContabilidadPage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="personal"
+                    element={
+                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_almacen]}>
+                            <PersonalPage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="bintelligence"
+                    element={
+                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_almacen]}>
+                            <BintelligencePage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
 
             </Route>
         </>
