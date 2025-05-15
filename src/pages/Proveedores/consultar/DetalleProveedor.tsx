@@ -1,8 +1,7 @@
-import {useState} from 'react';
 import {
     Flex, Box, Heading, Text, Button, VStack, HStack, 
-    Divider, Badge, Grid, GridItem, Card, CardHeader, 
-    CardBody, IconButton
+    Grid, GridItem, Card, CardHeader,
+    CardBody,
 } from '@chakra-ui/react';
 import {Proveedor} from "../types.tsx";
 import { ArrowBackIcon } from '@chakra-ui/icons';

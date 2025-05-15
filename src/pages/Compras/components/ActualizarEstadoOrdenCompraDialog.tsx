@@ -24,6 +24,7 @@ import {
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
 import { OrdenCompra, getEstadoText, getCondicionPagoText, getCantidadCorrectaText } from '../types';
+import PdfGenerator from "../pdfGenerator.tsx";
 
 interface ActualizarEstadoOrdenCompraDialogProps {
     isOpen: boolean;
@@ -74,19 +75,38 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
         }
     }, [isOpen, orden.itemsOrdenCompra]);
 
-    interface EstadoUpdate{
+    /*interface EstadoUpdate{
         newEstado: number;
-        facturaCompraId?: number;
-    }
+        OCMpdf?: Blob;
+    }*/
 
     // Function to update order estado via backend.
     // When newEstado === 1 and a facturaId is provided, include it in the request.
     const updateEstado = async (newEstado: number) => {
         try {
-            const requestBody:EstadoUpdate = { newEstado: newEstado };
+            // const requestBody:EstadoUpdate = { newEstado: newEstado };
+            const formData = new FormData();
+
+            formData.append(
+                'request',
+                new Blob([JSON.stringify({ newEstado })], { type: 'application/json' }),
+                'request'
+            );
+
+            let OCMpdf: Blob|null = null;
+            if(newEstado === 2){ // se adjunta OCM en pdf format para enviar como adjunto a proveedor
+                const generator = new PdfGenerator();
+                OCMpdf = await generator.getOCMpdf_Blob(orden);
+                formData.append(
+                    'OCMpdf',
+                    OCMpdf,
+                    `orden-compra-${orden.ordenCompraId}.pdf`
+                );
+            }
+
             const response = await axios.put(
                 `${EndPointsURL.getDomain()}/compras/orden_compra/${orden.ordenCompraId}/updateEstado`,
-                requestBody
+                formData
             );
             toast({
                 title: "Estado actualizado",

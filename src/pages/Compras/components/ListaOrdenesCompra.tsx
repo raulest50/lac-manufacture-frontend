@@ -59,7 +59,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
             // const generator = new ExcelOCGenerator();
             // await generator.downloadExcel(contextMenu.orden as OrdenCompra);
             const generator = new PdfGenerator();
-            await generator.generatePDF_OCM(contextMenu.orden as OrdenCompra);
+            await generator.downloadPDF_OCM(contextMenu.orden as OrdenCompra);
         }
         setContextMenu(null);
     };

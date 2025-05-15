@@ -21,7 +21,7 @@ export default class PdfGenerator {
      * Generates the PDF file for the given OrdenCompra-Materiales (OCM) and triggers its download.
      * @param orden the order data to populate the PDF with.
      */
-    public async generatePDF_OCM(orden: OrdenCompra): Promise<void> {
+    private async generatePDF_OCM(orden: OrdenCompra): Promise<jsPDFWithAutoTable> {
         // Create a new jsPDF instance (A4 size, mm units) and cast to our extended interface
         const doc = new jsPDF({ unit: "mm", format: "a4" }) as jsPDFWithAutoTable;
         const margin = 10;
@@ -216,7 +216,28 @@ export default class PdfGenerator {
         //
 
         // --- Trigger Download ---
+        //doc.save(`orden-compra-${orden.ordenCompraId}.pdf`);
+        //return doc.output("blob");
+        return doc;
+    }
+
+    /**
+     * hace trigger de descarga del pdf de OCM
+     * @param orden
+     */
+    public async downloadPDF_OCM(orden:OrdenCompra):Promise<void>{
+        const doc = await this.generatePDF_OCM(orden);
         doc.save(`orden-compra-${orden.ordenCompraId}.pdf`);
+    }
+
+    /**
+     * genera un Blob del OCMpdf para enviar a backend para
+     * ser adjuntado a correo proveedor.
+     * @param orden
+     */
+    public async getOCMpdf_Blob(orden:OrdenCompra):Promise<Blob>{
+        const doc = await this.generatePDF_OCM(orden);
+        return doc.output("blob");
     }
 
     /**

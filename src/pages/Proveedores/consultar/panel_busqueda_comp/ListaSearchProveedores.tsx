@@ -54,14 +54,3 @@ export function ListaSearchProveedores({ proveedores, onVerDetalle }: Props) {
     );
 }
 
-function getCategoriesText(categories: number[]): string {
-    const categoryNames = [
-        'Servicios Operativos',
-        'Materias Primas',
-        'Materiales de empaque',
-        'Servicios administrativos',
-        'Equipos y otros servicios'
-    ];
-
-    return categories.map(catId => categoryNames[catId]).join(', ');
-}

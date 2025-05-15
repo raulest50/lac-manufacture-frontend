@@ -125,11 +125,11 @@ export class ExcelOCGenerator {
         worksheet.mergeCells('A18:B18');
         this.setNormalFormat(worksheet.getCell('A18'), orden.proveedor.ciudad);
         worksheet.mergeCells('A19:B19');
-        this.setNormalFormat(worksheet.getCell('A19'), orden.proveedor.telefono);
+        this.setNormalFormat(worksheet.getCell('A19'), orden.proveedor.contactos[0].cel);
         worksheet.mergeCells('A20:B20');
         this.setNormalFormat(worksheet.getCell('A20'), getRegimenTributario(orden.proveedor.regimenTributario));
         worksheet.mergeCells('A21:B21');
-        this.setNormalFormat(worksheet.getCell('A21'), orden.proveedor.email);
+        this.setNormalFormat(worksheet.getCell('A21'), orden.proveedor.contactos[0].email);
 
         this.setHeaderFormat(worksheet.getCell('A25'), "CODIGO");
         worksheet.mergeCells('B25:D25');
