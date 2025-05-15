@@ -71,10 +71,10 @@ export default function Home(){
                 <SectionCard to={'/asistente_produccion'}    name={'Reporte Progreso en Procesos de Produccion'} icon={GiChemicalDrop}     supportedRoles={[role_master, role_asist_prod]} currentRoles={roles}/>
                 <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
                 {/*<SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload}          supportedRoles={[role_master]} currentRoles={roles}/>*/}
-                <SectionCard to={'/activos'} name={'Activos'} icon={FaSteam}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
-                <SectionCard to={'/contabilidad'} name={'Contabilidad'} icon={TbReportMoney}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
-                <SectionCard to={'/personal'} name={'Personal'} icon={PiMicrosoftTeamsLogoFill}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
-                <SectionCard to={'/bintelligence'} name={'BI'} icon={MdOutlineInsights}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
+                <SectionCard to={'/Activos'} name={'Activos'} icon={FaSteam}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
+                <SectionCard to={'/Contabilidad'} name={'Contabilidad'} icon={TbReportMoney}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
+                <SectionCard to={'/Personal'} name={'Personal'} icon={PiMicrosoftTeamsLogoFill}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
+                <SectionCard to={'/Bintelligence'} name={'BI'} icon={MdOutlineInsights}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
 
             </SimpleGrid>
         </Container>

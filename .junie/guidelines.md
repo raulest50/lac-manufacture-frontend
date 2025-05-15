@@ -10,4 +10,13 @@
 - The backend API details are stored in `.junie/backend_endpoints.json`.
 - Before implementing or modifying frontend code that interacts with the backend, refer to this JSON file to understand available endpoints, their methods, parameters, and expected responses.
 - This approach ensures consistency between frontend and backend, even though Junie doesn't have direct access to the backend source code.
-- 
+
+para actualizar informacion de endpoints
+```
+bun run .\.junie\endpoints_info.ts
+```
+
+para actualizar informacion de las clases o entidades o modelo
+```
+bun run .\.junie\models_info.ts
+```

@@ -27,13 +27,6 @@ async function fetchEndpointDetails(path: string, method: string): Promise<any |
     return await res.json();
 }
 
-async function fetchModelClassInfo(className: string): Promise<any | null> {
-    const url = new URL(`${BACKEND_BASE_URL}/models/class-info`);
-    url.searchParams.append("className", className);
-    const res = await fetch(url.toString());
-    if (!res.ok) return null;
-    return await res.json();
-}
 
 async function enrichEndpoint(endpoint: any): Promise<any[]> {
     const enriched = [];
@@ -47,19 +40,6 @@ async function enrichEndpoint(endpoint: any): Promise<any[]> {
             if (!detail) continue;
 
             const modelMap: Record<string, any> = {};
-
-            for (const param of detail.parameters || []) {
-                if (isCustomType(param.type)) {
-                    try {
-                        const model = await fetchModelClassInfo(param.type);
-                        if (model) {
-                            modelMap[param.type] = model;
-                        }
-                    } catch (e) {
-                        console.warn(`⚠️ Could not fetch model info for ${param.type}:`, e);
-                    }
-                }
-            }
 
             detail.models = modelMap;
             enriched.push(detail);

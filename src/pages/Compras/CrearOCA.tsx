@@ -16,7 +16,7 @@ export default function CrearOCA() {
     const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);
     const [isProveedorPickerOpen, setIsProveedorPickerOpen] = useState(false);
 
-    // NEW: state for activos
+    // NEW: state for Activos
     const [listaItemsActivos, setListaItemsActivos] = useState<ItemOCActivo[]>([]);
 
     const [ordenCompraId, setOrdenCompraId] = useState("");
@@ -145,7 +145,7 @@ export default function CrearOCA() {
 
                 </Flex>
 
-                {/* pass down activos list + setter */}
+                {/* pass down Activos list + setter */}
                 <ListaItemsOCA
                     items={listaItemsActivos}
                     setItems={setListaItemsActivos}

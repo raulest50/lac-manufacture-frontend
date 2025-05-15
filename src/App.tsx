@@ -24,10 +24,10 @@ import MultiRoleProtectedRoute from "./components/MultiRoleProtectedRoute.tsx";
 
 import {role_master, role_jefe_prod, role_compras, role_asist_prod, role_almacen} from "./pages/Usuarios/types.tsx";
 import CargaMasivaPage from "./pages/CargaMasiva/CargaMasivaPage.tsx";
-import ActivosPage from "./pages/activos/ActivosPage.tsx";
-import ContabilidadPage from "./pages/contabilidad/ContabilidadPage.tsx";
-import PersonalPage from "./pages/personal/PersonalPage.tsx";
-import BintelligencePage from "./pages/bintelligence/BintelligencePage.tsx";
+import ActivosPage from "./pages/Activos/ActivosPage.tsx";
+import ContabilidadPage from "./pages/Contabilidad/ContabilidadPage.tsx";
+import PersonalPage from "./pages/Personal/PersonalPage.tsx";
+import BintelligencePage from "./pages/Bintelligence/BintelligencePage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(

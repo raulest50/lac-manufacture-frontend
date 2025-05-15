@@ -141,7 +141,7 @@ export default class PdfGenerator {
         doc.text("INFORMACION IMPORTANTE:", 10, topNotesStartY);
         doc.setFont("helvetica", "normal");
         topNotesStartY += 4;
-        doc.text("- los materiales entregados estarán sujetos a inspección y verificación por parte del personal designado de la empresa antes de ser aceptados.", 10, topNotesStartY);
+        doc.text("- los materiales entregados estarán sujetos a inspección y verificación por parte del Personal designado de la empresa antes de ser aceptados.", 10, topNotesStartY);
         topNotesStartY += 4;
         doc.text("- los matriales deben ser entregados en la direcccion vía 11, Juan Mina #4 100", 10, topNotesStartY);
         topNotesStartY += 4;
@@ -158,7 +158,7 @@ export default class PdfGenerator {
 
         const tableStartY = topNotesStartY + 10;
 
-        // const topNote = "los materiales entregados estarán sujetos a inspección y verificación por parte del personal designado de la empresa antes de ser aceptados.";
+        // const topNote = "los materiales entregados estarán sujetos a inspección y verificación por parte del Personal designado de la empresa antes de ser aceptados.";
         // let topNotesTotalsY = 5;
         // const topNoteLines = doc.splitTextToSize(topNote, 190);
         // doc.text(topNoteLines, margin, topNotesTotalsY);
@@ -343,7 +343,7 @@ export default class PdfGenerator {
         doc.text("INFORMACION IMPORTANTE:", 10, topNotesStartY);
         doc.setFont("helvetica", "normal");
         topNotesStartY += 4;
-        doc.text("- los materiales entregados estarán sujetos a inspección y verificación por parte del personal designado de la empresa antes de ser aceptados.", 10, topNotesStartY);
+        doc.text("- los materiales entregados estarán sujetos a inspección y verificación por parte del Personal designado de la empresa antes de ser aceptados.", 10, topNotesStartY);
         topNotesStartY += 4;
         doc.text("- los matriales deben ser entregados en la direcccion vía 11, Juan Mina #4 100", 10, topNotesStartY);
         topNotesStartY += 4;
@@ -360,7 +360,7 @@ export default class PdfGenerator {
 
         const tableStartY = topNotesStartY + 10;
 
-        // const topNote = "los materiales entregados estarán sujetos a inspección y verificación por parte del personal designado de la empresa antes de ser aceptados.";
+        // const topNote = "los materiales entregados estarán sujetos a inspección y verificación por parte del Personal designado de la empresa antes de ser aceptados.";
         // let topNotesTotalsY = 5;
         // const topNoteLines = doc.splitTextToSize(topNote, 190);
         // doc.text(topNoteLines, margin, topNotesTotalsY);

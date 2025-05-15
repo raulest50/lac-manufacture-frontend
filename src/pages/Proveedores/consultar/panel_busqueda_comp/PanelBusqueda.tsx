@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Proveedor, DTO_SearchProveedor, TIPO_BUSQUEDA } from "./types.tsx";
+import { Proveedor, DTO_SearchProveedor, TIPO_BUSQUEDA } from "../../types.tsx";
 import {
     Flex, FormControl, FormLabel, Input,
     Stack, CheckboxGroup, Checkbox,
@@ -7,12 +7,18 @@ import {
     useToast
 } from "@chakra-ui/react";
 
-import MyPagination from "../../components/MyPagination.tsx";
-import { ListaSearchProveedores } from "./components/ListaSearchProveedores.tsx";
+import MyPagination from "../../../../components/MyPagination.tsx";
+import { ListaSearchProveedores } from "./ListaSearchProveedores.tsx";
 import axios from "axios";
-import EndPointsURL from "../../api/EndPointsURL.tsx";
+import EndPointsURL from "../../../../api/EndPointsURL.tsx";
 
-export default function ConsultarProveedores() {
+type Props = {
+    setEstado: (estado: number) => void;
+    setProveedorSeleccionado: (proveedor: Proveedor) => void;
+}
+
+
+export default function PanelBusqueda({setEstado, setProveedorSeleccionado}: Props) {
     const toast = useToast();
     const endpoints = new EndPointsURL();
 
@@ -44,16 +50,12 @@ export default function ConsultarProveedores() {
         }
     }, []);
 
+    const verDetalleProveedor = (proveedor: Proveedor) => {
+        setProveedorSeleccionado(proveedor);
+        setEstado(1);
+    }
+
     const fetchProveedores = async (pageNumber: number) => {
-        if (!searchText.trim()) {
-            toast({
-                title: "Ingrese un texto de búsqueda",
-                status: "warning",
-                duration: 3000,
-                isClosable: true,
-            });
-            return;
-        }
 
         setLoading(true);
         setPage(pageNumber);
@@ -171,11 +173,12 @@ export default function ConsultarProveedores() {
 
             </Box>
 
-            {proveedores.length > 0 && (
-                <Box mb={4}>
-                    <ListaSearchProveedores proveedores={proveedores} />
-                </Box>
-            )}
+            <Box mb={4}>
+                <ListaSearchProveedores 
+                    proveedores={proveedores} 
+                    onVerDetalle={verDetalleProveedor}
+                />
+            </Box>
 
             {totalPages > 1 && (
                 <MyPagination

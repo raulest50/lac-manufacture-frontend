@@ -7,7 +7,7 @@ import {
 import MyHeader from "../../components/MyHeader.tsx";
 import {my_style_tab} from "../../styles/styles_general.tsx";
 import CodificarProveedor from "./CodificarProveedor.tsx";
-import ConsultarProveedores from "./ConsultarProveedores.tsx";
+import {ConsultarProveedores} from "./consultar/ConsultarProveedores.tsx";
 
 
 function ProveedoresPage() {
