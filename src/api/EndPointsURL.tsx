@@ -56,6 +56,9 @@ export default class EndPointsURL{
     // users management CRUD operations
 
 
+    // integrantes de personal
+    public save_integrante_personal: string;
+
     // just in case of need
     public domain: string;
 
@@ -70,6 +73,7 @@ export default class EndPointsURL{
         const produccion_res = 'produccion';
         const movimientos_res = 'movimientos';
         const user_res = 'user';
+        const personal_res = 'integrantes-personal';
 
         // productos endpoints
         this.search_mprima = `${domain}/${productos_res}/search_mprima`;
@@ -115,6 +119,9 @@ export default class EndPointsURL{
 
         // user endpoints
         this.whoami = `${domain}/${user_res}/whoami`;
+
+        // integrantes de personal endpoints
+        this.save_integrante_personal = `${domain}/${personal_res}/save`;
 
     }
 
