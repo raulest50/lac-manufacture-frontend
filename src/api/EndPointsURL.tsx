@@ -52,6 +52,7 @@ export default class EndPointsURL{
 
     // user resources (solo autenticacion)
     public whoami:string;
+    public login:string;
 
     // users management CRUD operations
 
@@ -72,7 +73,7 @@ export default class EndPointsURL{
         const compras_res = 'compras';
         const produccion_res = 'produccion';
         const movimientos_res = 'movimientos';
-        const user_res = 'user';
+        const auth_res = 'api/auth';
         const personal_res = 'integrantes-personal';
 
         // productos endpoints
@@ -118,7 +119,8 @@ export default class EndPointsURL{
         this.save_doc_ingreso_oc = `${domain}/${movimientos_res}/save_doc_ingreso_oc`;
 
         // user endpoints
-        this.whoami = `${domain}/${user_res}/whoami`;
+        this.whoami = `${domain}/${auth_res}/whoami`;
+        this.login = `${domain}/${auth_res}/login`;
 
         // integrantes de personal endpoints
         this.save_integrante_personal = `${domain}/${personal_res}/save`;

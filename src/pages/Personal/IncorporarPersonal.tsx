@@ -136,7 +136,8 @@ export function IncorporarPersonal() {
             centroDeProduccion: centroDeProduccion.trim() || undefined,
             salario: salario ? Number(salario) : undefined,
             estado: EstadoIntegrante.ACTIVO,
-            //documentos: [],
+            //
+            // documentos: [],
             // idIntegrante en este caso null (sin jefe directo)
         };
 
