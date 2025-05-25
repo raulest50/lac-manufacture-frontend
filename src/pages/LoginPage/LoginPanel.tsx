@@ -183,9 +183,10 @@ export default function LoginPanel() {
     };
 
     return (
-        <Container minW={['auto', 'container.md', 'container.md']} w={"full"} h={"full"}>
-            <Flex direction={"column"} gap={7} border={"0.5px solid gray"} borderRadius={"2em"} p={"4em"} alignItems={"center"}>
-                <Box boxSize={'3xs'}>
+        <Container minW={['auto', 'container.md', 'container.md']} w={"full"} h={"100vh"}>
+            <Flex direction={"column"} gap={7} border={"0.5px solid gray"} borderRadius={"2em"} p={"4em"}
+                  alignItems={"center"} flex={1}>
+            <Box boxSize={'3xs'}>
                     <Image src={'/logo_exotic.svg'} />
                 </Box>
                 {viewMode === 'login' ? (

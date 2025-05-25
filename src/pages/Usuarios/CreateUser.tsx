@@ -31,7 +31,7 @@ export default function CreateUser({ onUserCreated, onCancel }: Props) {
     const [cel, setCel] = useState('');
     const [direccion, setDireccion] = useState('');
     const [fechaNacimiento, setFechaNacimiento] = useState('');
-    const [estado, setEstado] = useState('1'); // Default to active
+
 
     const toast = useToast();
 
@@ -62,7 +62,7 @@ export default function CreateUser({ onUserCreated, onCancel }: Props) {
                 cel,
                 direccion,
                 fechaNacimiento,
-                estado: Number(estado) // Always 1 (active) for new users
+                estado: '1' // Always 1 (active) for new users
             });
 
             toast({
