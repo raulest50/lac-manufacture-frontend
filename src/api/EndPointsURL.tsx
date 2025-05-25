@@ -53,6 +53,8 @@ export default class EndPointsURL{
     // user resources (solo autenticacion)
     public whoami:string;
     public login:string;
+    public request_reset_passw:string;
+    public set_new_passw:string;
 
     // users management CRUD operations
 
@@ -121,6 +123,8 @@ export default class EndPointsURL{
         // user endpoints
         this.whoami = `${domain}/${auth_res}/whoami`;
         this.login = `${domain}/${auth_res}/login`;
+        this.request_reset_passw = `${domain}/${auth_res}/request_reset_passw`;
+        this.set_new_passw = `${domain}/${auth_res}/set_new_passw`;
 
         // integrantes de personal endpoints
         this.save_integrante_personal = `${domain}/${personal_res}/save`;

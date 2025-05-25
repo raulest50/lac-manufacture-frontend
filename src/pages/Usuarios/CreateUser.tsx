@@ -11,7 +11,7 @@ import {
     Grid,
     GridItem,
     Flex,
-    Select
+    FormErrorMessage
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../api/EndPointsURL';
@@ -26,24 +26,43 @@ export default function CreateUser({ onUserCreated, onCancel }: Props) {
     const [username, setUsername] = useState('');
     const [nombreCompleto, setNombreCompleto] = useState('');
     const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
     const [cel, setCel] = useState('');
     const [direccion, setDireccion] = useState('');
     const [fechaNacimiento, setFechaNacimiento] = useState('');
-    const [estado, setEstado] = useState('1');
+    const [estado, setEstado] = useState('1'); // Default to active
 
     const toast = useToast();
 
+    const validateEmail = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
     const handleCreate = async () => {
+        // Validate email
+        if (!email) {
+            setEmailError('El email es requerido');
+            return;
+        } else if (!validateEmail(email)) {
+            setEmailError('Por favor ingrese un email válido');
+            return;
+        } else {
+            setEmailError('');
+        }
+
         try {
             await axios.post(`${EndPointsURL.getDomain()}/usuarios`, {
                 cedula: Number(cedula),
                 username,
                 nombreCompleto,
                 password,
+                email,
                 cel,
                 direccion,
                 fechaNacimiento,
-                estado: Number(estado)
+                estado: Number(estado) // Always 1 (active) for new users
             });
 
             toast({
@@ -96,6 +115,21 @@ export default function CreateUser({ onUserCreated, onCancel }: Props) {
                 </GridItem>
 
                 <GridItem>
+                    <FormControl isRequired isInvalid={!!emailError}>
+                        <FormLabel>Email</FormLabel>
+                        <Input 
+                            type="email" 
+                            value={email} 
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                                if (emailError) setEmailError('');
+                            }} 
+                        />
+                        {emailError && <FormErrorMessage>{emailError}</FormErrorMessage>}
+                    </FormControl>
+                </GridItem>
+
+                <GridItem>
                     <FormControl>
                         <FormLabel>Celular</FormLabel>
                         <Input value={cel} onChange={(e) => setCel(e.target.value)} />
@@ -112,15 +146,6 @@ export default function CreateUser({ onUserCreated, onCancel }: Props) {
                     <FormControl>
                         <FormLabel>Fecha de Nacimiento</FormLabel>
                         <Input type="date" value={fechaNacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} />
-                    </FormControl>
-                </GridItem>
-                <GridItem>
-                    <FormControl isRequired>
-                        <FormLabel>Estado</FormLabel>
-                        <Select value={estado} onChange={(e) => setEstado(e.target.value)}>
-                            <option value="1">Activo</option>
-                            <option value="2">Inactivo</option>
-                        </Select>
                     </FormControl>
                 </GridItem>
             </Grid>

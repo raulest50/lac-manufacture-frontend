@@ -15,6 +15,8 @@ import {
     Link,
     useToast
 } from "@chakra-ui/react";
+import axios from 'axios';
+import EndPointsURL from '../../api/EndPointsURL.tsx';
 
 // TypeScript interfaces for component props
 interface FormularioLoginProps {
@@ -114,6 +116,7 @@ export default function LoginPanel() {
     const { login } = useAuth();
     const navigate = useNavigate();
     const toast = useToast();
+    const endpoints = new EndPointsURL();
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -144,26 +147,39 @@ export default function LoginPanel() {
         }
     };
 
-    const onHandleEnviarForgot = (email: string) => {
+    const onHandleEnviarForgot = async (email: string) => {
         // Implement rate limiting to prevent system overload
         setIsRequestDisabled(true);
 
-        // Show toast notification
-        toast({
-            title: "Solicitud enviada",
-            description: "Se ha enviado un correo para recuperar su contraseña.",
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-        });
+        try {
+            // Call the API to request password reset
+            await axios.post(endpoints.request_reset_passw, { email });
+
+            // Show success toast notification
+            toast({
+                title: "Solicitud enviada",
+                description: "Se ha enviado un correo para recuperar su contraseña.",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+            });
+        } catch (error) {
+            console.error("Error requesting password reset:", error);
+
+            // Show error toast notification, but with generic message for security
+            toast({
+                title: "Solicitud enviada",
+                description: "Si el correo existe en nuestro sistema, recibirá un enlace para restablecer su contraseña.",
+                status: "info",
+                duration: 5000,
+                isClosable: true,
+            });
+        }
 
         // Enable the button after 60 seconds to prevent abuse
         requestTimeoutRef.current = setTimeout(() => {
             setIsRequestDisabled(false);
         }, 60000); // 60 seconds cooldown
-
-        // Empty implementation as requested
-        // The actual implementation will be added later
     };
 
     return (

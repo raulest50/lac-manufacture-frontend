@@ -17,6 +17,7 @@ import ProveedoresPage from "./pages/Proveedores/ProveedoresPage.tsx";
 import ComprasPage from "./pages/Compras/ComprasPage.tsx";
 import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
 import LoginPanel from "./pages/LoginPage/LoginPanel.tsx";
+import ResetPasswordPage from "./pages/LoginPage/ResetPasswordPage.tsx";
 import InformesPage from "./pages/Informes/InformesPage.tsx";
 import RecibirMercanciaPage from "./pages/RecibirMercancia/RecibirMercanciaPage.tsx";
 import UsuariosPage from "./pages/Usuarios/UsuariosPage.tsx";
@@ -34,6 +35,9 @@ const router = createBrowserRouter(
         <>
             {/* Public login route (outside RootLayout if you like) */}
             <Route path="/login" element={<LoginPanel />} />
+
+            {/* Public reset password route */}
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             <Route path="/" element={<RootLayout />}>
                 {/* Home is protected => if not logged in => go to /login */}
