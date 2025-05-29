@@ -6,8 +6,9 @@ import {
     useToast
 } from '@chakra-ui/react';
 import axios from 'axios';
-import RoleSelectionDialog from './RoleSelectionDialog.tsx';
-import {User, Role} from './types';
+import ModuleSelectionDialog, { ModuleItem } from './ModuleSelectionDialog.tsx';
+import {User, Acceso} from './types';
+import { Modulo } from '../../types/Modulo';
 import EndPointsURL from "../../api/EndPointsURL.tsx";
 
 type Props = {
@@ -18,18 +19,17 @@ export default function UserViewer({setViewMode}:Props) {
 
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-    const [showRoleDialog, setShowRoleDialog] = useState(false);
+    const [selectedAcceso, setSelectedAcceso] = useState<Acceso | null>(null);
+    const [showModuleDialog, setShowModuleDialog] = useState(false);
     const toast = useToast();
     const endPoints = new EndPointsURL();
 
-    // Hardcoded list of all available roles
-    const allRoles: Role[] = [
-        {id: 1, name: 'ROLE_COMPRAS'},
-        {id: 2, name: 'ROLE_JEFE_PRODUCCION'},
-        {id: 3, name: 'ROLE_ASISTENTE_PRODUCCION'},
-        {id: 4, name: 'ROLE_ALMACEN'},
-    ];
+    // List of all available modules
+    const allModules: ModuleItem[] = Object.values(Modulo).map((modulo, index) => ({
+        id: index + 1,
+        modulo: modulo as Modulo,
+        displayName: modulo.replace(/_/g, ' ')
+    }));
 
     const fetchUsers = async () => {
         try {
@@ -52,7 +52,7 @@ export default function UserViewer({setViewMode}:Props) {
 
     const handleUserSelect = (user: User) => {
         setSelectedUser(user);
-        setSelectedRole(null);
+        setSelectedAcceso(null);
     };
 
     const handleDeleteUser = async () => {
@@ -89,15 +89,15 @@ export default function UserViewer({setViewMode}:Props) {
         }
     };
 
-    const handleAddRole = async (roleName: string) => {
+    const handleAddAcceso = async (modulo: Modulo) => {
         if (!selectedUser) return;
         try {
             const response = await axios.post(
-                `${endPoints.domain}/usuarios/${selectedUser.id}/roles?roleName=${roleName}`
+                `${endPoints.domain}/usuarios/${selectedUser.id}/accesos/modulo?modulo=${modulo}&nivel=1`
             );
             toast({
-                title: 'Rol asignado',
-                description: 'El rol ha sido asignado exitosamente.',
+                title: 'Acceso asignado',
+                description: 'El acceso ha sido asignado exitosamente.',
                 status: 'success',
                 duration: 5000,
                 isClosable: true,
@@ -107,7 +107,7 @@ export default function UserViewer({setViewMode}:Props) {
         } catch (error) {
             toast({
                 title: 'Error',
-                description: 'No se pudo asignar el rol.',
+                description: 'No se pudo asignar el acceso.',
                 status: 'error',
                 duration: 5000,
                 isClosable: true,
@@ -115,12 +115,12 @@ export default function UserViewer({setViewMode}:Props) {
         }
     };
 
-    const handleRemoveRole = async (roleId: number) => {
+    const handleRemoveAcceso = async (accesoId: number) => {
         if (!selectedUser) return;
         if (selectedUser.username.toLowerCase() === 'master') {
             toast({
                 title: 'Acción no permitida',
-                description: 'No se puede remover roles del usuario master.',
+                description: 'No se puede remover accesos del usuario master.',
                 status: 'warning',
                 duration: 5000,
                 isClosable: true,
@@ -129,11 +129,11 @@ export default function UserViewer({setViewMode}:Props) {
         }
         try {
             const response = await axios.delete(
-                `${endPoints.domain}/usuarios/${selectedUser.id}/roles/${roleId}`
+                `${endPoints.domain}/usuarios/${selectedUser.id}/accesos/${accesoId}`
             );
             toast({
-                title: 'Rol removido',
-                description: 'El rol ha sido removido exitosamente.',
+                title: 'Acceso removido',
+                description: 'El acceso ha sido removido exitosamente.',
                 status: 'success',
                 duration: 5000,
                 isClosable: true,
@@ -143,7 +143,7 @@ export default function UserViewer({setViewMode}:Props) {
         } catch (error) {
             toast({
                 title: 'Error',
-                description: 'No se pudo remover el rol.',
+                description: 'No se pudo remover el acceso.',
                 status: 'error',
                 duration: 5000,
                 isClosable: true,
@@ -151,18 +151,18 @@ export default function UserViewer({setViewMode}:Props) {
         }
     };
 
-    // Compute roles that can be assigned (those not already in the selected user's roles)
-    const assignableRoles =
-        selectedUser &&
-        allRoles.filter(
-            (role) => !selectedUser.roles.some((r) => r.name === role.name)
-        );
+    // Compute modules that can be assigned (those not already in the selected user's accesos)
+    const assignableModules = selectedUser
+        ? allModules.filter(
+            (moduleItem) => !(selectedUser.accesos && selectedUser.accesos.some((a) => a.moduloAcceso === moduleItem.modulo))
+        )
+        : [];
 
     return (
         <Box p={4}>
 
             <Text fontSize="2xl" mb={4}>
-                Creación de Usuarios y Asignación de Roles
+                Creación de Usuarios y Asignación de Accesos
             </Text>
             <Flex mb={4}>
                 <Button colorScheme="blue" mr={4} onClick={ () => setViewMode(1)}>
@@ -207,28 +207,34 @@ export default function UserViewer({setViewMode}:Props) {
                 <Spacer />
                 <Box flex="1" borderWidth="1px" borderRadius="md" p={4}>
                     <Text fontSize="lg" mb={2}>
-                        Roles asignados
+                        Accesos asignados
                     </Text>
                     {selectedUser ? (
                         <Table variant="simple" size="sm">
                             <Thead>
                                 <Tr>
                                     <Th>ID</Th>
-                                    <Th>Nombre</Th>
+                                    <Th>Módulo</Th>
+                                    <Th>Nivel</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {selectedUser.roles.map((role) => (
+                                {selectedUser.accesos && selectedUser.accesos.length > 0 ? selectedUser.accesos.map((acceso) => (
                                     <Tr
-                                        key={role.id}
-                                        onClick={() => setSelectedRole(role)}
+                                        key={acceso.id}
+                                        onClick={() => setSelectedAcceso(acceso)}
                                         _hover={{ bg: 'green.50', cursor: 'pointer' }}
-                                        bg={selectedRole?.id === role.id ? 'green.100' : 'inherit'}
+                                        bg={selectedAcceso?.id === acceso.id ? 'green.100' : 'inherit'}
                                     >
-                                        <Td>{role.id}</Td>
-                                        <Td>{role.name}</Td>
+                                        <Td>{acceso.id}</Td>
+                                        <Td>{acceso.moduloAcceso.replace(/_/g, ' ')}</Td>
+                                        <Td>{acceso.nivel}</Td>
                                     </Tr>
-                                ))}
+                                )) : (
+                                    <Tr>
+                                        <Td colSpan={3}>No hay accesos asignados</Td>
+                                    </Tr>
+                                )}
                             </Tbody>
                         </Table>
                     ) : (
@@ -237,42 +243,41 @@ export default function UserViewer({setViewMode}:Props) {
                     <Flex mt={4}>
                         <Button
                             colorScheme="blue"
-                            onClick={() => setShowRoleDialog(true)}
+                            onClick={() => setShowModuleDialog(true)}
                             mr={2}
                             isDisabled={
                                 !selectedUser || selectedUser.username.toLowerCase() === 'master'
                             }
                         >
-                            Agregar Rol
+                            Agregar Acceso
                         </Button>
                         <Button
                             colorScheme="red"
                             onClick={() =>
-                                selectedRole && handleRemoveRole(selectedRole.id)
+                                selectedAcceso && handleRemoveAcceso(selectedAcceso.id)
                             }
                             isDisabled={
                                 !selectedUser ||
-                                !selectedRole ||
+                                !selectedAcceso ||
                                 selectedUser.username.toLowerCase() === 'master'
                             }
                         >
-                            Remover Rol
+                            Remover Acceso
                         </Button>
                     </Flex>
                 </Box>
             </Flex>
 
-            {showRoleDialog && selectedUser && assignableRoles && (
-                <RoleSelectionDialog
-                    isOpen={showRoleDialog}
-                    onClose={() => setShowRoleDialog(false)}
-                    availableRoles={assignableRoles}
-                    onRoleSelect={(role) => {
-                        handleAddRole(role.name);
+            {showModuleDialog && selectedUser && (
+                <ModuleSelectionDialog
+                    isOpen={showModuleDialog}
+                    onClose={() => setShowModuleDialog(false)}
+                    availableModules={assignableModules || []}
+                    onModuleSelect={(moduleItem) => {
+                        handleAddAcceso(moduleItem.modulo);
                     }}
                 />
             )}
         </Box>
     );
 }
-

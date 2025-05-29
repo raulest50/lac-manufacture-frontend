@@ -85,39 +85,54 @@ export default function CreateUser({ onUserCreated, onCancel }: Props) {
     };
 
     return (
-        <Box borderWidth="1px" borderRadius="lg" p={6}>
+        <Box borderWidth="1px" borderRadius="lg" p={6} >
             <Heading size="md" mb={4}>Crear Nuevo Usuario</Heading>
             <Grid templateColumns="repeat(2, 1fr)" gap={4}>
                 <GridItem>
                     <FormControl isRequired>
                         <FormLabel>Cédula</FormLabel>
-                        <Input type="number" value={cedula} onChange={(e) => setCedula(e.target.value)} />
+                        <Input autoComplete={"off"}
+                               type="number"
+                               value={cedula}
+                               onChange={(e) => setCedula(e.target.value)}
+                        />
                     </FormControl>
                 </GridItem>
                 <GridItem>
                     <FormControl isRequired>
                         <FormLabel>Nombre Completo</FormLabel>
-                        <Input value={nombreCompleto} onChange={(e) => setNombreCompleto(e.target.value)} />
+                        <Input autoComplete={"off"}
+                               value={nombreCompleto}
+                               onChange={(e) => setNombreCompleto(e.target.value)}
+                        />
                     </FormControl>
                 </GridItem>
 
                 <GridItem>
                     <FormControl isRequired>
                         <FormLabel>Nombre de Usuario</FormLabel>
-                        <Input value={username} onChange={(e) => setUsername(e.target.value)} />
+                        <Input autoComplete={"new-username"}
+                               value={username}
+                               onChange={(e) => setUsername(e.target.value)}
+                        />
                     </FormControl>
                 </GridItem>
                 <GridItem>
                     <FormControl isRequired>
                         <FormLabel>Contraseña</FormLabel>
-                        <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <Input autoComplete={"new-password"}
+                               type="password"
+                               value={password}
+                               onChange={(e) => setPassword(e.target.value)}
+                        />
                     </FormControl>
                 </GridItem>
 
                 <GridItem>
                     <FormControl isRequired isInvalid={!!emailError}>
                         <FormLabel>Email</FormLabel>
-                        <Input 
+                        <Input
+                            autoComplete={"off"}
                             type="email" 
                             value={email} 
                             onChange={(e) => {
@@ -132,20 +147,30 @@ export default function CreateUser({ onUserCreated, onCancel }: Props) {
                 <GridItem>
                     <FormControl>
                         <FormLabel>Celular</FormLabel>
-                        <Input value={cel} onChange={(e) => setCel(e.target.value)} />
+                        <Input autoComplete={"off"}
+                               value={cel}
+                               onChange={(e) => setCel(e.target.value)}
+                        />
                     </FormControl>
                 </GridItem>
                 <GridItem>
                     <FormControl>
                         <FormLabel>Dirección</FormLabel>
-                        <Input value={direccion} onChange={(e) => setDireccion(e.target.value)} />
+                        <Input autoComplete={"off"}
+                               value={direccion}
+                               onChange={(e) => setDireccion(e.target.value)}
+                        />
                     </FormControl>
                 </GridItem>
 
                 <GridItem>
                     <FormControl>
                         <FormLabel>Fecha de Nacimiento</FormLabel>
-                        <Input type="date" value={fechaNacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} />
+                        <Input autoComplete={"off"}
+                               type="date"
+                               value={fechaNacimiento}
+                               onChange={(e) => setFechaNacimiento(e.target.value)}
+                        />
                     </FormControl>
                 </GridItem>
             </Grid>

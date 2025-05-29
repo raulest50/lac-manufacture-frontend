@@ -136,8 +136,8 @@ export default function LoginPanel() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await login(username, password);
-            console.log(response);
+            await login(username, password);
+            //console.log(response);
             navigate('/');
             // after successful login, go to home or wherever you want
         } catch (error) {

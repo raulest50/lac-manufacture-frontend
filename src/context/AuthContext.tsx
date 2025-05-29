@@ -68,9 +68,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     // Split the comma-separated string into an array of role strings
                     const userRoles = decodedToken.accesos.split(',');
                     setRoles(userRoles);
-                } else {
-                    // Establecer un rol por defecto
+                } else if (decodedToken.sub === 'master') {
+                    // Si el usuario es 'master', darle acceso a todo incondicionalmente
                     setRoles(['ROLE_MASTER']);
+                } else {
+                    // Sin accesos asignados, no debe tener acceso a ningún módulo
+                    setRoles([]);
                 }
             } catch (error) {
                 console.error('Error decoding token on init:', error);
@@ -113,14 +116,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     // Split the comma-separated string into an array of role strings
                     const userRoles = decodedToken.accesos.split(',');
                     setRoles(userRoles);
-                } else {
-                    // Establecer al menos un rol por defecto para que se muestren algunas tarjetas
+                } else if (authData.username === 'master') {
+                    // Si el usuario es 'master', darle acceso a todo incondicionalmente
                     setRoles(['ROLE_MASTER']);
+                } else {
+                    // Sin accesos asignados, no debe tener acceso a ningún módulo
+                    setRoles([]);
                 }
             } catch (error) {
                 console.error('Error decoding token:', error);
-                // Establecer un rol por defecto en caso de error
-                setRoles(['ROLE_MASTER']);
+                // Verificar si el usuario es 'master' incluso en caso de error
+                if (authData.username === 'master') {
+                    // Si el usuario es 'master', darle acceso a todo incondicionalmente
+                    setRoles(['ROLE_MASTER']);
+                } else {
+                    // Sin accesos asignados en caso de error, no debe tener acceso a ningún módulo
+                    setRoles([]);
+                }
             }
 
             // Configurar el header de autorización para futuras peticiones

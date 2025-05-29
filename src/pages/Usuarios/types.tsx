@@ -1,8 +1,15 @@
 // src/pages/Usuarios/types.tsx
+import { Modulo } from "../../types/Modulo";
 
 export interface Role {
     id: number;
     name: string;
+}
+
+export interface Acceso {
+    id: number;
+    nivel: number;
+    moduloAcceso: Modulo;
 }
 
 export interface User {
@@ -15,7 +22,8 @@ export interface User {
     direccion?: string;
     fechaNacimiento?: string; // ISO format, e.g., '2025-05-06'
     estado: number;
-    roles: Role[];
+    accesos: Acceso[];
+    roles?: Role[]; // Keep for backward compatibility during transition
 }
 
 

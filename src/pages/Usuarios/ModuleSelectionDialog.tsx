@@ -1,4 +1,4 @@
-// src/components/RoleSelectionDialog.tsx
+// src/pages/Usuarios/ModuleSelectionDialog.tsx
 import React from 'react';
 import {
     Modal,
@@ -12,39 +12,41 @@ import {
     ListIcon,
 } from '@chakra-ui/react';
 import { CheckCircleIcon } from '@chakra-ui/icons';
+import { Modulo } from '../../types/Modulo';
 
-export type RoleItem = {
+export type ModuleItem = {
     id: number;
-    name: string;
+    modulo: Modulo;
+    displayName: string;
 };
 
-interface RoleSelectionDialogProps {
+interface ModuleSelectionDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    availableRoles: RoleItem[];
-    onRoleSelect: (role: RoleItem) => void;
+    availableModules: ModuleItem[];
+    onModuleSelect: (module: ModuleItem) => void;
 }
 
-const RoleSelectionDialog: React.FC<RoleSelectionDialogProps> = ({
-                                                                     isOpen,
-                                                                     onClose,
-                                                                     availableRoles,
-                                                                     onRoleSelect,
-                                                                 }) => {
+const ModuleSelectionDialog: React.FC<ModuleSelectionDialogProps> = ({
+    isOpen,
+    onClose,
+    availableModules,
+    onModuleSelect,
+}) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Seleccionar Rol</ModalHeader>
+                <ModalHeader>Seleccionar Módulo</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
                     <List spacing={3}>
-                        {availableRoles && availableRoles.length > 0 ? (
-                            availableRoles.map((role) => (
+                        {availableModules && availableModules.length > 0 ? (
+                            availableModules.map((module) => (
                                 <ListItem
-                                    key={role.id}
+                                    key={module.id}
                                     onClick={() => {
-                                        onRoleSelect(role);
+                                        onModuleSelect(module);
                                         onClose();
                                     }}
                                     _hover={{
@@ -54,12 +56,12 @@ const RoleSelectionDialog: React.FC<RoleSelectionDialogProps> = ({
                                     padding="2"
                                 >
                                     <ListIcon as={CheckCircleIcon} color="green.500" />
-                                    {role.name}
+                                    {module.displayName}
                                 </ListItem>
                             ))
                         ) : (
                             <ListItem padding="2">
-                                No hay roles disponibles para asignar
+                                No hay módulos disponibles para asignar
                             </ListItem>
                         )}
                     </List>
@@ -69,4 +71,4 @@ const RoleSelectionDialog: React.FC<RoleSelectionDialogProps> = ({
     );
 };
 
-export default RoleSelectionDialog;
+export default ModuleSelectionDialog;
