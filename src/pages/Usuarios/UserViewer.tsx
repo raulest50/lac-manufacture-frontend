@@ -8,7 +8,7 @@ import {
 import axios from 'axios';
 import ModuleSelectionDialog, { ModuleItem } from './ModuleSelectionDialog.tsx';
 import {User, Acceso} from './types';
-import { Modulo } from '../../types/Modulo';
+import { Modulo } from './types.tsx';
 import EndPointsURL from "../../api/EndPointsURL.tsx";
 
 type Props = {
@@ -52,6 +52,7 @@ export default function UserViewer({setViewMode}:Props) {
 
     const handleUserSelect = (user: User) => {
         setSelectedUser(user);
+        console.log(user.accesos);
         setSelectedAcceso(null);
     };
 
@@ -154,7 +155,7 @@ export default function UserViewer({setViewMode}:Props) {
     // Compute modules that can be assigned (those not already in the selected user's accesos)
     const assignableModules = selectedUser
         ? allModules.filter(
-            (moduleItem) => !(selectedUser.accesos && selectedUser.accesos.some((a) => a.moduloAcceso === moduleItem.modulo))
+            (moduleItem) => !(selectedUser.accesos && selectedUser.accesos.some((a) => a.moduloAcceso && a.moduloAcceso === moduleItem.modulo))
         )
         : [];
 
@@ -227,7 +228,7 @@ export default function UserViewer({setViewMode}:Props) {
                                         bg={selectedAcceso?.id === acceso.id ? 'green.100' : 'inherit'}
                                     >
                                         <Td>{acceso.id}</Td>
-                                        <Td>{acceso.moduloAcceso.replace(/_/g, ' ')}</Td>
+                                        <Td>{acceso.moduloAcceso ? acceso.moduloAcceso.replace(/_/g, ' ') : 'Desconocido'}</Td>
                                         <Td>{acceso.nivel}</Td>
                                     </Tr>
                                 )) : (

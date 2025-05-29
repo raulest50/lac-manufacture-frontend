@@ -1,5 +1,5 @@
 // src/pages/Usuarios/types.tsx
-import { Modulo } from "../../types/Modulo";
+
 
 export interface Role {
     id: number;
@@ -23,12 +23,21 @@ export interface User {
     fechaNacimiento?: string; // ISO format, e.g., '2025-05-06'
     estado: number;
     accesos: Acceso[];
-    roles?: Role[]; // Keep for backward compatibility during transition
 }
 
 
-export const role_master = "ROLE_MASTER";
-export const role_compras = "ROLE_COMPRAS";
-export const role_jefe_prod = "ROLE_JEFE_PRODUCCION";
-export const role_asist_prod = "ROLE_ASISTENTE PRODUCCION";
-export const role_almacen = "ROLE_ALMACEN";
+// src/types/Modulo.tsx
+export enum Modulo {
+    USUARIOS = "USUARIOS", // ruta /usuarios
+    PRODUCTOS = "PRODUCTOS", // ruta /productos
+    PRODUCCION = "PRODUCCION", // ruta /produccion
+    STOCK = "STOCK", // ruta /stock
+    PROVEEDORES = "PROVEEDORES", // ruta /Proveedores
+    COMPRAS = "COMPRAS", // ruta /compras
+    SEGUIMIENTO_PRODUCCION = "SEGUIMIENTO_PRODUCCION", // ruta /asistente_produccion
+    TRANSACCIONES_ALMACE = "TRANSACCIONES_ALMACE", // ruta /recepcion_mprima
+    ACTIVOS = "ACTIVOS", // ruta /Activos
+    CONTABILIDAD = "CONTABILIDAD", //ruta /Contabilidad
+    PERSONAL_PLANTA = "PERSONAL_PLANTA", // ruta /personal
+    BINTELLIGENCE = "BINTELLIGENCE" // ruta Bintelligence
+}

@@ -18,7 +18,7 @@ import { PiMicrosoftTeamsLogoFill } from "react-icons/pi";
 
 import '@fontsource-variable/comfortaa'
 
-import { Modulo } from "../types/Modulo.tsx";
+import { Modulo } from "./Usuarios/types.tsx";
 
 import { useAuth } from '../context/AuthContext';
 
