@@ -19,11 +19,11 @@ import {
     Td,
     Input,
     useToast,
-    HStack, VStack, FormControl, FormLabel
+    HStack, VStack, FormControl, FormLabel, Flex, Select
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
-import { OrdenCompra, getEstadoText, getCondicionPagoText, getCantidadCorrectaText } from '../types';
+import { OrdenCompra, getEstadoText, getCondicionPagoText, getCantidadCorrectaText, TipoEnvio } from '../types';
 import PdfGenerator from "../pdfGenerator.tsx";
 
 interface ActualizarEstadoOrdenCompraDialogProps {
@@ -45,9 +45,22 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     const [randomCode, setRandomCode] = useState<string>('');
     const [inputCode, setInputCode] = useState<string>('');
 
+    const [tipoEnvio, setTipoEnvio] = useState<string>(TipoEnvio.EMAIL);
 
     // For estados 1 and 2, keep a local copy of the items (to update precioCorrecto or check cantidadCorrecta).
     const [localItems, setLocalItems] = useState(orden.itemsOrdenCompra);
+
+    // Check if the provider has an email in their contacts
+    const hasEmail = () => {
+        if (!orden.proveedor || !orden.proveedor.contactos) return false;
+        return orden.proveedor.contactos.some(contacto => contacto.email && contacto.email.trim() !== '');
+    };
+
+    // Check if the provider has a phone number in their contacts
+    const hasPhoneNumber = () => {
+        if (!orden.proveedor || !orden.proveedor.contactos) return false;
+        return orden.proveedor.contactos.some(contacto => contacto.cel && contacto.cel.trim() !== '');
+    };
 
     /**
      * Cada item de la orden de compra debe tener cantidadCorrecta = 1 para que se considere
@@ -70,6 +83,16 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
             const code = Math.floor(1000 + Math.random() * 9000).toString();
             setRandomCode(code);
             setInputCode('');
+
+            // Reset tipoEnvio to default based on available options
+            if (hasEmail()) {
+                setTipoEnvio(TipoEnvio.EMAIL);
+            } else if (hasPhoneNumber()) {
+                setTipoEnvio(TipoEnvio.WHATSAPP);
+            } else {
+                setTipoEnvio(TipoEnvio.MANUAL);
+            }
+
             // Clone the items array for local updates.
             setLocalItems(orden.itemsOrdenCompra);
         }
@@ -87,9 +110,14 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
             // const requestBody:EstadoUpdate = { newEstado: newEstado };
             const formData = new FormData();
 
+            // Include tipoEnvio in the request when updating to estado 2
+            const requestData = newEstado === 2 
+                ? { newEstado, tipoEnvio } 
+                : { newEstado };
+
             formData.append(
                 'request',
-                new Blob([JSON.stringify({ newEstado })], { type: 'application/json' }),
+                new Blob([JSON.stringify(requestData)], { type: 'application/json' }),
                 'request'
             );
 
@@ -296,20 +324,39 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                     <OrdenCompraItemListComponent/>
                     <Box mt={4} textAlign="center">
                         <Text fontWeight="bold">Código: {randomCode}</Text>
-                        <HStack p="1em">
-                            <Input
+                        <Flex p="1em" direction={"row"} gap={10} alignItems={"center"} justifyContent={"space-between"}>
+                            <Box flex={1}>
+                                <FormControl>
+                                    <FormLabel>Tipo Envio Orden Compra</FormLabel>
+                                    <Select
+                                        value={tipoEnvio}
+                                        onChange={(e) => setTipoEnvio(e.target.value)}
+                                    >
+                                        <option value={TipoEnvio.MANUAL}>{TipoEnvio.MANUAL}</option>
+                                        {hasEmail() && (
+                                            <option value={TipoEnvio.EMAIL}>{TipoEnvio.EMAIL}</option>
+                                        )}
+                                        {hasPhoneNumber() && (
+                                            <option value={TipoEnvio.WHATSAPP}>{TipoEnvio.WHATSAPP}</option>
+                                        )}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                            <Box display={"flex"} gap={5} flex={2} >
+                                <Input
                                 placeholder="Digite el código"
                                 value={inputCode}
                                 onChange={(e) => setInputCode(e.target.value)}
                                 maxW="200px"
-                            />
-                            <Button
-                                colorScheme="green"
-                                onClick={handleEnviarProveedor}
-                            >
-                                Enviar a Proveedor
-                            </Button>
-                        </HStack>
+                                />
+                                <Button
+                                    colorScheme="green"
+                                    onClick={handleEnviarProveedor}
+                                >
+                                    Enviar a Proveedor
+                                </Button>
+                            </Box>
+                        </Flex>
                     </Box>
                 </>
             );

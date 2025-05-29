@@ -135,3 +135,10 @@ export interface Activo{
     ivaValue: number;
     ivaPercentage: number;
 }
+
+
+export enum TipoEnvio{
+    MANUAL = "MANUAL",
+    EMAIL = "EMAIL",
+    WHATSAPP = "WHATSAPP"
+}

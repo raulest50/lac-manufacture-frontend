@@ -13,7 +13,9 @@ import {
     Image, 
     Box,
     Link,
-    useToast
+    useToast,
+    Spinner,
+    Text
 } from "@chakra-ui/react";
 import axios from 'axios';
 import EndPointsURL from '../../api/EndPointsURL.tsx';
@@ -26,6 +28,7 @@ interface FormularioLoginProps {
     setPassword: (password: string) => void;
     handleLogin: (e: React.FormEvent) => void;
     setViewMode: (mode: string) => void;
+    isLoading: boolean;
 }
 
 interface FormularioForgotProps {
@@ -41,7 +44,8 @@ const FormularioLogin: React.FC<FormularioLoginProps> = ({
     password, 
     setPassword, 
     handleLogin, 
-    setViewMode 
+    setViewMode,
+    isLoading
 }) => {
     return (
         <>
@@ -52,6 +56,7 @@ const FormularioLogin: React.FC<FormularioLoginProps> = ({
                     placeholder="username"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
+                    isDisabled={isLoading}
                 />
             </FormControl>
             <FormControl isRequired>
@@ -62,15 +67,31 @@ const FormularioLogin: React.FC<FormularioLoginProps> = ({
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
+                    isDisabled={isLoading}
                 />
             </FormControl>
             <Button
                 variant="solid"
                 colorScheme={"blue"}
                 onClick={handleLogin}
-            >Login
+                isLoading={isLoading}
+                loadingText="Iniciando sesión"
+                spinnerPlacement="start"
+            >
+                Login
             </Button>
-            <Link color="blue.500" onClick={() => setViewMode('forgot')}>
+            {isLoading && (
+                <Flex align="center" justify="center" mt={2}>
+                    <Spinner size="sm" color="blue.500" mr={2} />
+                    <Text fontSize="sm" color="gray.600">Verificando credenciales...</Text>
+                </Flex>
+            )}
+            <Link 
+                color="blue.500" 
+                onClick={() => setViewMode('forgot')}
+                pointerEvents={isLoading ? "none" : "auto"}
+                opacity={isLoading ? 0.6 : 1}
+            >
                 ¿Olvidó su contraseña?
             </Link>
         </>
@@ -122,6 +143,7 @@ export default function LoginPanel() {
     const [password, setPassword] = useState('');
     const [viewMode, setViewMode] = useState('login'); // 'login' or 'forgot'
     const [isRequestDisabled, setIsRequestDisabled] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const requestTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Clean up timeout on component unmount
@@ -135,13 +157,28 @@ export default function LoginPanel() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Activar estado de carga
+        setIsLoading(true);
+
         try {
             await login(username, password);
             //console.log(response);
             navigate('/');
             // after successful login, go to home or wherever you want
+            // No necesitamos desactivar el estado de carga aquí porque la página se redirigirá
         } catch (error) {
-            alert('Login failed. Check console or server logs.');
+            // Desactivar estado de carga en caso de error
+            setIsLoading(false);
+
+            // Mostrar mensaje de error con toast en lugar de alert
+            toast({
+                title: "Error de inicio de sesión",
+                description: "No se pudo iniciar sesión. Verifique sus credenciales.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
 
@@ -195,6 +232,7 @@ export default function LoginPanel() {
                         setPassword={setPassword}
                         handleLogin={handleLogin}
                         setViewMode={setViewMode}
+                        isLoading={isLoading}
                     />
                 ) : (
                     <FormularioForgot 
