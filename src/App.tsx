@@ -23,7 +23,7 @@ import RecibirMercanciaPage from "./pages/RecibirMercancia/RecibirMercanciaPage.
 import UsuariosPage from "./pages/Usuarios/UsuariosPage.tsx";
 import MultiRoleProtectedRoute from "./components/MultiRoleProtectedRoute.tsx";
 
-import {role_master, role_jefe_prod, role_compras, role_asist_prod, role_almacen} from "./pages/Usuarios/types.tsx";
+import { Modulo } from "./types/Modulo.tsx";
 import CargaMasivaPage from "./pages/CargaMasiva/CargaMasivaPage.tsx";
 import ActivosPage from "./pages/Activos/ActivosPage.tsx";
 import ContabilidadPage from "./pages/Contabilidad/ContabilidadPage.tsx";
@@ -54,7 +54,7 @@ const router = createBrowserRouter(
                 <Route
                     path="asistente_produccion"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_asist_prod]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.SEGUIMIENTO_PRODUCCION]}>
                             <Responsable_1/>
                         </MultiRoleProtectedRoute>
                     }
@@ -63,7 +63,7 @@ const router = createBrowserRouter(
                 <Route
                     path="recepcion_mprima"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_almacen]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.TRANSACCIONES_ALMACE]}>
                             <RecibirMercanciaPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -73,7 +73,7 @@ const router = createBrowserRouter(
                 <Route
                     path="producto"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.PRODUCTOS]}>
                             <ProductosPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -81,7 +81,7 @@ const router = createBrowserRouter(
                 <Route
                     path="produccion"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_jefe_prod]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.PRODUCCION]}>
                             <ProduccionPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -89,7 +89,7 @@ const router = createBrowserRouter(
                 <Route
                     path="stock"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_jefe_prod, role_compras]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.STOCK]}>
                             <StockPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -97,7 +97,7 @@ const router = createBrowserRouter(
                 <Route
                     path="proveedores"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_compras]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.PROVEEDORES]}>
                             <ProveedoresPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -105,7 +105,7 @@ const router = createBrowserRouter(
                 <Route
                     path="compras"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_compras]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.COMPRAS]}>
                             <ComprasPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -113,7 +113,7 @@ const router = createBrowserRouter(
                 <Route
                     path="informes"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_jefe_prod, role_compras]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.PRODUCCION, Modulo.COMPRAS]}>
                             <InformesPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -122,7 +122,7 @@ const router = createBrowserRouter(
                 <Route
                     path="usuarios"
                     element={
-                        <ProtectedRoute requiredRole={role_master}>
+                        <ProtectedRoute requiredModulo={Modulo.USUARIOS}>
                             <UsuariosPage/>
                         </ProtectedRoute>
                     }
@@ -131,7 +131,7 @@ const router = createBrowserRouter(
                 <Route
                     path="carga_masiva"
                     element={
-                        <ProtectedRoute requiredRole={role_master}>
+                        <ProtectedRoute requiredModulo={Modulo.USUARIOS}>
                             <CargaMasivaPage/>
                         </ProtectedRoute>
                     }
@@ -140,7 +140,7 @@ const router = createBrowserRouter(
                 <Route
                     path="activos"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_almacen]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.ACTIVOS]}>
                             <ActivosPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -149,7 +149,7 @@ const router = createBrowserRouter(
                 <Route
                     path="contabilidad"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_almacen]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.CONTABILIDAD]}>
                             <ContabilidadPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -158,7 +158,7 @@ const router = createBrowserRouter(
                 <Route
                     path="personal"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_almacen]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.PERSONAL_PLANTA]}>
                             <PersonalPage/>
                         </MultiRoleProtectedRoute>
                     }
@@ -167,7 +167,7 @@ const router = createBrowserRouter(
                 <Route
                     path="bintelligence"
                     element={
-                        <MultiRoleProtectedRoute supportedRoles={[role_master, role_almacen]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.BINTELLIGENCE]}>
                             <BintelligencePage/>
                         </MultiRoleProtectedRoute>
                     }

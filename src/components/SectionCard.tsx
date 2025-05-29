@@ -19,18 +19,22 @@ interface SectionCardProps {
     name: string;
     icon: IconType;
     to: string;
-    /** Roles allowed to see this card */
-    supportedRoles?: string[];
-    /** Current roles of the user */
-    currentRoles?: string[];
+    /** Modules allowed to see this card */
+    supportedModules?: string[];
+    /** Current accesses of the user */
+    currentAccesos?: string[];
 }
 
 
-function SectionCard({ name, icon, to, supportedRoles, currentRoles }: SectionCardProps) {
-    // If supportedRoles is provided, check if there's at least one role
-    // in currentRoles that is allowed. If not, do not render anything.
-    if (supportedRoles && currentRoles) {
-        const hasAccess = currentRoles.some(role => supportedRoles.includes(role));
+function SectionCard({ name, icon, to, supportedModules, currentAccesos }: SectionCardProps) {
+    // If supportedModules is provided, check if there's at least one module
+    // in currentAccesos that is allowed, or if the user is "master".
+    // If not, do not render anything.
+    if (supportedModules && currentAccesos) {
+        // Check if user is "master" (should have access to all modules)
+        const isMaster = currentAccesos.includes('ROLE_MASTER');
+        // Check if user has access to at least one of the supported modules
+        const hasAccess = isMaster || currentAccesos.some(acceso => supportedModules.includes(acceso));
         if (!hasAccess) return null;
     }
 

@@ -18,8 +18,7 @@ import { PiMicrosoftTeamsLogoFill } from "react-icons/pi";
 
 import '@fontsource-variable/comfortaa'
 
-import {role_master, role_jefe_prod, role_compras, role_asist_prod, role_almacen} from "../pages/Usuarios/types.tsx";
-
+import { Modulo } from "../types/Modulo.tsx";
 
 import { useAuth } from '../context/AuthContext';
 
@@ -61,20 +60,20 @@ export default function Home(){
             </Flex>
 
             <SimpleGrid columns={[1,1,2,3,4]} gap={'0.5em'} rowGap={'1.5em'}>
-                <SectionCard to={"/usuarios"}         name={"Roles y Usuarios"}     icon={FaUsersGear}          supportedRoles={[role_master]} currentRoles={roles}/>
-                <SectionCard to={'/producto'}         name={'Codificar Materiales y Productos'}  icon={PiDownloadDuotone}    supportedRoles={[role_master]} currentRoles={roles}/>
-                <SectionCard to={'/produccion'}       name={'Gestion de Produccion'}           icon={AiOutlineAudit}       supportedRoles={[role_master, role_jefe_prod]} currentRoles={roles}/>
-                <SectionCard to={'/stock'}            name={'Stock'}                icon={BsDatabaseCheck}      supportedRoles={[role_master, role_jefe_prod, role_compras]} currentRoles={roles}/>
-                <SectionCard to={'/Proveedores'}      name={'Proveedores'}          icon={FaIndustry}           supportedRoles={[role_master, role_compras]} currentRoles={roles}/>
-                <SectionCard to={'/compras'}          name={'Compras'}              icon={GiBuyCard}            supportedRoles={[role_master, role_compras]} currentRoles={roles}/>
-                {/*<SectionCard to={'/informes'}         name={'Informes'}             icon={TbReportSearch}       supportedRoles={[role_master, role_compras, role_jefe_prod]} currentRoles={roles}/>*/}
-                <SectionCard to={'/asistente_produccion'}    name={'Reporte Progreso en Procesos de Produccion'} icon={GiChemicalDrop}     supportedRoles={[role_master, role_asist_prod]} currentRoles={roles}/>
-                <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
-                {/*<SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload}          supportedRoles={[role_master]} currentRoles={roles}/>*/}
-                <SectionCard to={'/Activos'} name={'Activos'} icon={FaSteam}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
-                <SectionCard to={'/Contabilidad'} name={'Contabilidad'} icon={TbReportMoney}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
-                <SectionCard to={'/Personal'} name={'Personal'} icon={PiMicrosoftTeamsLogoFill}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
-                <SectionCard to={'/Bintelligence'} name={'BI'} icon={MdOutlineInsights}          supportedRoles={[role_master, role_almacen]} currentRoles={roles}/>
+                <SectionCard to={"/usuarios"}         name={"Roles y Usuarios"}     icon={FaUsersGear}          supportedModules={[Modulo.USUARIOS]} currentAccesos={roles}/>
+                <SectionCard to={'/producto'}         name={'Codificar Materiales y Productos'}  icon={PiDownloadDuotone}    supportedModules={[Modulo.PRODUCTOS]} currentAccesos={roles}/>
+                <SectionCard to={'/produccion'}       name={'Gestion de Produccion'}           icon={AiOutlineAudit}       supportedModules={[Modulo.PRODUCCION]} currentAccesos={roles}/>
+                <SectionCard to={'/stock'}            name={'Stock'}                icon={BsDatabaseCheck}      supportedModules={[Modulo.STOCK]} currentAccesos={roles}/>
+                <SectionCard to={'/Proveedores'}      name={'Proveedores'}          icon={FaIndustry}           supportedModules={[Modulo.PROVEEDORES]} currentAccesos={roles}/>
+                <SectionCard to={'/compras'}          name={'Compras'}              icon={GiBuyCard}            supportedModules={[Modulo.COMPRAS]} currentAccesos={roles}/>
+                {/*<SectionCard to={'/informes'}         name={'Informes'}             icon={TbReportSearch}       supportedModules={[Modulo.INFORMES]} currentAccesos={roles}/>*/}
+                <SectionCard to={'/asistente_produccion'}    name={'Reporte Progreso en Procesos de Produccion'} icon={GiChemicalDrop}     supportedModules={[Modulo.SEGUIMIENTO_PRODUCCION]} currentAccesos={roles}/>
+                <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox}          supportedModules={[Modulo.TRANSACCIONES_ALMACE]} currentAccesos={roles}/>
+                {/*<SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload}          supportedModules={[Modulo.CARGA_MASIVA]} currentAccesos={roles}/>*/}
+                <SectionCard to={'/Activos'} name={'Activos'} icon={FaSteam}          supportedModules={[Modulo.ACTIVOS]} currentAccesos={roles}/>
+                <SectionCard to={'/Contabilidad'} name={'Contabilidad'} icon={TbReportMoney}          supportedModules={[Modulo.CONTABILIDAD]} currentAccesos={roles}/>
+                <SectionCard to={'/Personal'} name={'Personal'} icon={PiMicrosoftTeamsLogoFill}          supportedModules={[Modulo.PERSONAL_PLANTA]} currentAccesos={roles}/>
+                <SectionCard to={'/Bintelligence'} name={'BI'} icon={MdOutlineInsights}          supportedModules={[Modulo.BINTELLIGENCE]} currentAccesos={roles}/>
 
             </SimpleGrid>
         </Container>

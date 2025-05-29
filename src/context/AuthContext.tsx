@@ -13,7 +13,7 @@ interface Authority {
 // 2) Describe the JWT token payload structure
 interface JwtPayload {
     sub: string;
-    authorities: Authority[];
+    accesos: string; // Changed from authorities: Authority[] to match backend
     exp: number;
     iat: number;
     // Add other JWT claims as needed
@@ -64,8 +64,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
 
                 // Extraer los roles del token
-                if (decodedToken.authorities) {
-                    const userRoles = decodedToken.authorities.map((auth) => auth.authority);
+                if (decodedToken.accesos) {
+                    // Split the comma-separated string into an array of role strings
+                    const userRoles = decodedToken.accesos.split(',');
                     setRoles(userRoles);
                 } else {
                     // Establecer un rol por defecto
@@ -108,8 +109,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Decodificar el token JWT para obtener los roles
             try {
                 const decodedToken = jwtDecode<JwtPayload>(token);
-                if (decodedToken.authorities) {
-                    const userRoles = decodedToken.authorities.map((auth) => auth.authority);
+                if (decodedToken.accesos) {
+                    // Split the comma-separated string into an array of role strings
+                    const userRoles = decodedToken.accesos.split(',');
                     setRoles(userRoles);
                 } else {
                     // Establecer al menos un rol por defecto para que se muestren algunas tarjetas

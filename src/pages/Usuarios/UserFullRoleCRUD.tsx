@@ -30,7 +30,7 @@ export default function UserFullRoleCRUD() {
     }
 
     return (
-        <Box p={4}>
+        <Box p={4} flex={1}>
             <ConditionalRender/>
         </Box>
     );
