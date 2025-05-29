@@ -68,7 +68,7 @@ export default function Home(){
                 <SectionCard to={'/compras'}          name={'Compras'}              icon={GiBuyCard}            supportedModules={[Modulo.COMPRAS]} currentAccesos={roles}/>
                 {/*<SectionCard to={'/informes'}         name={'Informes'}             icon={TbReportSearch}       supportedModules={[Modulo.INFORMES]} currentAccesos={roles}/>*/}
                 <SectionCard to={'/asistente_produccion'}    name={'Reporte Progreso en Procesos de Produccion'} icon={GiChemicalDrop}     supportedModules={[Modulo.SEGUIMIENTO_PRODUCCION]} currentAccesos={roles}/>
-                <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox}          supportedModules={[Modulo.TRANSACCIONES_ALMACE]} currentAccesos={roles}/>
+                <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox} supportedModules={[Modulo.TRANSACCIONES_ALMACEN]} currentAccesos={roles}/>
                 {/*<SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload}          supportedModules={[Modulo.CARGA_MASIVA]} currentAccesos={roles}/>*/}
                 <SectionCard to={'/Activos'} name={'Activos'} icon={FaSteam}          supportedModules={[Modulo.ACTIVOS]} currentAccesos={roles}/>
                 <SectionCard to={'/Contabilidad'} name={'Contabilidad'} icon={TbReportMoney}          supportedModules={[Modulo.CONTABILIDAD]} currentAccesos={roles}/>

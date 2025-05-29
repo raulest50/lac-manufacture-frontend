@@ -30,8 +30,8 @@ export default function UserFullRoleCRUD() {
     }
 
     return (
-        <Box p={4} flex={1}>
-            <ConditionalRender/>
+        <Box p={4} flex={1} h={"inherit"}>
+            <ConditionalRender />
         </Box>
     );
 }

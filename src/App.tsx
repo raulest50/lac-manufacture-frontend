@@ -63,7 +63,7 @@ const router = createBrowserRouter(
                 <Route
                     path="recepcion_mprima"
                     element={
-                        <MultiRoleProtectedRoute supportedModules={[Modulo.TRANSACCIONES_ALMACE]}>
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.TRANSACCIONES_ALMACEN]}>
                             <RecibirMercanciaPage/>
                         </MultiRoleProtectedRoute>
                     }

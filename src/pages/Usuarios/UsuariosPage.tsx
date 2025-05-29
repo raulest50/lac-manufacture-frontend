@@ -6,7 +6,7 @@ import UserFullRoleCRUD from "./UserFullRoleCRUD.tsx";
 export default function UsuariosPage(){
 
     return(
-        <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
+        <Container minW={['auto', 'container.lg', 'container.xl']} minH={"100vh"} w={"full"} h={'full'}>
             <MyHeader title={'Roles y Usuarios'}/>
                 <UserFullRoleCRUD/>
         </Container>
