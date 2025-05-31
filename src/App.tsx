@@ -29,6 +29,9 @@ import ActivosPage from "./pages/Activos/ActivosPage.tsx";
 import ContabilidadPage from "./pages/Contabilidad/ContabilidadPage.tsx";
 import PersonalPage from "./pages/Personal/PersonalPage.tsx";
 import BintelligencePage from "./pages/Bintelligence/BintelligencePage.tsx";
+import AdministracionAlertasPage from "./pages/AdministracionAlertas/AdministracionAlertasPage.tsx";
+import MasterConfigsPage from "./pages/MasterConfigs/MasterConfigsPage.tsx";
+import CronogramaPage from "./pages/Cronograma/CronogramaPage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -131,9 +134,36 @@ const router = createBrowserRouter(
                 <Route
                     path="carga_masiva"
                     element={
-                        <ProtectedRoute requiredModulo={Modulo.USUARIOS}>
+                        <ProtectedRoute requiredModulo={Modulo.CARGA_MASIVA}>
                             <CargaMasivaPage/>
                         </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="administracion_alertas"
+                    element={
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.ADMINISTRACION_ALERTAS]}>
+                            <AdministracionAlertasPage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="master_configs"
+                    element={
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.MASTER_CONFIGS]}>
+                            <MasterConfigsPage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="cronograma"
+                    element={
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.CRONOGRAMA]}>
+                            <CronogramaPage/>
+                        </MultiRoleProtectedRoute>
                     }
                 />
 

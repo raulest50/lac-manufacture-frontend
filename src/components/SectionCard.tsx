@@ -3,18 +3,6 @@ import { Card, CardHeader, CardBody, Heading, Icon } from "@chakra-ui/react";
 import { IconType } from "react-icons";
 import { NavLink } from "react-router-dom";
 
-const my_sc_style = {
-    p: "2em",
-    m: "1em",
-    bg: "blue.100",
-    ":hover": {
-        bg: "blue.300",
-    },
-    ":active": {
-        bg: "blue.800",
-    },
-};
-
 interface SectionCardProps {
     name: string;
     icon: IconType;
@@ -23,10 +11,12 @@ interface SectionCardProps {
     supportedModules?: string[];
     /** Current accesses of the user */
     currentAccesos?: string[];
+    /** Background color of the card */
+    bgColor?: string;
 }
 
 
-function SectionCard({ name, icon, to, supportedModules, currentAccesos }: SectionCardProps) {
+function SectionCard({ name, icon, to, supportedModules, currentAccesos, bgColor = "blue.100" }: SectionCardProps) {
     // If supportedModules is provided, check if there's at least one module
     // in currentAccesos that is allowed, or if the user is "master".
     // If not, do not render anything.
@@ -38,9 +28,22 @@ function SectionCard({ name, icon, to, supportedModules, currentAccesos }: Secti
         if (!hasAccess) return null;
     }
 
+    // Create style object with the provided background color
+    const cardStyle = {
+        p: "2em",
+        m: "1em",
+        bg: bgColor,
+        ":hover": {
+            bg: bgColor === "red.100" ? "red.300" : "blue.300",
+        },
+        ":active": {
+            bg: bgColor === "red.100" ? "red.800" : "blue.800",
+        },
+    };
+
     return (
         <NavLink to={to}>
-            <Card h={"full"} sx={my_sc_style}>
+            <Card h={"full"} sx={cardStyle}>
                 <CardHeader h={"40%"} borderBottom="0.1em solid" alignContent={"center"}>
                     <Heading as={"h2"} size={"sm"} fontFamily={"Comfortaa Variable"}>
                         {name}
