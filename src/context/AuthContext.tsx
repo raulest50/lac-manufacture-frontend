@@ -6,9 +6,9 @@ import EndPointsURL from "../api/EndPointsURL.tsx";
 import { jwtDecode } from 'jwt-decode';
 
 // 1) Describe each authority object
-interface Authority {
+/*interface Authority {
     authority: string;
-}
+}*/
 
 // 2) Describe the JWT token payload structure
 interface JwtPayload {
