@@ -68,11 +68,14 @@ export default function PanelBusqueda({setEstado, setProveedorSeleccionado}: Pro
                 searchType: searchType
             };
 
-            const response = await axios.post(endpoints.search_proveedores_pag,
+            const response = await axios.post(
+                endpoints.search_proveedores_pag,
+                searchDTO,
                 {
-                    page: pageNumber,
-                    size: pageSize,
-                    ...searchDTO
+                    params:{
+                        page: pageNumber,
+                        size: pageSize,
+                    }
                 }
             );
 
