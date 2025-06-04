@@ -44,6 +44,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     // Generate a random 7-digit code and hold the user input.
     const [randomCode, setRandomCode] = useState<string>('');
     const [inputCode, setInputCode] = useState<string>('');
+    const [isLoadingEnvio, setIsLoadingEnvio] = useState<boolean>(false);
 
     const [tipoEnvio, setTipoEnvio] = useState<string>(TipoEnvio.EMAIL);
 
@@ -174,9 +175,14 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
     };
 
     // Handler for confirming precios (estado 1 -> 2).
-    const handleEnviarProveedor = () => {
+    const handleEnviarProveedor = async () => {
         if (inputCode === randomCode) {
-            updateEstado(2);
+            setIsLoadingEnvio(true);
+            try {
+                await updateEstado(2);
+            } finally {
+                setIsLoadingEnvio(false);
+            }
         } else {
             toast({
                 title: "Código incorrecto",
@@ -352,6 +358,8 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                                 <Button
                                     colorScheme="green"
                                     onClick={handleEnviarProveedor}
+                                    isLoading={isLoadingEnvio}
+                                    loadingText="Enviando..."
                                 >
                                     Enviar a Proveedor
                                 </Button>

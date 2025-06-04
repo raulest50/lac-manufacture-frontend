@@ -6,8 +6,6 @@ import {
     FormControl,
     FormLabel,
     Input,
-    List,
-    ListItem,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -19,20 +17,25 @@ import {
     VStack,
     HStack,
     Text,
-    Radio,
-    RadioGroup,
     Select,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    Flex,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
-import { MateriaPrima } from '../types.tsx';
+import { Material } from '../types.tsx';
 
 const endPoints = new EndPointsURL();
 
 interface MateriaPrimaPickerProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelectMateriaPrima: (materiaPrima: MateriaPrima) => void;
+    onSelectMateriaPrima: (materiaPrima: Material) => void;
 }
 
 const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
@@ -42,21 +45,39 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
                                                                }) => {
     const [searchText, setSearchText] = useState('');
     const [tipoBusqueda, setTipoBusqueda] = useState('NOMBRE'); // 'NOMBRE' or 'ID'
-    const [materiasPrimas, setMateriasPrimas] = useState<MateriaPrima[]>([]);
+    const [materiasPrimas, setMateriasPrimas] = useState<Material[]>([]);
     const [selectedMateriaPrimaId, setSelectedMateriaPrimaId] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0); // Backend uses 0-based indexing
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const size = 10; // Results per page
     const toast = useToast();
 
     const handleSearch = async () => {
+        setIsLoading(true);
         try {
             const response = await axios.get(endPoints.search_mprima, {
-                params: { search: searchText, tipoBusqueda },
+                params: { 
+                    search: searchText, 
+                    tipoBusqueda,
+                    page: currentPage,
+                    size: size
+                },
             });
-            // Assuming the endpoint returns an object with a "content" array:
-            const updatedMateriasPrimas = response.data.content.map((item: MateriaPrima) => ({
+            // Extract pagination information from the response
+            const { content, totalPages: pages, totalElements: elements, number: pageNumber } = response.data;
+
+            // Update state with the new data
+            const updatedMateriasPrimas = content.map((item: Material) => ({
                 ...item,
                 // Optionally adjust properties if needed.
             }));
+
             setMateriasPrimas(updatedMateriasPrimas);
+            setTotalPages(pages);
+            setTotalElements(elements);
+            setCurrentPage(pageNumber);
             setSelectedMateriaPrimaId(null);
         } catch (error) {
             console.error('Error searching materias primas:', error);
@@ -67,6 +88,8 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
                 duration: 5000,
                 isClosable: true,
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -87,7 +110,16 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
     };
 
     const onKeyPress_InputBuscar = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !isLoading) {
+            setCurrentPage(0); // Reset to first page on new search
+            handleSearch();
+        }
+    };
+
+    // Handle pagination
+    const goToPage = (page: number) => {
+        if (page >= 0 && page < totalPages) {
+            setCurrentPage(page);
             handleSearch();
         }
     };
@@ -108,41 +140,95 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
                                     onChange={(e) => setSearchText(e.target.value)}
                                     onKeyDown={onKeyPress_InputBuscar}
                                     placeholder="Ingrese nombre o ID"
+                                    isDisabled={isLoading}
                                 />
                                 <Select
                                     value={tipoBusqueda}
                                     onChange={(e) => setTipoBusqueda(e.target.value)}
                                     width="150px"
+                                    isDisabled={isLoading}
                                 >
                                     <option value="NOMBRE">Nombre</option>
                                     <option value="ID">ID</option>
                                 </Select>
-                                <Button onClick={handleSearch}>Buscar</Button>
+                                <Button 
+                                    onClick={() => {
+                                        setCurrentPage(0); // Reset to first page on new search
+                                        handleSearch();
+                                    }} 
+                                    isLoading={isLoading}
+                                    loadingText="Buscando"
+                                    colorScheme="blue"
+                                >
+                                    Buscar
+                                </Button>
                             </HStack>
                         </FormControl>
-                        <Box w="full">
-                            <RadioGroup
-                                value={selectedMateriaPrimaId !== null ? selectedMateriaPrimaId.toString() : ''}
-                                onChange={(value) => setSelectedMateriaPrimaId(parseInt(value))}
-                            >
-                                <List spacing={2}>
-                                    {materiasPrimas.map((materiaPrima) => (
-                                        <ListItem key={materiaPrima.productoId} borderBottom="1px solid #ccc">
-                                            <HStack>
-                                                <Radio value={materiaPrima.productoId.toString()} />
-                                                <Text>
-                                                    ID: {materiaPrima.productoId} - {materiaPrima.nombre}
-                                                </Text>
-                                            </HStack>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </RadioGroup>
+                        <Box w="full" overflowX="auto">
+                            {materiasPrimas.length > 0 ? (
+                                <>
+                                    <Table variant="simple" size="sm">
+                                        <Thead>
+                                            <Tr>
+                                                <Th>ID</Th>
+                                                <Th>Nombre</Th>
+                                                <Th>Categoría</Th>
+                                            </Tr>
+                                        </Thead>
+                                        <Tbody>
+                                            {materiasPrimas.map((materiaPrima) => (
+                                                <Tr 
+                                                    key={materiaPrima.productoId} 
+                                                    onClick={() => setSelectedMateriaPrimaId(materiaPrima.productoId)}
+                                                    bg={selectedMateriaPrimaId === materiaPrima.productoId ? "blue.100" : "transparent"}
+                                                    _hover={{ bg: "gray.100", cursor: "pointer" }}
+                                                >
+                                                    <Td>{materiaPrima.productoId}</Td>
+                                                    <Td>{materiaPrima.nombre}</Td>
+                                                    <Td>{materiaPrima.tipoMaterial === 1 ? "Materia Prima" : "Material de Empaque"}</Td>
+                                                </Tr>
+                                            ))}
+                                        </Tbody>
+                                    </Table>
+
+                                    {/* Pagination controls */}
+                                    {totalPages > 1 && (
+                                        <Flex justifyContent="center" mt={4}>
+                                            <Button 
+                                                size="sm" 
+                                                onClick={() => goToPage(currentPage - 1)} 
+                                                isDisabled={currentPage === 0 || isLoading}
+                                                mr={2}
+                                            >
+                                                Anterior
+                                            </Button>
+                                            <Text alignSelf="center" mx={2}>
+                                                Página {currentPage + 1} de {totalPages}
+                                            </Text>
+                                            <Button 
+                                                size="sm" 
+                                                onClick={() => goToPage(currentPage + 1)} 
+                                                isDisabled={currentPage === totalPages - 1 || isLoading}
+                                                ml={2}
+                                            >
+                                                Siguiente
+                                            </Button>
+                                        </Flex>
+                                    )}
+                                </>
+                            ) : (
+                                <Text textAlign="center">No hay materias primas para mostrar</Text>
+                            )}
                         </Box>
                     </VStack>
                 </ModalBody>
                 <ModalFooter>
-                    <Button colorScheme="blue" mr={3} onClick={handleConfirm}>
+                    <Button 
+                        colorScheme="blue" 
+                        mr={3} 
+                        onClick={handleConfirm}
+                        isDisabled={selectedMateriaPrimaId === null}
+                    >
                         Confirmar
                     </Button>
                     <Button variant="ghost" onClick={handleCancel}>
