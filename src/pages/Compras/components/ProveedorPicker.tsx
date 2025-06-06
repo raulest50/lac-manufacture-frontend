@@ -25,7 +25,6 @@ import {
     Th,
     Td,
     Flex,
-    Spinner,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from "../../../api/EndPointsURL.tsx";

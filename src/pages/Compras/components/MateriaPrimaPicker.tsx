@@ -50,18 +50,21 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
     const [isLoading, setIsLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(0); // Backend uses 0-based indexing
     const [totalPages, setTotalPages] = useState(0);
-    const [totalElements, setTotalElements] = useState(0);
+    const [, setTotalElements] = useState(0);
     const size = 10; // Results per page
     const toast = useToast();
 
-    const handleSearch = async () => {
+    const handleSearch = async (pageParam?: number) => {
         setIsLoading(true);
         try {
+            // Use pageParam if provided, otherwise use currentPage
+            const pageToUse = pageParam !== undefined ? pageParam : currentPage;
+
             const response = await axios.get(endPoints.search_mprima, {
                 params: { 
                     search: searchText, 
                     tipoBusqueda,
-                    page: currentPage,
+                    page: pageToUse,
                     size: size
                 },
             });
@@ -112,7 +115,7 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
     const onKeyPress_InputBuscar = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter' && !isLoading) {
             setCurrentPage(0); // Reset to first page on new search
-            handleSearch();
+            handleSearch(0); // Pass page 0 explicitly
         }
     };
 
@@ -120,7 +123,7 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
     const goToPage = (page: number) => {
         if (page >= 0 && page < totalPages) {
             setCurrentPage(page);
-            handleSearch();
+            handleSearch(page);  // Pass the page directly to handleSearch
         }
     };
 
@@ -154,7 +157,7 @@ const MateriaPrimaPicker: React.FC<MateriaPrimaPickerProps> = ({
                                 <Button 
                                     onClick={() => {
                                         setCurrentPage(0); // Reset to first page on new search
-                                        handleSearch();
+                                        handleSearch(0); // Pass page 0 explicitly
                                     }} 
                                     isLoading={isLoading}
                                     loadingText="Buscando"
