@@ -34,6 +34,7 @@ interface FormularioLoginProps {
 interface FormularioForgotProps {
     onHandleEnviarForgot: (email: string) => void;
     isRequestDisabled: boolean;
+    isLoading: boolean;
     setViewMode: (mode: string) => void;
 }
 
@@ -102,6 +103,7 @@ const FormularioLogin: React.FC<FormularioLoginProps> = ({
 const FormularioForgot: React.FC<FormularioForgotProps> = ({ 
     onHandleEnviarForgot, 
     isRequestDisabled, 
+    isLoading,
     setViewMode 
 }) => {
     const [email, setEmail] = useState('');
@@ -116,6 +118,7 @@ const FormularioForgot: React.FC<FormularioForgotProps> = ({
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
+                    isDisabled={isLoading}
                 />
             </FormControl>
             <Button
@@ -123,10 +126,24 @@ const FormularioForgot: React.FC<FormularioForgotProps> = ({
                 colorScheme={"blue"}
                 onClick={() => onHandleEnviarForgot(email)}
                 isDisabled={isRequestDisabled}
+                isLoading={isLoading}
+                loadingText="Enviando correo"
+                spinnerPlacement="start"
             >
                 Enviar
             </Button>
-            <Link color="blue.500" onClick={() => setViewMode('login')}>
+            {isLoading && (
+                <Flex align="center" justify="center" mt={2}>
+                    <Spinner size="sm" color="blue.500" mr={2} />
+                    <Text fontSize="sm" color="gray.600">Enviando solicitud...</Text>
+                </Flex>
+            )}
+            <Link 
+                color="blue.500" 
+                onClick={() => setViewMode('login')}
+                pointerEvents={isLoading ? "none" : "auto"}
+                opacity={isLoading ? 0.6 : 1}
+            >
                 Volver al login
             </Link>
         </>
@@ -144,6 +161,7 @@ export default function LoginPanel() {
     const [viewMode, setViewMode] = useState('login'); // 'login' or 'forgot'
     const [isRequestDisabled, setIsRequestDisabled] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isForgotLoading, setIsForgotLoading] = useState(false);
     const requestTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Clean up timeout on component unmount
@@ -185,6 +203,8 @@ export default function LoginPanel() {
     const onHandleEnviarForgot = async (email: string) => {
         // Implement rate limiting to prevent system overload
         setIsRequestDisabled(true);
+        // Set loading state to true
+        setIsForgotLoading(true);
 
         try {
             // Call the API to request password reset
@@ -209,6 +229,9 @@ export default function LoginPanel() {
                 duration: 5000,
                 isClosable: true,
             });
+        } finally {
+            // Set loading state to false
+            setIsForgotLoading(false);
         }
 
         // Enable the button after 60 seconds to prevent abuse
@@ -238,6 +261,7 @@ export default function LoginPanel() {
                     <FormularioForgot 
                         onHandleEnviarForgot={onHandleEnviarForgot}
                         isRequestDisabled={isRequestDisabled}
+                        isLoading={isForgotLoading}
                         setViewMode={setViewMode}
                     />
                 )}
