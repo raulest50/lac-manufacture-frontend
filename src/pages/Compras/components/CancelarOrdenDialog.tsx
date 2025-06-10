@@ -14,12 +14,12 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL.tsx';
-import { OrdenCompra } from '../types.tsx';
+import { OrdenCompraMateriales } from '../types.tsx';
 
 interface CancelarOrdenDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    orden: OrdenCompra;
+    orden: OrdenCompraMateriales;
     onOrderCancelled?: () => void;
 }
 

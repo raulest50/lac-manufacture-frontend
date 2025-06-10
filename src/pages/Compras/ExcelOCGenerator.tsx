@@ -1,6 +1,6 @@
 // ExcelOCGenerator.ts
 import ExcelJS from 'exceljs';
-import {getCondicionPagoText, getRegimenTributario, ItemOrdenCompra, OrdenCompra} from './types';
+import {getCondicionPagoText, getRegimenTributario, ItemOrdenCompra, OrdenCompraMateriales} from './types';
 
 export class ExcelOCGenerator {
     /**
@@ -8,7 +8,7 @@ export class ExcelOCGenerator {
      * @param orden the order data to populate the file with.
      * @returns a Promise that resolves to a Uint8Array containing the Excel file.
      */
-    public async generateExcel(orden: OrdenCompra): Promise<Uint8Array> {
+    public async generateExcel(orden: OrdenCompraMateriales): Promise<Uint8Array> {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Orden Compra');
 
@@ -160,7 +160,7 @@ export class ExcelOCGenerator {
         this.setNormalFormat(worksheet.getCell(`H${29+N}`), orden.subTotal);
 
         worksheet.mergeCells(`H${30+N}:I${30+N}`);
-        this.setNormalFormat(worksheet.getCell(`H${30+N}`), orden.iva19);
+        this.setNormalFormat(worksheet.getCell(`H${30+N}`), orden.ivaCOP);
 
         worksheet.mergeCells(`H${31+N}:I${31+N}`);
         this.setNormalFormat(worksheet.getCell(`H${31+N}`), orden.totalPagar);
@@ -213,7 +213,7 @@ export class ExcelOCGenerator {
      * Generates the Excel file and triggers a download in the browser.
      * @param orden the order data to populate the file with.
      */
-    public async downloadExcel(orden: OrdenCompra): Promise<void> {
+    public async downloadExcel(orden: OrdenCompraMateriales): Promise<void> {
         try {
             const buffer = await this.generateExcel(orden);
             const blob = new Blob([buffer], {

@@ -23,14 +23,14 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
-import { OrdenCompra, getEstadoText, getCondicionPagoText, getCantidadCorrectaText, TipoEnvio } from '../types';
+import { OrdenCompraMateriales, getEstadoText, getCondicionPagoText, getCantidadCorrectaText, TipoEnvio } from '../types';
 import PdfGenerator from "../pdfGenerator.tsx";
 
 interface ActualizarEstadoOrdenCompraDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    orden: OrdenCompra;
-    onEstadoUpdated?: (updatedOrden: OrdenCompra) => void;
+    orden: OrdenCompraMateriales;
+    onEstadoUpdated?: (updatedOrden: OrdenCompraMateriales) => void;
 }
 
 const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDialogProps> = ({

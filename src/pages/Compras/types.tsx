@@ -46,13 +46,14 @@ export function getCantidadCorrectaText(cantidadCorrecta: number){
 
 export interface Producto{
     productoId: number;
-    tipo_producto: string;
     nombre: string;
     observaciones: string;
     costo: number;
+    iva_percentual: number;
+    fechaCreacion?: string;
     tipoUnidades: string;
     cantidadUnidad: string;
-    fechaCreacion?: string;
+    tipo_producto: string;
 }
 
 export interface Material extends Producto{
@@ -66,7 +67,7 @@ export interface ItemOrdenCompra {
     material: Material;
     cantidad: number;
     precioUnitario: number;
-    iva19: number;
+    ivaCOP: number;
     subTotal: number;
     /**
      * 0: aún por revisar
@@ -82,7 +83,7 @@ export interface ItemOrdenCompra {
     precioCorrecto: number;
 }
 
-export interface OrdenCompra {
+export interface OrdenCompraMateriales {
     // The backend generates this id
     ordenCompraId?: number;
     fechaEmision?: string;
@@ -91,7 +92,7 @@ export interface OrdenCompra {
     proveedor: Proveedor;
     itemsOrdenCompra: ItemOrdenCompra[];
     subTotal: number;
-    iva19: number;
+    ivaCOP: number;
     totalPagar: number;
     condicionPago: string;
     tiempoEntrega: string;

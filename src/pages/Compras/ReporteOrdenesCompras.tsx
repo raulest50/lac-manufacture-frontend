@@ -1,7 +1,7 @@
 // ReporteOrdenesCompras.tsx
 import { useState } from "react";
 import { Button, Container, Flex, Select, Spinner } from "@chakra-ui/react";
-import { OrdenCompra } from "./types";
+import { OrdenCompraMateriales } from "./types";
 import { format } from "date-fns";
 import DateRangePicker from "../../components/DateRangePicker";
 import axios from "axios";
@@ -10,7 +10,7 @@ import ListaOrdenesCompra from "./components/ListaOrdenesCompra";
 import MyPagination from "../../components/MyPagination";
 
 export default function ReporteOrdenesCompras() {
-    const [listaOrdenesCompras, setListaOrdenesCompras] = useState<OrdenCompra[]>([]);
+    const [listaOrdenesCompras, setListaOrdenesCompras] = useState<OrdenCompraMateriales[]>([]);
     const [date1, setDate1] = useState(format(new Date(), "yyyy-MM-dd"));
     const [date2, setDate2] = useState(format(new Date(), "yyyy-MM-dd"));
     const [estadoOrden_search, setEstadoOrdenSearch] = useState("0,1,2");

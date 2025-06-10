@@ -18,12 +18,12 @@ import {
     Th,
     Td, Tfoot
 } from '@chakra-ui/react';
-import {getCondicionPagoText, getEstadoText, OrdenCompra} from '../types';
+import {getCondicionPagoText, getEstadoText, OrdenCompraMateriales} from '../types';
 
 interface OrdenCompraDetailsProps {
     isOpen: boolean;
     onClose: () => void;
-    orden: OrdenCompra;
+    orden: OrdenCompraMateriales;
 }
 
 const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose, orden }) => {

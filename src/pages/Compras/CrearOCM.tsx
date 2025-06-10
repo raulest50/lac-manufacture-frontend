@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import {Button, Container, Flex, FormControl, FormLabel, Input, Select, useToast, Text} from '@chakra-ui/react';
 import axios from 'axios';
-import { Proveedor, Material, ItemOrdenCompra, OrdenCompra } from './types';
+import { Proveedor, Material, ItemOrdenCompra, OrdenCompraMateriales } from './types';
 import EndPointsURL from '../../api/EndPointsURL';
 import ProveedorPicker from './components/ProveedorPicker.tsx';
 import ProveedorCard from './components/ProveedorCard.tsx';
@@ -28,6 +28,7 @@ export default function CrearOCM() {
     const [subTotal, setSubTotal] = useState(0);
     const [iva19, setIva19] = useState(0);
     const [totalPagar, setTotalPagar] = useState(0);
+    const [ivaEnabled, setIvaEnabled] = useState(true);
 
     const updateTotalesAndGetValues = () => {
         const calculatedSubTotal = listaItemsOrdenCompra.reduce(
@@ -35,7 +36,7 @@ export default function CrearOCM() {
             0
         );
         const calculatedIva = Math.round(
-            listaItemsOrdenCompra.reduce((sum, item) => sum + item.subTotal * 0.19, 0)
+            listaItemsOrdenCompra.reduce((sum, item) => sum + item.ivaCOP, 0)
         );
         const calculatedTotal = calculatedSubTotal + calculatedIva;
         setSubTotal(calculatedSubTotal);
@@ -60,21 +61,32 @@ export default function CrearOCM() {
 
     // When a MateriaPrima is selected from the picker, create an ItemOrdenCompra with default numeric values.
     const handleAddMateriaPrima = (material: Material) => {
+        // Default to 1 unit for better user experience
+        const cantidad = 1;
+        const precioUnitario = material.costo;
+        const subTotal = cantidad * precioUnitario;
+
+        // Calculate IVA based on the product's IVA percentage and the IVA toggle
+        const ivaPercentage = material.iva_percentual / 100; // Convert from percentage to decimal
+        const ivaCOP = ivaEnabled ? Math.round(subTotal * ivaPercentage) : 0;
+
         const newItem: ItemOrdenCompra = {
             material: material,
-            cantidad: 0,
-            precioUnitario: material.costo,
-            iva19: 0,
-            subTotal: 0,
+            cantidad: cantidad,
+            precioUnitario: precioUnitario,
+            ivaCOP: ivaCOP,
+            subTotal: subTotal,
             cantidadCorrecta: 0,
             precioCorrecto: 0,
         };
         setListaItemsOrdenCompra([...listaItemsOrdenCompra, newItem]);
+        updateTotalesAndGetValues();
     };
 
     const handleRemoveItem = (index: number) => {
         const newList = listaItemsOrdenCompra.filter((_, i) => i !== index);
         setListaItemsOrdenCompra(newList);
+        updateTotalesAndGetValues();
     };
 
     const handleUpdateItem = (
@@ -91,8 +103,24 @@ export default function CrearOCM() {
         }
         // Recalculate subTotal = cantidad * precioUnitario
         item.subTotal = item.cantidad * item.precioUnitario;
-        item.iva19 = Math.round(item.subTotal * 0.19);
+
+        // Calculate IVA based on the product's IVA percentage and the IVA toggle
+        const ivaPercentage = item.material.iva_percentual / 100; // Convert from percentage to decimal
+        item.ivaCOP = ivaEnabled ? Math.round(item.subTotal * ivaPercentage) : 0;
+
         newList[index] = item;
+        setListaItemsOrdenCompra(newList);
+        updateTotalesAndGetValues();
+    };
+
+    // Function to toggle IVA for all items
+    const toggleIvaForAllItems = (enabled: boolean) => {
+        setIvaEnabled(enabled);
+        const newList = [...listaItemsOrdenCompra];
+        newList.forEach(item => {
+            const ivaPercentage = item.material.iva_percentual / 100;
+            item.ivaCOP = enabled ? Math.round(item.subTotal * ivaPercentage) : 0;
+        });
         setListaItemsOrdenCompra(newList);
         updateTotalesAndGetValues();
     };
@@ -133,12 +161,12 @@ export default function CrearOCM() {
         // Calculate totals and get the latest values:
         const { calculatedSubTotal, calculatedIva, calculatedTotal } = updateTotalesAndGetValues();
 
-        const nuevaOrdenCompra: OrdenCompra = {
+        const nuevaOrdenCompra: OrdenCompraMateriales = {
             proveedor: selectedProveedor,
             fechaVencimiento: fechaVencimiento + "T00:00:00",
             itemsOrdenCompra: listaItemsOrdenCompra,
             subTotal: calculatedSubTotal,      // Use the freshly computed values
-            iva19: calculatedIva,
+            ivaCOP: calculatedIva,
             totalPagar: calculatedTotal,
             condicionPago: condicionPago,
             tiempoEntrega: tiempoEntrega,
@@ -241,6 +269,8 @@ export default function CrearOCM() {
                     items={listaItemsOrdenCompra}
                     onRemoveItem={handleRemoveItem}
                     onUpdateItem={handleUpdateItem}
+                    ivaEnabled={ivaEnabled}
+                    onToggleIva={toggleIvaForAllItems}
                 />
 
                 <Button colorScheme="teal" onClick={crearOrdenCompraOnClick}>

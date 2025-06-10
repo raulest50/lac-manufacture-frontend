@@ -10,7 +10,7 @@ import {
     Box,
     useOutsideClick
 } from '@chakra-ui/react';
-import {getEstadoText, OrdenCompra} from '../types';
+import {getEstadoText, OrdenCompraMateriales} from '../types';
 import OrdenCompraDetails from './OrdenCompraDetails';
 
 import CancelarOrdenDialog from './CancelarOrdenDialog';
@@ -19,7 +19,7 @@ import ActualizarEstadoOrdenCompraDialog from "./ActualizarEstadoOrdenCompraDial
 import PdfGenerator from "../pdfGenerator.tsx";
 
 interface ListaOrdenesCompraProps {
-    ordenes: OrdenCompra[];
+    ordenes: OrdenCompraMateriales[];
     onClose4Dialogs: (page:number) => void;
     page: number;
 }
@@ -27,17 +27,17 @@ interface ListaOrdenesCompraProps {
 interface ContextMenuState {
     mouseX: number;
     mouseY: number;
-    orden: OrdenCompra;
+    orden: OrdenCompraMateriales;
 }
 
 const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClose4Dialogs, page}) => {
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
-    const [selectedOrden, setSelectedOrden] = useState<OrdenCompra | null>(null);
-    const [ordenToCancel, setOrdenToCancel] = useState<OrdenCompra | null>(null);
+    const [selectedOrden, setSelectedOrden] = useState<OrdenCompraMateriales | null>(null);
+    const [ordenToCancel, setOrdenToCancel] = useState<OrdenCompraMateriales | null>(null);
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
     const [actualizarDialogOpen, setActualizarDialogOpen] = useState(false);
-    const [ordenToActualizar, setOrdenToActualizar] = useState<OrdenCompra | null>(null);
+    const [ordenToActualizar, setOrdenToActualizar] = useState<OrdenCompraMateriales | null>(null);
 
     const contextMenuRef = React.useRef<HTMLDivElement>(null);
     useOutsideClick({
@@ -45,7 +45,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
         handler: () => setContextMenu(null),
     });
 
-    const handleContextMenu = (event: React.MouseEvent, orden: OrdenCompra) => {
+    const handleContextMenu = (event: React.MouseEvent, orden: OrdenCompraMateriales) => {
         event.preventDefault();
         setContextMenu({
             mouseX: event.clientX,
@@ -59,7 +59,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
             // const generator = new ExcelOCGenerator();
             // await generator.downloadExcel(contextMenu.orden as OrdenCompra);
             const generator = new PdfGenerator();
-            await generator.downloadPDF_OCM(contextMenu.orden as OrdenCompra);
+            await generator.downloadPDF_OCM(contextMenu.orden as OrdenCompraMateriales);
         }
         setContextMenu(null);
     };

@@ -11,6 +11,9 @@ import {
     Input,
     Button,
     Box,
+    Switch,
+    Flex,
+    Text,
 } from '@chakra-ui/react';
 import { ItemOrdenCompra } from '../types';
 
@@ -22,23 +25,25 @@ interface OrdenCompraItemsProps {
         field: 'cantidad' | 'precioUnitario',
         value: number
     ) => void;
+    ivaEnabled: boolean;
+    onToggleIva: (enabled: boolean) => void;
 }
 
 const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                                                                items,
                                                                onRemoveItem,
                                                                onUpdateItem,
+                                                               ivaEnabled,
+                                                               onToggleIva,
                                                            }) => {
     // Calculate totals based on the items array.
     const totalSubTotal = items.reduce(
-        (sum, item) => sum + item.cantidad * item.precioUnitario,
+        (sum, item) => sum + item.subTotal,
         0
     );
-    const totalIVA = Math.round(
-        items.reduce(
-            (sum, item) => sum + item.cantidad * item.precioUnitario * 0.19,
-            0
-        )
+    const totalIVA = items.reduce(
+        (sum, item) => sum + item.ivaCOP,
+        0
     );
     const totalPagar = totalSubTotal + totalIVA;
 
@@ -51,15 +56,23 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                         <Th>Nombre</Th>
                         <Th isNumeric>Cantidad</Th>
                         <Th isNumeric>Precio Unitario</Th>
-                        <Th isNumeric>IVA (19%)</Th>
+                        <Th isNumeric>IVA %</Th>
+                        <Th isNumeric>
+                            <Flex alignItems="center" justifyContent="flex-end">
+                                <Text mr={2}>IVA (COP)</Text>
+                                <Switch 
+                                    isChecked={ivaEnabled} 
+                                    onChange={(e) => onToggleIva(e.target.checked)}
+                                    colorScheme="teal"
+                                />
+                            </Flex>
+                        </Th>
                         <Th isNumeric>Subtotal</Th>
                         <Th>Acciones</Th>
                     </Tr>
                 </Thead>
                 <Tbody>
                     {items.map((item, index) => {
-                        const itemSubtotal = item.cantidad * item.precioUnitario;
-                        const itemIVA = Math.round(itemSubtotal * 0.19);
                         return (
                             <Tr key={index}>
                                 <Td>{item.material.productoId}</Td>
@@ -92,8 +105,9 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                                         }
                                     />
                                 </Td>
-                                <Td isNumeric>{itemIVA}</Td>
-                                <Td isNumeric>{itemSubtotal}</Td>
+                                <Td isNumeric>{item.material.iva_percentual}%</Td>
+                                <Td isNumeric>{item.ivaCOP}</Td>
+                                <Td isNumeric>{item.subTotal}</Td>
                                 <Td>
                                     <Button
                                         colorScheme="red"
@@ -109,7 +123,7 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                 </Tbody>
                 <Tfoot>
                     <Tr>
-                        <Td colSpan={4} textAlign="right">
+                        <Td colSpan={5} textAlign="right">
                             <strong>SubTotal:</strong>
                         </Td>
                         <Td isNumeric colSpan={3}>
@@ -117,15 +131,15 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                         </Td>
                     </Tr>
                     <Tr>
-                        <Td colSpan={4} textAlign="right">
-                            <strong>IVA (19%):</strong>
+                        <Td colSpan={5} textAlign="right">
+                            <strong>IVA Total:</strong>
                         </Td>
                         <Td isNumeric colSpan={3}>
                             {totalIVA}
                         </Td>
                     </Tr>
                     <Tr>
-                        <Td colSpan={4} textAlign="right">
+                        <Td colSpan={5} textAlign="right">
                             <strong>Total a Pagar:</strong>
                         </Td>
                         <Td isNumeric colSpan={3}>

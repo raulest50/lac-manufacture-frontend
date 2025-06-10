@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import {
     getCondicionPagoText,
     getRegimenTributario,
-    OrdenCompra,
+    OrdenCompraMateriales,
     ItemOrdenCompra, OrdenCompraActivos, ItemOCActivo,
 } from "./types";
 
@@ -21,7 +21,7 @@ export default class PdfGenerator {
      * Generates the PDF file for the given OrdenCompra-Materiales (OCM) and triggers its download.
      * @param orden the order data to populate the PDF with.
      */
-    private async generatePDF_OCM(orden: OrdenCompra): Promise<jsPDFWithAutoTable> {
+    private async generatePDF_OCM(orden: OrdenCompraMateriales): Promise<jsPDFWithAutoTable> {
         // Create a new jsPDF instance (A4 size, mm units) and cast to our extended interface
         const doc = new jsPDF({ unit: "mm", format: "a4" }) as jsPDFWithAutoTable;
         const margin = 10;
@@ -91,7 +91,7 @@ export default class PdfGenerator {
         // --- Lugar de Entrega y Condiciones de Pago ---
         let entregaY = detailY + 7;
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(7);
+        doc.setFontSize(8);
         doc.text("LUGAR DE ENTREGA Y CONDICIONES DE PAGO", detailX, entregaY);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(7);
@@ -194,7 +194,7 @@ export default class PdfGenerator {
         doc.setFontSize(9);
         doc.text(`Sub Total: $ ${orden.subTotal.toFixed(2)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`IVA : $ ${orden.iva19.toFixed(2)}`, margin, totalsY);
+        doc.text(`IVA : $ ${orden.ivaCOP.toFixed(2)}`, margin, totalsY);
         totalsY += 5;
         doc.text(`Total Pagar: $ ${orden.totalPagar.toFixed(2)}`, margin, totalsY);
 
@@ -226,7 +226,7 @@ export default class PdfGenerator {
      * hace trigger de descarga del pdf de OCM
      * @param orden
      */
-    public async downloadPDF_OCM(orden:OrdenCompra):Promise<void>{
+    public async downloadPDF_OCM(orden:OrdenCompraMateriales):Promise<void>{
         const doc = await this.generatePDF_OCM(orden);
         doc.save(`orden-compra-${orden.ordenCompraId}.pdf`);
     }
@@ -236,7 +236,7 @@ export default class PdfGenerator {
      * ser adjuntado a correo proveedor.
      * @param orden
      */
-    public async getOCMpdf_Blob(orden:OrdenCompra):Promise<Blob>{
+    public async getOCMpdf_Blob(orden:OrdenCompraMateriales):Promise<Blob>{
         const doc = await this.generatePDF_OCM(orden);
         return doc.output("blob");
     }
@@ -315,10 +315,10 @@ export default class PdfGenerator {
         // --- Lugar de Entrega y Condiciones de Pago ---
         let entregaY = detailY + 7;
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(7);
+        doc.setFontSize(8);
         doc.text("LUGAR DE ENTREGA Y CONDICIONES DE PAGO", detailX, entregaY);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(6);
+        doc.setFontSize(7);
         entregaY += 4;
         doc.text("Empresa: Napolitana JP S.A.S - EXOTIC EXPERT", detailX, entregaY);
         entregaY += 3;
@@ -415,6 +415,7 @@ export default class PdfGenerator {
         const finalY = doc.lastAutoTable?.finalY ?? tableStartY;
         let totalsY = finalY + 5;
         doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
         doc.text(`Sub Total: $ ${orden.subTotal.toFixed(2)}`, margin, totalsY);
         totalsY += 5;
         doc.text(`IVA: $ ${orden.ivaValue.toFixed(2)}`, margin, totalsY);
