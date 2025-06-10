@@ -94,7 +94,7 @@ export default class PdfGenerator {
         doc.setFontSize(7);
         doc.text("LUGAR DE ENTREGA Y CONDICIONES DE PAGO", detailX, entregaY);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(6);
+        doc.setFontSize(7);
         entregaY += 4;
         doc.text("Empresa: Napolitana JP S.A.S - EXOTIC EXPERT", detailX, entregaY);
         entregaY += 3;
@@ -191,6 +191,7 @@ export default class PdfGenerator {
         const finalY = doc.lastAutoTable?.finalY ?? tableStartY;
         let totalsY = finalY + 5;
         doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
         doc.text(`Sub Total: $ ${orden.subTotal.toFixed(2)}`, margin, totalsY);
         totalsY += 5;
         doc.text(`IVA : $ ${orden.iva19.toFixed(2)}`, margin, totalsY);
