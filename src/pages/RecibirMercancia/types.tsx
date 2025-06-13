@@ -1,5 +1,5 @@
 // RecibirMercancia/types.tsx
-import {Contacto} from "../Proveedores/types.tsx";
+import {Contacto} from "../Proveedores/types";
 
 export interface Proveedor {
     id: string;
@@ -107,11 +107,60 @@ export interface OrdenCompra {
 }
 
 
-export interface DocIngresoDTA{
-    ordenCompra: OrdenCompra | null;
+export interface Lote{
+    id?: number;
+    batchNumber?: string;
+    productionDate: string;
+    expirationDate: string;
+}
+
+export enum TipoMovimiento{
+    COMPRA = "COMPRA",
+    BAJA = "BAJA",
+    CONSUMO = "CONSUMO",
+    BACKFLUSH = "BACKFLUSH",
+    VENTA = "VENTA",
+    PERDIDA = "PERDIDA"
+}
+
+export enum Almacen {
+    GENERAL = "GENERAL", // donde se reciben compras, se dispensa material, se ingresa backflush
+    PERDIDAS = "PERDIDAS", // scrap de OP's y perdidas de material por eventos fortuitos
+    CALIDAD = "CANTIDAD", // producto para control de calidad
+    DEVOLUCIONES = "DEVOLUCIONES" // terminados devuelto por clientes o materiales para devolverle a proveedor
+}
+
+export interface Movimiento{
+    movimientoId?: number;
+    cantidad: number;
+    producto: Producto
+    tipoMovimiento: TipoMovimiento;
+    almacen: Almacen;
+    lote: Lote;
+    fechaMovimiento: string;
+}
+
+export enum TipoEntidadCausante{
+    OCM = "OCM", // orden de compra de materiales
+    OP = "OP", // orden de produccion
+    OTA = "OTA", // orden de tranferencia de almacen
+    OAA = "OAA", // orden de ajuste de almacen
+}
+
+export interface TransaccionAlmancen{
+    transaccionId?: number;
+    movimientosTransaccion: Movimiento[];
+    fechaTransaccion?: string;
+    urlDocSoporte: string;
+    tipoEntidadCausante: TipoEntidadCausante;
+    idEntidadCausante: string;
+    observaciones: string;
+}
+
+export interface IngresoOCM_DTA{
+    transaccionAlmacen: TransaccionAlmancen;
+    ordenCompra: OrdenCompra;
     user: string | undefined; // responsable del ingreso a almacen
     observaciones: string;
     file: File;
 }
-
-

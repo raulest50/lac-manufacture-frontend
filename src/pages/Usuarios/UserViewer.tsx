@@ -90,11 +90,11 @@ export default function UserViewer({setViewMode}:Props) {
         }
     };
 
-    const handleAddAcceso = async (modulo: Modulo) => {
-        if (!selectedUser) return;
+    const handleAddAcceso = async (moduleItem: ModuleItem) => {
+        if (!selectedUser || !moduleItem.nivelAcceso) return;
         try {
             const response = await axios.post(
-                `${endPoints.domain}/usuarios/${selectedUser.id}/accesos/modulo?modulo=${modulo}&nivel=1`
+                `${endPoints.domain}/usuarios/${selectedUser.id}/accesos/modulo?modulo=${moduleItem.modulo}&nivel=${moduleItem.nivelAcceso}`
             );
             toast({
                 title: 'Acceso asignado',
@@ -274,9 +274,7 @@ export default function UserViewer({setViewMode}:Props) {
                     isOpen={showModuleDialog}
                     onClose={() => setShowModuleDialog(false)}
                     availableModules={assignableModules || []}
-                    onModuleSelect={(moduleItem) => {
-                        handleAddAcceso(moduleItem.modulo);
-                    }}
+                    onModuleSelect={handleAddAcceso}
                 />
             )}
         </Box>

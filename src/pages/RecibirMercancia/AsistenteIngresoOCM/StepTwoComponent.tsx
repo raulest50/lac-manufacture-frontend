@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import {DocIngresoDTA, OrdenCompra} from "./types.tsx";
+import {IngresoOCM_DTA, OrdenCompra} from "../types";
 import {
     Button,
     Divider,
@@ -15,18 +15,18 @@ import { FaFolderOpen } from "react-icons/fa";
 import { FaFileCircleQuestion } from "react-icons/fa6";
 import { FaFileCircleCheck } from "react-icons/fa6";
 
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 
 interface StepTwoComponentProps {
     setActiveStep: (step: number) => void;
     orden: OrdenCompra | null;
-    setDocIngresoDTA: (docIngresoDTA: DocIngresoDTA) => void;
+    setIngresoOCM_DTA: (ingresoOCM_DTA: IngresoOCM_DTA) => void;
 }
 
 export default function StepTwoComponent({
                                              setActiveStep,
                                              orden,
-                                             setDocIngresoDTA,
+                                             setIngresoOCM_DTA,
                                          }: StepTwoComponentProps) {
 
     const { user } = useAuth();
@@ -98,7 +98,7 @@ export default function StepTwoComponent({
         }
     };
 
-    // When continuing, package the file and order into a FormData and post it.
+    // When continuing, update the ingresoOCM_DTA with the file and proceed
     const onClickContinuar = async () => {
         if (!file) {
             toast({
@@ -112,15 +112,32 @@ export default function StepTwoComponent({
             return;
         }
 
+        // Actualizar el ingresoOCM_DTA existente con el archivo y el usuario
+        setIngresoOCM_DTA(prevState => {
+            if (!prevState) {
+                // Si por alguna razón no existe el objeto previo, crearlo
+                return {
+                    transaccionAlmacen: {
+                        movimientosTransaccion: [],
+                        urlDocSoporte: "",
+                        tipoEntidadCausante: "OCM",
+                        idEntidadCausante: orden?.ordenCompraId?.toString() || "",
+                        observaciones: ""
+                    },
+                    ordenCompra: orden!,
+                    user: user?.toString(),
+                    observaciones: "",
+                    file: file,
+                };
+            }
 
-        const docIngresoDTA:DocIngresoDTA = {
-            ordenCompra: orden,
-            user: user?.toString(),
-            observaciones: "",
-            file: file,
-        };
-
-        setDocIngresoDTA(docIngresoDTA);
+            // Mantener los movimientos existentes y actualizar solo el archivo y usuario
+            return {
+                ...prevState,
+                user: user?.toString(),
+                file: file
+            };
+        });
 
         setActiveStep(3);
 

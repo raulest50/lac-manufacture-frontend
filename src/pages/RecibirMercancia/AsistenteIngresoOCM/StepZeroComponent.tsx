@@ -11,8 +11,8 @@ import {
     useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { OrdenCompra } from "./types";
-import EndPointsURL from "../../api/EndPointsURL";
+import { OrdenCompra } from "../types";
+import EndPointsURL from "../../../api/EndPointsURL";
 
 interface StepZeroComponentProps {
     setActiveStep: (step: number) => void;

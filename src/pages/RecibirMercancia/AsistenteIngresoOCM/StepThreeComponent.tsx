@@ -1,6 +1,6 @@
 
 
-import {DocIngresoDTA} from "./types.tsx";
+import {IngresoOCM_DTA} from "../types";
 import {
     Box,
     Button,
@@ -8,26 +8,22 @@ import {
     Flex,
     Heading,
     Icon,
-    Table,
-    Tbody,
-    Td,
     Text,
-    Th,
-    Thead,
-    Tr,
     Image,
     Textarea,
-    FormControl, FormLabel
+    FormControl, 
+    FormLabel,
+    Badge
 } from "@chakra-ui/react";
 import { FaCheckCircle } from "react-icons/fa";
 import {useState} from "react";
 import axios from "axios";
-import EndPointsURL from "../../api/EndPointsURL.tsx";
+import EndPointsURL from "../../../api/EndPointsURL";
 
 
 interface StepThreeComponentProps {
     setActiveStep: (step: number) => void;
-    docIngresoDTA: DocIngresoDTA | null;
+    docIngresoDTA: IngresoOCM_DTA | null;
 }
 
 const endpoints = new EndPointsURL();
@@ -91,28 +87,24 @@ export default function StepThreeComponent({
 
             <Divider/>
 
-            {/* Table with Order Items */}
-            <Box w="full" overflowX="auto" >
-                <Table variant="striped">
-                    <Thead>
-                        <Tr>
-                            <Th>Producto ID</Th>
-                            <Th>Nombre</Th>
-                            <Th isNumeric>Cantidad</Th>
-                            <Th>Verificado</Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {docIngresoDTA?.ordenCompra?.itemsOrdenCompra.map((item, index) => (
-                            <Tr key={index}>
-                                <Td>{item.materiaPrima.productoId}</Td>
-                                <Td>{item.materiaPrima.nombre}</Td>
-                                <Td isNumeric>{item.cantidad}</Td>
-                                <Td > <Icon as={FaCheckCircle} w={"2em"} h={"2em"} color={"green.400"} /> </Td>
-                            </Tr>
-                        ))}
-                    </Tbody>
-                </Table>
+            {/* Materiales y Lotes */}
+            <Box w="full" overflowX="auto">
+                <Heading size="md" mb={4}>Materiales y Lotes</Heading>
+                {docIngresoDTA?.transaccionAlmacen.movimientosTransaccion.map((movimiento, index) => (
+                    <Box key={index} mb={4} p={3} borderWidth="1px" borderRadius="md">
+                        <Flex justifyContent="space-between" alignItems="center">
+                            <Box>
+                                <Text fontWeight="bold">{movimiento.producto.nombre}</Text>
+                                <Text>ID: {movimiento.producto.productoId}</Text>
+                            </Box>
+                            <Badge colorScheme="green">{movimiento.cantidad} {movimiento.producto.tipoUnidades}</Badge>
+                        </Flex>
+                        <Divider my={2} />
+                        <Text fontWeight="bold">Información del Lote:</Text>
+                        <Text>Fecha de Fabricación: {new Date(movimiento.lote.productionDate).toLocaleDateString()}</Text>
+                        <Text>Fecha de Vencimiento: {new Date(movimiento.lote.expirationDate).toLocaleDateString()}</Text>
+                    </Box>
+                ))}
             </Box>
 
 

@@ -40,8 +40,8 @@ export enum Modulo {
     CONTABILIDAD = "CONTABILIDAD", //ruta /Contabilidad
     PERSONAL_PLANTA = "PERSONAL_PLANTA", // ruta /personal
     BINTELLIGENCE = "BINTELLIGENCE", // ruta /Bintelligence
-    CARGA_MASIVA = "CARGA_MASIVA", // ruta /carga_masiva
+    //CARGA_MASIVA = "CARGA_MASIVA", // ruta /carga_masiva
     ADMINISTRACION_ALERTAS = "ADMINISTRACION_ALERTAS", // ruta /administracion_alertas
-    MASTER_CONFIGS = "MASTER_CONFIGS", // ruta /master_configs
+    //MASTER_CONFIGS = "MASTER_CONFIGS", // ruta /master_configs
     CRONOGRAMA = "CRONOGRAMA" // ruta /cronograma
 }

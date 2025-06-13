@@ -10,13 +10,13 @@ import {
     useSteps,
 } from "@chakra-ui/react";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
-import StepZeroComponent from "./StepZeroComponent.tsx";
+import StepZeroComponent from "./StepZeroComponent";
 import {useState} from "react";
-import {DocIngresoDTA, OrdenCompra} from "./types.tsx";
-import StepOneComponent from "./StepOneComponent.tsx";
-import StepTwoComponent from "./StepTwoComponent.tsx";
-import StepThreeComponent from "./StepThreeComponent.tsx";
-import StepFourComponent from "./StepFourComponent.tsx";
+import {IngresoOCM_DTA, OrdenCompra} from "../types";
+import StepOneComponent from "./StepOneComponent";
+import StepTwoComponent from "./StepTwoComponent";
+import StepThreeComponent from "./StepThreeComponent";
+import StepFourComponent from "./StepFourComponent";
 
 
 
@@ -37,27 +37,27 @@ export default function AsistenteIngresoMercancia() {
 
     const [selectedOrder, setSelectedOrder] = useState<OrdenCompra|null>(null);
 
-    const [docIngresoDTA, setDocIngresoDTA] = useState<DocIngresoDTA | null>(null);
+    const [ingresoOCM_DTA, setIngresoOCM_DTA] = useState<IngresoOCM_DTA | null>(null);
 
     function ConditionalRenderStep() {
         if (activeStep === 0) { // identificar la orden de compra
             return(
-                <StepZeroComponent setActiveStep={setActiveStep} setSelectedOrder={setSelectedOrder}/>
+                <StepZeroComponent setActiveStep={setActiveStep} setSelectedOrder={setSelectedOrder} />
             );
         }
         if (activeStep === 1) { // verificar cantidades en el pedido
             return(
-                <StepOneComponent setActiveStep={setActiveStep} orden={selectedOrder} />
+                <StepOneComponent setActiveStep={setActiveStep} orden={selectedOrder} setIngresoOCM_DTA={setIngresoOCM_DTA} />
             );
         }
         if (activeStep === 2) { // subir documento soporte
             return(
-                <StepTwoComponent setActiveStep={setActiveStep} orden={selectedOrder} setDocIngresoDTA={setDocIngresoDTA}/>
+                <StepTwoComponent setActiveStep={setActiveStep} orden={selectedOrder} setIngresoOCM_DTA={setIngresoOCM_DTA}/>
             );
         }
         if (activeStep === 3) { // verificar los datos y enviar a backend
             return(
-                <StepThreeComponent setActiveStep={setActiveStep} docIngresoDTA={docIngresoDTA} />
+                <StepThreeComponent setActiveStep={setActiveStep} docIngresoDTA={ingresoOCM_DTA} />
             );
         }
         if (activeStep === 4){ // ventana de finalizacion, no se hace nada, solo notifica al usuario

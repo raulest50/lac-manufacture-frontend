@@ -1,6 +1,6 @@
-import MyHeader from "../../components/MyHeader.tsx";
+import MyHeader from "../../components/MyHeader";
 import {Container} from "@chakra-ui/react";
-import AsistenteIngresoMercancia from "./AsistenteIngresoMercancia.tsx";
+import AsistenteIngresoMercancia from "./AsistenteIngresoOCM/AsistenteIngresoMercancia";
 
 
 export default function RecibirMercanciaPage(){
@@ -12,4 +12,3 @@ export default function RecibirMercanciaPage(){
         </Container>
     )
 }
-

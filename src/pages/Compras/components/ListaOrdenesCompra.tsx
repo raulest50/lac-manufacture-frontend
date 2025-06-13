@@ -1,5 +1,5 @@
 // src/components/ListaOrdenesCompra.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Table,
     Thead,
@@ -12,6 +12,9 @@ import {
 } from '@chakra-ui/react';
 import {getEstadoText, OrdenCompraMateriales} from '../types';
 import OrdenCompraDetails from './OrdenCompraDetails';
+import axios from 'axios';
+import EndPointsURL from '../../../api/EndPointsURL';
+import { useAuth } from '../../../context/AuthContext';
 
 import CancelarOrdenDialog from './CancelarOrdenDialog';
 import ActualizarEstadoOrdenCompraDialog from "./ActualizarEstadoOrdenCompraDialog.tsx";
@@ -30,6 +33,20 @@ interface ContextMenuState {
     orden: OrdenCompraMateriales;
 }
 
+// Interfaz para las autoridades del usuario
+interface Authority {
+    authority: string;
+    nivel: string;
+}
+
+// Interfaz para la respuesta del endpoint whoami
+interface WhoAmIResponse {
+    principal: {
+        authorities: Authority[];
+    };
+    authorities: Authority[];
+}
+
 const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClose4Dialogs, page}) => {
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
     const [selectedOrden, setSelectedOrden] = useState<OrdenCompraMateriales | null>(null);
@@ -38,6 +55,37 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
 
     const [actualizarDialogOpen, setActualizarDialogOpen] = useState(false);
     const [ordenToActualizar, setOrdenToActualizar] = useState<OrdenCompraMateriales | null>(null);
+
+    // Estado para almacenar el nivel de acceso del usuario para el módulo COMPRAS
+    const [comprasAccessLevel, setComprasAccessLevel] = useState<number>(0);
+
+    // Obtener información del usuario autenticado
+    const { user } = useAuth();
+    const endPoints = new EndPointsURL();
+
+    // Obtener el nivel de acceso del usuario al cargar el componente
+    useEffect(() => {
+        const fetchUserAccessLevel = async () => {
+            try {
+                const response = await axios.get<WhoAmIResponse>(endPoints.whoami);
+                const authorities = response.data.authorities;
+
+                // Buscar la autoridad para el módulo COMPRAS
+                const comprasAuthority = authorities.find(
+                    auth => auth.authority === "ACCESO_COMPRAS"
+                );
+
+                // Si se encuentra, establecer el nivel de acceso
+                if (comprasAuthority) {
+                    setComprasAccessLevel(parseInt(comprasAuthority.nivel));
+                }
+            } catch (error) {
+                console.error("Error al obtener el nivel de acceso:", error);
+            }
+        };
+
+        fetchUserAccessLevel();
+    }, []);
 
     const contextMenuRef = React.useRef<HTMLDivElement>(null);
     useOutsideClick({
@@ -164,13 +212,16 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
                     >
                         Cancelar Orden
                     </Box>
-                    <Box
-                        p={1}
-                        _hover={{ bg: 'gray.100', cursor: 'pointer' }}
-                        onClick={handleActualizarOrden}
-                    >
-                        Actualizar Estado de la Orden
-                    </Box>
+                    {/* Solo mostrar la opción de actualizar estado si el usuario es master o tiene nivel de acceso 2 o superior */}
+                    {(user === 'master' || comprasAccessLevel >= 2) && (
+                        <Box
+                            p={1}
+                            _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                            onClick={handleActualizarOrden}
+                        >
+                            Actualizar Estado de la Orden
+                        </Box>
+                    )}
                 </Box>
             )}
 
