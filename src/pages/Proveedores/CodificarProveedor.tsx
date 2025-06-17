@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     Container,
     FormControl,
@@ -19,6 +19,7 @@ import {
 import axios, { AxiosError } from 'axios';
 import EndPointsURL from "../../api/EndPointsURL.tsx";
 import { Proveedor, Contacto } from './types';
+import { departamentosColombia } from "../../data/colombiaData.tsx";
 
 import { FaFileCircleQuestion, FaFileCircleCheck } from "react-icons/fa6";
 
@@ -35,6 +36,9 @@ function CodificarProveedor() {
     const [regimenTributario, setRegimenTributario] = useState(0);
     const [ciudad, setCiudad] = useState('');
     const [departamento, setDepartamento] = useState('');
+    const [ciudadesDisponibles, setCiudadesDisponibles] = useState<{nombre: string, codigo: string}[]>([]);
+    const [otraCiudad, setOtraCiudad] = useState('');
+    const [mostrarInputOtraCiudad, setMostrarInputOtraCiudad] = useState(false);
     const [url, setUrl] = useState('');
     const [observacion, setObservacion] = useState('');
     // New state for condición de pago (e.g., "credito" or "contado")
@@ -65,8 +69,8 @@ function CodificarProveedor() {
             !id.trim() ||
             !nombre.trim() ||
             !direccion.trim() ||
-            !ciudad.trim() ||
-            !departamento.trim()
+            !departamento.trim() ||
+            (mostrarInputOtraCiudad ? !otraCiudad.trim() : !ciudad.trim())
         ) {
             toast({
                 title: 'Campos obligatorios faltantes',
@@ -165,6 +169,44 @@ function CodificarProveedor() {
             }
         }
         return true;
+    };
+
+    // Function to handle department selection change
+    const handleDepartamentoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const deptoSeleccionado = e.target.value;
+        setDepartamento(deptoSeleccionado);
+
+        // Clear the selected city
+        setCiudad('');
+        setOtraCiudad('');
+        setMostrarInputOtraCiudad(false);
+
+        // Update the list of available cities
+        const depto = departamentosColombia.find(d => d.nombre === deptoSeleccionado);
+        if (depto) {
+            setCiudadesDisponibles(depto.ciudades);
+        } else {
+            setCiudadesDisponibles([]);
+        }
+    };
+
+    // Function to handle city selection change
+    const handleCiudadChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const ciudadSeleccionada = e.target.value;
+
+        if (ciudadSeleccionada === "otro") {
+            setMostrarInputOtraCiudad(true);
+            setCiudad('');
+        } else {
+            setMostrarInputOtraCiudad(false);
+            setCiudad(ciudadSeleccionada);
+        }
+    };
+
+    // Function to handle "Other city" input change
+    const handleOtraCiudadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setOtraCiudad(e.target.value);
+        setCiudad(e.target.value); // Update the main city value as well
     };
 
     // Handle changes in a contacto field
@@ -290,6 +332,9 @@ function CodificarProveedor() {
             setRegimenTributario(0);
             setCiudad('');
             setDepartamento('');
+            setCiudadesDisponibles([]);
+            setOtraCiudad('');
+            setMostrarInputOtraCiudad(false);
             setUrl('');
             setObservacion('');
             setCategorias([]);
@@ -368,22 +413,46 @@ function CodificarProveedor() {
                     </GridItem>
                     <GridItem>
                         <FormControl isRequired>
-                            <FormLabel>Ciudad</FormLabel>
-                            <Input
-                                value={ciudad}
-                                onChange={(e) => setCiudad(e.target.value)}
-                                placeholder="Ciudad"
-                            />
+                            <FormLabel>Departamento</FormLabel>
+                            <Select
+                                placeholder="Seleccione un departamento"
+                                value={departamento}
+                                onChange={handleDepartamentoChange}
+                            >
+                                {departamentosColombia.map((depto) => (
+                                    <option key={depto.codigo} value={depto.nombre}>
+                                        {depto.nombre}
+                                    </option>
+                                ))}
+                            </Select>
                         </FormControl>
                     </GridItem>
                     <GridItem>
                         <FormControl isRequired>
-                            <FormLabel>Departamento</FormLabel>
-                            <Input
-                                value={departamento}
-                                onChange={(e) => setDepartamento(e.target.value)}
-                                placeholder="Departamento"
-                            />
+                            <FormLabel>Ciudad</FormLabel>
+                            <Select
+                                placeholder="Seleccione una ciudad"
+                                value={ciudad}
+                                onChange={handleCiudadChange}
+                                isDisabled={!departamento} // Disable if no department is selected
+                            >
+                                {ciudadesDisponibles.map((ciudad) => (
+                                    <option key={ciudad.codigo} value={ciudad.nombre}>
+                                        {ciudad.nombre}
+                                    </option>
+                                ))}
+                                <option value="otro">Otro</option>
+                            </Select>
+
+                            {/* Additional input for "Other city" */}
+                            {mostrarInputOtraCiudad && (
+                                <Input
+                                    mt={2}
+                                    value={otraCiudad}
+                                    onChange={handleOtraCiudadChange}
+                                    placeholder="Ingrese el nombre de la ciudad"
+                                />
+                            )}
                         </FormControl>
                     </GridItem>
                     <GridItem>
