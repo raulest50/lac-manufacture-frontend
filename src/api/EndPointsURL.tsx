@@ -99,6 +99,7 @@ export default class EndPointsURL{
         this.save_proveedores = `${domain}/${proveedores_res}/save`;
         this.search_proveedores = `${domain}/${proveedores_res}/search`;
         this.search_proveedores_pag = `${domain}/${proveedores_res}/search_pag`;
+        this.bulk_upload_proveedores = `${domain}/api/bulk-upload/proveedores`;
 
         // compras endpoints
         this.byProveedorAndDate = `${domain}/${compras_res}/byProveedorAndDate`;

@@ -1,82 +1,182 @@
 import { useState } from "react";
-import { Container, Button, Input, useToast } from "@chakra-ui/react";
+import { 
+    Container, 
+    Button, 
+    Input, 
+    VStack, 
+    HStack, 
+    Text, 
+    Divider, 
+    Box,
+    useToast,
+    FormControl,
+    FormLabel,
+    FormHelperText
+} from "@chakra-ui/react";
 import MyHeader from "../../components/MyHeader";
-import axios, {AxiosError} from "axios";
-import EndPointsURL from "../../api/EndPointsURL.tsx";
-
-const endpoints = new EndPointsURL();
+import axios, { AxiosError } from "axios";
+import EndPointsURL from "../../api/EndPointsURL";
 
 export default function CargaMasivaPage() {
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [proveedoresLink, setProveedoresLink] = useState<string>("");
+    const [productosLink, setProductosLink] = useState<string>("");
+    const [isLoadingProveedores, setIsLoadingProveedores] = useState<boolean>(false);
     const toast = useToast();
 
-    // Validate that the file is an Excel file (.xlsx or .xls)
-    const isValidExcel = (file:File) => {
-        return file && (file.name.endsWith(".xlsx") || file.name.endsWith(".xls"));
-    };
+    // Implementación de la carga masiva de proveedores
+    const handleProveedoresUpload = async () => {
+        if (!proveedoresLink) return;
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (!files) return; // Early return if files is null
-
-        const file = files[0];
-        if (file && !isValidExcel(file)) {
-            toast({
-                title: "Invalid file",
-                description: "Please select a valid Excel file (.xlsx or .xls).",
-                status: "error",
-                duration: 4000,
-                isClosable: true,
-            });
-            setSelectedFile(null);
-            return;
-        }
-        setSelectedFile(file);
-    };
-
-    const handleUpload = async () => {
-        if (!selectedFile) return;
-
-        const formData = new FormData();
-        formData.append("file", selectedFile);
+        setIsLoadingProveedores(true);
 
         try {
-            const response = await axios.post(endpoints.carga_masiva_mprims, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
+            // Verificar que la URL sea de Google Sheets
+            if (!proveedoresLink.includes("docs.google.com/spreadsheets")) {
+                throw new Error("La URL debe ser de un archivo de Google Sheets");
+            }
+
+            // Convertir la URL de Google Sheets a una URL de descarga directa
+            // Formato típico: https://docs.google.com/spreadsheets/d/FILE_ID/edit?usp=sharing
+            let fileId = "";
+
+            // Extraer el ID del archivo de la URL de Google Sheets
+            const match = proveedoresLink.match(/spreadsheets\/d\/([^\/]+)/);
+            if (match && match[1]) {
+                fileId = match[1];
+            }
+
+            if (!fileId) {
+                throw new Error("No se pudo extraer el ID del archivo de la URL proporcionada");
+            }
+
+            // Crear la URL de descarga directa para Google Sheets (exportar como Excel)
+            const downloadUrl = `https://docs.google.com/spreadsheets/d/${fileId}/export?format=xlsx`;
+
+            // Descargar el archivo
+            const response = await axios.get(downloadUrl, {
+                responseType: 'blob'
             });
-            // Assuming the response data contains the success message
+
+            // Crear un objeto FormData para enviar el archivo
+            const formData = new FormData();
+            const file = new File([response.data], "proveedores.xlsx", { 
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+            });
+            formData.append("file", file);
+
+            // Enviar el archivo al backend
+            const uploadResponse = await axios.post(
+                new EndPointsURL().bulk_upload_proveedores,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+
+            // Mostrar mensaje de éxito
+            const data = uploadResponse.data;
             toast({
-                title: "Upload successful",
-                description: response.data,
+                title: "Carga exitosa",
+                description: `Se han procesado ${data.totalRecords} registros. ${data.successCount} exitosos, ${data.failureCount} fallidos.`,
                 status: "success",
-                duration: 4000,
+                duration: 5000,
                 isClosable: true,
             });
-            setSelectedFile(null);
+
+            // Limpiar el campo de entrada
+            setProveedoresLink("");
+
         } catch (error) {
-            const e = error as AxiosError;
+            // Manejar errores
+            const err = error as Error | AxiosError;
+            let errorMessage = "Ha ocurrido un error al cargar los proveedores.";
+
+            if (axios.isAxiosError(err)) {
+                // Error de red o del servidor
+                errorMessage = err.response?.data?.message || err.message;
+            } else {
+                // Error de la aplicación
+                errorMessage = err.message;
+            }
+
             toast({
-                title: "Upload failed",
-                description: e.message,
+                title: "Error en la carga",
+                description: errorMessage,
                 status: "error",
-                duration: 4000,
+                duration: 5000,
                 isClosable: true,
             });
+        } finally {
+            setIsLoadingProveedores(false);
         }
+    };
+
+    const handleProductosUpload = () => {
+        // This will be implemented later
+        console.log("Upload productos from link:", productosLink);
     };
 
     return (
         <Container minW={["auto", "container.lg", "container.xl"]} w="full" h="full">
             <MyHeader title="Carga Masiva" />
-            <Input
-                type="file"
-                accept=".xlsx, .xls"
-                onChange={handleFileChange}
-                mb={4}
-            />
-            <Button onClick={handleUpload} colorScheme="blue" isDisabled={!selectedFile}>
-                Upload Excel File
-            </Button>
+
+            <VStack spacing={8} align="stretch" w="full">
+                {/* Carga Masiva de Proveedores */}
+                <Box p={5} borderWidth="1px" borderRadius="lg">
+                    <Text fontSize="xl" fontWeight="bold" mb={4}>
+                        Carga Masiva de Proveedores
+                    </Text>
+                    <FormControl>
+                        <FormLabel>URL del archivo Excel en Google Sheets</FormLabel>
+                        <HStack spacing={4}>
+                            <Input 
+                                placeholder="Ingrese el enlace de Google Sheets para carga de proveedores"
+                                value={proveedoresLink}
+                                onChange={(e) => setProveedoresLink(e.target.value)}
+                                flex={1}
+                            />
+                            <Button 
+                                colorScheme="blue" 
+                                onClick={handleProveedoresUpload}
+                                isDisabled={!proveedoresLink || isLoadingProveedores}
+                                isLoading={isLoadingProveedores}
+                                loadingText="Cargando..."
+                            >
+                                Cargar Proveedores
+                            </Button>
+                        </HStack>
+                        <FormHelperText>
+                            Pegue la URL de un archivo Excel compartido públicamente en Google Sheets
+                        </FormHelperText>
+                    </FormControl>
+                </Box>
+
+                <Divider />
+
+                {/* Carga Masiva de Productos */}
+                <Box p={5} borderWidth="1px" borderRadius="lg">
+                    <Text fontSize="xl" fontWeight="bold" mb={4}>
+                        Carga Masiva de Productos
+                    </Text>
+                    <HStack spacing={4}>
+                        <Input 
+                            placeholder="Ingrese el enlace para carga de productos"
+                            value={productosLink}
+                            onChange={(e) => setProductosLink(e.target.value)}
+                            flex={1}
+                        />
+                        <Button 
+                            colorScheme="green" 
+                            onClick={handleProductosUpload}
+                            isDisabled={!productosLink}
+                        >
+                            Cargar Productos
+                        </Button>
+                    </HStack>
+                </Box>
+            </VStack>
         </Container>
     );
 }
