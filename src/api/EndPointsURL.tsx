@@ -23,6 +23,7 @@ export default class EndPointsURL{
     public save_proveedores:string;
     public search_proveedores:string;
     public search_proveedores_pag :string;
+    public bulk_upload_productos: string;
 
 
     // produccion resource
@@ -100,6 +101,7 @@ export default class EndPointsURL{
         this.search_proveedores = `${domain}/${proveedores_res}/search`;
         this.search_proveedores_pag = `${domain}/${proveedores_res}/search_pag`;
         this.bulk_upload_proveedores = `${domain}/api/bulk-upload/proveedores`;
+        this.bulk_upload_productos = `${domain}/api/bulk-upload/products`;
 
         // compras endpoints
         this.byProveedorAndDate = `${domain}/${compras_res}/byProveedorAndDate`;
