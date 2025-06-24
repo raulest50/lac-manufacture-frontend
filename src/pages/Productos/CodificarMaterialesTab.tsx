@@ -61,10 +61,20 @@ function CodificarMaterialesTab() {
             });
             return false;
         }
-        if (!codigo.trim() || isNaN(Number(codigo))) {
+        if (!codigo.trim()) {
             toast({
                 title: "Validation Error",
-                description: "El 'Código' debe ser numérico y no estar vacío.",
+                description: "El 'Código' no puede estar vacío.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return false;
+        }
+        if (!/^[a-zA-Z0-9]+$/.test(codigo)) {
+            toast({
+                title: "Validation Error",
+                description: "El 'Código' solo puede contener letras y números, sin espacios ni caracteres especiales.",
                 status: "warning",
                 duration: 3000,
                 isClosable: true,
@@ -82,6 +92,7 @@ function CodificarMaterialesTab() {
             });
             return false;
         }
+        /* Comentado para hacer el campo observaciones opcional
         if (!observaciones.trim()) {
             toast({
                 title: "Validation Error",
@@ -92,18 +103,10 @@ function CodificarMaterialesTab() {
             });
             return false;
         }
-        if (!selectedFile) {
-            toast({
-                title: "Validation Error",
-                description: "Debe seleccionar un archivo PDF para la ficha técnica.",
-                status: "warning",
-                duration: 3000,
-                isClosable: true,
-            });
-            return false;
-        }
-        // Check file type
-        if (selectedFile.type !== 'application/pdf' && !selectedFile.name.toLowerCase().endsWith('.pdf')) {
+        */
+        // Ficha técnica is now optional, so we only validate the file type if a file is selected
+        // Check file type if a file is selected
+        if (selectedFile && selectedFile.type !== 'application/pdf' && !selectedFile.name.toLowerCase().endsWith('.pdf')) {
             toast({
                 title: "Validation Error",
                 description: "El archivo seleccionado debe ser un PDF.",
@@ -158,7 +161,7 @@ function CodificarMaterialesTab() {
         if (!validateData()) return;
 
         const materiaPrima: Material = {
-            productoId: Number(codigo),
+            productoId: codigo,
             nombre,
             observaciones,
             costo: 0,
@@ -173,6 +176,7 @@ function CodificarMaterialesTab() {
             "materiaPrima",
             new Blob([JSON.stringify(materiaPrima)], { type: "application/json" })
         );
+        // Only append the file if one is selected (ficha técnica is optional)
         if (selectedFile) {
             formData.append("file", selectedFile);
         }
@@ -254,8 +258,8 @@ function CodificarMaterialesTab() {
                                 colorScheme="green"
                                 onClick={onClickUploadFicha}
                             />
-                            <FormControl isRequired>
-                                <FormLabel>Url Ficha Tecnica</FormLabel>
+                            <FormControl>
+                                <FormLabel>Url Ficha Tecnica (Opcional)</FormLabel>
                                 <Input
                                     readOnly
                                     value={url_ftecnica}
@@ -322,7 +326,7 @@ function CodificarMaterialesTab() {
                     </GridItem>
 
                     <GridItem colSpan={3}>
-                        <FormControl isRequired>
+                        <FormControl>
                             <FormLabel>Observaciones</FormLabel>
                             <Textarea
                                 value={observaciones}

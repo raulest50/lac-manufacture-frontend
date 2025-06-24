@@ -44,11 +44,11 @@ export default function StepOne({setActiveStep, setSemioter}: props) {
             });
             return false;
         }
-        // Check if productoId contains only numbers
-        if (!/^\d+$/.test(productoId)) {
+        // Check if productoId contains only alphanumeric characters (letters and numbers)
+        if (!/^[a-zA-Z0-9]+$/.test(productoId)) {
             toast({
                 title: "Validación",
-                description: "El 'Código Id' debe ser numérico.",
+                description: "El 'Código Id' solo puede contener letras y números, sin espacios ni caracteres especiales.",
                 status: "warning",
                 duration: 3000,
                 isClosable: true,
@@ -88,6 +88,7 @@ export default function StepOne({setActiveStep, setSemioter}: props) {
             });
             return false;
         }
+        /* Comentado para hacer el campo observaciones opcional
         // Check if observaciones is empty
         if (!observaciones || observaciones.trim() === "") {
             toast({
@@ -99,6 +100,7 @@ export default function StepOne({setActiveStep, setSemioter}: props) {
             });
             return false;
         }
+        */
         return true;
     };
 
@@ -107,7 +109,7 @@ export default function StepOne({setActiveStep, setSemioter}: props) {
             const semioter: ProductoSemiter = {
                 productoId: productoId!,
                 nombre: nombre!,
-                observaciones: observaciones!,
+                observaciones: observaciones || "",
                 tipoUnidades: tipoUnidades,
                 cantidadUnidad: cantidadUnidad!,
                 tipo_producto: tipo_producto
@@ -182,7 +184,7 @@ export default function StepOne({setActiveStep, setSemioter}: props) {
                 </GridItem>
 
                 <GridItem colSpan={3}>
-                    <FormControl isRequired>
+                    <FormControl>
                         <FormLabel>Observaciones</FormLabel>
                         <Textarea
                             value={observaciones}

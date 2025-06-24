@@ -12,10 +12,10 @@ export const UNIDADES = {L:"L", KG:"KG", U:"U"};
  * para uso principalmente en step 2 creacion de semiterminado o temrinado
  */
 export interface Producto{
-    productoId: number;
+    productoId: string;
     tipo_producto: string;
     nombre: string;
-    observaciones: string;
+    observaciones?: string;
     costo: number;
     tipoUnidades: string;
     cantidadUnidad: string;
@@ -77,7 +77,7 @@ export interface ProcesoProduccion{
 export interface ProductoSemiter {
     productoId: string;
     nombre: string;
-    observaciones: string;
+    observaciones?: string;
     costo?: string; // se determina a al momento de seleccinoar los insumos - step 2
     insumos?: Insumo[]; // se determina tambien en - step 2
     tipoUnidades: string;

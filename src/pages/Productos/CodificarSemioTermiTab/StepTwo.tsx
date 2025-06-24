@@ -63,7 +63,7 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => 
     };
 
     // Function to update the quantity of an insumo
-    const handleUpdateCantidad = (productoId: number, newCantidad: number) => {
+    const handleUpdateCantidad = (productoId: string, newCantidad: number) => {
         setSelectedInsumos((prev) =>
             prev.map((insumo) =>
                 insumo.producto.productoId === productoId
@@ -78,7 +78,7 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => 
     };
 
     // Function to remove an insumo from the selection
-    const handleRemoveInsumo = (productoId: number) => {
+    const handleRemoveInsumo = (productoId: string) => {
         setSelectedInsumos((prev) =>
             prev.filter((insumo) => insumo.producto.productoId !== productoId)
         );
