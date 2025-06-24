@@ -262,7 +262,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
                                         <Td>{item.material ? `${item.material.productoId} - ${item.material.nombre} - (${item.material.tipoUnidades}) ` : '-'}</Td>
                                         <Td >{item.cantidad}</Td>
                                         <Td >{item.precioUnitario}</Td>
-                                        <Td >{item.iva19}</Td>
+                                        <Td >{item.ivaCOP}</Td>
                                         <Td >{item.subTotal}</Td>
                                         <Td hidden={orden.estado!=2}>{getCantidadCorrectaText(item.cantidadCorrecta)}</Td>
                                     </Tr>

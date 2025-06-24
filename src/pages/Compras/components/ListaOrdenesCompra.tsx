@@ -191,13 +191,16 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
                     zIndex={1000}
                     p={2}
                 >
-                    <Box
-                        p={1}
-                        _hover={{ bg: 'gray.100', cursor: 'pointer' }}
-                        onClick={handleGenerarExcel}
-                    >
-                        Generar PDF
-                    </Box>
+                    {/* Solo mostrar la opción de generar PDF si la orden está liberada (estado > 0) */}
+                    {contextMenu.orden.estado > 0 && (
+                        <Box
+                            p={1}
+                            _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                            onClick={handleGenerarExcel}
+                        >
+                            Generar PDF
+                        </Box>
+                    )}
                     <Box
                         p={1}
                         _hover={{ bg: 'gray.100', cursor: 'pointer' }}
