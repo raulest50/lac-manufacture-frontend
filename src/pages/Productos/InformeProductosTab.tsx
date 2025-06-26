@@ -20,6 +20,7 @@ import axios from "axios";
 import MyPagination from "../../components/MyPagination";
 import { Producto } from "./types";
 import EndPointsURL from "../../api/EndPointsURL";
+import DetalleProducto from "./consulta/DetalleProducto";
 
 const endpoints = new EndPointsURL();
 
@@ -31,6 +32,10 @@ export default function InformeProductosTab() {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 10; // adjust as needed
+
+    // Estados para manejar la visualización del detalle
+    const [estado, setEstado] = useState(0);
+    const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null);
 
     // Fetch products given a page number
     const fetchProductos = async (pageNumber: number) => {
@@ -62,6 +67,22 @@ export default function InformeProductosTab() {
     const handlePageChange = (newPage: number) => {
         fetchProductos(newPage);
     };
+
+    // Función para ver el detalle de un producto
+    const verDetalleProducto = (producto: Producto) => {
+        setProductoSeleccionado(producto);
+        setEstado(1);
+    };
+
+    // Renderizado condicional basado en el estado
+    if (estado === 1 && productoSeleccionado) {
+        return (
+            <DetalleProducto 
+                producto={productoSeleccionado} 
+                setEstado={setEstado} 
+            />
+        );
+    }
 
     return (
         <Flex direction="column" p={4}>
@@ -115,6 +136,7 @@ export default function InformeProductosTab() {
                             <Th>Costo</Th>
                             <Th>Tipo</Th>
                             <Th>Fecha Creación</Th>
+                            <Th>Acciones</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
@@ -125,6 +147,15 @@ export default function InformeProductosTab() {
                                 <Td>{producto.costo}</Td>
                                 <Td>{producto.tipo_producto}</Td>
                                 <Td>{producto.fechaCreacion}</Td>
+                                <Td>
+                                    <Button
+                                        size="sm"
+                                        colorScheme="blue"
+                                        onClick={() => verDetalleProducto(producto)}
+                                    >
+                                        Ver Detalle
+                                    </Button>
+                                </Td>
                             </Tr>
                         ))}
                     </Tbody>
