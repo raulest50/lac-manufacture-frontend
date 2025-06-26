@@ -4,6 +4,9 @@
 
 import './App.css'
 
+// Silenciar advertencias de deprecación de React Router
+window.REACT_ROUTER_SILENT_DEPRECATIONS = true;
+
 import RootLayout from "./pages/RootLayout.tsx";
 import Home from "./pages/Home.tsx"
 import ProductosPage from './pages/Productos/ProductosPage.tsx'
@@ -205,7 +208,12 @@ const router = createBrowserRouter(
 
             </Route>
         </>
-    )
+    ),
+    {
+        future: {
+            v7_startTransition: true
+        }
+    }
 )
 
 function App() {

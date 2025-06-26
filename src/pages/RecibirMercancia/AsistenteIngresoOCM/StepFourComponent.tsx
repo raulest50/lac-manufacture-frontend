@@ -1,5 +1,6 @@
 
-import {Button, Flex, Heading, HStack, Icon, keyframes, Text} from "@chakra-ui/react";
+import {Button, Flex, Heading, HStack, Icon, Text} from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
 
 import { RiSave3Fill } from "react-icons/ri";
 import { ImCheckboxChecked } from "react-icons/im";
