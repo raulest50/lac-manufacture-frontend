@@ -7,7 +7,8 @@ Este documento describe la implementación y funcionamiento del sistema de restr
 1. [Introducción](#introducción)
 2. [Módulo de Productos](#módulo-de-productos)
 3. [Módulo de Compras](#módulo-de-compras)
-4. [Guía de Implementación](#guía-de-implementación)
+4. [Módulo de Proveedores](#módulo-de-proveedores)
+5. [Guía de Implementación](#guía-de-implementación)
 
 ## Introducción
 
@@ -96,6 +97,54 @@ La implementación se encuentra en el archivo `src/pages/Compras/components/List
 )}
 ```
 
+## Módulo de Proveedores
+
+En el módulo de Proveedores, las restricciones por nivel están implementadas siguiendo el mismo patrón:
+
+### Niveles de Acceso
+
+- **Nivel 1**: Solo permite acceder a la pestaña de "Consultar Proveedores" para visualizar proveedores existentes.
+- **Nivel 2 o superior**: Permite acceder a todas las pestañas, incluyendo "Codificar Proveedor" para crear nuevos proveedores.
+
+### Implementación
+
+La implementación se encuentra en el archivo `src/pages/Proveedores/ProveedoresPage.tsx`. El componente obtiene el nivel de acceso del usuario mediante una llamada al endpoint `whoami` y luego renderiza condicionalmente las pestañas según el nivel de acceso:
+
+```tsx
+// Obtener el nivel de acceso
+useEffect(() => {
+    const fetchUserAccessLevel = async () => {
+        try {
+            const response = await axios.get<WhoAmIResponse>(endPoints.whoami);
+            const authorities = response.data.authorities;
+
+            // Buscar la autoridad para el módulo PROVEEDORES
+            const proveedoresAuthority = authorities.find(
+                auth => auth.authority === "ACCESO_PROVEEDORES"
+            );
+
+            // Si se encuentra, establecer el nivel de acceso
+            if (proveedoresAuthority) {
+                setProveedoresAccessLevel(parseInt(proveedoresAuthority.nivel));
+            }
+        } catch (error) {
+            console.error("Error al obtener el nivel de acceso:", error);
+        }
+    };
+
+    fetchUserAccessLevel();
+}, []);
+
+// Renderizado condicional de pestañas
+<TabList>
+    {/* Solo mostrar la pestaña de codificar si el usuario es master o tiene nivel 2 o superior */}
+    {(user === 'master' || proveedoresAccessLevel >= 2) && (
+        <Tab sx={my_style_tab}> Codificar Proveedor </Tab>
+    )}
+    <Tab sx={my_style_tab}> Consultar Proveedores </Tab>
+</TabList>
+```
+
 ## Guía de Implementación
 
 Para implementar restricciones por nivel en un nuevo módulo, sigue estos pasos:
@@ -109,17 +158,17 @@ Para implementar restricciones por nivel en un nuevo módulo, sigue estos pasos:
    ```tsx
    const [moduleAccessLevel, setModuleAccessLevel] = useState<number>(0);
    const { user } = useAuth();
-   
+
    useEffect(() => {
        const fetchUserAccessLevel = async () => {
            try {
                const response = await axios.get<WhoAmIResponse>(endPoints.whoami);
                const authorities = response.data.authorities;
-               
+
                const moduleAuthority = authorities.find(
                    auth => auth.authority === "ACCESO_MODULO"
                );
-               
+
                if (moduleAuthority) {
                    setModuleAccessLevel(parseInt(moduleAuthority.nivel));
                }
@@ -127,7 +176,7 @@ Para implementar restricciones por nivel en un nuevo módulo, sigue estos pasos:
                console.error("Error al obtener el nivel de acceso:", error);
            }
        };
-       
+
        fetchUserAccessLevel();
    }, []);
    ```

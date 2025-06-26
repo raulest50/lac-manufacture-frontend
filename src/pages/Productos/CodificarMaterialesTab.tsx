@@ -17,7 +17,7 @@ import {
 import axios, { AxiosError } from 'axios';
 
 import { input_style } from "../../styles/styles_general";
-import { Material, UNIDADES, TIPOS_PRODUCTOS } from "./types";
+import {Material, UNIDADES, TIPOS_PRODUCTOS, TIPOS_MATERIALES} from "./types";
 
 import { FaFileUpload } from "react-icons/fa";
 import EndPointsURL from "../../api/EndPointsURL";
@@ -29,7 +29,7 @@ function CodificarMaterialesTab() {
     const [cantidad_unidad, setCantidad_unidad] = useState('');
     const [codigo, setCodigo] = useState('');
     const [url_ftecnica, setUrl_ftecnica] = useState('');
-    const [tipoMateriaPrima, setTipoMateriaPrima] = useState('1');
+    const [tipoMaterial, setTipoMaterial] = useState(TIPOS_MATERIALES.materiaPrima);
 
     const [ivaPercentage, setIvaPercentage] = useState(0);
 
@@ -47,6 +47,9 @@ function CodificarMaterialesTab() {
         setCodigo('');
         setUrl_ftecnica('');
         setSelectedFile(null);
+        setIvaPercentage(0);
+        setTipoMaterial(TIPOS_MATERIALES.materiaPrima);
+        setTipo_unidad(UNIDADES.KG);
     };
 
     // Validate data: all fields must be non-empty, codigo numeric, cantidad positive, and a PDF file must be loaded.
@@ -168,6 +171,8 @@ function CodificarMaterialesTab() {
             tipoUnidades: tipo_unidad,
             cantidadUnidad: cantidad_unidad,
             tipo_producto: TIPOS_PRODUCTOS.materiaPrima,
+            tipoMaterial: tipoMaterial,
+            iva_percentual: ivaPercentage
         };
 
         // Create a FormData object and append the materiaPrima as a Blob with correct MIME type.
@@ -297,11 +302,11 @@ function CodificarMaterialesTab() {
                                 <FormLabel>Tipo:</FormLabel>
                                 <Select
                                     flex="1"
-                                    value={tipoMateriaPrima}
-                                    onChange={(e) => setTipoMateriaPrima(e.target.value)}
+                                    value={tipoMaterial}
+                                    onChange={(e) => setTipoMaterial(Number(e.target.value))}
                                 >
-                                    <option value={'1'}>Materia Prima</option>
-                                    <option value={'2'}>Material Empaque</option>
+                                    <option value={TIPOS_MATERIALES.materiaPrima}>Materia Prima</option>
+                                    <option value={TIPOS_MATERIALES.materialDeEmpaque}>Material Empaque</option>
                                 </Select>
                             </FormControl>
                         </Flex>

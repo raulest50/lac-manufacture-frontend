@@ -42,7 +42,7 @@ export default function CargaMasivaPage() {
             let fileId = "";
 
             // Extraer el ID del archivo de la URL de Google Sheets
-            const match = proveedoresLink.match(/spreadsheets\/d\/([^\/]+)/);
+            const match = proveedoresLink.match(/spreadsheets\/d\/([^/]+)/);
             if (match && match[1]) {
                 fileId = match[1];
             }
@@ -130,7 +130,7 @@ export default function CargaMasivaPage() {
             let fileId = "";
 
             // Extraer el ID del archivo de la URL de Google Sheets
-            const match = productosLink.match(/spreadsheets\/d\/([^\/]+)/);
+            const match = productosLink.match(/spreadsheets\/d\/([^/]+)/);
             if (match && match[1]) {
                 fileId = match[1];
             }

@@ -23,8 +23,6 @@ export default class EndPointsURL{
     public save_proveedores:string;
     public search_proveedores:string;
     public search_proveedores_pag :string;
-    public bulk_upload_productos: string;
-
 
     // produccion resource
     public save_produccion:string;
@@ -62,6 +60,10 @@ export default class EndPointsURL{
 
     // integrantes de personal
     public save_integrante_personal: string;
+
+    // bulk uploads por link
+    public bulk_upload_proveedores: string;
+    public bulk_upload_productos: string;
 
     // just in case of need
     public domain: string;
