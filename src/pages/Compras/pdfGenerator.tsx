@@ -6,6 +6,7 @@ import {
     OrdenCompraMateriales,
     ItemOrdenCompra, OrdenCompraActivos, ItemOCActivo,
 } from "./types";
+import { formatCOP, formatCOPWithoutSymbol } from "../../utils/formatters";
 
 // Extend jsPDF with properties added by jsPDF-AutoTable
 interface AutoTableProperties {
@@ -171,8 +172,8 @@ export default class PdfGenerator {
             item.material.productoId,
             item.material.nombre,
             item.cantidad,
-            `$ ${item.precioUnitario.toFixed(2)}`,
-            `$ ${item.subTotal.toFixed(2)}`
+            formatCOP(item.precioUnitario, 2),
+            formatCOP(item.subTotal)
         ]);
         autoTable(doc, {
             head: [tableColumns],
@@ -192,11 +193,11 @@ export default class PdfGenerator {
         let totalsY = finalY + 5;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
-        doc.text(`Sub Total: $ ${orden.subTotal.toFixed(2)}`, margin, totalsY);
+        doc.text(`Sub Total: ${formatCOP(orden.subTotal)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`IVA : $ ${orden.ivaCOP.toFixed(2)}`, margin, totalsY);
+        doc.text(`IVA: ${formatCOP(orden.ivaCOP)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`Total Pagar: $ ${orden.totalPagar.toFixed(2)}`, margin, totalsY);
+        doc.text(`Total Pagar: ${formatCOP(orden.totalPagar)}`, margin, totalsY);
 
 
         // --- Leyenda ---
@@ -395,8 +396,8 @@ export default class PdfGenerator {
             item.activo.idActivo,
             item.activo.descripcion,
             item.cantidad,
-            `$ ${item.activo.precio.toFixed(2)}`,
-            `$ ${item.subTotal.toFixed(2)}`
+            formatCOP(item.activo.precio, 2),
+            formatCOP(item.subTotal)
         ]);
         autoTable(doc, {
             head: [tableColumns],
@@ -416,11 +417,11 @@ export default class PdfGenerator {
         let totalsY = finalY + 5;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
-        doc.text(`Sub Total: $ ${orden.subTotal.toFixed(2)}`, margin, totalsY);
+        doc.text(`Sub Total: ${formatCOP(orden.subTotal)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`IVA: $ ${orden.ivaValue.toFixed(2)}`, margin, totalsY);
+        doc.text(`IVA: ${formatCOP(orden.ivaValue)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`Total Pagar: $ ${orden.totalPagar.toFixed(2)}`, margin, totalsY);
+        doc.text(`Total Pagar: ${formatCOP(orden.totalPagar)}`, margin, totalsY);
 
 
         // --- Leyenda ---

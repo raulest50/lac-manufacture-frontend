@@ -16,6 +16,7 @@ import {
     Text,
 } from '@chakra-ui/react';
 import { ItemOrdenCompra } from '../types';
+import { formatCOP } from '../../../utils/formatters';
 
 interface OrdenCompraItemsProps {
     items: ItemOrdenCompra[];
@@ -106,8 +107,8 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                                     />
                                 </Td>
                                 <Td isNumeric>{item.material.iva_percentual}%</Td>
-                                <Td isNumeric>{item.ivaCOP}</Td>
-                                <Td isNumeric>{item.subTotal}</Td>
+                                <Td isNumeric>{formatCOP(item.ivaCOP)}</Td>
+                                <Td isNumeric>{formatCOP(item.subTotal)}</Td>
                                 <Td>
                                     <Button
                                         colorScheme="red"
@@ -127,7 +128,7 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                             <strong>SubTotal:</strong>
                         </Td>
                         <Td isNumeric colSpan={3}>
-                            {totalSubTotal}
+                            {formatCOP(totalSubTotal)}
                         </Td>
                     </Tr>
                     <Tr>
@@ -135,7 +136,7 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                             <strong>IVA Total:</strong>
                         </Td>
                         <Td isNumeric colSpan={3}>
-                            {totalIVA}
+                            {formatCOP(totalIVA)}
                         </Td>
                     </Tr>
                     <Tr>
@@ -143,7 +144,7 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                             <strong>Total a Pagar:</strong>
                         </Td>
                         <Td isNumeric colSpan={3}>
-                            {totalPagar}
+                            {formatCOP(totalPagar)}
                         </Td>
                     </Tr>
                 </Tfoot>

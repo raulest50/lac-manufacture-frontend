@@ -10,6 +10,7 @@ import MateriaPrimaPicker from './components/MateriaPrimaPicker.tsx';
 import ListaItemsOCM from './components/ListaItemsOCM.tsx';
 import MyDatePicker from "../../components/MyDatePicker.tsx";
 import {format, addDays} from "date-fns";
+import { formatCOP } from '../../utils/formatters';
 
 const endPoints = new EndPointsURL();
 
@@ -260,7 +261,7 @@ export default function CrearOCM() {
 
                 </Flex>
 
-                <Text hidden={true}> Sub Total: {subTotal} - iva19: {iva19} - Total a Pagar: {totalPagar} </Text>
+                <Text hidden={true}> Sub Total: {formatCOP(subTotal)} - iva19: {formatCOP(iva19)} - Total a Pagar: {formatCOP(totalPagar)} </Text>
                 <Button onClick={() => setIsMateriaPrimaPickerOpen(true)}>
                     Agregar Materia Prima
                 </Button>

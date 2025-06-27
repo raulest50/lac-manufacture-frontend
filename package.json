@@ -21,6 +21,7 @@
     "@fontsource/anton": "^5.2.6",
     "@svgdotjs/svg.js": "^3.2.4",
     "@xyflow/react": "^12.7.1",
+    "accounting-js": "^2.0.3",
     "axios": "^1.10.0",
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
