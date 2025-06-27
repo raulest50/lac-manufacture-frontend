@@ -6,7 +6,7 @@ import {
     OrdenCompraMateriales,
     ItemOrdenCompra, OrdenCompraActivos, ItemOCActivo,
 } from "./types";
-import { formatCOP, formatCOPWithoutSymbol } from "../../utils/formatters";
+import { formatCOP } from "../../utils/formatters";
 
 // Extend jsPDF with properties added by jsPDF-AutoTable
 interface AutoTableProperties {
@@ -103,7 +103,7 @@ export default class PdfGenerator {
         entregaY += 3;
         doc.text("Barranquilla, Atlántico", detailX, entregaY);
         entregaY += 3;
-        doc.text(`CONDICION PAGO: ${getCondicionPagoText(orden.condicionPago)}` ?? "", detailX, entregaY);
+        doc.text(`CONDICION PAGO: ${getCondicionPagoText(orden.condicionPago)}`, detailX, entregaY);
         entregaY += 3;
         doc.text(`PLAZO PAGO ${orden.plazoPago} DIAS`, detailX, entregaY);
         entregaY += 3;
@@ -327,7 +327,7 @@ export default class PdfGenerator {
         entregaY += 3;
         doc.text("Barranquilla, Atlántico", detailX, entregaY);
         entregaY += 3;
-        doc.text(`CONDICION PAGO: ${getCondicionPagoText(orden.condicionPago)}` ?? "", detailX, entregaY);
+        doc.text(`CONDICION PAGO: ${getCondicionPagoText(orden.condicionPago)}`, detailX, entregaY);
         entregaY += 3;
         doc.text(`PLAZO PAGO: ${orden.plazoPago} DIAS`, detailX, entregaY);
         entregaY += 3;
