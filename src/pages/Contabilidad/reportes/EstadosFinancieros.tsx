@@ -27,6 +27,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { PeriodoContable, TipoCuenta } from '../types';
+import EndPointsURL from '../../../api/EndPointsURL';
 
 interface CuentaReporte {
   codigo: string;
@@ -109,7 +110,7 @@ const EstadosFinancieros: React.FC = () => {
         duration: 5000,
         isClosable: true,
       });
-      
+
       // Mock data for development
       // Balance General
       const mockBalanceGeneral: EstadoFinanciero = {
@@ -143,7 +144,7 @@ const EstadosFinancieros: React.FC = () => {
         ],
         total: 55200 // Activos = Pasivos + Patrimonio
       };
-      
+
       // Estado de Resultados
       const mockEstadoResultados: EstadoFinanciero = {
         grupos: [
@@ -165,7 +166,7 @@ const EstadosFinancieros: React.FC = () => {
         ],
         total: 20200 // Ingresos - Gastos = Utilidad
       };
-      
+
       setBalanceGeneral(mockBalanceGeneral);
       setEstadoResultados(mockEstadoResultados);
     } finally {
@@ -188,7 +189,7 @@ const EstadosFinancieros: React.FC = () => {
 
   const renderEstadoFinanciero = (estado: EstadoFinanciero | null) => {
     if (!estado) return null;
-    
+
     return (
       <Box overflowX="auto">
         <Table variant="simple">
@@ -232,7 +233,7 @@ const EstadosFinancieros: React.FC = () => {
   return (
     <Box w="full">
       <Heading size="md" mb={4}>Estados Financieros</Heading>
-      
+
       <Box p={4} bg="gray.50" borderRadius="md" mb={4}>
         <FormControl mb={4}>
           <FormLabel>Período</FormLabel>
@@ -248,7 +249,7 @@ const EstadosFinancieros: React.FC = () => {
             ))}
           </Select>
         </FormControl>
-        
+
         <Button 
           colorScheme="blue" 
           onClick={handleGenerateReport}
@@ -257,14 +258,14 @@ const EstadosFinancieros: React.FC = () => {
           Generar Estados Financieros
         </Button>
       </Box>
-      
+
       {error && (
         <Alert status="error" mb={4}>
           <AlertIcon />
           {error}
         </Alert>
       )}
-      
+
       {isLoading ? (
         <Flex justify="center" align="center" h="200px">
           <Spinner size="xl" />
@@ -272,19 +273,19 @@ const EstadosFinancieros: React.FC = () => {
       ) : (balanceGeneral || estadoResultados) ? (
         <Box>
           <Text fontWeight="bold" mb={4}>Período: {getPeriodoInfo()}</Text>
-          
+
           <Tabs colorScheme="blue" variant="enclosed">
             <TabList>
               <Tab>Balance General</Tab>
               <Tab>Estado de Resultados</Tab>
             </TabList>
-            
+
             <TabPanels>
               <TabPanel>
                 <Heading size="sm" mb={4}>Balance General</Heading>
                 {renderEstadoFinanciero(balanceGeneral)}
               </TabPanel>
-              
+
               <TabPanel>
                 <Heading size="sm" mb={4}>Estado de Resultados</Heading>
                 {renderEstadoFinanciero(estadoResultados)}

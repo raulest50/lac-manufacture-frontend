@@ -38,6 +38,7 @@ import {
 import { AddIcon, EditIcon, LockIcon, UnlockIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import { PeriodoContable, EstadoPeriodo } from '../types';
+import EndPointsURL from '../../../api/EndPointsURL';
 
 const GestionPeriodos: React.FC = () => {
   const [periodos, setPeriodos] = useState<PeriodoContable[]>([]);
@@ -49,6 +50,7 @@ const GestionPeriodos: React.FC = () => {
   const [alertAction, setAlertAction] = useState<'open' | 'close'>('close');
   const cancelRef = React.useRef<HTMLButtonElement>(null);
   const toast = useToast();
+  const endpoints = new EndPointsURL();
 
   const [formData, setFormData] = useState<PeriodoContable>({
     fechaInicio: '',
@@ -71,7 +73,7 @@ const GestionPeriodos: React.FC = () => {
       const today = new Date();
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      
+
       setFormData({
         fechaInicio: firstDay.toISOString().split('T')[0],
         fechaFin: lastDay.toISOString().split('T')[0],
@@ -92,8 +94,10 @@ const GestionPeriodos: React.FC = () => {
   const fetchPeriodos = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('/api/contabilidad/periodos');
-      setPeriodos(response.data);
+      const response = await axios.get(endpoints.get_periodos);
+      // Asegúrate de que response.data sea un array
+      const periodosData = Array.isArray(response.data) ? response.data : [];
+      setPeriodos(periodosData);
     } catch (error) {
       console.error('Error fetching periodos:', error);
       toast({
@@ -141,19 +145,22 @@ const GestionPeriodos: React.FC = () => {
 
   const confirmOpenClosePeriodo = async () => {
     if (!selectedPeriodo) return;
-    
+
     try {
       const newEstado = alertAction === 'open' ? EstadoPeriodo.ABIERTO : EstadoPeriodo.CERRADO;
-      
-      await axios.put(`/api/contabilidad/periodos/${selectedPeriodo.id}/estado`, {
+
+      const updateEstadoUrl = endpoints.update_periodo_estado.replace('{id}', selectedPeriodo.id!.toString());
+      await axios.put(updateEstadoUrl, {
         estado: newEstado
       });
-      
+
       // Update local state
-      setPeriodos(periodos.map(p => 
-        p.id === selectedPeriodo.id ? { ...p, estado: newEstado } : p
-      ));
-      
+      if (Array.isArray(periodos)) {
+        setPeriodos(periodos.map(p => 
+          p.id === selectedPeriodo.id ? { ...p, estado: newEstado } : p
+        ));
+      }
+
       toast({
         title: 'Éxito',
         description: `El período ha sido ${alertAction === 'open' ? 'abierto' : 'cerrado'} correctamente`,
@@ -181,7 +188,7 @@ const GestionPeriodos: React.FC = () => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when field is edited
     if (errors[name]) {
       setErrors(prev => {
@@ -194,33 +201,36 @@ const GestionPeriodos: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.nombre) {
       newErrors.nombre = 'El nombre es requerido';
     }
-    
+
     if (!formData.fechaInicio) {
       newErrors.fechaInicio = 'La fecha de inicio es requerida';
     }
-    
+
     if (!formData.fechaFin) {
       newErrors.fechaFin = 'La fecha de fin es requerida';
     } else if (formData.fechaInicio && new Date(formData.fechaFin) < new Date(formData.fechaInicio)) {
       newErrors.fechaFin = 'La fecha de fin debe ser posterior a la fecha de inicio';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-    
+
     try {
       if (selectedPeriodo?.id) {
         // Update existing period
-        await axios.put(`/api/contabilidad/periodos/${selectedPeriodo.id}`, formData);
-        setPeriodos(periodos.map(p => p.id === selectedPeriodo.id ? { ...formData, id: selectedPeriodo.id } : p));
+        const updateUrl = endpoints.update_periodo.replace('{id}', selectedPeriodo.id.toString());
+        await axios.put(updateUrl, formData);
+        if (Array.isArray(periodos)) {
+          setPeriodos(periodos.map(p => p.id === selectedPeriodo.id ? { ...formData, id: selectedPeriodo.id } : p));
+        }
         toast({
           title: 'Período actualizado',
           description: `El período ${formData.nombre} ha sido actualizado correctamente`,
@@ -230,7 +240,7 @@ const GestionPeriodos: React.FC = () => {
         });
       } else {
         // Create new period
-        const response = await axios.post('/api/contabilidad/periodos', formData);
+        const response = await axios.post(endpoints.save_periodo, formData);
         setPeriodos([...periodos, response.data]);
         toast({
           title: 'Período creado',
@@ -287,6 +297,10 @@ const GestionPeriodos: React.FC = () => {
             {isLoading ? (
               <Tr>
                 <Td colSpan={6} textAlign="center">Cargando...</Td>
+              </Tr>
+            ) : !Array.isArray(periodos) ? (
+              <Tr>
+                <Td colSpan={6} textAlign="center">Error al cargar los períodos</Td>
               </Tr>
             ) : periodos.length === 0 ? (
               <Tr>
@@ -364,7 +378,7 @@ const GestionPeriodos: React.FC = () => {
                   />
                   <FormErrorMessage>{errors.nombre}</FormErrorMessage>
                 </FormControl>
-                
+
                 <FormControl isInvalid={!!errors.fechaInicio}>
                   <FormLabel>Fecha de Inicio</FormLabel>
                   <Input
@@ -375,7 +389,7 @@ const GestionPeriodos: React.FC = () => {
                   />
                   <FormErrorMessage>{errors.fechaInicio}</FormErrorMessage>
                 </FormControl>
-                
+
                 <FormControl isInvalid={!!errors.fechaFin}>
                   <FormLabel>Fecha de Fin</FormLabel>
                   <Input
@@ -393,22 +407,22 @@ const GestionPeriodos: React.FC = () => {
                   <Text fontWeight="bold">ID:</Text>
                   <Text>{selectedPeriodo?.id}</Text>
                 </HStack>
-                
+
                 <HStack justify="space-between">
                   <Text fontWeight="bold">Nombre:</Text>
                   <Text>{selectedPeriodo?.nombre}</Text>
                 </HStack>
-                
+
                 <HStack justify="space-between">
                   <Text fontWeight="bold">Fecha de Inicio:</Text>
                   <Text>{selectedPeriodo ? formatDate(selectedPeriodo.fechaInicio) : ''}</Text>
                 </HStack>
-                
+
                 <HStack justify="space-between">
                   <Text fontWeight="bold">Fecha de Fin:</Text>
                   <Text>{selectedPeriodo ? formatDate(selectedPeriodo.fechaFin) : ''}</Text>
                 </HStack>
-                
+
                 <HStack justify="space-between">
                   <Text fontWeight="bold">Estado:</Text>
                   <Badge colorScheme={selectedPeriodo?.estado === EstadoPeriodo.ABIERTO ? 'green' : 'red'}>
@@ -418,7 +432,7 @@ const GestionPeriodos: React.FC = () => {
               </VStack>
             )}
           </ModalBody>
-          
+
           <ModalFooter>
             {isEditing ? (
               <>

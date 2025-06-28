@@ -66,6 +66,22 @@ export default class EndPointsURL{
     public bulk_upload_productos: string;
 
     // just in case of need
+    // contabilidad resource
+    public get_cuentas: string;
+    public save_cuenta: string;
+    public update_cuenta: string;
+    public get_periodos: string;
+    public save_periodo: string;
+    public update_periodo: string;
+    public update_periodo_estado: string;
+    public get_asientos: string;
+    public save_asiento: string;
+    public update_asiento: string;
+    public get_libro_mayor: string;
+    public get_balance_comprobacion: string;
+    public get_balance_general: string;
+    public get_estado_resultados: string;
+
     public domain: string;
 
     constructor() {
@@ -78,6 +94,7 @@ export default class EndPointsURL{
         const compras_res = 'compras';
         const produccion_res = 'produccion';
         const movimientos_res = 'movimientos';
+        const contabilidad_res = 'api/contabilidad';
         const auth_res = 'api/auth';
         const personal_res = 'integrantes-personal';
 
@@ -134,6 +151,21 @@ export default class EndPointsURL{
         // integrantes de personal endpoints
         this.save_integrante_personal = `${domain}/${personal_res}/save`;
 
+        // contabilidad endpoints
+        this.get_cuentas = `${domain}/${contabilidad_res}/cuentas`;
+        this.save_cuenta = `${domain}/${contabilidad_res}/cuentas`;
+        this.update_cuenta = `${domain}/${contabilidad_res}/cuentas/{codigo}`;
+        this.get_periodos = `${domain}/${contabilidad_res}/periodos`;
+        this.save_periodo = `${domain}/${contabilidad_res}/periodos`;
+        this.update_periodo = `${domain}/${contabilidad_res}/periodos/{id}`;
+        this.update_periodo_estado = `${domain}/${contabilidad_res}/periodos/{id}/estado`;
+        this.get_asientos = `${domain}/${contabilidad_res}/asientos`;
+        this.save_asiento = `${domain}/${contabilidad_res}/asientos`;
+        this.update_asiento = `${domain}/${contabilidad_res}/asientos/{id}`;
+        this.get_libro_mayor = `${domain}/${contabilidad_res}/libro-mayor`;
+        this.get_balance_comprobacion = `${domain}/${contabilidad_res}/balance-comprobacion`;
+        this.get_balance_general = `${domain}/${contabilidad_res}/balance-general`;
+        this.get_estado_resultados = `${domain}/${contabilidad_res}/estado-resultados`;
     }
 
 
