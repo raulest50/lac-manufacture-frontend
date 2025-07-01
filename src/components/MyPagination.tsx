@@ -14,7 +14,7 @@ const MyPagination: React.FC<PaginationProps> = ({ page, totalPages, loading, ha
     }
 
     return (
-        <Flex mt={6} justifyContent="center" alignItems="center">
+        <Flex w={"auto"} mt={6} justifyContent="center" alignItems="center">
             <Button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 0 || loading}

@@ -1,15 +1,13 @@
 // src/pages/Stock/StockPage.tsx
 
 import React, { useState, useEffect } from 'react';
-import { useToast } from '@chakra-ui/react';
+import {Box, useToast} from '@chakra-ui/react';
 
 import {
-    Container, VStack, HStack, Flex, Box,
+    Container, VStack, HStack, Flex,
     FormControl, Input,
-    Button, Text,
-    Spinner,
-    Select,
-    Table, Thead, Tbody, Tr, Th, Td, TableContainer
+    Button,
+    Select
 } from "@chakra-ui/react";
 
 
@@ -20,9 +18,10 @@ import axios from 'axios';
 
 const endPoints = new EndPointsURL();
 
-import MyPagination from '../../components/MyPagination';
 import { ProductStockDTO, Movimiento } from './types.tsx';
 import EndPointsURL from "../../api/EndPointsURL.tsx";
+import ListaProductos from './ListaProductos';
+import ListaMovimientos from './ListaMovimientos';
 
 function Inventario() {
 
@@ -126,8 +125,7 @@ function Inventario() {
 
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'} >
-
-                <VStack h={'full'} w={'full'} align="stretch">
+                <VStack h={'full'} w={'full'} >
                             <FormControl>
                                 <HStack>
                                     <Input
@@ -150,115 +148,28 @@ function Inventario() {
                                     }}>Buscar</Button>
                                 </HStack>
                             </FormControl>
-                            <Flex mt={4}>
+                            <Flex w={"full"} mt={4} direction={"row"}>
                                 {/* Left Panel: Product List */}
-                                <Box flex="1" mr="4">
-                                    {loadingProductos ? (
-                                        <Spinner />
-                                    ) : (
-                                        <>
-                                            <Box overflowX="auto" width="100%" maxH="400px" overflowY="auto">
-                                                <Table variant="striped" colorScheme="gray" size="sm" width="100%">
-                                                    <Thead position="sticky" top={0} bg="white" zIndex={1}>
-                                                        <Tr>
-                                                            <Th>ID</Th>
-                                                            <Th>Nombre</Th>
-                                                            <Th>Stock</Th>
-                                                            <Th>Unidades</Th>
-                                                        </Tr>
-                                                    </Thead>
-                                                    <Tbody>
-                                                        {productos.length === 0 ? (
-                                                            <Tr>
-                                                                <Td colSpan={4} textAlign="center">
-                                                                    <Text py={2}>No se encontraron productos.</Text>
-                                                                </Td>
-                                                            </Tr>
-                                                        ) : (
-                                                            productos.map((item) => (
-                                                                <Tr
-                                                                    key={item.producto.productoId}
-                                                                    cursor="pointer"
-                                                                    onClick={() => handleProductoClick(item)}
-                                                                    bg={
-                                                                        selectedProducto && selectedProducto.producto.productoId === item.producto.productoId
-                                                                            ? 'gray.100'
-                                                                            : 'white'
-                                                                    }
-                                                                    _hover={{ bg: "gray.50" }}
-                                                                >
-                                                                    <Td>{item.producto.productoId}</Td>
-                                                                    <Td>{item.producto.nombre}</Td>
-                                                                    <Td>{item.stock}</Td>
-                                                                    <Td>{item.producto.tipoUnidades}</Td>
-                                                                </Tr>
-                                                            ))
-                                                        )}
-                                                    </Tbody>
-                                                </Table>
-                                            </Box>
-                                            <MyPagination
-                                                page={pageProductos}
-                                                totalPages={totalPagesProductos}
-                                                loading={loadingProductos}
-                                                handlePageChange={handlePageChangeProductos}
-                                            />
-                                        </>
-                                    )}
-                                </Box>
-                                {/* Right Panel: Movimientos */}
-                                <Box flex="2" ml="4">
-                                    {selectedProducto ? (
-                                        <>
-                                            <Text fontSize="xl" fontWeight="bold">Movimientos for {selectedProducto.producto.nombre}</Text>
-                                            {loadingMovimientos ? (
-                                                <Spinner />
-                                            ) : (
-                                                <>
-                                                    <TableContainer maxH="400px" overflowY="auto">
-                                                        <Table variant="striped" colorScheme="gray" size="sm">
-                                                            <Thead position="sticky" top={0} bg="white" zIndex={1}>
-                                                                <Tr>
-                                                                    <Th>Fecha</Th>
-                                                                    <Th>Cantidad</Th>
-                                                                    <Th>Unidades</Th>
-                                                                    <Th>Causa</Th>
-                                                                    <Th>Observaciones</Th>
-                                                                </Tr>
-                                                            </Thead>
-                                                            <Tbody>
-                                                                {movimientos.length === 0 ? (
-                                                                    <Tr>
-                                                                        <Td colSpan={5} textAlign="center">
-                                                                            <Text py={2}>No hay movimientos para este producto.</Text>
-                                                                        </Td>
-                                                                    </Tr>
-                                                                ) : (
-                                                                    movimientos.map((mov) => (
-                                                                        <Tr key={mov.movimientoId}>
-                                                                            <Td>{new Date(mov.fechaMovimiento).toLocaleString()}</Td>
-                                                                            <Td>{mov.cantidad}</Td>
-                                                                            <Td>{mov.producto.tipoUnidades}</Td>
-                                                                            <Td>{mov.causa}</Td>
-                                                                            <Td>{mov.observaciones}</Td>
-                                                                        </Tr>
-                                                                    ))
-                                                                )}
-                                                            </Tbody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                    <MyPagination
-                                                        page={pageMovimientos}
-                                                        totalPages={totalPagesMovimientos}
-                                                        loading={loadingMovimientos}
-                                                        handlePageChange={handlePageChangeMovimientos}
-                                                    />
-                                                </>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <Text>Select a product to view its movements.</Text>
-                                    )}
+                                <Box minW={0} flex={1}>
+                                    <ListaProductos
+                                        productos={productos}
+                                        loadingProductos={loadingProductos}
+                                        selectedProducto={selectedProducto}
+                                        pageProductos={pageProductos}
+                                        totalPagesProductos={totalPagesProductos}
+                                        handleProductoClick={handleProductoClick}
+                                        handlePageChangeProductos={handlePageChangeProductos}
+                                    />
+                                </Box >
+                                <Box minW={0} flex={1} >
+                                    <ListaMovimientos
+                                        selectedProducto={selectedProducto}
+                                        movimientos={movimientos}
+                                        loadingMovimientos={loadingMovimientos}
+                                        pageMovimientos={pageMovimientos}
+                                        totalPagesMovimientos={totalPagesMovimientos}
+                                        handlePageChangeMovimientos={handlePageChangeMovimientos}
+                                    />
                                 </Box>
                             </Flex>
                     </VStack>
@@ -267,3 +178,7 @@ function Inventario() {
 }
 
 export default Inventario;
+
+
+
+{/* Right Panel: Movimientos */}

@@ -49,3 +49,6 @@ production/
 .rts2_cache_esm/
 .rts2_cache/
 /.junie/temp/
+
+
+*.patch
