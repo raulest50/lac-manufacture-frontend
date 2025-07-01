@@ -153,19 +153,8 @@ export default class EndPointsURL{
 
         // contabilidad endpoints
         this.get_cuentas = `${domain}/${contabilidad_res}/cuentas`;
-        this.save_cuenta = `${domain}/${contabilidad_res}/cuentas`;
-        this.update_cuenta = `${domain}/${contabilidad_res}/cuentas/{codigo}`;
-        this.get_periodos = `${domain}/${contabilidad_res}/periodos`;
-        this.save_periodo = `${domain}/${contabilidad_res}/periodos`;
-        this.update_periodo = `${domain}/${contabilidad_res}/periodos/{id}`;
-        this.update_periodo_estado = `${domain}/${contabilidad_res}/periodos/{id}/estado`;
-        this.get_asientos = `${domain}/${contabilidad_res}/asientos`;
-        this.save_asiento = `${domain}/${contabilidad_res}/asientos`;
-        this.update_asiento = `${domain}/${contabilidad_res}/asientos/{id}`;
         this.get_libro_mayor = `${domain}/${contabilidad_res}/libro-mayor`;
-        this.get_balance_comprobacion = `${domain}/${contabilidad_res}/balance-comprobacion`;
-        this.get_balance_general = `${domain}/${contabilidad_res}/balance-general`;
-        this.get_estado_resultados = `${domain}/${contabilidad_res}/estado-resultados`;
+        this.get_periodos = `${domain}/${contabilidad_res}/periodos`;
     }
 
 

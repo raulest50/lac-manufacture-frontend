@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Button,
   Flex,
   Heading,
   Table,
@@ -10,19 +9,18 @@ import {
   Tr,
   Th,
   Td,
-  useDisclosure,
-  IconButton,
   Input,
   InputGroup,
   InputLeftElement,
   Badge,
-  useToast
+  useToast,
+  Button
 } from '@chakra-ui/react';
-import { SearchIcon, AddIcon, EditIcon, ViewIcon } from '@chakra-ui/icons';
+import { SearchIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import { CuentaContable, SaldoNormal, TipoCuenta } from '../types';
-import DetalleCuenta from './DetalleCuenta';
 import EndPointsURL from '../../../api/EndPointsURL';
+import DetalleAsientosCuenta from './DetalleAsientosCuenta';
 
 const CatalogoCuentas: React.FC = () => {
   const [cuentas, setCuentas] = useState<CuentaContable[]>([]);
@@ -30,8 +28,6 @@ const CatalogoCuentas: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCuenta, setSelectedCuenta] = useState<CuentaContable | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const endpoints = new EndPointsURL();
 
@@ -89,61 +85,12 @@ const CatalogoCuentas: React.FC = () => {
     }
   };
 
-  const handleViewCuenta = (cuenta: CuentaContable) => {
+  const handleVerAsientos = (cuenta: CuentaContable) => {
     setSelectedCuenta(cuenta);
-    setIsEditing(false);
-    onOpen();
   };
 
-  const handleEditCuenta = (cuenta: CuentaContable) => {
-    setSelectedCuenta(cuenta);
-    setIsEditing(true);
-    onOpen();
-  };
-
-  const handleAddCuenta = () => {
+  const handleVolverACatalogo = () => {
     setSelectedCuenta(null);
-    setIsEditing(true);
-    onOpen();
-  };
-
-  const handleSaveCuenta = async (cuenta: CuentaContable) => {
-    try {
-      if (cuenta.codigo && selectedCuenta) {
-        // Update existing account
-        const updateUrl = endpoints.update_cuenta.replace('{codigo}', cuenta.codigo);
-        await axios.put(updateUrl, cuenta);
-        setCuentas(cuentas.map(c => c.codigo === cuenta.codigo ? cuenta : c));
-        toast({
-          title: 'Cuenta actualizada',
-          description: `La cuenta ${cuenta.codigo} ha sido actualizada correctamente`,
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
-      } else {
-        // Create new account
-        const response = await axios.post(endpoints.save_cuenta, cuenta);
-        setCuentas([...cuentas, response.data]);
-        toast({
-          title: 'Cuenta creada',
-          description: `La cuenta ${response.data.codigo} ha sido creada correctamente`,
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-      onClose();
-    } catch (error) {
-      console.error('Error saving cuenta:', error);
-      toast({
-        title: 'Error',
-        description: 'No se pudo guardar la cuenta contable',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    }
   };
 
   const getTipoBadgeColor = (tipo: TipoCuenta) => {
@@ -163,17 +110,15 @@ const CatalogoCuentas: React.FC = () => {
     }
   };
 
+  // Renderizado condicional: mostrar catálogo o detalle de asientos
+  if (selectedCuenta) {
+    return <DetalleAsientosCuenta cuenta={selectedCuenta} onVolver={handleVolverACatalogo} />;
+  }
+
   return (
     <Box w="full">
       <Flex justifyContent="space-between" alignItems="center" mb={4}>
         <Heading size="md">Catálogo de Cuentas</Heading>
-        <Button 
-          leftIcon={<AddIcon />} 
-          colorScheme="blue" 
-          onClick={handleAddCuenta}
-        >
-          Nueva Cuenta
-        </Button>
       </Flex>
 
       <InputGroup mb={4}>
@@ -214,7 +159,15 @@ const CatalogoCuentas: React.FC = () => {
               </Tr>
             ) : (
               filteredCuentas.map((cuenta) => (
-                <Tr key={cuenta.codigo}>
+                <Tr 
+                  key={cuenta.codigo}
+                  _hover={{ 
+                    bg: "blue.50", 
+                    cursor: "pointer",
+                    transition: "background-color 0.2s"
+                  }}
+                  onClick={() => handleVerAsientos(cuenta)}
+                >
                   <Td>{cuenta.codigo}</Td>
                   <Td>{cuenta.nombre}</Td>
                   <Td>
@@ -225,21 +178,16 @@ const CatalogoCuentas: React.FC = () => {
                   <Td>{cuenta.saldoNormal}</Td>
                   <Td>{cuenta.cuentaControl ? 'Sí' : 'No'}</Td>
                   <Td>
-                    <Flex gap={2}>
-                      <IconButton
-                        aria-label="Ver cuenta"
-                        icon={<ViewIcon />}
-                        size="sm"
-                        onClick={() => handleViewCuenta(cuenta)}
-                      />
-                      <IconButton
-                        aria-label="Editar cuenta"
-                        icon={<EditIcon />}
-                        size="sm"
-                        colorScheme="blue"
-                        onClick={() => handleEditCuenta(cuenta)}
-                      />
-                    </Flex>
+                    <Button
+                      colorScheme="blue"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleVerAsientos(cuenta);
+                      }}
+                    >
+                      Ver asientos
+                    </Button>
                   </Td>
                 </Tr>
               ))
@@ -247,17 +195,6 @@ const CatalogoCuentas: React.FC = () => {
           </Tbody>
         </Table>
       </Box>
-
-      {/* Modal for viewing/editing account details */}
-      {isOpen && (
-        <DetalleCuenta
-          isOpen={isOpen}
-          onClose={onClose}
-          cuenta={selectedCuenta}
-          isEditing={isEditing}
-          onSave={handleSaveCuenta}
-        />
-      )}
     </Box>
   );
 };
