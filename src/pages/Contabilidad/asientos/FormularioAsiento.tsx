@@ -32,6 +32,7 @@ import {
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import { AsientoContable, LineaAsientoContable, PeriodoContable, EstadoAsiento, CuentaContable } from '../types';
+import EndPointsURL from '../../../api/EndPointsURL';
 
 interface FormularioAsientoProps {
   isOpen: boolean;
@@ -64,6 +65,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [lineErrors, setLineErrors] = useState<Record<number, Record<string, string>>>({});
   const toast = useToast();
+  const endpoints = new EndPointsURL();
 
   useEffect(() => {
     if (asiento) {
@@ -86,8 +88,10 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
 
   const fetchCuentas = async () => {
     try {
-      const response = await axios.get('/api/contabilidad/cuentas');
-      setCuentas(response.data);
+      const response = await axios.get(endpoints.get_cuentas);
+      // Asegúrate de que response.data sea un array
+      const cuentasData = Array.isArray(response.data) ? response.data : [];
+      setCuentas(cuentasData);
     } catch (error) {
       console.error('Error fetching cuentas:', error);
       // Mock data for development
@@ -104,7 +108,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
+
     if (name === 'periodoContable') {
       const selectedPeriodo = periodos.find(p => p.id?.toString() === value);
       if (selectedPeriodo) {
@@ -119,7 +123,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
         [name]: value
       }));
     }
-    
+
     // Clear error when field is edited
     if (errors[name]) {
       setErrors(prev => {
@@ -132,7 +136,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
 
   const handleLineChange = (index: number, field: keyof LineaAsientoContable, value: string | number) => {
     const updatedLineas = [...formData.lineas];
-    
+
     if (field === 'debito' || field === 'credito') {
       // Convert to number and handle NaN
       const numValue = parseFloat(value as string);
@@ -140,7 +144,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
         ...updatedLineas[index],
         [field]: isNaN(numValue) ? 0 : numValue
       };
-      
+
       // If debito is set, clear credito and vice versa
       if (field === 'debito' && numValue > 0) {
         updatedLineas[index].credito = 0;
@@ -153,12 +157,12 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
         [field]: value
       };
     }
-    
+
     setFormData(prev => ({
       ...prev,
       lineas: updatedLineas
     }));
-    
+
     // Clear line error when field is edited
     if (lineErrors[index]?.[field as string]) {
       setLineErrors(prev => {
@@ -181,7 +185,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
       credito: 0,
       descripcion: ''
     };
-    
+
     setFormData(prev => ({
       ...prev,
       lineas: [...prev.lineas, newLine]
@@ -191,12 +195,12 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
   const removeLine = (index: number) => {
     const updatedLineas = [...formData.lineas];
     updatedLineas.splice(index, 1);
-    
+
     setFormData(prev => ({
       ...prev,
       lineas: updatedLineas
     }));
-    
+
     // Clear line errors for removed line
     if (lineErrors[index]) {
       setLineErrors(prev => {
@@ -210,53 +214,53 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
     const newLineErrors: Record<number, Record<string, string>> = {};
-    
+
     // Validate header fields
     if (!formData.descripcion) {
       newErrors.descripcion = 'La descripción es requerida';
     }
-    
+
     if (!formData.fecha) {
       newErrors.fecha = 'La fecha es requerida';
     }
-    
+
     // Validate lines
     let totalDebito = 0;
     let totalCredito = 0;
-    
+
     formData.lineas.forEach((linea, index) => {
       const lineError: Record<string, string> = {};
-      
+
       if (!linea.cuentaCodigo) {
         lineError.cuentaCodigo = 'La cuenta es requerida';
       }
-      
+
       if (linea.debito === 0 && linea.credito === 0) {
         lineError.debito = 'Debe ingresar un valor de débito o crédito';
         lineError.credito = 'Debe ingresar un valor de débito o crédito';
       }
-      
+
       if (Object.keys(lineError).length > 0) {
         newLineErrors[index] = lineError;
       }
-      
+
       totalDebito += linea.debito || 0;
       totalCredito += linea.credito || 0;
     });
-    
+
     // Check if there are any lines
     if (formData.lineas.length === 0) {
       newErrors.lineas = 'Debe agregar al menos una línea al asiento';
     }
-    
+
     // Check if debits equal credits
     if (totalDebito !== totalCredito) {
       newErrors.balance = 'El asiento no está balanceado. Los débitos deben ser iguales a los créditos.';
     }
-    
+
     setErrors(newErrors);
     setLineErrors(newLineErrors);
-    
+
     return Object.keys(newErrors).length === 0 && Object.keys(newLineErrors).length === 0;
   };
 
@@ -282,12 +286,12 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
   const calculateTotals = () => {
     let totalDebito = 0;
     let totalCredito = 0;
-    
+
     formData.lineas.forEach(linea => {
       totalDebito += linea.debito || 0;
       totalCredito += linea.credito || 0;
     });
-    
+
     return { totalDebito, totalCredito };
   };
 
@@ -326,7 +330,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
                   />
                   <FormErrorMessage>{errors.fecha}</FormErrorMessage>
                 </FormControl>
-                
+
                 <FormControl>
                   <FormLabel>Período Contable</FormLabel>
                   <Select
@@ -342,7 +346,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
                   </Select>
                 </FormControl>
               </HStack>
-              
+
               <FormControl isInvalid={!!errors.descripcion}>
                 <FormLabel>Descripción</FormLabel>
                 <Input
@@ -353,7 +357,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
                 />
                 <FormErrorMessage>{errors.descripcion}</FormErrorMessage>
               </FormControl>
-              
+
               <HStack spacing={4}>
                 <FormControl>
                   <FormLabel>Módulo</FormLabel>
@@ -364,7 +368,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
                     placeholder="Ej: COMPRAS, PRODUCCION"
                   />
                 </FormControl>
-                
+
                 <FormControl>
                   <FormLabel>Documento de Origen</FormLabel>
                   <Input
@@ -375,9 +379,9 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
                   />
                 </FormControl>
               </HStack>
-              
+
               <Divider my={2} />
-              
+
               <Box>
                 <Flex justifyContent="space-between" alignItems="center" mb={2}>
                   <Text fontWeight="bold">Líneas del Asiento</Text>
@@ -390,15 +394,15 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
                     Agregar Línea
                   </Button>
                 </Flex>
-                
+
                 {errors.lineas && (
                   <Text color="red.500" mb={2}>{errors.lineas}</Text>
                 )}
-                
+
                 {errors.balance && (
                   <Text color="red.500" mb={2}>{errors.balance}</Text>
                 )}
-                
+
                 <Table variant="simple" size="sm">
                   <Thead>
                     <Tr>
@@ -427,11 +431,11 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
                                 placeholder="Seleccione una cuenta"
                                 size="sm"
                               >
-                                {cuentas.map(cuenta => (
+                                {Array.isArray(cuentas) ? cuentas.map(cuenta => (
                                   <option key={cuenta.codigo} value={cuenta.codigo}>
                                     {cuenta.codigo} - {cuenta.nombre}
                                   </option>
-                                ))}
+                                )) : <option value="">No hay cuentas disponibles</option>}
                               </Select>
                               {lineErrors[index]?.cuentaCodigo && (
                                 <FormErrorMessage>{lineErrors[index]?.cuentaCodigo}</FormErrorMessage>
@@ -512,31 +516,31 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
                 <Text>{asiento?.id}</Text>
               </HStack>
               <Divider />
-              
+
               <HStack justify="space-between">
                 <Text fontWeight="bold">Fecha:</Text>
                 <Text>{new Date(asiento?.fecha || '').toLocaleDateString()}</Text>
               </HStack>
               <Divider />
-              
+
               <HStack justify="space-between">
                 <Text fontWeight="bold">Descripción:</Text>
                 <Text>{asiento?.descripcion}</Text>
               </HStack>
               <Divider />
-              
+
               <HStack justify="space-between">
                 <Text fontWeight="bold">Módulo:</Text>
                 <Text>{asiento?.modulo}</Text>
               </HStack>
               <Divider />
-              
+
               <HStack justify="space-between">
                 <Text fontWeight="bold">Documento de Origen:</Text>
                 <Text>{asiento?.documentoOrigen}</Text>
               </HStack>
               <Divider />
-              
+
               <HStack justify="space-between">
                 <Text fontWeight="bold">Estado:</Text>
                 <Badge colorScheme={
@@ -547,13 +551,13 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
                 </Badge>
               </HStack>
               <Divider />
-              
+
               <HStack justify="space-between">
                 <Text fontWeight="bold">Período Contable:</Text>
                 <Text>{asiento?.periodoContable.nombre}</Text>
               </HStack>
               <Divider />
-              
+
               <Text fontWeight="bold">Líneas del Asiento:</Text>
               <Table variant="simple" size="sm">
                 <Thead>
@@ -589,7 +593,7 @@ const FormularioAsiento: React.FC<FormularioAsientoProps> = ({
             </VStack>
           )}
         </ModalBody>
-        
+
         <ModalFooter>
           {isEditing ? (
             <>

@@ -22,6 +22,7 @@ import { SearchIcon, AddIcon, EditIcon, ViewIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import { CuentaContable, SaldoNormal, TipoCuenta } from '../types';
 import DetalleCuenta from './DetalleCuenta';
+import EndPointsURL from '../../../api/EndPointsURL';
 
 const CatalogoCuentas: React.FC = () => {
   const [cuentas, setCuentas] = useState<CuentaContable[]>([]);
@@ -32,12 +33,18 @@ const CatalogoCuentas: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const endpoints = new EndPointsURL();
 
   useEffect(() => {
     fetchCuentas();
   }, []);
 
   useEffect(() => {
+    if (!Array.isArray(cuentas)) {
+      setFilteredCuentas([]);
+      return;
+    }
+
     if (searchTerm) {
       const filtered = cuentas.filter(cuenta => 
         cuenta.codigo.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -52,9 +59,11 @@ const CatalogoCuentas: React.FC = () => {
   const fetchCuentas = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('/api/contabilidad/cuentas');
-      setCuentas(response.data);
-      setFilteredCuentas(response.data);
+      const response = await axios.get(endpoints.get_cuentas);
+      // Asegúrate de que response.data sea un array
+      const cuentasData = Array.isArray(response.data) ? response.data : [];
+      setCuentas(cuentasData);
+      setFilteredCuentas(cuentasData);
     } catch (error) {
       console.error('Error fetching cuentas:', error);
       toast({
@@ -102,7 +111,8 @@ const CatalogoCuentas: React.FC = () => {
     try {
       if (cuenta.codigo && selectedCuenta) {
         // Update existing account
-        await axios.put(`/api/contabilidad/cuentas/${cuenta.codigo}`, cuenta);
+        const updateUrl = endpoints.update_cuenta.replace('{codigo}', cuenta.codigo);
+        await axios.put(updateUrl, cuenta);
         setCuentas(cuentas.map(c => c.codigo === cuenta.codigo ? cuenta : c));
         toast({
           title: 'Cuenta actualizada',
@@ -113,7 +123,7 @@ const CatalogoCuentas: React.FC = () => {
         });
       } else {
         // Create new account
-        const response = await axios.post('/api/contabilidad/cuentas', cuenta);
+        const response = await axios.post(endpoints.save_cuenta, cuenta);
         setCuentas([...cuentas, response.data]);
         toast({
           title: 'Cuenta creada',
@@ -193,6 +203,10 @@ const CatalogoCuentas: React.FC = () => {
             {isLoading ? (
               <Tr>
                 <Td colSpan={6} textAlign="center">Cargando...</Td>
+              </Tr>
+            ) : !Array.isArray(filteredCuentas) ? (
+              <Tr>
+                <Td colSpan={6} textAlign="center">Error al cargar las cuentas</Td>
               </Tr>
             ) : filteredCuentas.length === 0 ? (
               <Tr>

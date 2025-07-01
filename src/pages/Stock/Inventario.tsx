@@ -7,8 +7,6 @@ import {
     Container, VStack, HStack, Flex, Box,
     FormControl, Input,
     Button, Text,
-    List,
-    ListItem,
     Spinner,
     Select,
     Table, Thead, Tbody, Tr, Th, Td, TableContainer

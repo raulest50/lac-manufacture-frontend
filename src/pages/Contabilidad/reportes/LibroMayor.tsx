@@ -22,6 +22,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { CuentaContable, PeriodoContable, MovimientoLibroMayor } from '../types';
+import EndPointsURL from '../../../api/EndPointsURL';
 
 const LibroMayor: React.FC = () => {
   const [cuentas, setCuentas] = useState<CuentaContable[]>([]);
@@ -32,6 +33,7 @@ const LibroMayor: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
+  const endpoints = new EndPointsURL();
 
   useEffect(() => {
     fetchCuentas();
@@ -40,8 +42,10 @@ const LibroMayor: React.FC = () => {
 
   const fetchCuentas = async () => {
     try {
-      const response = await axios.get('/api/contabilidad/cuentas');
-      setCuentas(response.data);
+      const response = await axios.get(endpoints.get_cuentas);
+      // Asegúrate de que response.data sea un array
+      const cuentasData = Array.isArray(response.data) ? response.data : [];
+      setCuentas(cuentasData);
     } catch (error) {
       console.error('Error fetching cuentas:', error);
       // Mock data for development
@@ -58,8 +62,10 @@ const LibroMayor: React.FC = () => {
 
   const fetchPeriodos = async () => {
     try {
-      const response = await axios.get('/api/contabilidad/periodos');
-      setPeriodos(response.data);
+      const response = await axios.get(endpoints.get_periodos);
+      // Asegúrate de que response.data sea un array
+      const periodosData = Array.isArray(response.data) ? response.data : [];
+      setPeriodos(periodosData);
     } catch (error) {
       console.error('Error fetching periodos:', error);
       // Mock data for development
@@ -82,7 +88,7 @@ const LibroMayor: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.get(`/api/contabilidad/libro-mayor`, {
+      const response = await axios.get(endpoints.get_libro_mayor, {
         params: {
           cuentaCodigo: selectedCuenta,
           periodoId: selectedPeriodo
@@ -99,7 +105,7 @@ const LibroMayor: React.FC = () => {
         duration: 5000,
         isClosable: true,
       });
-      
+
       // Mock data for development
       if (selectedCuenta === '1010') { // Banco
         const mockMovimientos: MovimientoLibroMayor[] = [
@@ -143,12 +149,12 @@ const LibroMayor: React.FC = () => {
   const calculateTotals = () => {
     let totalDebito = 0;
     let totalCredito = 0;
-    
+
     movimientos.forEach(movimiento => {
       totalDebito += movimiento.debito || 0;
       totalCredito += movimiento.credito || 0;
     });
-    
+
     return { totalDebito, totalCredito };
   };
 
@@ -168,7 +174,7 @@ const LibroMayor: React.FC = () => {
   return (
     <Box w="full">
       <Heading size="md" mb={4}>Libro Mayor</Heading>
-      
+
       <Box p={4} bg="gray.50" borderRadius="md" mb={4}>
         <HStack spacing={4} mb={4}>
           <FormControl>
@@ -178,14 +184,14 @@ const LibroMayor: React.FC = () => {
               value={selectedCuenta}
               onChange={(e) => setSelectedCuenta(e.target.value)}
             >
-              {cuentas.map(cuenta => (
+              {Array.isArray(cuentas) ? cuentas.map(cuenta => (
                 <option key={cuenta.codigo} value={cuenta.codigo}>
                   {cuenta.codigo} - {cuenta.nombre}
                 </option>
-              ))}
+              )) : <option value="">No hay cuentas disponibles</option>}
             </Select>
           </FormControl>
-          
+
           <FormControl>
             <FormLabel>Período</FormLabel>
             <Select 
@@ -193,15 +199,15 @@ const LibroMayor: React.FC = () => {
               value={selectedPeriodo}
               onChange={(e) => setSelectedPeriodo(e.target.value)}
             >
-              {periodos.map(periodo => (
+              {Array.isArray(periodos) ? periodos.map(periodo => (
                 <option key={periodo.id} value={periodo.id?.toString()}>
                   {periodo.nombre}
                 </option>
-              ))}
+              )) : <option value="">No hay períodos disponibles</option>}
             </Select>
           </FormControl>
         </HStack>
-        
+
         <Button 
           colorScheme="blue" 
           onClick={handleGenerateReport}
@@ -210,14 +216,14 @@ const LibroMayor: React.FC = () => {
           Generar Reporte
         </Button>
       </Box>
-      
+
       {error && (
         <Alert status="error" mb={4}>
           <AlertIcon />
           {error}
         </Alert>
       )}
-      
+
       {isLoading ? (
         <Flex justify="center" align="center" h="200px">
           <Spinner size="xl" />
@@ -233,7 +239,7 @@ const LibroMayor: React.FC = () => {
               <Text fontWeight="bold">Saldo Final: {formatCurrency(saldoFinal)}</Text>
             </Box>
           </Flex>
-          
+
           <Box overflowX="auto">
             <Table variant="simple">
               <Thead>

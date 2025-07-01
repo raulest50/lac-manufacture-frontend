@@ -25,6 +25,7 @@ import { SearchIcon, AddIcon, EditIcon, ViewIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import { AsientoContable, EstadoAsiento, PeriodoContable, EstadoPeriodo } from '../types';
 import FormularioAsiento from './FormularioAsiento';
+import EndPointsURL from '../../../api/EndPointsURL';
 
 const ListaAsientos: React.FC = () => {
   const [asientos, setAsientos] = useState<AsientoContable[]>([]);
@@ -37,6 +38,7 @@ const ListaAsientos: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const endpoints = new EndPointsURL();
 
   useEffect(() => {
     fetchPeriodos();
@@ -49,8 +51,10 @@ const ListaAsientos: React.FC = () => {
 
   const fetchPeriodos = async () => {
     try {
-      const response = await axios.get('/api/contabilidad/periodos');
-      setPeriodos(response.data);
+      const response = await axios.get(endpoints.get_periodos);
+      // Asegúrate de que response.data sea un array
+      const periodosData = Array.isArray(response.data) ? response.data : [];
+      setPeriodos(periodosData);
     } catch (error) {
       console.error('Error fetching periodos:', error);
       // Mock data for development
@@ -66,9 +70,11 @@ const ListaAsientos: React.FC = () => {
   const fetchAsientos = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('/api/contabilidad/asientos');
-      setAsientos(response.data);
-      setFilteredAsientos(response.data);
+      const response = await axios.get(endpoints.get_asientos);
+      // Asegúrate de que response.data sea un array
+      const asientosData = Array.isArray(response.data) ? response.data : [];
+      setAsientos(asientosData);
+      setFilteredAsientos(asientosData);
     } catch (error) {
       console.error('Error fetching asientos:', error);
       toast({
@@ -86,7 +92,7 @@ const ListaAsientos: React.FC = () => {
         fechaFin: '2023-03-31', 
         estado: EstadoPeriodo.ABIERTO 
       };
-      
+
       const mockAsientos: AsientoContable[] = [
         { 
           id: 1, 
@@ -128,7 +134,7 @@ const ListaAsientos: React.FC = () => {
 
   const filterAsientos = () => {
     let filtered = [...asientos];
-    
+
     // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(asiento => 
@@ -137,14 +143,14 @@ const ListaAsientos: React.FC = () => {
         asiento.id?.toString().includes(searchTerm)
       );
     }
-    
+
     // Filter by period
     if (selectedPeriodo) {
       filtered = filtered.filter(asiento => 
         asiento.periodoContable.id?.toString() === selectedPeriodo
       );
     }
-    
+
     setFilteredAsientos(filtered);
   };
 
@@ -163,7 +169,7 @@ const ListaAsientos: React.FC = () => {
   const handleAddAsiento = () => {
     // Create a new asiento with default values
     const defaultPeriodo = periodos.find(p => p.estado === EstadoPeriodo.ABIERTO) || periodos[0];
-    
+
     const newAsiento: AsientoContable = {
       fecha: new Date().toISOString(),
       descripcion: '',
@@ -173,7 +179,7 @@ const ListaAsientos: React.FC = () => {
       periodoContable: defaultPeriodo,
       lineas: []
     };
-    
+
     setSelectedAsiento(newAsiento);
     setIsEditing(true);
     onOpen();
@@ -183,7 +189,8 @@ const ListaAsientos: React.FC = () => {
     try {
       if (asiento.id) {
         // Update existing journal entry
-        await axios.put(`/api/contabilidad/asientos/${asiento.id}`, asiento);
+        const updateUrl = endpoints.update_asiento.replace('{id}', asiento.id.toString());
+        await axios.put(updateUrl, asiento);
         setAsientos(asientos.map(a => a.id === asiento.id ? asiento : a));
         toast({
           title: 'Asiento actualizado',
@@ -194,7 +201,7 @@ const ListaAsientos: React.FC = () => {
         });
       } else {
         // Create new journal entry
-        const response = await axios.post('/api/contabilidad/asientos', asiento);
+        const response = await axios.post(endpoints.save_asiento, asiento);
         setAsientos([...asientos, response.data]);
         toast({
           title: 'Asiento creado',
@@ -259,18 +266,18 @@ const ListaAsientos: React.FC = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </InputGroup>
-        
+
         <Select 
           placeholder="Todos los períodos" 
           value={selectedPeriodo}
           onChange={(e) => setSelectedPeriodo(e.target.value)}
           w="300px"
         >
-          {periodos.map(periodo => (
+          {Array.isArray(periodos) ? periodos.map(periodo => (
             <option key={periodo.id} value={periodo.id?.toString()}>
               {periodo.nombre} ({periodo.estado === EstadoPeriodo.ABIERTO ? 'Abierto' : 'Cerrado'})
             </option>
-          ))}
+          )) : <option value="">No hay períodos disponibles</option>}
         </Select>
       </HStack>
 
