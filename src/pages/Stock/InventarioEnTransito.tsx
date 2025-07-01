@@ -11,6 +11,7 @@ import {
     Heading,
     List,
     ListItem,
+    Table, Thead, Tbody, Tr, Th, Td, TableContainer
 } from "@chakra-ui/react";
 import axios from 'axios';
 import { InventarioEnTransitoDTO, PaginatedResponse } from './types.tsx';
@@ -81,36 +82,34 @@ export default function InventarioEnTransito() {
                 <Text>No hay inventario en tránsito.</Text>
             ) : (
                 <>
-                    <VStack spacing={4} align="stretch">
-                        {inventario.map((item) => (
-                            <Box
-                                key={item.productoId}
-                                borderWidth="1px"
-                                borderRadius="lg"
-                                p={4}
-                                boxShadow="sm"
-                            >
-                                <HStack spacing={4} mb={2}>
-                                    <Text fontWeight="bold">Producto ID:</Text>
-                                    <Text>{item.productoId}</Text>
-                                    <Text fontWeight="bold">Nombre:</Text>
-                                    <Text>{item.productoNombre}</Text>
-                                </HStack>
-                                <HStack spacing={4} mb={2}>
-                                    <Text fontWeight="bold">Cantidad Total:</Text>
-                                    <Text>{item.cantidadTotal}</Text>
-                                </HStack>
-                                <Box mt={2}>
-                                    <Text fontWeight="bold">Órdenes de Producción:</Text>
-                                    <List ml={4} mt={1}>
-                                        {item.ordenesProduccionIds.map((id) => (
-                                            <ListItem key={id}>Orden de Producción ID: {id}</ListItem>
-                                        ))}
-                                    </List>
-                                </Box>
-                            </Box>
-                        ))}
-                    </VStack>
+                    <Box overflowX="auto" width="100%" maxH="400px" overflowY="auto">
+                        <Table variant="striped" colorScheme="gray" size="sm" width="100%">
+                            <Thead>
+                                <Tr>
+                                    <Th>ID Producto</Th>
+                                    <Th>Nombre</Th>
+                                    <Th>Cantidad Total</Th>
+                                    <Th>Unidades</Th>
+                                    <Th>Órdenes de Producción</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {inventario.map((item) => (
+                                    <Tr key={item.productoId}>
+                                        <Td>{item.productoId}</Td>
+                                        <Td>{item.productoNombre}</Td>
+                                        <Td>{item.cantidadTotal}</Td>
+                                        <Td>{item.tipoUnidades}</Td>
+                                        <Td>
+                                            {item.ordenesProduccionIds.map((id) => (
+                                                <Text key={id}>ID: {id}</Text>
+                                            ))}
+                                        </Td>
+                                    </Tr>
+                                ))}
+                            </Tbody>
+                        </Table>
+                    </Box>
                     {/* Pagination Component */}
                     <MyPagination
                         page={page}

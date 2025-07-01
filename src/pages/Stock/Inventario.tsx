@@ -11,6 +11,7 @@ import {
     ListItem,
     Spinner,
     Select,
+    Table, Thead, Tbody, Tr, Th, Td, TableContainer
 } from "@chakra-ui/react";
 
 
@@ -158,28 +159,46 @@ function Inventario() {
                                         <Spinner />
                                     ) : (
                                         <>
-                                            <List spacing={2} maxH="400px" overflowY="auto">
-                                                {productos.map((item) => (
-                                                    <ListItem
-                                                        key={item.producto.productoId}
-                                                        borderBottom="1px solid #ccc"
-                                                        p="2"
-                                                        cursor="pointer"
-                                                        onClick={() => handleProductoClick(item)}
-                                                        bg={
-                                                            selectedProducto && selectedProducto.producto.productoId === item.producto.productoId
-                                                                ? 'gray.100'
-                                                                : 'white'
-                                                        }
-                                                    >
-                                                        <HStack>
-                                                            <Text>
-                                                                ID: {item.producto.productoId} - {item.producto.nombre} - Stock: {item.stock}
-                                                            </Text>
-                                                        </HStack>
-                                                    </ListItem>
-                                                ))}
-                                            </List>
+                                            <Box overflowX="auto" width="100%" maxH="400px" overflowY="auto">
+                                                <Table variant="striped" colorScheme="gray" size="sm" width="100%">
+                                                    <Thead position="sticky" top={0} bg="white" zIndex={1}>
+                                                        <Tr>
+                                                            <Th>ID</Th>
+                                                            <Th>Nombre</Th>
+                                                            <Th>Stock</Th>
+                                                            <Th>Unidades</Th>
+                                                        </Tr>
+                                                    </Thead>
+                                                    <Tbody>
+                                                        {productos.length === 0 ? (
+                                                            <Tr>
+                                                                <Td colSpan={4} textAlign="center">
+                                                                    <Text py={2}>No se encontraron productos.</Text>
+                                                                </Td>
+                                                            </Tr>
+                                                        ) : (
+                                                            productos.map((item) => (
+                                                                <Tr
+                                                                    key={item.producto.productoId}
+                                                                    cursor="pointer"
+                                                                    onClick={() => handleProductoClick(item)}
+                                                                    bg={
+                                                                        selectedProducto && selectedProducto.producto.productoId === item.producto.productoId
+                                                                            ? 'gray.100'
+                                                                            : 'white'
+                                                                    }
+                                                                    _hover={{ bg: "gray.50" }}
+                                                                >
+                                                                    <Td>{item.producto.productoId}</Td>
+                                                                    <Td>{item.producto.nombre}</Td>
+                                                                    <Td>{item.stock}</Td>
+                                                                    <Td>{item.producto.tipoUnidades}</Td>
+                                                                </Tr>
+                                                            ))
+                                                        )}
+                                                    </Tbody>
+                                                </Table>
+                                            </Box>
                                             <MyPagination
                                                 page={pageProductos}
                                                 totalPages={totalPagesProductos}
@@ -190,7 +209,7 @@ function Inventario() {
                                     )}
                                 </Box>
                                 {/* Right Panel: Movimientos */}
-                                <Box flex="1" ml="4">
+                                <Box flex="2" ml="4">
                                     {selectedProducto ? (
                                         <>
                                             <Text fontSize="xl" fontWeight="bold">Movimientos for {selectedProducto.producto.nombre}</Text>
@@ -198,19 +217,38 @@ function Inventario() {
                                                 <Spinner />
                                             ) : (
                                                 <>
-                                                    <List spacing={2} maxH="400px" overflowY="auto">
-                                                        {movimientos.map((mov) => (
-                                                            <ListItem
-                                                                key={mov.movimientoId}
-                                                                borderBottom="1px solid #ccc"
-                                                                p="2"
-                                                            >
-                                                                <Text>
-                                                                    Fecha: {new Date(mov.fechaMovimiento).toLocaleString()} - Cantidad: {mov.cantidad} - Causa: {mov.causa} - Observaciones: {mov.observaciones}
-                                                                </Text>
-                                                            </ListItem>
-                                                        ))}
-                                                    </List>
+                                                    <TableContainer maxH="400px" overflowY="auto">
+                                                        <Table variant="striped" colorScheme="gray" size="sm">
+                                                            <Thead position="sticky" top={0} bg="white" zIndex={1}>
+                                                                <Tr>
+                                                                    <Th>Fecha</Th>
+                                                                    <Th>Cantidad</Th>
+                                                                    <Th>Unidades</Th>
+                                                                    <Th>Causa</Th>
+                                                                    <Th>Observaciones</Th>
+                                                                </Tr>
+                                                            </Thead>
+                                                            <Tbody>
+                                                                {movimientos.length === 0 ? (
+                                                                    <Tr>
+                                                                        <Td colSpan={5} textAlign="center">
+                                                                            <Text py={2}>No hay movimientos para este producto.</Text>
+                                                                        </Td>
+                                                                    </Tr>
+                                                                ) : (
+                                                                    movimientos.map((mov) => (
+                                                                        <Tr key={mov.movimientoId}>
+                                                                            <Td>{new Date(mov.fechaMovimiento).toLocaleString()}</Td>
+                                                                            <Td>{mov.cantidad}</Td>
+                                                                            <Td>{mov.producto.tipoUnidades}</Td>
+                                                                            <Td>{mov.causa}</Td>
+                                                                            <Td>{mov.observaciones}</Td>
+                                                                        </Tr>
+                                                                    ))
+                                                                )}
+                                                            </Tbody>
+                                                        </Table>
+                                                    </TableContainer>
                                                     <MyPagination
                                                         page={pageMovimientos}
                                                         totalPages={totalPagesMovimientos}

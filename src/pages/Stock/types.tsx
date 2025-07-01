@@ -30,6 +30,7 @@ export interface InventarioEnTransitoDTO {
     productoId: number;
     productoNombre: string;
     cantidadTotal: number;
+    tipoUnidades: string;
     ordenesProduccionIds: number[];
 }
 

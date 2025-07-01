@@ -73,15 +73,37 @@ export default function CargaMasivaPage() {
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data'
-                    }
+                    },
+                    responseType: 'blob' // Cambiar para manejar archivos
                 }
             );
 
+            // Procesar la respuesta como un archivo para descargar
+            const blob = new Blob([uploadResponse.data]);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            // Obtener el nombre del archivo de las cabeceras de respuesta si está disponible
+            const contentDisposition = uploadResponse.headers['content-disposition'];
+            let filename = 'reporte_proveedores.xlsx';
+
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch && filenameMatch[1]) {
+                    filename = filenameMatch[1];
+                }
+            }
+
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+
             // Mostrar mensaje de éxito
-            const data = uploadResponse.data;
             toast({
-                title: "Carga exitosa",
-                description: `Se han procesado ${data.totalRecords} registros. ${data.successCount} exitosos, ${data.failureCount} fallidos.`,
+                title: "Carga completada",
+                description: "Se ha generado un reporte detallado con los resultados de la carga. Descargando...",
                 status: "success",
                 duration: 5000,
                 isClosable: true,
@@ -161,15 +183,37 @@ export default function CargaMasivaPage() {
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data'
-                    }
+                    },
+                    responseType: 'blob' // Cambiar para manejar archivos
                 }
             );
 
+            // Procesar la respuesta como un archivo para descargar
+            const blob = new Blob([uploadResponse.data]);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            // Obtener el nombre del archivo de las cabeceras de respuesta si está disponible
+            const contentDisposition = uploadResponse.headers['content-disposition'];
+            let filename = 'reporte_productos.xlsx';
+
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch && filenameMatch[1]) {
+                    filename = filenameMatch[1];
+                }
+            }
+
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+
             // Mostrar mensaje de éxito
-            const data = uploadResponse.data;
             toast({
-                title: "Carga exitosa",
-                description: `Se han procesado ${data.totalRecords} registros. ${data.successCount} exitosos, ${data.failureCount} fallidos.`,
+                title: "Carga completada",
+                description: "Se ha generado un reporte detallado con los resultados de la carga. Descargando...",
                 status: "success",
                 duration: 5000,
                 isClosable: true,
