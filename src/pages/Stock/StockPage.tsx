@@ -14,7 +14,7 @@ export default function StockPage() {
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
-            <MyHeader title={'Ordenes De ProduccionPage'}/>
+            <MyHeader title={'Stock'}/>
 
             <Tabs>
                 <TabList>

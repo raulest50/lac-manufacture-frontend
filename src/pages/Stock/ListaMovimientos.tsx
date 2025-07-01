@@ -1,4 +1,4 @@
-import React from 'react';
+
 import {
     Box, Spinner, Text, TableContainer,
     Table, Thead, Tbody, Tr, Th, Td

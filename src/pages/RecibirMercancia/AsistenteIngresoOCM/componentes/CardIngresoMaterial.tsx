@@ -42,7 +42,7 @@ export function CardIngresoMaterial({ item, onMovimientosChange }: Props) {
     // Actualizar los movimientos cuando cambian los lotes
     useEffect(() => {
         const movimientos: Movimiento[] = lotes
-            .filter(lote => lote.cantidad > 0 && lote.productionDate && lote.expirationDate)
+            .filter(lote => lote.cantidad > 0 && lote.expirationDate)
             .map(lote => ({
                 cantidad: lote.cantidad,
                 producto: item.material,
@@ -141,7 +141,7 @@ export function CardIngresoMaterial({ item, onMovimientosChange }: Props) {
                         </Flex>
 
                         <FormControl mb={2}>
-                            <FormLabel>Fecha de Fabricación</FormLabel>
+                            <FormLabel>Fecha de Fabricación (opcional)</FormLabel>
                             <Input 
                                 type="date" 
                                 value={lote.productionDate}

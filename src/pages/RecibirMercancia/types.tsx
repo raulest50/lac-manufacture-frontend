@@ -110,7 +110,7 @@ export interface OrdenCompra {
 export interface Lote{
     id?: number;
     batchNumber?: string;
-    productionDate: string;
+    productionDate?: string;
     expirationDate: string;
 }
 

@@ -34,6 +34,7 @@ export default function StepThreeComponent({
                                          }: StepThreeComponentProps) {
 
     const [observaciones, setObservaciones] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const onClickEnviar = async () => {
         if (!docIngresoDTA || !docIngresoDTA.file) {
@@ -41,14 +42,24 @@ export default function StepThreeComponent({
             return;
         }
 
+        // Activar el estado de carga
+        setIsLoading(true);
+
         // Create a copy of the docIngresoDTA excluding the file property.
         const { file, ...docData } = docIngresoDTA;
+
+        // Renombrar ordenCompra a ordenCompraMateriales para que coincida con lo que espera el backend
+        const docDataWithRenamedProperty = {
+            ...docData,
+            ordenCompraMateriales: docData.ordenCompra,
+        };
+        delete docDataWithRenamedProperty.ordenCompra;
 
         // Build FormData.
         const formData = new FormData();
         formData.append(
             "docIngresoDTA",
-            new Blob([JSON.stringify(docData)], { type: "application/json" })
+            new Blob([JSON.stringify(docDataWithRenamedProperty)], { type: "application/json" })
         );
         formData.append("file", file);
 
@@ -63,6 +74,9 @@ export default function StepThreeComponent({
             setActiveStep(4);
         } catch (error) {
             console.error("Error creating DocIngreso:", error);
+        } finally {
+            // Desactivar el estado de carga independientemente del resultado
+            setIsLoading(false);
         }
     };
 
@@ -143,6 +157,8 @@ export default function StepThreeComponent({
                 variant="solid"
                 colorScheme={"teal"}
                 onClick={onClickEnviar}
+                isLoading={isLoading}
+                loadingText="Enviando..."
             >
                 Enviar Formato De Ingreso
             </Button>
