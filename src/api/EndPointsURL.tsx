@@ -5,6 +5,7 @@ export default class EndPointsURL{
     public search_mprima:string;
     public search_semi:string;
     public save_producto:string;
+    public update_producto:string;
     public insumos_with_stock:string;
     public search_semiytermi:string;
 
@@ -23,6 +24,7 @@ export default class EndPointsURL{
     public save_proveedores:string;
     public search_proveedores:string;
     public search_proveedores_pag :string;
+    public update_proveedores:string;
 
     // produccion resource
     public save_produccion:string;
@@ -68,19 +70,19 @@ export default class EndPointsURL{
     // just in case of need
     // contabilidad resource
     public get_cuentas: string;
-    public save_cuenta: string;
-    public update_cuenta: string;
+    // public save_cuenta: string;
+    // public update_cuenta: string;
     public get_periodos: string;
-    public save_periodo: string;
-    public update_periodo: string;
-    public update_periodo_estado: string;
-    public get_asientos: string;
-    public save_asiento: string;
-    public update_asiento: string;
+    // public save_periodo: string;
+    // public update_periodo: string;
+    // public update_periodo_estado: string;
+    // public get_asientos: string;
+    // public save_asiento: string;
+    // public update_asiento: string;
     public get_libro_mayor: string;
-    public get_balance_comprobacion: string;
-    public get_balance_general: string;
-    public get_estado_resultados: string;
+    // public get_balance_comprobacion: string;
+    // public get_balance_general: string;
+    // public get_estado_resultados: string;
 
     public domain: string;
 
@@ -102,6 +104,7 @@ export default class EndPointsURL{
         this.search_mprima = `${domain}/${productos_res}/search_mprima`;
         this.search_semi = `${domain}/${productos_res}/search_semi`;
         this.save_producto = `${domain}/${productos_res}/save`;
+        this.update_producto = `${domain}/${productos_res}/{productoId}`;
         this.insumos_with_stock = `${domain}/${productos_res}/{id}/insumos_with_stock`;
         this.search_semiytermi = `${domain}/${productos_res}/search_semiytermi`;
         this.search_p4_receta_v2 = `${domain}/${productos_res}/search_p4_receta_v2`;
@@ -119,6 +122,7 @@ export default class EndPointsURL{
         this.save_proveedores = `${domain}/${proveedores_res}/save`;
         this.search_proveedores = `${domain}/${proveedores_res}/search`;
         this.search_proveedores_pag = `${domain}/${proveedores_res}/search_pag`;
+        this.update_proveedores = `${domain}/${proveedores_res}/{id}`;
         this.bulk_upload_proveedores = `${domain}/api/bulk-upload/proveedores`;
         this.bulk_upload_productos = `${domain}/api/bulk-upload/products`;
 

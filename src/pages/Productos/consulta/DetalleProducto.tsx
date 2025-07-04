@@ -160,8 +160,9 @@ export default function DetalleProducto({producto, setEstado}: Props) {
         // Ejemplo de cómo se implementaría:
 
         try {
-            // Llamada al endpoint de actualización (a implementar en el backend)
-            // const response = await axios.put(`${endPoints.domain}/productos/${productoData.productoId}`, productoData);
+            // Llamada al endpoint de actualización
+            const url = endPoints.update_producto.replace('{productoId}', productoData.productoId);
+            const response = await axios.put(url, productoData);
 
             // Mostrar mensaje de éxito
             toast({
@@ -175,8 +176,11 @@ export default function DetalleProducto({producto, setEstado}: Props) {
             // Salir del modo edición
             setEditMode(false);
 
-            // Actualizar el producto en la vista
-            // setProducto(response.data);
+            // Actualizar el producto en la vista local
+            setProductoData(response.data);
+
+            // Notificar al componente padre que los datos han sido actualizados
+            // Si es necesario, se puede implementar un callback adicional para pasar los datos actualizados
         } catch (error) {
             console.error('Error al actualizar el producto:', error);
             toast({

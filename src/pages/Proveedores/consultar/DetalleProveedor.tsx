@@ -318,10 +318,11 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
                 formData.append("camaraFile", camaraFile);
             }
 
-            // Llamada al endpoint de actualización (a implementar en el backend)
-            // const response = await axios.put(`${endPoints.domain}/proveedores/${proveedorData.id}`, formData, {
-            //     headers: { "Content-Type": "multipart/form-data" }
-            // });
+            // Llamada al endpoint de actualización
+            const url = endPoints.update_proveedores.replace('{id}', proveedorData.id);
+            const response = await axios.put(url, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
 
             // Mostrar mensaje de éxito
             toast({
@@ -336,7 +337,7 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
             setEditMode(false);
 
             // Actualizar el proveedor en la vista
-            // setProveedor(response.data);
+            setProveedorData(response.data);
         } catch (error) {
             console.error('Error al actualizar el proveedor:', error);
             toast({

@@ -208,13 +208,16 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
                     >
                         Ver más
                     </Box>
-                    <Box
-                        p={1}
-                        _hover={{ bg: 'gray.100', cursor: 'pointer' }}
-                        onClick={handleCancelarOrden}
-                    >
-                        Cancelar Orden
-                    </Box>
+                    {/* Solo mostrar la opción de cancelar orden si el usuario es master o tiene nivel de acceso 2 o superior */}
+                    {(user === 'master' || comprasAccessLevel >= 2) && (
+                        <Box
+                            p={1}
+                            _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                            onClick={handleCancelarOrden}
+                        >
+                            Cancelar Orden
+                        </Box>
+                    )}
                     {/* Solo mostrar la opción de actualizar estado si el usuario es master o tiene nivel de acceso 2 o superior */}
                     {(user === 'master' || comprasAccessLevel >= 2) && (
                         <Box
