@@ -2,6 +2,8 @@
 export const TIPOS_PRODUCTOS = {materiaPrima: "M", semiTerminado:"S", terminado:"T"};
 export const UNIDADES = {L:"L", KG:"KG", U:"U"};
 export const TIPOS_MATERIALES = {materiaPrima: 1, materialDeEmpaque: 2};
+export const IVA_VALUES = {'iva_0':0, 'iva_5':5,'iva_19':19, };
+
 /**
  * interfaces para la codificacion de materias primas
  */
@@ -20,7 +22,7 @@ export interface Producto{
     tipoUnidades: string;
     cantidadUnidad: string;
     fechaCreacion?: string;
-    iva_percentual?: number;
+    ivaPercentual?: number;
 }
 
 export interface Material extends Producto{

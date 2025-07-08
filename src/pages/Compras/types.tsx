@@ -49,7 +49,7 @@ export interface Producto{
     nombre: string;
     observaciones: string;
     costo: number;
-    iva_percentual: number;
+    ivaPercentual: number;
     fechaCreacion?: string;
     tipoUnidades: string;
     cantidadUnidad: string;

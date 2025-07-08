@@ -68,7 +68,7 @@ export default function CrearOCM() {
         const subTotal = cantidad * precioUnitario;
 
         // Calculate IVA based on the product's IVA percentage and the IVA toggle
-        const ivaPercentage = material.iva_percentual / 100; // Convert from percentage to decimal
+        const ivaPercentage = material.ivaPercentual / 100; // Convert from percentage to decimal
         const ivaCOP = ivaEnabled ? Math.round(subTotal * ivaPercentage) : 0;
 
         const newItem: ItemOrdenCompra = {
@@ -106,7 +106,7 @@ export default function CrearOCM() {
         item.subTotal = item.cantidad * item.precioUnitario;
 
         // Calculate IVA based on the product's IVA percentage and the IVA toggle
-        const ivaPercentage = item.material.iva_percentual / 100; // Convert from percentage to decimal
+        const ivaPercentage = item.material.ivaPercentual / 100; // Convert from percentage to decimal
         item.ivaCOP = ivaEnabled ? Math.round(item.subTotal * ivaPercentage) : 0;
 
         newList[index] = item;
@@ -119,7 +119,7 @@ export default function CrearOCM() {
         setIvaEnabled(enabled);
         const newList = [...listaItemsOrdenCompra];
         newList.forEach(item => {
-            const ivaPercentage = item.material.iva_percentual / 100;
+            const ivaPercentage = item.material.ivaPercentual / 100;
             item.ivaCOP = enabled ? Math.round(item.subTotal * ivaPercentage) : 0;
         });
         setListaItemsOrdenCompra(newList);

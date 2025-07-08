@@ -10,6 +10,7 @@ import { GiBuyCard } from "react-icons/gi";
 // import { TbReportSearch } from "react-icons/tb";
 import { FaTruckRampBox } from "react-icons/fa6";
 import { FaUsersGear } from "react-icons/fa6";
+import { FaSitemap } from "react-icons/fa6";
 import { FaFileUpload } from "react-icons/fa";
 import { TbReportMoney } from 'react-icons/tb';
 import { MdOutlineInsights } from "react-icons/md";
@@ -80,6 +81,7 @@ export default function Home(){
                 <SectionCard to={'/administracion_alertas'} name={'Administracion Alertas'} icon={MdNotificationsActive} supportedModules={[Modulo.ADMINISTRACION_ALERTAS]} currentAccesos={roles}/>
                 <SectionCard to={'/master_configs'} name={'Master Config'} icon={FaCogs} supportedModules={[Modulo.MASTER_CONFIGS]} currentAccesos={roles} bgColor="red.100"/>
                 <SectionCard to={'/cronograma'} name={'Cronograma'} icon={FaCalendarAlt} supportedModules={[Modulo.CRONOGRAMA]} currentAccesos={roles}/>
+                <SectionCard to={'/organigrama'} name={'Organigrama'} icon={FaSitemap} supportedModules={[Modulo.ORGANIGRAMA]} currentAccesos={roles}/>
             </SimpleGrid>
         </Container>
     );

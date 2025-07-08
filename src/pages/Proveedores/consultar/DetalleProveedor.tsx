@@ -60,6 +60,17 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
         fetchUserAccessLevel();
     }, []);
 
+    // Inicializar un contacto vacío si el proveedor no tiene contactos
+    useEffect(() => {
+        // Si el proveedor no tiene contactos o contactos es undefined, inicializar con un contacto vacío
+        if (!proveedor.contactos || proveedor.contactos.length === 0) {
+            setProveedorData({
+                ...proveedor,
+                contactos: [{ fullName: '', cargo: '', cel: '', email: '' }]
+            });
+        }
+    }, [proveedor]);
+
     const handleBack = () => {
         setEstado(0);
     };
@@ -202,10 +213,10 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
 
         for (const contacto of proveedorData.contactos) {
             if (
-                !contacto.fullName.trim() ||
-                !contacto.cargo.trim() ||
-                !contacto.cel.trim() ||
-                !contacto.email.trim()
+                !contacto.fullName?.trim() ||
+                !contacto.cargo?.trim() ||
+                !contacto.cel?.trim() ||
+                !contacto.email?.trim()
             ) {
                 if (showToast) {
                     toast({
@@ -219,7 +230,7 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
                 return false;
             }
 
-            if (!phoneRegex.test(contacto.cel.trim())) {
+            if (!contacto.cel?.trim() || !phoneRegex.test(contacto.cel.trim())) {
                 if (showToast) {
                     toast({
                         title: 'Teléfono inválido',
@@ -232,7 +243,7 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
                 return false;
             }
 
-            if (!emailRegex.test(contacto.email.trim())) {
+            if (!contacto.email?.trim() || !emailRegex.test(contacto.email.trim())) {
                 if (showToast) {
                     toast({
                         title: 'Email inválido',
@@ -258,13 +269,13 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
         }
 
         // Verificar cambios en contactos
-        if (proveedorData.contactos.length !== proveedor.contactos.length) {
+        if (proveedorData.contactos.length !== (proveedor.contactos?.length || 0)) {
             return true;
         }
 
         for (let i = 0; i < proveedorData.contactos.length; i++) {
             const currentContact = proveedorData.contactos[i];
-            const originalContact = proveedor.contactos[i];
+            const originalContact = proveedor.contactos?.[i] || { fullName: '', cargo: '', cel: '', email: '' };
 
             if (currentContact.fullName !== originalContact.fullName ||
                 currentContact.cargo !== originalContact.cargo ||

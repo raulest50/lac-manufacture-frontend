@@ -1,11 +1,36 @@
 
 // src/models/types.ts
 
-export interface Producto {
-    productoId: number;
+import {Node, ProcesoNode} from "../Productos/types.tsx";
+
+export interface Producto{
+    productoId: string;
+    tipo_producto: string;
     nombre: string;
-    tipo_producto: string; // 'T' or 'S'
-    // Other fields...
+    observaciones?: string;
+    costo: number;
+    tipoUnidades: string;
+    cantidadUnidad: string;
+    fechaCreacion?: string;
+    ivaPercentual?: number;
+}
+
+export interface Insumo {
+    cantidadRequerida: number;
+    producto: Producto;
+    subtotal?: number; // this is not part of the model at backend, but useful for frontend
+}
+
+export interface ProcesoProduccion{
+    procesoId: number;
+    procesoNodes: ProcesoNode[];
+    materiaPrimaNodes: Node[];
+    targetNode: Node;
+}
+
+export interface Terminado extends Producto {
+    insumos: Insumo[];
+    procesoProduccion: ProcesoProduccion;
 }
 
 export interface ProductoStockDTO {

@@ -35,6 +35,7 @@ import BintelligencePage from "./pages/Bintelligence/BintelligencePage.tsx";
 import AdministracionAlertasPage from "./pages/AdministracionAlertas/AdministracionAlertasPage.tsx";
 import MasterConfigsPage from "./pages/MasterConfigs/MasterConfigsPage.tsx";
 import CronogramaPage from "./pages/Cronograma/CronogramaPage.tsx";
+import OrganigramaPage from "./pages/Organigrama/OrganigramaPage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -166,6 +167,15 @@ const router = createBrowserRouter(
                     element={
                         <MultiRoleProtectedRoute supportedModules={[Modulo.CRONOGRAMA]}>
                             <CronogramaPage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="organigrama"
+                    element={
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.ORGANIGRAMA]}>
+                            <OrganigramaPage/>
                         </MultiRoleProtectedRoute>
                     }
                 />

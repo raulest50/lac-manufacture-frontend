@@ -1,16 +1,18 @@
 import {
     Flex, Box, Heading, Text, Button, VStack, HStack, 
     Grid, GridItem, Card, CardHeader, CardBody, 
-    FormControl, FormLabel, Select, Input, Textarea,
-    useToast, NumberInput, NumberInputField, NumberInputStepper,
-    NumberIncrementStepper, NumberDecrementStepper
+    FormControl, Select, Input, Textarea,
+    useToast,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import { Producto } from "../types.tsx";
+import {Material, Producto} from "../types.tsx";
 import { ArrowBackIcon, EditIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
 import { useAuth } from '../../../context/AuthContext';
+import {IVA_VALUES} from "../types.tsx";
+
+import {Authority} from "../../../api/global_types.tsx";
 
 type Props = {
     producto: Producto;
@@ -23,7 +25,7 @@ type Props = {
  */
 export default function DetalleProducto({producto, setEstado}: Props) {
     const [editMode, setEditMode] = useState(false);
-    const [productoData, setProductoData] = useState<Producto>({...producto});
+    const [productoData, setProductoData] = useState<Producto | Material>({...producto});
     const [productosAccessLevel, setProductosAccessLevel] = useState<number>(0);
     const [isFormValid, setIsFormValid] = useState<boolean>(true);
     const [hasChanges, setHasChanges] = useState<boolean>(false);
@@ -39,7 +41,7 @@ export default function DetalleProducto({producto, setEstado}: Props) {
                 const authorities = response.data.authorities;
 
                 const productosAuthority = authorities.find(
-                    auth => auth.authority === "ACCESO_PRODUCTOS"
+                    (auth:Authority) => auth.authority === "ACCESO_PRODUCTOS"
                 );
 
                 if (productosAuthority) {
@@ -58,7 +60,10 @@ export default function DetalleProducto({producto, setEstado}: Props) {
     };
 
     // Manejar cambios en los campos editables
-    const handleInputChange = (field: keyof Producto, value: any) => {
+    const handleInputChange = (
+        field: keyof (Producto | Material),
+        value: string | number | undefined) =>
+    {
         setProductoData({
             ...productoData,
             [field]: value
@@ -101,7 +106,7 @@ export default function DetalleProducto({producto, setEstado}: Props) {
         }
 
         // Validar IVA (debe ser un número entre 0 y 100)
-        const iva = productoData.iva_percentual !== undefined ? productoData.iva_percentual : 0;
+        const iva = productoData.ivaPercentual !== undefined ? productoData.ivaPercentual : 0;
         if (isNaN(iva) || iva < 0 || iva > 100) {
             if (showToast) {
                 toast({
@@ -124,7 +129,7 @@ export default function DetalleProducto({producto, setEstado}: Props) {
         if (productoData.nombre !== producto.nombre ||
             productoData.cantidadUnidad !== producto.cantidadUnidad ||
             productoData.observaciones !== producto.observaciones ||
-            productoData.iva_percentual !== producto.iva_percentual) {
+            productoData.ivaPercentual !== producto.ivaPercentual) {
             return true;
         }
 
@@ -132,7 +137,7 @@ export default function DetalleProducto({producto, setEstado}: Props) {
         if (producto.tipo_producto === 'M' && 
             'tipoMaterial' in productoData && 
             'tipoMaterial' in producto && 
-            (productoData as any).tipoMaterial !== (producto as any).tipoMaterial) {
+            (productoData as Material).tipoMaterial !== (producto as Material).tipoMaterial) {
             return true;
         }
 
@@ -292,7 +297,7 @@ export default function DetalleProducto({producto, setEstado}: Props) {
                                         {editMode ? (
                                             <FormControl mt={2}>
                                                 <Select
-                                                    value={(productoData as any).tipoMaterial}
+                                                    value={(productoData as Material).tipoMaterial}
                                                     onChange={(e) => handleInputChange('tipoMaterial', Number(e.target.value))}
                                                 >
                                                     <option value={1}>Materia Prima</option>
@@ -300,7 +305,7 @@ export default function DetalleProducto({producto, setEstado}: Props) {
                                                 </Select>
                                             </FormControl>
                                         ) : (
-                                            <Text>{getTipoMaterialText((producto as any).tipoMaterial)}</Text>
+                                            <Text>{getTipoMaterialText((producto as Material).tipoMaterial)}</Text>
                                         )}
                                     </Box>
                                 )}
@@ -333,21 +338,19 @@ export default function DetalleProducto({producto, setEstado}: Props) {
                                     <Text fontWeight="bold">IVA (%):</Text>
                                     {editMode ? (
                                         <FormControl mt={2}>
-                                            <NumberInput
-                                                value={productoData.iva_percentual || 0}
-                                                onChange={(valueString) => handleInputChange('iva_percentual', Number(valueString))}
-                                                min={0}
-                                                max={100}
+                                            <Select
+                                                value={productoData.ivaPercentual}
+                                                onChange={(e) =>
+                                                    handleInputChange('ivaPercentual', Number(e.target.value))
+                                                }
                                             >
-                                                <NumberInputField />
-                                                <NumberInputStepper>
-                                                    <NumberIncrementStepper />
-                                                    <NumberDecrementStepper />
-                                                </NumberInputStepper>
-                                            </NumberInput>
+                                                <option value={IVA_VALUES.iva_0}> No Tiene </option>
+                                                <option value={IVA_VALUES.iva_5} > 5 %</option>
+                                                <option value={IVA_VALUES.iva_19} > 19 %</option>
+                                            </Select>
                                         </FormControl>
                                     ) : (
-                                        <Text>{producto.iva_percentual || 0}%</Text>
+                                        <Text>{producto.ivaPercentual || 0}%</Text>
                                     )}
                                 </Box>
                                 {producto.fechaCreacion && (

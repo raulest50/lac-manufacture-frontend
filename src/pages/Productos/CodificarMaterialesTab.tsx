@@ -21,6 +21,7 @@ import {Material, UNIDADES, TIPOS_PRODUCTOS, TIPOS_MATERIALES} from "./types";
 
 import { FaFileUpload } from "react-icons/fa";
 import EndPointsURL from "../../api/EndPointsURL";
+import {IVA_VALUES} from "./types.tsx"
 
 function CodificarMaterialesTab() {
     const [nombre, setNombre] = useState('');
@@ -32,8 +33,6 @@ function CodificarMaterialesTab() {
     const [tipoMaterial, setTipoMaterial] = useState(TIPOS_MATERIALES.materiaPrima);
 
     const [ivaPercentage, setIvaPercentage] = useState(0);
-
-    const IVA_VALUES = {'iva_0':0, 'iva_5':5,'iva_19':19, };
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -172,7 +171,7 @@ function CodificarMaterialesTab() {
             cantidadUnidad: cantidad_unidad,
             tipo_producto: TIPOS_PRODUCTOS.materiaPrima,
             tipoMaterial: tipoMaterial,
-            iva_percentual: ivaPercentage
+            ivaPercentual: ivaPercentage
         };
 
         // Create a FormData object and append the materiaPrima as a Blob with correct MIME type.

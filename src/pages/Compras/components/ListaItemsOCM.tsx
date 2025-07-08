@@ -106,7 +106,7 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                                         }
                                     />
                                 </Td>
-                                <Td isNumeric>{item.material.iva_percentual}%</Td>
+                                <Td isNumeric>{item.material.ivaPercentual}%</Td>
                                 <Td isNumeric>{formatCOP(item.ivaCOP)}</Td>
                                 <Td isNumeric>{formatCOP(item.subTotal)}</Td>
                                 <Td>
