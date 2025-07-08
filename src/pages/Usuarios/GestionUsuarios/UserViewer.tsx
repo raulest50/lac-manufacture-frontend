@@ -7,9 +7,9 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import ModuleSelectionDialog, { ModuleItem } from './ModuleSelectionDialog.tsx';
-import {User, Acceso} from './types';
+import {User, Acceso} from './types.tsx';
 import { Modulo } from './types.tsx';
-import EndPointsURL from "../../api/EndPointsURL.tsx";
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
 
 type Props = {
     setViewMode: (viewMode: number) => void;

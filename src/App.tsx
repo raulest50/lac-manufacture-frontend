@@ -26,7 +26,7 @@ import RecibirMercanciaPage from "./pages/RecibirMercancia/RecibirMercanciaPage.
 import UsuariosPage from "./pages/Usuarios/UsuariosPage.tsx";
 import MultiRoleProtectedRoute from "./components/MultiRoleProtectedRoute.tsx";
 
-import { Modulo } from "./pages/Usuarios/types.tsx";
+import { Modulo } from "./pages/Usuarios/GestionUsuarios/types.tsx";
 import CargaMasivaPage from "./pages/CargaMasiva/CargaMasivaPage.tsx";
 import ActivosPage from "./pages/Activos/ActivosPage.tsx";
 import ContabilidadPage from "./pages/Contabilidad/ContabilidadPage.tsx";

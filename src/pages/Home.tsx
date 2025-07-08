@@ -21,7 +21,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 
 import '@fontsource-variable/comfortaa'
 
-import { Modulo } from "./Usuarios/types.tsx";
+import { Modulo } from "./Usuarios/GestionUsuarios/types.tsx";
 
 import { useAuth } from '../context/AuthContext';
 

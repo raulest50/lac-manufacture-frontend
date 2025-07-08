@@ -14,7 +14,7 @@ import {
     FormErrorMessage
 } from '@chakra-ui/react';
 import axios from 'axios';
-import EndPointsURL from '../../api/EndPointsURL';
+import EndPointsURL from '../../../api/EndPointsURL.tsx';
 
 type Props = {
     onUserCreated: () => void;
