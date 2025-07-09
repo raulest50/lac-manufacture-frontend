@@ -2,9 +2,7 @@ import {
     Flex, Box, Heading, Text, Button, VStack, HStack, 
     Grid, GridItem, Card, CardHeader, CardBody, 
     FormControl, FormLabel, Select, Input, Icon,
-    useToast, useDisclosure, Modal, ModalOverlay,
-    ModalContent, ModalHeader, ModalFooter, ModalBody,
-    ModalCloseButton
+    useToast
 } from '@chakra-ui/react';
 import { useState, useEffect, useRef } from 'react';
 import { Proveedor, Contacto } from "../types.tsx";
@@ -13,18 +11,20 @@ import { FaFileCircleQuestion, FaFileCircleCheck } from "react-icons/fa6";
 import axios from 'axios';
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
 import { useAuth } from '../../../context/AuthContext';
+import {Authority} from "../../../api/global_types.tsx";
 
 type Props = {
     proveedor: Proveedor;
     setEstado: (estado: number) => void;
+    setProveedorSeleccionado?: (proveedor: Proveedor) => void;
+    refreshSearch?: () => void;
 };
 
 /**
  * Componente que muestra la información detallada de un proveedor dado.
  * Permite edición de ciertos campos si el usuario tiene nivel de acceso 3.
  */
-export function DetalleProveedor({proveedor, setEstado}: Props) {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+export function DetalleProveedor({proveedor, setEstado, setProveedorSeleccionado, refreshSearch}: Props) {
     const [editMode, setEditMode] = useState(false);
     const [proveedorData, setProveedorData] = useState<Proveedor>({...proveedor});
     const [proveedoresAccessLevel, setProveedoresAccessLevel] = useState<number>(0);
@@ -46,7 +46,7 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
                 const authorities = response.data.authorities;
 
                 const proveedoresAuthority = authorities.find(
-                    auth => auth.authority === "ACCESO_PROVEEDORES"
+                    (auth:Authority) => auth.authority === "ACCESO_PROVEEDORES"
                 );
 
                 if (proveedoresAuthority) {
@@ -73,6 +73,10 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
 
     const handleBack = () => {
         setEstado(0);
+        // Si existe una función para refrescar la búsqueda, llamarla
+        if (typeof refreshSearch === 'function') {
+            refreshSearch();
+        }
     };
 
     // Manejar cambios en los campos editables
@@ -310,9 +314,6 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
             return;
         }
 
-        // Aquí iría la llamada al backend para actualizar el proveedor
-        // Ejemplo de cómo se implementaría:
-
         try {
             // Crear FormData para enviar archivos
             const formData = new FormData();
@@ -347,8 +348,14 @@ export function DetalleProveedor({proveedor, setEstado}: Props) {
             // Salir del modo edición
             setEditMode(false);
 
-            // Actualizar el proveedor en la vista
+            // Actualizar el proveedor en la vista local con los datos completos del servidor
             setProveedorData(response.data);
+
+            // Actualizar también el proveedor seleccionado para mantener la consistencia
+            // cuando se regrese a la vista de lista
+            if (typeof setProveedorSeleccionado === 'function') {
+                setProveedorSeleccionado(response.data);
+            }
         } catch (error) {
             console.error('Error al actualizar el proveedor:', error);
             toast({

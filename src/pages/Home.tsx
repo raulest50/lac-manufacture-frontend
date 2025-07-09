@@ -8,7 +8,8 @@ import { FaIndustry } from "react-icons/fa";
 import { GiChemicalDrop } from "react-icons/gi";
 import { GiBuyCard } from "react-icons/gi";
 // import { TbReportSearch } from "react-icons/tb";
-import { FaTruckRampBox } from "react-icons/fa6";
+// import { FaTruckRampBox } from "react-icons/fa6";
+import { MdWarehouse } from "react-icons/md";
 import { FaUsersGear } from "react-icons/fa6";
 import { FaSitemap } from "react-icons/fa6";
 import { FaFileUpload } from "react-icons/fa";
@@ -72,14 +73,14 @@ export default function Home(){
                 <SectionCard to={'/compras'}          name={'Compras'}              icon={GiBuyCard}            supportedModules={[Modulo.COMPRAS]} currentAccesos={roles}/>
                 {/*<SectionCard to={'/informes'}         name={'Informes'}             icon={TbReportSearch}       supportedModules={[Modulo.INFORMES]} currentAccesos={roles}/>*/}
                 <SectionCard to={'/asistente_produccion'}    name={'Reporte Progreso en Procesos de Produccion'} icon={GiChemicalDrop}     supportedModules={[Modulo.SEGUIMIENTO_PRODUCCION]} currentAccesos={roles}/>
-                <SectionCard to={'/recepcion_mprima'} name={'Ingreso Mercancia'} icon={FaTruckRampBox} supportedModules={[Modulo.TRANSACCIONES_ALMACEN]} currentAccesos={roles}/>
-                <SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload} supportedModules={[Modulo.CARGA_MASIVA]} currentAccesos={roles} bgColor="red.100"/>
+                <SectionCard to={'/transacciones_almacen'} name={'Transacciones de Almacen'} icon={MdWarehouse} supportedModules={[Modulo.TRANSACCIONES_ALMACEN]} currentAccesos={roles}/>
+                <SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload} supportedModules={[]} currentAccesos={roles} bgColor="red.100"/>
                 <SectionCard to={'/Activos'} name={'Activos'} icon={FaSteam}          supportedModules={[Modulo.ACTIVOS]} currentAccesos={roles}/>
                 <SectionCard to={'/Contabilidad'} name={'Contabilidad'} icon={TbReportMoney}          supportedModules={[Modulo.CONTABILIDAD]} currentAccesos={roles}/>
                 <SectionCard to={'/Personal'} name={'Personal'} icon={PiMicrosoftTeamsLogoFill}          supportedModules={[Modulo.PERSONAL_PLANTA]} currentAccesos={roles}/>
                 <SectionCard to={'/Bintelligence'} name={'BI'} icon={MdOutlineInsights}          supportedModules={[Modulo.BINTELLIGENCE]} currentAccesos={roles}/>
                 <SectionCard to={'/administracion_alertas'} name={'Administracion Alertas'} icon={MdNotificationsActive} supportedModules={[Modulo.ADMINISTRACION_ALERTAS]} currentAccesos={roles}/>
-                <SectionCard to={'/master_configs'} name={'Master Config'} icon={FaCogs} supportedModules={[Modulo.MASTER_CONFIGS]} currentAccesos={roles} bgColor="red.100"/>
+                <SectionCard to={'/master_configs'} name={'Master Config'} icon={FaCogs} supportedModules={[]} currentAccesos={roles} bgColor="red.100"/>
                 <SectionCard to={'/cronograma'} name={'Cronograma'} icon={FaCalendarAlt} supportedModules={[Modulo.CRONOGRAMA]} currentAccesos={roles}/>
                 <SectionCard to={'/organigrama'} name={'Organigrama'} icon={FaSitemap} supportedModules={[Modulo.ORGANIGRAMA]} currentAccesos={roles}/>
             </SimpleGrid>

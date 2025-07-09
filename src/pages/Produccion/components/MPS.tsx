@@ -208,7 +208,7 @@ const MPS: React.FC<MPSProps> = ({ terminados }) => {
         height="auto" 
         verticalAlign="top" 
         border="1px solid" 
-        borderColor={esHoy ? MPSColors.diaActualBorde : MPSColors.bordesCeldas}
+        borderColor={esHoy ? MPSColors.diaActualBorde : MPSColors.bordeCeldas}
         bg={esHoy ? MPSColors.diaActualFondo : MPSColors.fondoCeldas}
         _hover={{ bg: MPSColors.hoverCeldas }}
       >

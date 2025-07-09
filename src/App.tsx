@@ -68,7 +68,7 @@ const router = createBrowserRouter(
                 />
 
                 <Route
-                    path="recepcion_mprima"
+                    path="transacciones_almacen"
                     element={
                         <MultiRoleProtectedRoute supportedModules={[Modulo.TRANSACCIONES_ALMACEN]}>
                             <RecibirMercanciaPage/>

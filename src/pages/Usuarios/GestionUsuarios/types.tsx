@@ -35,7 +35,7 @@ export enum Modulo {
     PROVEEDORES = "PROVEEDORES", // ruta /Proveedores
     COMPRAS = "COMPRAS", // ruta /compras
     SEGUIMIENTO_PRODUCCION = "SEGUIMIENTO_PRODUCCION", // ruta /asistente_produccion
-    TRANSACCIONES_ALMACEN = "TRANSACCIONES_ALMACEN", // ruta /recepcion_mprima
+    TRANSACCIONES_ALMACEN = "TRANSACCIONES_ALMACEN", // ruta /transacciones_almacen
     ACTIVOS = "ACTIVOS", // ruta /Activos
     CONTABILIDAD = "CONTABILIDAD", //ruta /Contabilidad
     PERSONAL_PLANTA = "PERSONAL_PLANTA", // ruta /personal

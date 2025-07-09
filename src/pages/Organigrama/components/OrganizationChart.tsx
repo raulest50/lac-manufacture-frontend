@@ -246,13 +246,6 @@ export default function OrganizationChart({
 
   return (
     <Flex direction="column" gap={8} p="1em">
-      <Flex direction="row">
-        <Heading flex={2} as="h2" size="lg" fontFamily="Comfortaa Variable">
-          Organigrama
-        </Heading>
-      </Flex>
-
-      <Divider />
 
       <Box w="full" style={{ height: "70vh", border: "1px solid #E2E8F0" }}>
         <ReactFlow
