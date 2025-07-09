@@ -17,13 +17,15 @@ import {Authority} from "../../../api/global_types.tsx";
 type Props = {
     producto: Producto;
     setEstado: (estado: number) => void;
+    setProductoSeleccionado?: (producto: Producto) => void;
+    refreshSearch?: () => void;
 };
 
 /**
  * Componente que muestra la información detallada de un producto dado.
  * Permite edición de ciertos campos si el usuario tiene nivel de acceso adecuado.
  */
-export default function DetalleProducto({producto, setEstado}: Props) {
+export default function DetalleProducto({producto, setEstado, setProductoSeleccionado, refreshSearch}: Props) {
     const [editMode, setEditMode] = useState(false);
     const [productoData, setProductoData] = useState<Producto | Material>({...producto});
     const [productosAccessLevel, setProductosAccessLevel] = useState<number>(0);
@@ -57,6 +59,10 @@ export default function DetalleProducto({producto, setEstado}: Props) {
 
     const handleBack = () => {
         setEstado(0);
+        // Si existe una función para refrescar la búsqueda, llamarla
+        if (typeof refreshSearch === 'function') {
+            refreshSearch();
+        }
     };
 
     // Manejar cambios en los campos editables
@@ -161,9 +167,6 @@ export default function DetalleProducto({producto, setEstado}: Props) {
             return;
         }
 
-        // Aquí iría la llamada al backend para actualizar el producto
-        // Ejemplo de cómo se implementaría:
-
         try {
             // Llamada al endpoint de actualización
             const url = endPoints.update_producto.replace('{productoId}', productoData.productoId);
@@ -181,11 +184,14 @@ export default function DetalleProducto({producto, setEstado}: Props) {
             // Salir del modo edición
             setEditMode(false);
 
-            // Actualizar el producto en la vista local
+            // Actualizar el producto en la vista local con los datos completos del servidor
             setProductoData(response.data);
 
-            // Notificar al componente padre que los datos han sido actualizados
-            // Si es necesario, se puede implementar un callback adicional para pasar los datos actualizados
+            // Actualizar también el producto seleccionado para mantener la consistencia
+            // cuando se regrese a la vista de lista
+            if (typeof setProductoSeleccionado === 'function') {
+                setProductoSeleccionado(response.data);
+            }
         } catch (error) {
             console.error('Error al actualizar el producto:', error);
             toast({

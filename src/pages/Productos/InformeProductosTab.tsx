@@ -79,7 +79,9 @@ export default function InformeProductosTab() {
         return (
             <DetalleProducto 
                 producto={productoSeleccionado} 
-                setEstado={setEstado} 
+                setEstado={setEstado}
+                setProductoSeleccionado={setProductoSeleccionado}
+                refreshSearch={handleSearch}
             />
         );
     }

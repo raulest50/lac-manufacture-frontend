@@ -4,7 +4,8 @@ export const MPSColors = {
   fondoGeneral:       "#F5F7FA", // Gris muy claro, limpio, sirve de lienzo neutro
   fondoCabecera:      "#FFFFFF", // Blanco puro, mantiene aire y hace destacar la pestaña activa
   cabeceraBorder:     "#E2E8F0", // Delineado suave, da estructura sin recargar
-  pestañaActivaFondo: "#E0F7FA", // Cian muy pálido, marca claramente la vista actual
+  tabActivaFondo:     "#E0F7FA", // Cian muy pálido, marca claramente la vista actual
+  diaActualFondo:     "#80b9c7", // Cian muy pálido, marca claramente la vista actual
 
   // Tab text
   textoPestanasInactivas: "#687182", // Gris azulado medio, legible pero secundario
@@ -31,6 +32,7 @@ export const MPSColors = {
   endingText:         "#047857", // Verde oscuro, alta legibilidad
 
   // Actions
-  botonAgregar:       "#0E7490", // Cian oscuro, consistente con acentos principales
-  iconoAccion:        "#F43F5F", // Papelera de basura, Rojo neon, aviso de accion destructiva
+  //botonAgregar:       "#0E7490", // Cian oscuro, consistente con acentos principales
+  botonAgregar:       "#047857", // Cian oscuro, consistente con acentos principales
+  iconoEliminar:        "#F43F5F", // Papelera de basura, Rojo neon, aviso de accion destructiva
 };
