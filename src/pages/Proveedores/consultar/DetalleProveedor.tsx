@@ -396,7 +396,7 @@ export function DetalleProveedor({proveedor, setEstado, setProveedorSeleccionado
     const canEdit = user === 'master' || proveedoresAccessLevel >= 3;
 
     return (
-        <Box p={5}>
+        <Box p={5} bg="white" borderRadius="md" boxShadow="base">
             <Flex justifyContent="space-between" alignItems="center" mb={5}>
                 <Button 
                     leftIcon={<ArrowBackIcon />} 
@@ -441,7 +441,7 @@ export function DetalleProveedor({proveedor, setEstado, setProveedorSeleccionado
                 )}
             </Flex>
 
-            <Card mb={5}>
+            <Card mb={5} variant="outline" boxShadow="md">
                 <CardHeader bg="blue.50">
                     <Heading size="md">{proveedor.nombre}</Heading>
                     <Text color="gray.600">ID: {proveedor.id}</Text>
@@ -516,7 +516,7 @@ export function DetalleProveedor({proveedor, setEstado, setProveedorSeleccionado
 
             {/* Sección de archivos (RUT y Cámara de Comercio) */}
             {editMode && (
-                <Card mb={5}>
+                <Card mb={5} variant="outline" boxShadow="md">
                     <CardHeader bg="blue.50">
                         <Heading size="md">Documentos</Heading>
                     </CardHeader>
@@ -566,14 +566,14 @@ export function DetalleProveedor({proveedor, setEstado, setProveedorSeleccionado
             )}
 
             {/* Sección de contactos */}
-            <Card>
+            <Card variant="outline" boxShadow="md">
                 <CardHeader bg="blue.50">
                     <Heading size="md">Contactos</Heading>
                 </CardHeader>
                 <CardBody>
                     <VStack spacing={4} align="stretch">
                         {(editMode ? proveedorData.contactos : proveedor.contactos).map((contacto, index) => (
-                            <Box key={index} p={3} borderWidth="1px" borderRadius="md">
+                            <Box key={index} p={3} borderWidth="1px" borderRadius="md" bg="gray.50">
                                 {editMode ? (
                                     <>
                                         <Grid templateColumns="repeat(2, 1fr)" gap={4}>
