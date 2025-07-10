@@ -1,5 +1,5 @@
 // src/pages/Organigrama/prototype_data.tsx
-import { AccessLevel, Position, FunctionManual, OrganizationChart } from "./types";
+import { AccessLevel, Cargo, FunctionManual, OrganizationChart } from "./types";
 
 // Mock user access level - can be changed to test different permission levels
 export const mockUserAccess = {
@@ -7,43 +7,43 @@ export const mockUserAccess = {
 };
 
 // Mock positions for the organization chart
-export const mockPositions: Position[] = [
+export const mockPositions: Cargo[] = [
   // Level 1 - CEO
   {
     id: "pos-1",
-    title: "Director General",
-    department: "Dirección",
-    description: "Responsable de la dirección estratégica y operativa de la empresa",
+    tituloCargo: "Director General",
+    departamento: "Dirección",
+    descripcionCargo: "Responsable de la dirección estratégica y operativa de la empresa",
     level: 1
   },
 
   // Level 2 - Directors
   {
     id: "pos-2",
-    title: "Director de Producción",
-    department: "Producción",
-    description: "Responsable de supervisar todos los procesos de producción",
-    reportTo: "pos-1",
+    tituloCargo: "Director de Producción",
+    departamento: "Producción",
+    descripcionCargo: "Responsable de supervisar todos los procesos de producción",
+    jefeInmediato: "pos-1",
     level: 2
   },
 
   // Level 3 - Managers
   {
     id: "pos-6",
-    title: "Gerente de Planta",
-    department: "Producción",
-    description: "Supervisa las operaciones diarias de la planta de producción",
-    reportTo: "pos-2",
+    tituloCargo: "Gerente de Planta",
+    departamento: "Producción",
+    descripcionCargo: "Supervisa las operaciones diarias de la planta de producción",
+    jefeInmediato: "pos-2",
     level: 3
   },
 
   // Level 4 - Staff
   {
     id: "pos-11",
-    title: "Supervisor de Producción",
-    department: "Producción",
-    description: "Supervisa el trabajo de los operarios de producción",
-    reportTo: "pos-6",
+    tituloCargo: "Supervisor de Producción",
+    departamento: "Producción",
+    descripcionCargo: "Supervisa el trabajo de los operarios de producción",
+    jefeInmediato: "pos-6",
     level: 4
   }
 ];
@@ -152,12 +152,12 @@ export const mockApiResponses = {
   },
 
   // Create a new position
-  createPosition: (position: Position) => {
+  createPosition: (position: Cargo) => {
     return Promise.resolve({ data: position });
   },
 
   // Update a position
-  updatePosition: (id: string, data: Partial<Position>) => {
+  updatePosition: (id: string, data: Partial<Cargo>) => {
     const position = mockPositions.find(pos => pos.id === id);
     if (position) {
       return Promise.resolve({ data: { ...position, ...data } });

@@ -15,7 +15,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import PositionNode from "./PositionNode";
-import { Position, PositionNodeData, AccessLevel } from "../types";
+import { Cargo, PositionNodeData, AccessLevel } from "../types";
 import EditPositionDialog from "./EditPositionDialog";
 import axios from "axios";
 // Import mock API responses
@@ -37,18 +37,18 @@ export default function OrganizationChart({
   onNavigateToDetails 
 }: Props) {
   const toast = useToast();
-  const [positions, setPositions] = useState<Position[]>([]);
+  const [positions, setPositions] = useState<Cargo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Convertir posiciones a nodos para React Flow
-  const createNodesFromPositions = (positions: Position[]): Node[] => {
+  const createNodesFromPositions = (positions: Cargo[]): Node[] => {
     return positions.map((position, index) => ({
       id: position.id,
       data: {
         id: position.id,
-        title: position.title,
-        department: position.department,
-        description: position.description,
+        title: position.tituloCargo,
+        department: position.departamento,
+        description: position.descripcionCargo,
         level: position.level,
       } as PositionNodeData,
       position: { 
@@ -60,12 +60,12 @@ export default function OrganizationChart({
   };
 
   // Crear conexiones entre nodos basadas en la relación reportTo
-  const createEdgesFromPositions = (positions: Position[]): Edge[] => {
+  const createEdgesFromPositions = (positions: Cargo[]): Edge[] => {
     return positions
-      .filter(position => position.reportTo)
+      .filter(position => position.jefeInmediato)
       .map(position => ({
-        id: `e-${position.reportTo}-${position.id}`,
-        source: position.reportTo!,
+        id: `e-${position.jefeInmediato}-${position.id}`,
+        source: position.jefeInmediato!,
         target: position.id,
         type: 'smoothstep',
       }));
@@ -130,13 +130,13 @@ export default function OrganizationChart({
     try {
       // Usar mock API en lugar de axios
       await mockApiResponses.updatePosition(positionId, {
-        reportTo: reportToId
+        jefeInmediato: reportToId
       });
 
       // Actualizar el estado local
       setPositions(prevPositions => 
         prevPositions.map(pos => 
-          pos.id === positionId ? { ...pos, reportTo: reportToId } : pos
+          pos.id === positionId ? { ...pos, jefeInmediato: reportToId } : pos
         )
       );
     } catch (error) {
@@ -152,11 +152,11 @@ export default function OrganizationChart({
   const addNewPosition = () => {
     if (accessLevel !== AccessLevel.EDIT) return;
 
-    const newPosition: Position = {
+    const newPosition: Cargo = {
       id: `pos-${Date.now()}`,
-      title: "Nuevo Cargo",
-      department: "Departamento",
-      description: "Descripción del cargo",
+      tituloCargo: "Nuevo Cargo",
+      departamento: "Departamento",
+      descripcionCargo: "Descripción del cargo",
       level: 1,
     };
 
@@ -165,9 +165,9 @@ export default function OrganizationChart({
       id: newPosition.id,
       data: {
         id: newPosition.id,
-        title: newPosition.title,
-        department: newPosition.department,
-        description: newPosition.description,
+        title: newPosition.tituloCargo,
+        department: newPosition.departamento,
+        description: newPosition.descripcionCargo,
         level: newPosition.level,
       } as PositionNodeData,
       position: { x: 100, y: nodes.length * 150 },
@@ -179,7 +179,7 @@ export default function OrganizationChart({
   };
 
   // Guardar una nueva posición en el backend
-  const saveNewPosition = async (position: Position, node: Node) => {
+  const saveNewPosition = async (position: Cargo, node: Node) => {
     try {
       // Usar mock API en lugar de axios
       const response = await mockApiResponses.createPosition(position);
@@ -330,9 +330,9 @@ export default function OrganizationChart({
     try {
       // Usar mock API en lugar de axios
       await mockApiResponses.updatePosition(positionId, {
-        title: data.title,
-        department: data.department,
-        description: data.description,
+        tituloCargo: data.title,
+        departamento: data.department,
+        descripcionCargo: data.description,
         level: data.level,
       });
 
@@ -342,9 +342,9 @@ export default function OrganizationChart({
           pos.id === positionId 
             ? { 
                 ...pos, 
-                title: data.title,
-                department: data.department,
-                description: data.description,
+                tituloCargo: data.title,
+                departamento: data.department,
+                descripcionCargo: data.description,
                 level: data.level,
               } 
             : pos

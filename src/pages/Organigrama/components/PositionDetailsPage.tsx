@@ -14,7 +14,7 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
-import { AccessLevel, FunctionManual, Position } from "../types";
+import { AccessLevel, FunctionManual, Cargo } from "../types";
 import axios from "axios";
 // Import mock API responses
 import { mockApiResponses } from "../prototype_data";
@@ -29,7 +29,7 @@ export default function PositionDetailsPage({ positionId, accessLevel, onBack }:
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [position, setPosition] = useState<Position | null>(null);
+  const [position, setPosition] = useState<Cargo | null>(null);
   const [manual, setManual] = useState<FunctionManual | null>(null);
   const [editableManual, setEditableManual] = useState<FunctionManual | null>(null);
 
@@ -154,14 +154,14 @@ export default function PositionDetailsPage({ positionId, accessLevel, onBack }:
       </HStack>
 
       <Heading as="h1" size="xl" mb={2}>
-        {position.title}
+        {position.tituloCargo}
       </Heading>
 
       <Text fontSize="lg" color="gray.600" mb={4}>
-        Departamento: {position.department}
+        Departamento: {position.departamento}
       </Text>
 
-      <Text mb={6}>{position.description}</Text>
+      <Text mb={6}>{position.descripcionCargo}</Text>
 
       <Divider mb={6} />
 

@@ -22,7 +22,6 @@ import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
 import LoginPanel from "./pages/LoginPage/LoginPanel.tsx";
 import ResetPasswordPage from "./pages/LoginPage/ResetPasswordPage.tsx";
 import InformesPage from "./pages/Informes/InformesPage.tsx";
-import RecibirMercanciaPage from "./pages/RecibirMercancia/RecibirMercanciaPage.tsx";
 import UsuariosPage from "./pages/Usuarios/UsuariosPage.tsx";
 import MultiRoleProtectedRoute from "./components/MultiRoleProtectedRoute.tsx";
 
@@ -36,6 +35,9 @@ import AdministracionAlertasPage from "./pages/AdministracionAlertas/Administrac
 import MasterConfigsPage from "./pages/MasterConfigs/MasterConfigsPage.tsx";
 import CronogramaPage from "./pages/Cronograma/CronogramaPage.tsx";
 import OrganigramaPage from "./pages/Organigrama/OrganigramaPage.tsx";
+import TransaccionesAlmacenPage from "./pages/TransaccionesAlmacen/TransaccionesAlmacenPage.tsx";
+import ClientesPage from "./pages/Clientes/ClientesPage.tsx";
+import VentasPage from "./pages/Ventas/VentasPage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -68,10 +70,28 @@ const router = createBrowserRouter(
                 />
 
                 <Route
+                    path="clientes"
+                    element={
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.CLIENTES]}>
+                            <ClientesPage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="ventas"
+                    element={
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.VENTAS]}>
+                            <VentasPage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
+
+                <Route
                     path="transacciones_almacen"
                     element={
                         <MultiRoleProtectedRoute supportedModules={[Modulo.TRANSACCIONES_ALMACEN]}>
-                            <RecibirMercanciaPage/>
+                            <TransaccionesAlmacenPage/>
                         </MultiRoleProtectedRoute>
                     }
                 />
@@ -138,7 +158,7 @@ const router = createBrowserRouter(
                 <Route
                     path="carga_masiva"
                     element={
-                        <ProtectedRoute requiredModulo={Modulo.CARGA_MASIVA}>
+                        <ProtectedRoute requiredModulo={""}>
                             <CargaMasivaPage/>
                         </ProtectedRoute>
                     }
@@ -156,7 +176,7 @@ const router = createBrowserRouter(
                 <Route
                     path="master_configs"
                     element={
-                        <MultiRoleProtectedRoute supportedModules={[Modulo.MASTER_CONFIGS]}>
+                        <MultiRoleProtectedRoute supportedModules={[""]}>
                             <MasterConfigsPage/>
                         </MultiRoleProtectedRoute>
                     }

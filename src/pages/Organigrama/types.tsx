@@ -5,13 +5,14 @@ export enum AccessLevel {
 }
 
 // Interfaz para el cargo en el organigrama
-export interface Position {
-  id: string;
-  title: string;        // Título del cargo
-  department: string;   // Departamento
-  description: string;  // Descripción breve
-  reportTo?: string;    // ID del cargo al que reporta
-  level: number;        // Nivel jerárquico
+export interface Cargo {
+  idCargo: string;
+  tituloCargo: string;        // Título del cargo
+  descripcionCargo: string;  // Descripción breve
+  departamento: string;   // Departamento
+  jefeInmediato?: string;    // ID del cargo al que reporta
+  urlDocManualFunciones?: string; // url del pdf con el manual de funciones aprovado
+  usuario?: string; // Id Usuario asignado al cargo
 }
 
 // Datos para el nodo de cargo
@@ -39,6 +40,6 @@ export interface OrganizationChart {
   id: string;
   name: string;
   description: string;
-  positions: Position[];
+  positions: Cargo[];
   functionManuals: Record<string, FunctionManual>; // Manuales indexados por positionId
 }

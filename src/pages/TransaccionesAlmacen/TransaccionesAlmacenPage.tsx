@@ -4,7 +4,7 @@ import AsistenteIngresoMercancia from "./AsistenteIngresoOCM/AsistenteIngresoMer
 import {AsistenteDispensacion} from "./AsistenteDispensacion/AsistenteDispensacion.tsx";
 
 
-export default function RecibirMercanciaPage(){
+export default function TransaccionesAlmacenPage(){
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>

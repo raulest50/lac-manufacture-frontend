@@ -21,6 +21,18 @@ export default function UserViewer({setViewMode}:Props) {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [selectedAcceso, setSelectedAcceso] = useState<Acceso | null>(null);
     const [showModuleDialog, setShowModuleDialog] = useState(false);
+
+    // Estados de carga para los botones
+    const [isCreatingUser, setIsCreatingUser] = useState(false);
+    const [isDeletingUser, setIsDeletingUser] = useState(false);
+    const [isActivatingUser, setIsActivatingUser] = useState(false);
+    const [isDeactivatingUser, setIsDeactivatingUser] = useState(false);
+    const [isAddingAcceso, setIsAddingAcceso] = useState(false);
+    const [isRemovingAcceso, setIsRemovingAcceso] = useState(false);
+
+    // Variable para verificar si alguna operación está en curso
+    const isLoading = isCreatingUser || isDeletingUser || isActivatingUser || isDeactivatingUser || isAddingAcceso || isRemovingAcceso;
+
     const toast = useToast();
     const endPoints = new EndPointsURL();
 
@@ -68,6 +80,8 @@ export default function UserViewer({setViewMode}:Props) {
             });
             return;
         }
+
+        setIsDeletingUser(true);
         try {
             await axios.delete(`${endPoints.domain}/usuarios/${selectedUser.id}`);
             toast({
@@ -82,16 +96,126 @@ export default function UserViewer({setViewMode}:Props) {
         } catch (error) {
             toast({
                 title: 'Error',
-                description: 'No se pudo eliminar el usuario.',
+                description: error.response?.data || 'No se pudo eliminar el usuario.',
                 status: 'error',
                 duration: 5000,
                 isClosable: true,
             });
+        } finally {
+            setIsDeletingUser(false);
+        }
+    };
+
+    const handleDeactivateUser = async () => {
+        if (!selectedUser) return;
+        if (selectedUser.username.toLowerCase() === 'master') {
+            toast({
+                title: 'Acción no permitida',
+                description: 'El usuario master no se puede desactivar.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        // Solo permitir desactivar si el usuario está activo (estado = 1)
+        if (selectedUser.estado !== 1) {
+            toast({
+                title: 'Acción no permitida',
+                description: 'El usuario ya está desactivado.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        setIsDeactivatingUser(true);
+        try {
+            const response = await axios.put(
+                endPoints.deactivate_user.replace('{userId}', selectedUser.id.toString())
+            );
+            toast({
+                title: 'Usuario desactivado',
+                description: 'El usuario ha sido desactivado exitosamente.',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+            setSelectedUser(response.data);
+            fetchUsers();
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: error.response?.data || 'No se pudo desactivar el usuario.',
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setIsDeactivatingUser(false);
+        }
+    };
+
+    const handleActivateUser = async () => {
+        if (!selectedUser) return;
+
+        // No permitir activar al usuario master
+        if (selectedUser.username.toLowerCase() === 'master') {
+            toast({
+                title: 'Acción no permitida',
+                description: 'El usuario master siempre está activo.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        // Solo permitir activar si el usuario está inactivo (estado = 2)
+        if (selectedUser.estado !== 2) {
+            toast({
+                title: 'Acción no permitida',
+                description: 'El usuario ya está activo.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        setIsActivatingUser(true);
+        try {
+            const response = await axios.put(
+                endPoints.activate_user.replace('{userId}', selectedUser.id.toString())
+            );
+            toast({
+                title: 'Usuario activado',
+                description: 'El usuario ha sido activado exitosamente.',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+            setSelectedUser(response.data);
+            fetchUsers();
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: error.response?.data || 'No se pudo activar el usuario.',
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setIsActivatingUser(false);
         }
     };
 
     const handleAddAcceso = async (moduleItem: ModuleItem) => {
         if (!selectedUser || !moduleItem.nivelAcceso) return;
+
+        setIsAddingAcceso(true);
         try {
             const response = await axios.post(
                 `${endPoints.domain}/usuarios/${selectedUser.id}/accesos/modulo?modulo=${moduleItem.modulo}&nivel=${moduleItem.nivelAcceso}`
@@ -113,6 +237,8 @@ export default function UserViewer({setViewMode}:Props) {
                 duration: 5000,
                 isClosable: true,
             });
+        } finally {
+            setIsAddingAcceso(false);
         }
     };
 
@@ -128,6 +254,8 @@ export default function UserViewer({setViewMode}:Props) {
             });
             return;
         }
+
+        setIsRemovingAcceso(true);
         try {
             const response = await axios.delete(
                 `${endPoints.domain}/usuarios/${selectedUser.id}/accesos/${accesoId}`
@@ -149,6 +277,8 @@ export default function UserViewer({setViewMode}:Props) {
                 duration: 5000,
                 isClosable: true,
             });
+        } finally {
+            setIsRemovingAcceso(false);
         }
     };
 
@@ -159,6 +289,14 @@ export default function UserViewer({setViewMode}:Props) {
         )
         : [];
 
+    const handleCreateUser = () => {
+        setIsCreatingUser(true);
+        setViewMode(1);
+        // Nota: setIsCreatingUser(false) se manejará en el componente de creación de usuario
+        // Para este ejemplo, lo desactivamos después de un tiempo
+        setTimeout(() => setIsCreatingUser(false), 500);
+    };
+
     return (
         <Box p={4}>
 
@@ -166,17 +304,54 @@ export default function UserViewer({setViewMode}:Props) {
                 Creación de Usuarios y Asignación de Accesos
             </Text>
             <Flex mb={4}>
-                <Button colorScheme="blue" mr={4} onClick={ () => setViewMode(1)}>
+                <Button 
+                    colorScheme="blue" 
+                    mr={4} 
+                    onClick={handleCreateUser}
+                    isLoading={isCreatingUser}
+                    isDisabled={isLoading}
+                >
                     Crear Nuevo Usuario
                 </Button>
                 <Button
                     colorScheme="red"
                     onClick={handleDeleteUser}
+                    isLoading={isDeletingUser}
                     isDisabled={
-                        !selectedUser || selectedUser.username.toLowerCase() === 'master'
+                        isLoading ||
+                        !selectedUser || 
+                        selectedUser.username.toLowerCase() === 'master'
                     }
+                    mr={4}
                 >
                     Eliminar Usuario
+                </Button>
+                <Button
+                    colorScheme="orange"
+                    onClick={handleDeactivateUser}
+                    isLoading={isDeactivatingUser}
+                    isDisabled={
+                        isLoading ||
+                        !selectedUser || 
+                        selectedUser.username.toLowerCase() === 'master' ||
+                        selectedUser.estado !== 1
+                    }
+                    mr={4}
+                >
+                    Desactivar Usuario
+                </Button>
+                <Button
+                    colorScheme="green"
+                    onClick={handleActivateUser}
+                    isLoading={isActivatingUser}
+                    isDisabled={
+                        isLoading ||
+                        !selectedUser || 
+                        selectedUser.username.toLowerCase() === 'master' ||
+                        selectedUser.estado !== 2
+                    }
+                >
+                    Activar Usuario
                 </Button>
             </Flex>
             <Flex>
@@ -187,6 +362,7 @@ export default function UserViewer({setViewMode}:Props) {
                                 <Th>ID</Th>
                                 <Th>Username</Th>
                                 <Th>Nombre Completo</Th>
+                                <Th>Estado</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -195,11 +371,20 @@ export default function UserViewer({setViewMode}:Props) {
                                     key={user.id}
                                     onClick={() => handleUserSelect(user)}
                                     _hover={{ bg: 'blue.50', cursor: 'pointer' }}
-                                    bg={selectedUser?.id === user.id ? 'blue.100' : 'inherit'}
+                                    bg={
+                                        selectedUser?.id === user.id 
+                                            ? 'blue.100' 
+                                            : user.username.toLowerCase() === 'master'
+                                                ? 'green.200'
+                                                : user.estado === 1 
+                                                    ? 'green.50' 
+                                                    : 'orange.50'
+                                    }
                                 >
                                     <Td>{user.id}</Td>
                                     <Td>{user.username}</Td>
                                     <Td>{user.nombreCompleto}</Td>
+                                    <Td>{user.username.toLowerCase() === 'master' ? 'Activo' : user.estado === 1 ? 'Activo' : 'Inactivo'}</Td>
                                 </Tr>
                             ))}
                         </Tbody>
@@ -246,8 +431,11 @@ export default function UserViewer({setViewMode}:Props) {
                             colorScheme="blue"
                             onClick={() => setShowModuleDialog(true)}
                             mr={2}
+                            isLoading={isAddingAcceso}
                             isDisabled={
-                                !selectedUser || selectedUser.username.toLowerCase() === 'master'
+                                isLoading ||
+                                !selectedUser || 
+                                selectedUser.username.toLowerCase() === 'master'
                             }
                         >
                             Agregar Acceso
@@ -257,7 +445,9 @@ export default function UserViewer({setViewMode}:Props) {
                             onClick={() =>
                                 selectedAcceso && handleRemoveAcceso(selectedAcceso.id)
                             }
+                            isLoading={isRemovingAcceso}
                             isDisabled={
+                                isLoading ||
                                 !selectedUser ||
                                 !selectedAcceso ||
                                 selectedUser.username.toLowerCase() === 'master'
@@ -272,9 +462,13 @@ export default function UserViewer({setViewMode}:Props) {
             {showModuleDialog && selectedUser && (
                 <ModuleSelectionDialog
                     isOpen={showModuleDialog}
-                    onClose={() => setShowModuleDialog(false)}
+                    onClose={() => {
+                        setShowModuleDialog(false);
+                        setIsAddingAcceso(false);
+                    }}
                     availableModules={assignableModules || []}
                     onModuleSelect={handleAddAcceso}
+                    isDisabled={isLoading}
                 />
             )}
         </Box>

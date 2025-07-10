@@ -37,6 +37,7 @@ interface ModuleSelectionDialogProps {
     onClose: () => void;
     availableModules: ModuleItem[];
     onModuleSelect: (module: ModuleItem) => void;
+    isDisabled?: boolean;
 }
 
 const ModuleSelectionDialog: React.FC<ModuleSelectionDialogProps> = ({
@@ -44,6 +45,7 @@ const ModuleSelectionDialog: React.FC<ModuleSelectionDialogProps> = ({
     onClose,
     availableModules,
     onModuleSelect,
+    isDisabled = false,
 }) => {
     const [selectedModule, setSelectedModule] = useState<ModuleItem | null>(null);
     const [accessLevel, setAccessLevel] = useState<number>(1);
@@ -88,13 +90,14 @@ const ModuleSelectionDialog: React.FC<ModuleSelectionDialogProps> = ({
                             availableModules.map((module) => (
                                 <ListItem
                                     key={module.id}
-                                    onClick={() => handleModuleClick(module)}
+                                    onClick={() => !isDisabled && handleModuleClick(module)}
                                     _hover={{
-                                        cursor: 'pointer',
-                                        bg: 'gray.100',
+                                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                        bg: isDisabled ? 'inherit' : 'gray.100',
                                     }}
                                     padding="2"
                                     bg={selectedModule?.id === module.id ? 'blue.100' : 'inherit'}
+                                    opacity={isDisabled ? 0.6 : 1}
                                 >
                                     <ListIcon as={CheckCircleIcon} color="green.500" />
                                     {module.displayName}
@@ -113,6 +116,7 @@ const ModuleSelectionDialog: React.FC<ModuleSelectionDialogProps> = ({
                             value={accessLevel} 
                             onChange={handleLevelChange}
                             precision={0}
+                            isDisabled={isDisabled}
                         >
                             <NumberInputField />
                             <NumberInputStepper>
@@ -124,13 +128,17 @@ const ModuleSelectionDialog: React.FC<ModuleSelectionDialogProps> = ({
                 </ModalBody>
                 <ModalFooter>
                     <Flex width="100%" justifyContent="space-between">
-                        <Button colorScheme="gray" onClick={resetAndClose}>
+                        <Button 
+                            colorScheme="gray" 
+                            onClick={resetAndClose}
+                            isDisabled={isDisabled}
+                        >
                             Cancelar
                         </Button>
                         <Button 
                             colorScheme="blue" 
                             onClick={handleAssign}
-                            isDisabled={!selectedModule || !isValidLevel}
+                            isDisabled={!selectedModule || !isValidLevel || isDisabled}
                         >
                             Asignar
                         </Button>

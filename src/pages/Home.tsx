@@ -20,6 +20,8 @@ import { PiMicrosoftTeamsLogoFill } from "react-icons/pi";
 import { MdNotificationsActive } from "react-icons/md";
 import { FaCogs } from "react-icons/fa";
 import { FaCalendarAlt } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa"; // Nuevo icono para Clientes
+import { FaShoppingCart } from "react-icons/fa"; // Nuevo icono para Ventas
 
 import '@fontsource-variable/comfortaa'
 
@@ -73,6 +75,8 @@ export default function Home(){
                 <SectionCard to={'/compras'}          name={'Compras'}              icon={GiBuyCard}            supportedModules={[Modulo.COMPRAS]} currentAccesos={roles}/>
                 {/*<SectionCard to={'/informes'}         name={'Informes'}             icon={TbReportSearch}       supportedModules={[Modulo.INFORMES]} currentAccesos={roles}/>*/}
                 <SectionCard to={'/asistente_produccion'}    name={'Reporte Progreso en Procesos de Produccion'} icon={GiChemicalDrop}     supportedModules={[Modulo.SEGUIMIENTO_PRODUCCION]} currentAccesos={roles}/>
+                <SectionCard to={'/clientes'}         name={'Clientes'}             icon={FaUsers}              supportedModules={[Modulo.CLIENTES]} currentAccesos={roles}/>
+                <SectionCard to={'/ventas'}           name={'Ventas'}               icon={FaShoppingCart}       supportedModules={[Modulo.VENTAS]} currentAccesos={roles}/>
                 <SectionCard to={'/transacciones_almacen'} name={'Transacciones de Almacen'} icon={MdWarehouse} supportedModules={[Modulo.TRANSACCIONES_ALMACEN]} currentAccesos={roles}/>
                 <SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload} supportedModules={[]} currentAccesos={roles} bgColor="red.100"/>
                 <SectionCard to={'/Activos'} name={'Activos'} icon={FaSteam}          supportedModules={[Modulo.ACTIVOS]} currentAccesos={roles}/>
