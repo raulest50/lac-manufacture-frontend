@@ -19,6 +19,7 @@ import {
     Td, Tfoot
 } from '@chakra-ui/react';
 import {getCondicionPagoText, getEstadoText, OrdenCompraMateriales} from '../types';
+import { formatCOP } from '../../../utils/formatters';
 
 interface OrdenCompraDetailsProps {
     isOpen: boolean;
@@ -48,7 +49,7 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                             <strong>Proveedor:</strong>{' '}
                             {orden.proveedor ? orden.proveedor.nombre : '-'}
                         </Text>
-                        <Text><strong>Total a Pagar:</strong> {orden.totalPagar}</Text>
+                        <Text><strong>Total a Pagar:</strong> {formatCOP(orden.totalPagar)}</Text>
                         <Text><strong>Estado:</strong> {getEstadoText(orden.estado)}</Text>
                         <Text><strong>Condición de Pago:</strong> {getCondicionPagoText(orden.condicionPago)}</Text>
                         <Text><strong>Tiempo de Entrega:</strong> {orden.tiempoEntrega}</Text>
@@ -74,9 +75,9 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                                             <Td>{item.itemOrdenId}</Td>
                                             <Td>{item.material ? `${item.material.productoId} - ${item.material.nombre} - (${item.material.tipoUnidades}) ` : '-'}</Td>
                                             <Td>{item.cantidad}</Td>
-                                            <Td>{item.precioUnitario}</Td>
-                                            <Td>{item.ivaCOP}</Td>
-                                            <Td>{item.subTotal}</Td>
+                                            <Td>{formatCOP(item.precioUnitario)}</Td>
+                                            <Td>{formatCOP(item.ivaCOP)}</Td>
+                                            <Td>{formatCOP(item.subTotal)}</Td>
                                         </Tr>
                                     ))}
                                 </Tbody>
@@ -86,7 +87,7 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                                             <strong>SubTotal:</strong>
                                         </Td>
                                         <Td isNumeric colSpan={3}>
-                                            {orden.subTotal}
+                                            {formatCOP(orden.subTotal)}
                                         </Td>
                                     </Tr>
                                     <Tr>
@@ -94,7 +95,7 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                                             <strong>IVA (19%):</strong>
                                         </Td>
                                         <Td isNumeric colSpan={3}>
-                                            {orden.ivaCOP}
+                                            {formatCOP(orden.ivaCOP)}
                                         </Td>
                                     </Tr>
                                     <Tr>
@@ -102,7 +103,7 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                                             <strong>Total a Pagar:</strong>
                                         </Td>
                                         <Td isNumeric colSpan={3}>
-                                            {orden.totalPagar}
+                                            {formatCOP(orden.totalPagar)}
                                         </Td>
                                     </Tr>
                                 </Tfoot>
