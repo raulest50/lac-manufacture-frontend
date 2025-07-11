@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Tabs, TabList, TabPanels, TabPanel, Tab } from '@chakra-ui/react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
@@ -11,17 +11,8 @@ import { my_style_tab } from '../../styles/styles_general.tsx';
 import CodificarMaterialesTab from './CodificarMaterialesTab.tsx';
 import CodificarSemioTermiTab from "./CodificarSemioTermiTab/CodificarSemioTermiTab.tsx";
 import InformeProductosTab from './InformeProductosTab.tsx';
+import {Authority, WhoAmIResponse} from "../../api/global_types.tsx";
 
-// Interfaz para las autoridades del usuario
-interface Authority {
-    authority: string;
-    nivel: string;
-}
-
-// Interfaz para la respuesta del endpoint whoami
-interface WhoAmIResponse {
-    authorities: Authority[];
-}
 
 function ProductosPage() {
     const [productosAccessLevel, setProductosAccessLevel] = useState<number>(0);
@@ -36,7 +27,7 @@ function ProductosPage() {
 
                 // Buscar la autoridad para el módulo PRODUCTOS
                 const productosAuthority = authorities.find(
-                    auth => auth.authority === "ACCESO_PRODUCTOS"
+                    (auth:Authority) => auth.authority === "ACCESO_PRODUCTOS"
                 );
 
                 // Si se encuentra, establecer el nivel de acceso

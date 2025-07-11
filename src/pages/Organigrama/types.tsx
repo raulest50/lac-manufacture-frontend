@@ -4,42 +4,26 @@ export enum AccessLevel {
   EDIT = 2   // Edición completa
 }
 
-// Interfaz para el cargo en el organigrama
+// Interfaz unificada para el cargo en el organigrama
 export interface Cargo {
   idCargo: string;
-  tituloCargo: string;        // Título del cargo
-  descripcionCargo: string;  // Descripción breve
-  departamento: string;   // Departamento
-  jefeInmediato?: string;    // ID del cargo al que reporta
+  tituloCargo: string;        // Título del cargo (será el mismo que el título del nodo)
+  descripcionCargo: string;   // Descripción breve
+  departamento: string;       // Departamento
   urlDocManualFunciones?: string; // url del pdf con el manual de funciones aprovado
-  usuario?: string; // Id Usuario asignado al cargo
-}
+  manualFuncionesFile?: File;  // Archivo del manual de funciones (solo en frontend)
+  usuario?: string;           // Id Usuario asignado al cargo
 
-// Datos para el nodo de cargo
-export interface PositionNodeData {
-  id: string;
-  title: string;
-  department: string;
-  description: string;
-  level: number;
-}
-
-// Manual de funciones asociado a un cargo
-export interface FunctionManual {
-  positionId: string;
-  responsibilities: string;  // Responsabilidades
-  requirements: string;      // Requisitos
-  skills: string;            // Habilidades
-  experience: string;        // Experiencia requerida
-  education: string;         // Formación académica
-  additionalInfo: string;    // Información adicional
+  // Propiedades del nodo (anteriormente en CargoNodeData)
+  posicionX: number;          // Posición X en el diagrama
+  posicionY: number;          // Posición Y en el diagrama
+  nivel: number;              // Nivel jerárquico
+  jefeInmediato?: string;     // ID Nodo al que reporta
 }
 
 // Estructura completa del organigrama
 export interface OrganizationChart {
   id: string;
   name: string;
-  description: string;
-  positions: Cargo[];
-  functionManuals: Record<string, FunctionManual>; // Manuales indexados por positionId
+  cargos: Cargo[];
 }

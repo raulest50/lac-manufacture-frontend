@@ -58,6 +58,7 @@ export default class EndPointsURL{
     public set_new_passw:string;
 
     // users management CRUD operations
+    public get_all_users: string;
     public deactivate_user: string;
     public activate_user: string;
 
@@ -68,6 +69,11 @@ export default class EndPointsURL{
     // bulk uploads por link
     public bulk_upload_proveedores: string;
     public bulk_upload_productos: string;
+
+    // organigrama endpoints
+    public get_all_cargos: string;
+    public save_cargo_with_manual: string;
+    public save_changes_organigrama: string;
 
     // just in case of need
     // contabilidad resource
@@ -153,6 +159,7 @@ export default class EndPointsURL{
         this.login = `${domain}/${auth_res}/login`;
         this.request_reset_passw = `${domain}/${auth_res}/request_reset_passw`;
         this.set_new_passw = `${domain}/${auth_res}/set_new_passw`;
+        this.get_all_users = `${domain}/usuarios`;
         this.deactivate_user = `${domain}/usuarios/{userId}/deactivate`;
         this.activate_user = `${domain}/usuarios/{userId}/activate`;
 
@@ -163,6 +170,12 @@ export default class EndPointsURL{
         this.get_cuentas = `${domain}/${contabilidad_res}/cuentas`;
         this.get_libro_mayor = `${domain}/${contabilidad_res}/libro-mayor`;
         this.get_periodos = `${domain}/${contabilidad_res}/periodos`;
+
+        // organigrama endpoints
+        const organigrama_res = 'organigrama';
+        this.get_all_cargos = `${domain}/${organigrama_res}`;
+        this.save_cargo_with_manual = `${domain}/${organigrama_res}/save_mfunciones`;
+        this.save_changes_organigrama = `${domain}/${organigrama_res}/save_changes_organigrama`;
     }
 
 

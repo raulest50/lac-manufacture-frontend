@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -9,95 +9,180 @@ import {
   HStack,
   Spinner,
   useToast,
-  Textarea,
+  Input,
+  Link,
   FormControl,
   FormLabel,
+  Icon,
 } from "@chakra-ui/react";
-import { ChevronLeftIcon } from "@chakra-ui/icons";
-import { AccessLevel, FunctionManual, Cargo } from "../types";
+import { ChevronLeftIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { FaFileCircleQuestion, FaFileCircleCheck } from "react-icons/fa6";
+import { AccessLevel, Cargo } from "../types";
 import axios from "axios";
-// Import mock API responses
-import { mockApiResponses } from "../prototype_data";
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
 
 interface Props {
   positionId: string;
   accessLevel: AccessLevel;
+  isMaster: boolean;
   onBack: () => void;
 }
 
-export default function PositionDetailsPage({ positionId, accessLevel, onBack }: Props) {
+export default function PositionDetailsPage({ positionId, accessLevel, isMaster, onBack }: Props) {
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [position, setPosition] = useState<Cargo | null>(null);
-  const [manual, setManual] = useState<FunctionManual | null>(null);
-  const [editableManual, setEditableManual] = useState<FunctionManual | null>(null);
+  const [cargo, setCargo] = useState<Cargo | null>(null);
+  const [editableUrl, setEditableUrl] = useState<string>("");
+  const [manualFile, setManualFile] = useState<File | null>(null);
+  const manualInputRef = useRef<HTMLInputElement>(null);
 
-  // Cargar los datos de la posición y su manual de funciones
+  // Manejar la selección de archivo
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        toast({
+          title: "Tipo de archivo no permitido",
+          description: "Solo se permiten archivos PDF para el manual de funciones.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        e.target.value = "";
+        return;
+      }
+      setManualFile(file);
+    }
+  };
+
+  // Cargar los datos del cargo
   useEffect(() => {
-    const fetchPositionDetails = async () => {
+    const fetchCargoDetails = async () => {
       try {
         setIsLoading(true);
+        const endPoints = new EndPointsURL();
 
-        // Usar mock API en lugar de axios para obtener datos de la posición
-        const positionResponse = await mockApiResponses.getPosition(positionId);
-        setPosition(positionResponse.data);
+        // Verificar si el usuario tiene acceso al módulo de organigrama
+        if (accessLevel === AccessLevel.VIEW || accessLevel === AccessLevel.EDIT || isMaster) {
+          // Usar axios para obtener todos los cargos y filtrar por ID
+          const response = await axios.get(endPoints.get_all_cargos);
+          const cargos = response.data || [];
+          const cargoEncontrado = cargos.find(c => c.idCargo === positionId);
 
-        // Usar mock API en lugar de axios para obtener el manual de funciones
-        try {
-          const manualResponse = await mockApiResponses.getFunctionManual(positionId);
-          setManual(manualResponse.data);
-          setEditableManual(manualResponse.data);
-        } catch (error) {
-          // Si no existe un manual, crear uno vacío
-          const emptyManual: FunctionManual = {
-            positionId,
-            responsibilities: "",
-            requirements: "",
-            skills: "",
-            experience: "",
-            education: "",
-            additionalInfo: "",
-          };
-          setManual(emptyManual);
-          setEditableManual(emptyManual);
+          if (cargoEncontrado) {
+            setCargo(cargoEncontrado);
+            // Inicializar el URL editable
+            setEditableUrl(cargoEncontrado.urlDocManualFunciones || "");
+          } else {
+            console.error("No se encontró el cargo con ID:", positionId);
+            toast({
+              title: "Cargo no encontrado",
+              description: "No se encontró el cargo solicitado",
+              status: "error",
+              duration: 3000,
+            });
+          }
+        } else {
+          // Si el usuario no tiene acceso, mostrar un mensaje
+          console.warn("El usuario no tiene acceso al módulo de organigrama");
+          toast({
+            title: "Acceso denegado",
+            description: "No tienes permisos para acceder al módulo de organigrama",
+            status: "warning",
+            duration: 5000,
+          });
         }
       } catch (error) {
-        toast({
-          title: "Error al cargar los detalles del cargo",
-          status: "error",
-          duration: 3000,
-        });
+        console.error("Error al cargar los detalles del cargo:", error);
+
+        // Verificar si es un error de autorización (403)
+        if (axios.isAxiosError(error) && error.response?.status === 403) {
+          toast({
+            title: "Acceso denegado",
+            description: "No tienes permisos para acceder al módulo de organigrama",
+            status: "warning",
+            duration: 5000,
+          });
+        } else {
+          toast({
+            title: "Error al cargar los detalles del cargo",
+            description: "Ocurrió un error al cargar los detalles del cargo",
+            status: "error",
+            duration: 3000,
+          });
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchPositionDetails();
-  }, [positionId, toast]);
+    fetchCargoDetails();
+  }, [positionId, toast, accessLevel, isMaster]);
 
-  // Guardar los cambios en el manual de funciones
+  // Guardar la URL del manual de funciones
   const handleSaveManual = async () => {
-    if (!editableManual) return;
+    if (!cargo) return;
 
     try {
-      // Usar mock API en lugar de axios
-      const response = await mockApiResponses.updateFunctionManual(positionId, editableManual);
+      const endPoints = new EndPointsURL();
 
-      setManual(response.data);
+      // Verificar si el usuario tiene permisos de edición
+      if (accessLevel !== AccessLevel.EDIT && !isMaster) {
+        toast({
+          title: "Acceso denegado",
+          description: "No tienes permisos para editar el manual de funciones",
+          status: "warning",
+          duration: 5000,
+        });
+        return;
+      }
+
+      // Actualizar el cargo con la nueva URL
+      const updatedCargo = { ...cargo, urlDocManualFunciones: editableUrl };
+
+      // Crear un FormData para enviar el cargo
+      const formData = new FormData();
+      formData.append('cargo', JSON.stringify(updatedCargo));
+
+      // Usar axios para actualizar el cargo con el endpoint correcto
+      const response = await axios.post(
+        endPoints.save_cargo_with_manual,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      setCargo(response.data);
       setIsEditing(false);
 
       toast({
-        title: "Manual de funciones actualizado correctamente",
+        title: "URL del manual de funciones actualizada correctamente",
         status: "success",
         duration: 3000,
       });
     } catch (error) {
-      toast({
-        title: "Error al actualizar el manual de funciones",
-        status: "error",
-        duration: 3000,
-      });
+      console.error("Error al actualizar la URL del manual de funciones:", error);
+
+      // Verificar si es un error de autorización (403)
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        toast({
+          title: "Acceso denegado",
+          description: "No tienes permisos para editar el manual de funciones",
+          status: "warning",
+          duration: 5000,
+        });
+      } else {
+        toast({
+          title: "Error al actualizar la URL del manual de funciones",
+          description: "Ocurrió un error al actualizar la URL del manual de funciones",
+          status: "error",
+          duration: 3000,
+        });
+      }
     }
   };
 
@@ -109,7 +194,7 @@ export default function PositionDetailsPage({ positionId, accessLevel, onBack }:
     );
   }
 
-  if (!position) {
+  if (!cargo) {
     return (
       <Box>
         <Button leftIcon={<ChevronLeftIcon />} onClick={onBack} mb={4}>
@@ -127,13 +212,13 @@ export default function PositionDetailsPage({ positionId, accessLevel, onBack }:
           Volver al Organigrama
         </Button>
 
-        {accessLevel === AccessLevel.EDIT && (
+        {(accessLevel === AccessLevel.EDIT || isMaster) && (
           <Button
             colorScheme={isEditing ? "red" : "blue"}
             onClick={() => {
               if (isEditing) {
                 // Cancelar edición
-                setEditableManual(manual);
+                setEditableUrl(cargo.urlDocManualFunciones || "");
                 setIsEditing(false);
               } else {
                 // Iniciar edición
@@ -142,7 +227,7 @@ export default function PositionDetailsPage({ positionId, accessLevel, onBack }:
             }}
             ml="auto"
           >
-            {isEditing ? "Cancelar" : "Editar Manual"}
+            {isEditing ? "Cancelar" : "Editar URL Manual"}
           </Button>
         )}
 
@@ -154,14 +239,14 @@ export default function PositionDetailsPage({ positionId, accessLevel, onBack }:
       </HStack>
 
       <Heading as="h1" size="xl" mb={2}>
-        {position.tituloCargo}
+        {cargo.tituloCargo}
       </Heading>
 
       <Text fontSize="lg" color="gray.600" mb={4}>
-        Departamento: {position.departamento}
+        Departamento: {cargo.departamento}
       </Text>
 
-      <Text mb={6}>{position.descripcionCargo}</Text>
+      <Text mb={6}>{cargo.descripcionCargo}</Text>
 
       <Divider mb={6} />
 
@@ -172,126 +257,31 @@ export default function PositionDetailsPage({ positionId, accessLevel, onBack }:
       {isEditing ? (
         <VStack spacing={6} align="stretch">
           <FormControl>
-            <FormLabel fontWeight="bold">Responsabilidades</FormLabel>
-            <Textarea
-              value={editableManual?.responsibilities || ""}
-              onChange={(e) =>
-                setEditableManual(prev => 
-                  prev ? { ...prev, responsibilities: e.target.value } : null
-                )
-              }
-              rows={5}
+            <FormLabel fontWeight="bold">URL del Manual de Funciones (PDF)</FormLabel>
+            <Input
+              value={editableUrl}
+              onChange={(e) => setEditableUrl(e.target.value)}
+              placeholder="Ingrese la URL del documento PDF con el manual de funciones"
             />
           </FormControl>
-
-          <FormControl>
-            <FormLabel fontWeight="bold">Requisitos</FormLabel>
-            <Textarea
-              value={editableManual?.requirements || ""}
-              onChange={(e) =>
-                setEditableManual(prev => 
-                  prev ? { ...prev, requirements: e.target.value } : null
-                )
-              }
-              rows={4}
-            />
-          </FormControl>
-
-          <FormControl>
-            <FormLabel fontWeight="bold">Habilidades</FormLabel>
-            <Textarea
-              value={editableManual?.skills || ""}
-              onChange={(e) =>
-                setEditableManual(prev => 
-                  prev ? { ...prev, skills: e.target.value } : null
-                )
-              }
-              rows={4}
-            />
-          </FormControl>
-
-          <FormControl>
-            <FormLabel fontWeight="bold">Experiencia</FormLabel>
-            <Textarea
-              value={editableManual?.experience || ""}
-              onChange={(e) =>
-                setEditableManual(prev => 
-                  prev ? { ...prev, experience: e.target.value } : null
-                )
-              }
-              rows={3}
-            />
-          </FormControl>
-
-          <FormControl>
-            <FormLabel fontWeight="bold">Formación Académica</FormLabel>
-            <Textarea
-              value={editableManual?.education || ""}
-              onChange={(e) =>
-                setEditableManual(prev => 
-                  prev ? { ...prev, education: e.target.value } : null
-                )
-              }
-              rows={3}
-            />
-          </FormControl>
-
-          <FormControl>
-            <FormLabel fontWeight="bold">Información Adicional</FormLabel>
-            <Textarea
-              value={editableManual?.additionalInfo || ""}
-              onChange={(e) =>
-                setEditableManual(prev => 
-                  prev ? { ...prev, additionalInfo: e.target.value } : null
-                )
-              }
-              rows={4}
-            />
-          </FormControl>
+          <Text fontSize="sm" color="gray.500">
+            Ingrese la URL completa del documento PDF que contiene el manual de funciones aprobado para este cargo.
+          </Text>
         </VStack>
       ) : (
         <VStack spacing={6} align="stretch">
-          <Box>
-            <Heading as="h3" size="md" mb={2}>
-              Responsabilidades
-            </Heading>
-            <Text whiteSpace="pre-line">{manual?.responsibilities || "No especificado"}</Text>
-          </Box>
-
-          <Box>
-            <Heading as="h3" size="md" mb={2}>
-              Requisitos
-            </Heading>
-            <Text whiteSpace="pre-line">{manual?.requirements || "No especificado"}</Text>
-          </Box>
-
-          <Box>
-            <Heading as="h3" size="md" mb={2}>
-              Habilidades
-            </Heading>
-            <Text whiteSpace="pre-line">{manual?.skills || "No especificado"}</Text>
-          </Box>
-
-          <Box>
-            <Heading as="h3" size="md" mb={2}>
-              Experiencia
-            </Heading>
-            <Text whiteSpace="pre-line">{manual?.experience || "No especificado"}</Text>
-          </Box>
-
-          <Box>
-            <Heading as="h3" size="md" mb={2}>
-              Formación Académica
-            </Heading>
-            <Text whiteSpace="pre-line">{manual?.education || "No especificado"}</Text>
-          </Box>
-
-          <Box>
-            <Heading as="h3" size="md" mb={2}>
-              Información Adicional
-            </Heading>
-            <Text whiteSpace="pre-line">{manual?.additionalInfo || "No especificado"}</Text>
-          </Box>
+          {cargo.urlDocManualFunciones ? (
+            <Box>
+              <Link href={cargo.urlDocManualFunciones} isExternal color="blue.500">
+                Ver Manual de Funciones (PDF) <ExternalLinkIcon mx="2px" />
+              </Link>
+              <Text fontSize="sm" color="gray.500" mt={2}>
+                Haga clic en el enlace para ver o descargar el manual de funciones completo.
+              </Text>
+            </Box>
+          ) : (
+            <Text>No hay un manual de funciones disponible para este cargo.</Text>
+          )}
         </VStack>
       )}
     </Box>

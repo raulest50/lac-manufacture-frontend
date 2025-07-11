@@ -1,97 +1,173 @@
-import { useCallback, useEffect, useState } from "react";
-import { Box, Flex, Button, Heading, Divider, useToast } from "@chakra-ui/react";
+import {useCallback, useEffect, useState} from "react";
+import {Box, Button, Flex, useToast} from "@chakra-ui/react";
 import {
-  ReactFlow,
-  Node,
-  Edge,
-  Controls,
-  MiniMap,
-  BackgroundVariant,
-  Background,
-  useNodesState,
-  useEdgesState,
-  Connection,
   addEdge,
+  Background,
+  BackgroundVariant,
+  Connection,
+  Controls,
+  Edge,
+  MiniMap,
+  Node,
+  NodeChange,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import PositionNode from "./PositionNode";
-import { Cargo, PositionNodeData, AccessLevel } from "../types";
+import {AccessLevel, Cargo} from "../types";
 import EditPositionDialog from "./EditPositionDialog";
 import axios from "axios";
-// Import mock API responses
-import { mockApiResponses } from "../prototype_data";
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
 
 const nodeTypes = {
   positionNode: PositionNode,
 };
 
+const endPoints = new EndPointsURL();
+
 interface Props {
   accessLevel: AccessLevel;
+  isMaster: boolean;
   organizationChartId: string;
   onNavigateToDetails: (positionId: string) => void;
 }
 
 export default function OrganizationChart({ 
   accessLevel, 
+  isMaster,
   organizationChartId,
   onNavigateToDetails 
 }: Props) {
   const toast = useToast();
   const [positions, setPositions] = useState<Cargo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
 
-  // Convertir posiciones a nodos para React Flow
-  const createNodesFromPositions = (positions: Cargo[]): Node[] => {
-    return positions.map((position, index) => ({
-      id: position.id,
-      data: {
-        id: position.id,
-        title: position.tituloCargo,
-        department: position.departamento,
-        description: position.descripcionCargo,
-        level: position.level,
-      } as PositionNodeData,
+  // Convertir cargos a nodos para React Flow
+  const createNodesFromPositions = (cargos: Cargo[]): Node[] => {
+    return cargos.map((cargo, index) => ({
+      id: cargo.idCargo,
+      data: { 
+        ...cargo,
+        accessLevel, // Pasar el nivel de acceso al nodo
+        isMaster,    // Pasar si el usuario es master
+        onEdit: (nodeId) => {
+          // Establecer el nodo seleccionado y abrir el diálogo de edición
+          const node = nodes.find(n => n.id === nodeId);
+          if (node) {
+            setSelectedNode(node);
+            setIsEditDialogOpen(true);
+          }
+        },
+        onViewManual: (nodeId) => {
+          // Navegar a la página de detalles del cargo
+          onNavigateToDetails(nodeId);
+        }
+      },
       position: { 
-        x: 250 * (position.level || 1), 
-        y: index * 150 
+        x: cargo.posicionX || 250 * (cargo.nivel || 1), 
+        y: cargo.posicionY || index * 150 
       },
       type: "positionNode",
     }));
   };
 
-  // Crear conexiones entre nodos basadas en la relación reportTo
-  const createEdgesFromPositions = (positions: Cargo[]): Edge[] => {
-    return positions
-      .filter(position => position.jefeInmediato)
-      .map(position => ({
-        id: `e-${position.jefeInmediato}-${position.id}`,
-        source: position.jefeInmediato!,
-        target: position.id,
+  // Crear conexiones entre nodos basadas en la relación jefeInmediato
+  const createEdgesFromPositions = (cargos: Cargo[]): Edge[] => {
+    return cargos
+      .filter(cargo => cargo.jefeInmediato)
+      .map(cargo => ({
+        id: `e-${cargo.jefeInmediato}-${cargo.idCargo}`,
+        source: cargo.jefeInmediato!,
+        target: cargo.idCargo,
         type: 'smoothstep',
       }));
   };
+
+  // Validar un cargo individual
+  const validarCargoData = (cargo: Cargo): boolean => {
+    // Verificar que todos los campos obligatorios estén presentes
+    return !!(
+      cargo.idCargo && 
+      cargo.tituloCargo && 
+      cargo.tituloCargo.trim() !== "" && 
+      cargo.departamento && 
+      cargo.departamento.trim() !== "" && 
+      cargo.descripcionCargo && 
+      cargo.descripcionCargo.trim() !== "" &&
+      cargo.nivel
+    );
+  };
+
+  // Validar todos los cargos del organigrama
+  const validarOrganigramaData = (cargos: Cargo[]): boolean => {
+    // Si no hay cargos, el organigrama es válido (vacío)
+    if (cargos.length === 0) return true;
+
+    // Verificar que todos los cargos sean válidos
+    return cargos.every(cargo => validarCargoData(cargo));
+  };
+
+  // Estado para controlar si el organigrama es válido
+  const [isOrganigramaValid, setIsOrganigramaValid] = useState<boolean>(true);
 
   // Cargar datos del organigrama
   useEffect(() => {
     const fetchOrganizationChart = async () => {
       try {
         setIsLoading(true);
-        // Usar mock API en lugar de axios
-        const response = await mockApiResponses.getOrganizationChart(organizationChartId);
-        setPositions(response.data.positions || []);
+
+        // Verificar si el usuario tiene acceso al módulo de organigrama
+        if (accessLevel === AccessLevel.VIEW || accessLevel === AccessLevel.EDIT || isMaster) {
+          // Usar el endpoint correcto para obtener todos los cargos
+          const response = await axios.get(endPoints.get_all_cargos);
+          setPositions(response.data || []);
+        } else {
+          // Si el usuario no tiene acceso, mostrar un mensaje
+          console.warn("El usuario no tiene acceso al módulo de organigrama");
+          toast({
+            title: "Acceso denegado",
+            description: "No tienes permisos para acceder al módulo de organigrama",
+            status: "warning",
+            duration: 5000,
+          });
+          setPositions([]);
+        }
       } catch (error) {
-        toast({
-          title: "Error al cargar el organigrama",
-          status: "error",
-          duration: 3000,
-        });
+        console.error("Error al cargar el organigrama:", error);
+
+        // Verificar si es un error de autorización (403)
+        if (axios.isAxiosError(error) && error.response?.status === 403) {
+          toast({
+            title: "Acceso denegado",
+            description: "No tienes permisos para acceder al módulo de organigrama",
+            status: "warning",
+            duration: 5000,
+          });
+        } else {
+          toast({
+            title: "Error al cargar el organigrama",
+            description: "Ocurrió un error al cargar los datos del organigrama",
+            status: "error",
+            duration: 3000,
+          });
+        }
+
+        // En caso de error, inicializar con un array vacío
+        setPositions([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchOrganizationChart();
-  }, [organizationChartId, toast]);
+
+    console.log( ` nivel de acceso : ${accessLevel} ` );
+    console.log( ` es Master : ${isMaster} ` );
+  }, [organizationChartId, toast, accessLevel, isMaster]);
 
   const initialNodes = createNodesFromPositions(positions);
   const initialEdges = createEdgesFromPositions(positions);
@@ -101,17 +177,46 @@ export default function OrganizationChart({
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
+  // Manejar cambios en los nodos y detectar cambios de posición
+  const handleNodesChange = (changes: NodeChange[]) => {
+    // Si el usuario tiene nivel de acceso VIEW y no es master, no permitir mover los nodos
+    if (accessLevel === AccessLevel.VIEW && !isMaster) {
+      // Filtrar los cambios para eliminar los de tipo 'position'
+      const filteredChanges = changes.filter(change => change.type !== 'position');
+      onNodesChange(filteredChanges);
+    } else {
+      onNodesChange(changes);
+
+      // Si hay cambios de posición, marcar como cambios sin guardar
+      if (changes.some(change => change.type === 'position')) {
+        setHasUnsavedChanges(true);
+      }
+    }
+  };
+
   // Actualizar nodos y conexiones cuando cambian las posiciones
   useEffect(() => {
     setNodes(createNodesFromPositions(positions));
     setEdges(createEdgesFromPositions(positions));
+
+    // Actualizar la lista de usuarios asignados
+    const users = positions
+      .filter(cargo => cargo.usuario)
+      .map(cargo => cargo.usuario as string);
+    setAssignedUsers(users);
   }, [positions, setNodes, setEdges]);
+
+  // Actualizar la validación cuando cambian las posiciones
+  useEffect(() => {
+    setIsOrganigramaValid(validarOrganigramaData(positions));
+  }, [positions]);
 
   const onConnect = useCallback(
     (params: Connection) => {
-      // Solo permitir conexiones si el usuario tiene nivel de acceso de edición
-      if (accessLevel === AccessLevel.EDIT) {
+      // Permitir conexiones si el usuario tiene nivel de acceso de edición o es master
+      if (accessLevel === AccessLevel.EDIT || isMaster) {
         setEdges((eds) => addEdge(params, eds));
+        setHasUnsavedChanges(true);
 
         // Actualizar la relación reportTo en el backend
         const sourceId = params.source;
@@ -122,24 +227,90 @@ export default function OrganizationChart({
         }
       }
     },
-    [accessLevel, setEdges]
+    [accessLevel, isMaster, setEdges]
   );
 
-  // Actualizar la relación reportTo de una posición
-  const updatePositionReportTo = async (positionId: string, reportToId: string) => {
+  // Guardar los cambios del organigrama
+  const saveOrganizationChanges = async () => {
+    // Solo permitir guardar cambios si el usuario tiene nivel de acceso de edición o es master
+    if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
+
+    // Validar el organigrama antes de guardarlo
+    if (!isOrganigramaValid) {
+      toast({
+        title: "Error al guardar los cambios",
+        description: "Hay cargos con datos incompletos",
+        status: "error",
+        duration: 3000,
+      });
+      return;
+    }
+
     try {
-      // Usar mock API en lugar de axios
-      await mockApiResponses.updatePosition(positionId, {
-        jefeInmediato: reportToId
+      // Actualizar las posiciones de los nodos en el estado
+      const updatedPositions = positions.map(cargo => {
+        const node = nodes.find(n => n.id === cargo.idCargo);
+        if (node) {
+          return {
+            ...cargo,
+            posicionX: node.position.x,
+            posicionY: node.position.y
+          };
+        }
+        return cargo;
       });
 
-      // Actualizar el estado local
-      setPositions(prevPositions => 
-        prevPositions.map(pos => 
-          pos.id === positionId ? { ...pos, jefeInmediato: reportToId } : pos
-        )
-      );
+      // Llamar a la API para guardar los cambios
+      const response = await axios.post(endPoints.save_changes_organigrama, updatedPositions);
+
+      // Actualizar el estado local con los cargos guardados
+      setPositions(response.data);
+      setHasUnsavedChanges(false);
+
+      toast({
+        title: "Cambios guardados correctamente",
+        status: "success",
+        duration: 3000,
+      });
     } catch (error) {
+      console.error("Error al guardar los cambios:", error);
+      toast({
+        title: "Error al guardar los cambios",
+        status: "error",
+        duration: 3000,
+      });
+    }
+  };
+
+  // Actualizar la relación jefeInmediato de un cargo
+  const updatePositionReportTo = async (cargoId: string, reportToId: string) => {
+    // Solo permitir actualizar relaciones si el usuario tiene nivel de acceso de edición o es master
+    if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
+
+    try {
+      // Actualizar el estado local primero
+      const updatedPositions = positions.map(cargo => 
+        cargo.idCargo === cargoId ? { ...cargo, jefeInmediato: reportToId } : cargo
+      );
+
+      // Si es un cargo temporal, solo actualizar el estado local
+      if (cargoId.startsWith('temp-')) {
+        setPositions(updatedPositions);
+        return;
+      }
+
+      // Para cargos guardados en el backend, guardar todos los cambios
+      const response = await axios.post(endPoints.save_changes_organigrama, updatedPositions);
+
+      // Actualizar el estado local con la respuesta del servidor
+      setPositions(response.data);
+
+      // Actualizar las conexiones
+      setEdges(createEdgesFromPositions(response.data));
+
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      console.error("Error al actualizar la relación jerárquica:", error);
       toast({
         title: "Error al actualizar la relación jerárquica",
         status: "error",
@@ -148,84 +319,169 @@ export default function OrganizationChart({
     }
   };
 
-  // Agregar una nueva posición
+  // Agregar un nuevo cargo
   const addNewPosition = () => {
-    if (accessLevel !== AccessLevel.EDIT) return;
+    if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
 
-    const newPosition: Cargo = {
-      id: `pos-${Date.now()}`,
-      tituloCargo: "Nuevo Cargo",
-      departamento: "Departamento",
-      descripcionCargo: "Descripción del cargo",
-      level: 1,
+    const newCargo: Cargo = {
+      idCargo: `temp-${Date.now()}`, // ID temporal, se reemplazará por el del backend
+      tituloCargo: "",
+      departamento: "",
+      descripcionCargo: "",
+      nivel: 1,
+      posicionX: 100,
+      posicionY: nodes.length * 150
     };
 
-    // Crear el nodo para la nueva posición
+    // Crear el nodo para el nuevo cargo
     const newNode: Node = {
-      id: newPosition.id,
+      id: newCargo.idCargo,
       data: {
-        id: newPosition.id,
-        title: newPosition.tituloCargo,
-        department: newPosition.departamento,
-        description: newPosition.descripcionCargo,
-        level: newPosition.level,
-      } as PositionNodeData,
-      position: { x: 100, y: nodes.length * 150 },
+        ...newCargo,
+        accessLevel,
+        isMaster,
+        onEdit: (nodeId) => {
+          const node = nodes.find(n => n.id === nodeId);
+          if (node) {
+            setSelectedNode(node);
+            setIsEditDialogOpen(true);
+          }
+        },
+        onViewManual: (nodeId) => {
+          onNavigateToDetails(nodeId);
+        }
+      },
+      position: { x: newCargo.posicionX, y: newCargo.posicionY },
       type: "positionNode",
     };
 
-    // Guardar la nueva posición en el backend
-    saveNewPosition(newPosition, newNode);
+    // Añadir el nuevo cargo al estado local
+    setPositions(prevPositions => [...prevPositions, newCargo]);
+    setNodes(prevNodes => [...prevNodes, newNode]);
+
+    // Abrir automáticamente el diálogo de edición para el nuevo cargo
+    setSelectedNode(newNode);
+    setIsEditDialogOpen(true);
   };
 
-  // Guardar una nueva posición en el backend
-  const saveNewPosition = async (position: Cargo, node: Node) => {
-    try {
-      // Usar mock API en lugar de axios
-      const response = await mockApiResponses.createPosition(position);
-      const savedPosition = response.data;
+  // Guardar un nuevo cargo en el backend
+  const saveNewPosition = async (cargo: Cargo) => {
+    // Solo permitir crear cargos si el usuario tiene nivel de acceso de edición o es master
+    if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
 
-      // Actualizar el estado local con la posición guardada
-      setPositions(prevPositions => [...prevPositions, savedPosition]);
-      setNodes(prevNodes => [...prevNodes, { ...node, id: savedPosition.id }]);
+    // Validar el cargo antes de guardarlo
+    if (!validarCargoData(cargo)) {
+      toast({
+        title: "Error al crear el cargo",
+        description: "Todos los campos son obligatorios",
+        status: "error",
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      // Crear un FormData para enviar el cargo
+      const formData = new FormData();
+
+      // Extraer el archivo del cargo y eliminarlo del objeto JSON
+      const { manualFuncionesFile, ...cargoData } = cargo;
+
+      // Agregar el cargo como JSON
+      formData.append('cargo', JSON.stringify(cargoData));
+
+      // Agregar el archivo si existe
+      if (manualFuncionesFile) {
+        formData.append('manualFuncionesFile', manualFuncionesFile);
+      }
+
+      // Usar axios para crear el cargo
+      const response = await axios.post(
+        endPoints.save_cargo_with_manual,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      const savedCargo = response.data;
+
+      // Actualizar el estado local con el cargo guardado
+      setPositions(prevCargos => 
+        prevCargos.map(c => c.idCargo === cargo.idCargo ? savedCargo : c)
+      );
+
+      // Actualizar el nodo correspondiente
+      setNodes(prevNodes => 
+        prevNodes.map(node => 
+          node.id === cargo.idCargo 
+            ? { ...node, id: savedCargo.idCargo, data: { ...node.data, ...savedCargo } } 
+            : node
+        )
+      );
 
       toast({
-        title: "Posición creada correctamente",
+        title: "Cargo creado correctamente",
         status: "success",
         duration: 3000,
       });
     } catch (error) {
+      console.error("Error al crear el cargo:", error);
       toast({
-        title: "Error al crear la posición",
+        title: "Error al crear el cargo",
         status: "error",
         duration: 3000,
       });
     }
   };
 
-  // Eliminar una posición
-  const deletePosition = async (positionId: string) => {
-    if (accessLevel !== AccessLevel.EDIT) return;
+  // Eliminar un cargo
+  const deletePosition = async (cargoId: string) => {
+    if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
 
     try {
-      // Usar mock API en lugar de axios
-      await mockApiResponses.deletePosition(positionId);
+      // Si es un cargo temporal (no guardado en el backend), solo eliminarlo del estado local
+      if (cargoId.startsWith('temp-')) {
+        // Actualizar el estado local
+        setPositions(prevCargos => prevCargos.filter(cargo => cargo.idCargo !== cargoId));
+        setNodes(prevNodes => prevNodes.filter(node => node.id !== cargoId));
+        setEdges(prevEdges => 
+          prevEdges.filter(edge => edge.source !== cargoId && edge.target !== cargoId)
+        );
 
-      // Actualizar el estado local
-      setPositions(prevPositions => prevPositions.filter(pos => pos.id !== positionId));
-      setNodes(prevNodes => prevNodes.filter(node => node.id !== positionId));
+        toast({
+          title: "Cargo eliminado correctamente",
+          status: "success",
+          duration: 3000,
+        });
+        return;
+      }
+
+      // Para cargos guardados en el backend, eliminar y luego guardar los cambios
+      // Actualizar el estado local primero
+      const updatedPositions = positions.filter(cargo => cargo.idCargo !== cargoId);
+
+      // Llamar a la API para guardar los cambios (sin el cargo eliminado)
+      const response = await axios.post(endPoints.save_changes_organigrama, updatedPositions);
+
+      // Actualizar el estado local con la respuesta del servidor
+      setPositions(response.data);
+      setNodes(prevNodes => prevNodes.filter(node => node.id !== cargoId));
       setEdges(prevEdges => 
-        prevEdges.filter(edge => edge.source !== positionId && edge.target !== positionId)
+        prevEdges.filter(edge => edge.source !== cargoId && edge.target !== cargoId)
       );
 
       toast({
-        title: "Posición eliminada correctamente",
+        title: "Cargo eliminado correctamente",
         status: "success",
         duration: 3000,
       });
     } catch (error) {
+      console.error("Error al eliminar el cargo:", error);
       toast({
-        title: "Error al eliminar la posición",
+        title: "Error al eliminar el cargo",
         status: "error",
         duration: 3000,
       });
@@ -237,12 +493,6 @@ export default function OrganizationChart({
     setSelectedNode(node);
   };
 
-  // Navegar a la página de detalles de la posición
-  const navigateToPositionDetails = () => {
-    if (selectedNode) {
-      onNavigateToDetails(selectedNode.id);
-    }
-  };
 
   return (
     <Flex direction="column" gap={8} p="1em">
@@ -251,11 +501,14 @@ export default function OrganizationChart({
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          onNodesChange={onNodesChange}
+          onNodesChange={handleNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
           onNodeClick={(_, node) => handleNodeClick(node)}
+          nodesDraggable={accessLevel === AccessLevel.EDIT || isMaster}
+          nodesConnectable={accessLevel === AccessLevel.EDIT || isMaster}
+          edgesFocusable={accessLevel === AccessLevel.EDIT || isMaster}
           fitView
         >
           <Controls />
@@ -264,10 +517,16 @@ export default function OrganizationChart({
         </ReactFlow>
       </Box>
 
-      <Flex direction="row" gap={5} alignItems="center">
-        {accessLevel === AccessLevel.EDIT && (
+      <Flex direction="row" gap={5} alignItems="center" wrap="wrap">
+        {(accessLevel === AccessLevel.EDIT || isMaster) && (
           <>
-            <Button variant="solid" colorScheme="teal" onClick={addNewPosition}>
+            <Button
+                variant="solid"
+                colorScheme="teal"
+                onClick={addNewPosition}
+                //visibility={ accessLevel === AccessLevel.EDIT || isMaster ? "visible" : "hidden"}
+                display={ accessLevel === AccessLevel.EDIT || isMaster ? "" : "none"}
+            >
               Agregar Cargo
             </Button>
 
@@ -276,89 +535,116 @@ export default function OrganizationChart({
               colorScheme="red"
               onClick={() => selectedNode && deletePosition(selectedNode.id)}
               isDisabled={!selectedNode}
+              //visibility={ accessLevel === AccessLevel.EDIT || isMaster ? "visible" : "hidden"}
+              display={ accessLevel === AccessLevel.EDIT || isMaster ? "" : "none"}
             >
               Eliminar Cargo
             </Button>
 
             <Button
-              variant="solid"
-              colorScheme="blue"
-              onClick={() => setIsEditDialogOpen(true)}
-              isDisabled={!selectedNode}
+              variant="solid" 
+              colorScheme="green"
+              onClick={saveOrganizationChanges}
+              isDisabled={!hasUnsavedChanges || !isOrganigramaValid}
+              //visibility={ accessLevel === AccessLevel.EDIT || isMaster ? "visible" : "hidden"}
+              display={ accessLevel === AccessLevel.EDIT || isMaster ? "" : "none"}
             >
-              Editar Cargo
+              Guardar Cambios Organigrama
             </Button>
           </>
         )}
-
-        <Button
-          variant="solid"
-          colorScheme="purple"
-          onClick={navigateToPositionDetails}
-          isDisabled={!selectedNode}
-        >
-          Ver Manual de Funciones
-        </Button>
       </Flex>
 
       {isEditDialogOpen && selectedNode && (
         <EditPositionDialog
           isOpen={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
-          positionData={selectedNode.data as PositionNodeData}
-          onSave={(updatedData) => {
+          cargo={selectedNode.data as Cargo}
+          assignedUsers={assignedUsers}
+          onSave={(updatedCargo) => {
             // Actualizar el nodo en el estado local
             setNodes((prevNodes) =>
               prevNodes.map((node) => {
                 if (node.id === selectedNode.id) {
-                  return { ...node, data: { ...updatedData } };
+                  return { ...node, data: updatedCargo };
                 }
                 return node;
               })
             );
 
-            // Actualizar la posición en el backend
-            updatePosition(selectedNode.id, updatedData);
+            // Si es un cargo nuevo (ID temporal), usar saveNewPosition
+            if (selectedNode.id.startsWith('temp-')) {
+              saveNewPosition(updatedCargo);
+            } else {
+              // Si es un cargo existente, usar updatePosition
+              updatePosition(selectedNode.id, updatedCargo);
+            }
           }}
         />
       )}
     </Flex>
   );
 
-  // Actualizar una posición existente
-  async function updatePosition(positionId: string, data: PositionNodeData) {
-    try {
-      // Usar mock API en lugar de axios
-      await mockApiResponses.updatePosition(positionId, {
-        tituloCargo: data.title,
-        departamento: data.department,
-        descripcionCargo: data.description,
-        level: data.level,
+  // Actualizar un cargo existente
+  async function updatePosition(cargoId: string, cargo: Cargo) {
+    // Solo permitir actualizar cargos si el usuario tiene nivel de acceso de edición o es master
+    if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
+
+    // Validar el cargo antes de actualizarlo
+    if (!validarCargoData(cargo)) {
+      toast({
+        title: "Error al actualizar el cargo",
+        description: "Todos los campos son obligatorios",
+        status: "error",
+        duration: 3000,
       });
+      return;
+    }
+
+    try {
+      // Crear un FormData para enviar el cargo
+      const formData = new FormData();
+
+      // Extraer el archivo del cargo y eliminarlo del objeto JSON
+      const { manualFuncionesFile, ...cargoData } = cargo;
+
+      // Agregar el cargo como JSON
+      formData.append('cargo', JSON.stringify(cargoData));
+
+      // Agregar el archivo si existe
+      if (manualFuncionesFile) {
+        formData.append('manualFuncionesFile', manualFuncionesFile);
+      }
+
+      // Usar axios para actualizar el cargo
+      const response = await axios.post(
+        endPoints.save_cargo_with_manual,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      const updatedCargo = response.data;
 
       // Actualizar el estado local
-      setPositions(prevPositions => 
-        prevPositions.map(pos => 
-          pos.id === positionId 
-            ? { 
-                ...pos, 
-                tituloCargo: data.title,
-                departamento: data.department,
-                descripcionCargo: data.description,
-                level: data.level,
-              } 
-            : pos
+      setPositions(prevCargos => 
+        prevCargos.map(c => 
+          c.idCargo === cargoId ? updatedCargo : c
         )
       );
 
       toast({
-        title: "Posición actualizada correctamente",
+        title: "Cargo actualizado correctamente",
         status: "success",
         duration: 3000,
       });
     } catch (error) {
+      console.error("Error al actualizar el cargo:", error);
       toast({
-        title: "Error al actualizar la posición",
+        title: "Error al actualizar el cargo",
         status: "error",
         duration: 3000,
       });

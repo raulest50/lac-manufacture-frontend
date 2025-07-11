@@ -6,38 +6,64 @@ import OrganizationChart from "./components/OrganizationChart";
 import PositionDetailsPage from "./components/PositionDetailsPage";
 import { AccessLevel } from "./types";
 import axios from "axios";
-// Import mock data and API responses
-import { mockApiResponses, mockOrganizationChart } from "./prototype_data";
+import { Authority, WhoAmIResponse } from "../../api/global_types.tsx";
+import { useAuth } from "../../context/AuthContext";
+import EndPointsURL from "../../api/EndPointsURL.tsx";
 
 export default function OrganigramaPage() {
   const [accessLevel, setAccessLevel] = useState<AccessLevel>(AccessLevel.VIEW);
+  const [isMaster, setIsMaster] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPositionId, setSelectedPositionId] = useState<string | null>(null);
-  const [organizationChartId, setOrganizationChartId] = useState<string | null>(null);
+  const [organizationChartId, setOrganizationChartId] = useState<string | null>("org-1"); // ID temporal
+  const { user } = useAuth();
+  const endPoints = new EndPointsURL();
 
-  // Obtener el nivel de acceso del usuario y el ID del organigrama
+  // Obtener el nivel de acceso del usuario
   useEffect(() => {
     const fetchUserAccess = async () => {
       try {
         setIsLoading(true);
-        // Usar datos mock en lugar de llamadas a API reales
-        const userResponse = await mockApiResponses.getUserAccess();
-        setAccessLevel(userResponse.data.accessLevel);
 
-        // Obtener el ID del organigrama mock
-        const chartResponse = await mockApiResponses.getOrganizationCharts();
-        if (chartResponse.data.length > 0) {
-          setOrganizationChartId(chartResponse.data[0].id);
+        // Obtener el nivel de acceso del usuario desde el endpoint whoami
+        const response = await axios.get<WhoAmIResponse>(endPoints.whoami);
+        const authorities = response.data.authorities;
+
+        // Buscar la autoridad para el módulo ORGANIGRAMA
+        const organigramaAuthority = authorities.find(
+            (auth:Authority) => auth.authority === "ACCESO_ORGANIGRAMA"
+        );
+
+        // Verificar si el usuario es master
+        const userIsMaster = user === 'master';
+        setIsMaster(userIsMaster);
+
+        // Si se encuentra la autoridad, establecer el nivel de acceso
+        if (organigramaAuthority) {
+          setAccessLevel(parseInt(organigramaAuthority.nivel) as AccessLevel);
+        } else if (userIsMaster) {
+          // Si el usuario es master, darle nivel de edición
+          setAccessLevel(AccessLevel.EDIT);
+        } else {
+          // Por defecto, nivel de visualización
+          setAccessLevel(AccessLevel.VIEW);
         }
+
+        // Aquí se debería obtener el ID del organigrama desde una API real
+        // Por ahora, usamos un ID fijo
+        setOrganizationChartId("org-1");
+
       } catch (error) {
-        console.error("Error al cargar datos iniciales:", error);
+        console.error("Error al obtener el nivel de acceso:", error);
+        // En caso de error, establecer nivel de visualización por defecto
+        setAccessLevel(AccessLevel.VIEW);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchUserAccess();
-  }, []);
+  }, [user, endPoints.whoami]);
 
   // Manejar la navegación a los detalles de una posición
   const handleNavigateToDetails = (positionId: string) => {
@@ -66,6 +92,7 @@ export default function OrganigramaPage() {
           <PositionDetailsPage
             positionId={selectedPositionId}
             accessLevel={accessLevel}
+            isMaster={isMaster}
             onBack={handleBackToChart}
           />
         </Box>
@@ -73,6 +100,7 @@ export default function OrganigramaPage() {
         <Box>
           <OrganizationChart
             accessLevel={accessLevel}
+            isMaster={isMaster}
             organizationChartId={organizationChartId}
             onNavigateToDetails={handleNavigateToDetails}
           />
