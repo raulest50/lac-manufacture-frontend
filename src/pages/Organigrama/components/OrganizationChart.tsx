@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useState} from "react";
 import {Box, Button, Flex, useToast} from "@chakra-ui/react";
+
 import {
   addEdge,
   Background,
@@ -14,6 +15,7 @@ import {
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
+
 import "@xyflow/react/dist/style.css";
 import PositionNode from "./PositionNode";
 import {AccessLevel, Cargo} from "../types";
@@ -330,7 +332,7 @@ export default function OrganizationChart({
     if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
 
     const newCargo: Cargo = {
-      idCargo: "0", // ID temporal, se reemplazará por el del backend
+      idCargo: "0",
       tituloCargo: "",
       departamento: "",
       descripcionCargo: "",
@@ -570,7 +572,7 @@ export default function OrganizationChart({
         <EditPositionDialog
           isOpen={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
-          cargo={selectedNode.data as Cargo}
+          cargo={(selectedNode.data as unknown) as Cargo}
           assignedUsers={assignedUsers}
           mode="edit"
           accessLevel={accessLevel}
@@ -602,7 +604,7 @@ export default function OrganizationChart({
         <EditPositionDialog
           isOpen={isDetailsDialogOpen}
           onClose={() => setIsDetailsDialogOpen(false)}
-          cargo={detailsNode.data as Cargo}
+          cargo={(detailsNode.data as unknown) as Cargo}
           mode="view"
           accessLevel={accessLevel}
           isMaster={isMaster}
