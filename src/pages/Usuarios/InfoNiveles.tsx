@@ -87,9 +87,9 @@ useEffect(() => {
     </Box>
 )}`,
     levels: [
-      { level: 1, description: 'Permite visualizar órdenes de compra pero con funcionalidades limitadas.' },
-      { level: 2, description: 'Permite acceder a todas las funcionalidades, incluyendo la actualización del estado de las órdenes de compra.' },
-      { level: 3, description: 'Acceso completo a todas las funcionalidades del módulo.' }
+      { level: 1, description: 'Permite crear y visualizar órdenes de compra.' },
+      { level: 2, description: 'Lo mismo que en nivel 1 + permite cancelar, liberar y enviar Ordenes de Compra.' },
+      //{ level: 3, description: 'Acceso completo a todas las funcionalidades del módulo.' }
     ]
   },
   [Modulo.PROVEEDORES]: {

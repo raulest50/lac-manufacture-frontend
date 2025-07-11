@@ -107,7 +107,7 @@ export default function PositionNode(props: NodeProps<PositionNodeData>) {
                 aria-label="Opciones"
                 icon={<LuMousePointerClick />}
                 variant="ghost"
-                size="sm"
+                size="lg"
                 color="blue.500"
                 _hover={{ bg: "blue.50" }}
                 onClick={(e) => e.stopPropagation()}

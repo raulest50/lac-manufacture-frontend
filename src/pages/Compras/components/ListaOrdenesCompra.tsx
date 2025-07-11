@@ -25,6 +25,7 @@ interface ListaOrdenesCompraProps {
     ordenes: OrdenCompraMateriales[];
     onClose4Dialogs: (page:number) => void;
     page: number;
+    onEditarOrden?: (orden: OrdenCompraMateriales) => void; // Nuevo callback
 }
 
 interface ContextMenuState {
@@ -47,7 +48,7 @@ interface WhoAmIResponse {
     authorities: Authority[];
 }
 
-const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClose4Dialogs, page}) => {
+const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClose4Dialogs, page, onEditarOrden }) => {
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
     const [selectedOrden, setSelectedOrden] = useState<OrdenCompraMateriales | null>(null);
     const [ordenToCancel, setOrdenToCancel] = useState<OrdenCompraMateriales | null>(null);
@@ -131,6 +132,14 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
         if (contextMenu) {
             setOrdenToActualizar(contextMenu.orden);
             setActualizarDialogOpen(true);
+        }
+        setContextMenu(null);
+    };
+
+    // Añadir el handler para editar orden
+    const handleEditarOrden = () => {
+        if (contextMenu && onEditarOrden) {
+            onEditarOrden(contextMenu.orden);
         }
         setContextMenu(null);
     };
@@ -226,6 +235,22 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
                             onClick={handleActualizarOrden}
                         >
                             Actualizar Estado de la Orden
+                        </Box>
+                    )}
+
+                    {/* Solo mostrar la opción de editar orden si:
+                        1. La orden no ha sido liberada (estado <= 0)
+                        2. El usuario es master o tiene nivel de acceso 2 o superior
+                        3. Se ha proporcionado el callback onEditarOrden */}
+                    {(user === 'master' || comprasAccessLevel >= 2) && 
+                     contextMenu.orden.estado <= 0 && 
+                     onEditarOrden && (
+                        <Box
+                            p={1}
+                            _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                            onClick={handleEditarOrden}
+                        >
+                            Editar Orden Compra
                         </Box>
                     )}
                 </Box>

@@ -24,7 +24,6 @@ import {
   Box,
   Link,
   HStack,
-  Divider,
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
 import { Cargo, AccessLevel } from "../types";
@@ -205,13 +204,7 @@ export default function EditPositionDialog({
             <>
               <FormControl mb={4}>
                 <FormLabel>ID del Cargo</FormLabel>
-                <Input
-                  value={localCargo.idCargo}
-                  onChange={(e) =>
-                    setLocalCargo({...localCargo, idCargo: e.target.value})
-                  }
-                  placeholder="Identificador único del cargo"
-                />
+                <Text>{localCargo.idCargo}</Text>
               </FormControl>
 
               <FormControl mb={4}>
@@ -251,6 +244,7 @@ export default function EditPositionDialog({
                   min={1}
                   max={10}
                   value={localCargo.nivel}
+                  contentEditable={false}
                   onChange={(valueString) =>
                     setLocalCargo({ ...localCargo, nivel: parseInt(valueString) })
                   }
@@ -338,17 +332,6 @@ export default function EditPositionDialog({
                             Editar URL
                           </Button>
                         </Box>
-                      )}
-                      {!localCargo.urlDocManualFunciones && (
-                        <Button 
-                          size="sm" 
-                          onClick={() => {
-                            setManualUrl("");
-                            setIsEditingManual(true);
-                          }}
-                        >
-                          Agregar URL Manual
-                        </Button>
                       )}
                     </>
                   )}
@@ -441,15 +424,6 @@ export default function EditPositionDialog({
           ) : (
             // Botones para modo de visualización
             <>
-              {(accessLevel === AccessLevel.EDIT || isMaster) && !isEditingManual && (
-                <Button 
-                  colorScheme="blue" 
-                  mr={3} 
-                  onClick={() => setIsEditingManual(true)}
-                >
-                  Editar URL Manual
-                </Button>
-              )}
               <Button variant="ghost" onClick={onClose}>
                 Cerrar
               </Button>

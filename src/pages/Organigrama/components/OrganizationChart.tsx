@@ -46,6 +46,23 @@ export default function OrganizationChart({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
 
+  // Find the highest existing ID and return the next ID
+  const getNextId = () => {
+    // Find the highest existing ID
+    let highestId = -1;
+    positions.forEach(cargo => {
+      // Convert idCargo to number if possible
+      const idNumber = parseInt(cargo.idCargo);
+      // Only consider valid numeric IDs
+      if (!isNaN(idNumber) && idNumber > highestId) {
+        highestId = idNumber;
+      }
+    });
+
+    // Increment the highest ID by 1
+    return (highestId + 1).toString();
+  };
+
   // Estados para el diálogo de detalles
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [detailsNode, setDetailsNode] = useState<Node | null>(null);
@@ -332,7 +349,7 @@ export default function OrganizationChart({
     if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
 
     const newCargo: Cargo = {
-      idCargo: "0",
+      idCargo: getNextId(),
       tituloCargo: "",
       departamento: "",
       descripcionCargo: "",
