@@ -20,10 +20,16 @@ import {
   VStack,
   Icon,
   useToast,
+  Text,
+  Box,
+  Link,
+  HStack,
+  Divider,
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
-import { Cargo } from "../types";
+import { Cargo, AccessLevel } from "../types";
 import { FaFileCircleQuestion, FaFileCircleCheck } from "react-icons/fa6";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
 
@@ -39,6 +45,9 @@ interface EditPositionDialogProps {
   cargo: Cargo;
   onSave: (updatedCargo: Cargo) => void;
   assignedUsers?: string[]; // Lista de usuarios ya asignados a otros cargos
+  mode?: 'edit' | 'view'; // Modo de visualización o edición
+  accessLevel?: AccessLevel; // Nivel de acceso del usuario
+  isMaster?: boolean; // Si el usuario es master
 }
 
 export default function EditPositionDialog({
@@ -47,21 +56,29 @@ export default function EditPositionDialog({
   cargo,
   onSave,
   assignedUsers = [],
+  mode = 'edit', // Por defecto, modo de edición
+  accessLevel = AccessLevel.VIEW,
+  isMaster = false,
 }: EditPositionDialogProps) {
   const toast = useToast();
-  const [localData, setLocalData] = useState<Cargo>(cargo);
+  const [localCargo, setLocalCargo] = useState<Cargo>(cargo);
   const [users, setUsers] = useState<User[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [isEditingManual, setIsEditingManual] = useState(false);
+  const [manualUrl, setManualUrl] = useState<string>("");
   const manualInputRef = useRef<HTMLInputElement>(null);
   const endPoints = new EndPointsURL();
 
   // Cargar los datos del cargo
   useEffect(() => {
-    setLocalData(cargo);
+    setLocalCargo(cargo);
+    setManualUrl(cargo.urlDocManualFunciones || "");
   }, [cargo]);
 
-  // Cargar la lista de usuarios
+  // Cargar la lista de usuarios (solo en modo edición)
   useEffect(() => {
+    if (mode !== 'edit') return;
+
     const fetchUsers = async () => {
       try {
         setIsLoadingUsers(true);
@@ -71,7 +88,7 @@ export default function EditPositionDialog({
           (user: User) => 
             user.username !== 'master' && 
             !assignedUsers.includes(user.username) || 
-            (localData.usuario && user.username === localData.usuario)
+            (localCargo.usuario && user.username === localCargo.usuario)
         );
         setUsers(filteredUsers);
       } catch (error) {
@@ -87,7 +104,7 @@ export default function EditPositionDialog({
     };
 
     fetchUsers();
-  }, [endPoints.get_all_users, assignedUsers, localData.usuario, toast]);
+  }, [endPoints.get_all_users, assignedUsers, localCargo.usuario, toast, mode]);
 
   // Manejar la selección de archivo
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,139 +121,340 @@ export default function EditPositionDialog({
         e.target.value = "";
         return;
       }
-      setLocalData({ ...localData, manualFuncionesFile: file });
+      setLocalCargo({ ...localCargo, manualFuncionesFile: file });
+    }
+  };
+
+  // Guardar la URL del manual de funciones
+  const handleSaveManual = async () => {
+    if (mode === 'edit') {
+      // En modo edición, actualizar el cargo local y continuar con el flujo normal
+      setLocalCargo({ ...localCargo, urlDocManualFunciones: manualUrl });
+      setIsEditingManual(false);
+      return;
+    }
+
+    // En modo visualización, guardar directamente la URL
+    try {
+      // Verificar si el usuario tiene permisos de edición
+      if (accessLevel !== AccessLevel.EDIT && !isMaster) {
+        toast({
+          title: "Acceso denegado",
+          description: "No tienes permisos para editar el manual de funciones",
+          status: "warning",
+          duration: 5000,
+        });
+        return;
+      }
+
+      // Actualizar el cargo con la nueva URL
+      const updatedCargo = { ...localCargo, urlDocManualFunciones: manualUrl };
+
+      // Crear un FormData para enviar el cargo
+      const formData = new FormData();
+      formData.append('cargo', JSON.stringify(updatedCargo));
+
+      // Usar axios para actualizar el cargo con el endpoint correcto
+      const response = await axios.post(
+        endPoints.save_cargo_with_manual,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      setLocalCargo(response.data);
+      setIsEditingManual(false);
+
+      toast({
+        title: "URL del manual de funciones actualizada correctamente",
+        status: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error al actualizar la URL del manual de funciones:", error);
+      toast({
+        title: "Error al actualizar la URL del manual de funciones",
+        status: "error",
+        duration: 3000,
+      });
     }
   };
 
   const handleSave = () => {
-    onSave(localData);
+    // Si estamos editando el manual, guardar primero esos cambios
+    if (isEditingManual) {
+      setLocalCargo({ ...localCargo, urlDocManualFunciones: manualUrl });
+    }
+
+    onSave(localCargo);
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} size={mode === 'view' ? "lg" : "md"}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Editar Cargo</ModalHeader>
+        <ModalHeader>{mode === 'edit' ? "Editar Cargo" : "Detalles del Cargo"}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <FormControl mb={4}>
-            <FormLabel>ID del Cargo</FormLabel>
-            <Input
-                value={localData.idCargo}
-                onChange={(e) =>
-                    setLocalData({...localData, idCargo: e.target.value})
-                }
-                placeholder="Identificador único del cargo"
-            />
-          </FormControl>
+          {mode === 'edit' ? (
+            // Modo de edición - Formulario completo
+            <>
+              <FormControl mb={4}>
+                <FormLabel>ID del Cargo</FormLabel>
+                <Input
+                  value={localCargo.idCargo}
+                  onChange={(e) =>
+                    setLocalCargo({...localCargo, idCargo: e.target.value})
+                  }
+                  placeholder="Identificador único del cargo"
+                />
+              </FormControl>
 
-          <FormControl mb={4}>
-            <FormLabel>Título del Cargo</FormLabel>
-            <Input
-              value={localData.tituloCargo}
-              onChange={(e) =>
-                setLocalData({ ...localData, tituloCargo: e.target.value })
-              }
-            />
-          </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Título del Cargo</FormLabel>
+                <Input
+                  value={localCargo.tituloCargo}
+                  onChange={(e) =>
+                    setLocalCargo({ ...localCargo, tituloCargo: e.target.value })
+                  }
+                />
+              </FormControl>
 
-          <FormControl mb={4}>
-            <FormLabel>Departamento</FormLabel>
-            <Input
-              value={localData.departamento}
-              onChange={(e) =>
-                setLocalData({ ...localData, departamento: e.target.value })
-              }
-            />
-          </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Departamento</FormLabel>
+                <Input
+                  value={localCargo.departamento}
+                  onChange={(e) =>
+                    setLocalCargo({ ...localCargo, departamento: e.target.value })
+                  }
+                />
+              </FormControl>
 
-          <FormControl mb={4}>
-            <FormLabel>Descripción</FormLabel>
-            <Textarea
-              value={localData.descripcionCargo}
-              onChange={(e) =>
-                setLocalData({ ...localData, descripcionCargo: e.target.value })
-              }
-              placeholder="Descripción breve del cargo"
-            />
-          </FormControl>
+              <FormControl mb={4}>
+                <FormLabel>Descripción</FormLabel>
+                <Textarea
+                  value={localCargo.descripcionCargo}
+                  onChange={(e) =>
+                    setLocalCargo({ ...localCargo, descripcionCargo: e.target.value })
+                  }
+                  placeholder="Descripción breve del cargo"
+                />
+              </FormControl>
 
-          <FormControl mb={4}>
-            <FormLabel>Nivel Jerárquico</FormLabel>
-            <NumberInput
-              min={1}
-              max={10}
-              value={localData.nivel}
-              onChange={(valueString) =>
-                setLocalData({ ...localData, nivel: parseInt(valueString) })
-              }
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </FormControl>
-
-          <FormControl mb={4}>
-            <FormLabel>Usuario</FormLabel>
-            <Select
-              value={localData.usuario || ""}
-              onChange={(e) =>
-                setLocalData({ ...localData, usuario: e.target.value })
-              }
-              placeholder="Seleccione un usuario"
-              isDisabled={isLoadingUsers}
-            >
-              {users.map((user) => (
-                <option key={user.id} value={user.username}>
-                  {user.nombreCompleto || user.username}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl mb={4}>
-            <FormLabel>Manual de Funciones</FormLabel>
-            <VStack spacing={4} align="stretch" alignItems="center">
-              <Icon
-                as={localData.manualFuncionesFile || localData.urlDocManualFunciones ? FaFileCircleCheck : FaFileCircleQuestion}
-                boxSize="4em"
-                color={localData.manualFuncionesFile || localData.urlDocManualFunciones ? "green" : "orange.500"}
-              />
-              <Button onClick={() => manualInputRef.current?.click()}>Seleccionar Archivo</Button>
-              <Input
-                type="file"
-                ref={manualInputRef}
-                style={{ display: 'none' }}
-                accept="application/pdf"
-                onChange={handleFileChange}
-              />
-              {localData.urlDocManualFunciones && (
-                <Button 
-                  as="a" 
-                  href={localData.urlDocManualFunciones} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  size="sm"
-                  colorScheme="blue"
-                  variant="outline"
+              <FormControl mb={4}>
+                <FormLabel>Nivel Jerárquico</FormLabel>
+                <NumberInput
+                  min={1}
+                  max={10}
+                  value={localCargo.nivel}
+                  onChange={(valueString) =>
+                    setLocalCargo({ ...localCargo, nivel: parseInt(valueString) })
+                  }
                 >
-                  Ver Manual Actual
-                </Button>
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+
+              <FormControl mb={4}>
+                <FormLabel>Usuario</FormLabel>
+                <Select
+                  value={localCargo.usuario || ""}
+                  onChange={(e) =>
+                    setLocalCargo({ ...localCargo, usuario: e.target.value })
+                  }
+                  placeholder="Seleccione un usuario"
+                  isDisabled={isLoadingUsers}
+                >
+                  {users.map((user) => (
+                    <option key={user.id} value={user.username}>
+                      {user.nombreCompleto || user.username}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl mb={4}>
+                <FormLabel>Manual de Funciones</FormLabel>
+                <VStack spacing={4} align="stretch" alignItems="center">
+                  <Icon
+                    as={localCargo.manualFuncionesFile || localCargo.urlDocManualFunciones ? FaFileCircleCheck : FaFileCircleQuestion}
+                    boxSize="4em"
+                    color={localCargo.manualFuncionesFile || localCargo.urlDocManualFunciones ? "green" : "orange.500"}
+                  />
+                  <Button onClick={() => manualInputRef.current?.click()}>Seleccionar Archivo</Button>
+                  <Input
+                    type="file"
+                    ref={manualInputRef}
+                    style={{ display: 'none' }}
+                    accept="application/pdf"
+                    onChange={handleFileChange}
+                  />
+                  {isEditingManual ? (
+                    <FormControl>
+                      <FormLabel>URL del Manual</FormLabel>
+                      <Input
+                        value={manualUrl}
+                        onChange={(e) => setManualUrl(e.target.value)}
+                        placeholder="URL del manual de funciones"
+                      />
+                      <HStack mt={2}>
+                        <Button size="sm" colorScheme="green" onClick={() => {
+                          setLocalCargo({ ...localCargo, urlDocManualFunciones: manualUrl });
+                          setIsEditingManual(false);
+                        }}>
+                          Guardar URL
+                        </Button>
+                        <Button size="sm" colorScheme="red" onClick={() => {
+                          setManualUrl(localCargo.urlDocManualFunciones || "");
+                          setIsEditingManual(false);
+                        }}>
+                          Cancelar
+                        </Button>
+                      </HStack>
+                    </FormControl>
+                  ) : (
+                    <>
+                      {localCargo.urlDocManualFunciones && (
+                        <Box>
+                          <Link href={localCargo.urlDocManualFunciones} isExternal color="blue.500">
+                            Ver Manual Actual <ExternalLinkIcon mx="2px" />
+                          </Link>
+                          <Button 
+                            size="sm" 
+                            mt={2} 
+                            onClick={() => {
+                              setManualUrl(localCargo.urlDocManualFunciones || "");
+                              setIsEditingManual(true);
+                            }}
+                          >
+                            Editar URL
+                          </Button>
+                        </Box>
+                      )}
+                      {!localCargo.urlDocManualFunciones && (
+                        <Button 
+                          size="sm" 
+                          onClick={() => {
+                            setManualUrl("");
+                            setIsEditingManual(true);
+                          }}
+                        >
+                          Agregar URL Manual
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </VStack>
+              </FormControl>
+            </>
+          ) : (
+            // Modo de visualización - Detalles del cargo
+            <>
+              <Text fontSize="2xl" fontWeight="bold" mb={2}>
+                {localCargo.tituloCargo}
+              </Text>
+
+              <Text fontSize="lg" color="gray.600" mb={4}>
+                Departamento: {localCargo.departamento}
+              </Text>
+
+              <Text mb={6}>{localCargo.descripcionCargo}</Text>
+
+              {localCargo.usuario && (
+                <Text fontSize="sm" color="blue.600" mb={4}>
+                  Usuario asignado: {localCargo.usuario}
+                </Text>
               )}
-            </VStack>
-          </FormControl>
+
+              <Box mt={6} pt={4} borderTop="1px solid" borderColor="gray.200">
+                <Text fontSize="xl" fontWeight="bold" mb={4}>
+                  Manual de Funciones
+                </Text>
+
+                {isEditingManual ? (
+                  <VStack spacing={4} align="stretch">
+                    <FormControl>
+                      <FormLabel fontWeight="bold">URL del Manual de Funciones (PDF)</FormLabel>
+                      <Input
+                        value={manualUrl}
+                        onChange={(e) => setManualUrl(e.target.value)}
+                        placeholder="Ingrese la URL del documento PDF con el manual de funciones"
+                      />
+                    </FormControl>
+                    <Text fontSize="sm" color="gray.500">
+                      Ingrese la URL completa del documento PDF que contiene el manual de funciones aprobado para este cargo.
+                    </Text>
+                    <HStack>
+                      <Button colorScheme="green" onClick={handleSaveManual}>
+                        Guardar URL
+                      </Button>
+                      <Button 
+                        colorScheme="red" 
+                        onClick={() => {
+                          setManualUrl(localCargo.urlDocManualFunciones || "");
+                          setIsEditingManual(false);
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                    </HStack>
+                  </VStack>
+                ) : (
+                  <VStack spacing={4} align="stretch">
+                    {localCargo.urlDocManualFunciones ? (
+                      <Box>
+                        <Link href={localCargo.urlDocManualFunciones} isExternal color="blue.500">
+                          Ver Manual de Funciones (PDF) <ExternalLinkIcon mx="2px" />
+                        </Link>
+                        <Text fontSize="sm" color="gray.500" mt={2}>
+                          Haga clic en el enlace para ver o descargar el manual de funciones completo.
+                        </Text>
+                      </Box>
+                    ) : (
+                      <Text>No hay un manual de funciones disponible para este cargo.</Text>
+                    )}
+                  </VStack>
+                )}
+              </Box>
+            </>
+          )}
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSave}>
-            Guardar
-          </Button>
-          <Button variant="ghost" onClick={onClose}>
-            Cancelar
-          </Button>
+          {mode === 'edit' ? (
+            // Botones para modo de edición
+            <>
+              <Button colorScheme="blue" mr={3} onClick={handleSave}>
+                Guardar
+              </Button>
+              <Button variant="ghost" onClick={onClose}>
+                Cancelar
+              </Button>
+            </>
+          ) : (
+            // Botones para modo de visualización
+            <>
+              {(accessLevel === AccessLevel.EDIT || isMaster) && !isEditingManual && (
+                <Button 
+                  colorScheme="blue" 
+                  mr={3} 
+                  onClick={() => setIsEditingManual(true)}
+                >
+                  Editar URL Manual
+                </Button>
+              )}
+              <Button variant="ghost" onClick={onClose}>
+                Cerrar
+              </Button>
+            </>
+          )}
         </ModalFooter>
       </ModalContent>
     </Modal>

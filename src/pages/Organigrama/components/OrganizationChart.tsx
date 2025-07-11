@@ -31,20 +31,22 @@ interface Props {
   accessLevel: AccessLevel;
   isMaster: boolean;
   organizationChartId: string;
-  onNavigateToDetails: (positionId: string) => void;
 }
 
 export default function OrganizationChart({ 
   accessLevel, 
   isMaster,
-  organizationChartId,
-  onNavigateToDetails 
+  organizationChartId
 }: Props) {
   const toast = useToast();
   const [positions, setPositions] = useState<Cargo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
+
+  // Estados para el diálogo de detalles
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [detailsNode, setDetailsNode] = useState<Node | null>(null);
 
   // Convertir cargos a nodos para React Flow
   const createNodesFromPositions = (cargos: Cargo[]): Node[] => {
@@ -54,7 +56,7 @@ export default function OrganizationChart({
         ...cargo,
         accessLevel, // Pasar el nivel de acceso al nodo
         isMaster,    // Pasar si el usuario es master
-        onEdit: (nodeId) => {
+        onEdit: (nodeId:string) => {
           // Establecer el nodo seleccionado y abrir el diálogo de edición
           const node = nodes.find(n => n.id === nodeId);
           if (node) {
@@ -62,9 +64,13 @@ export default function OrganizationChart({
             setIsEditDialogOpen(true);
           }
         },
-        onViewManual: (nodeId) => {
-          // Navegar a la página de detalles del cargo
-          onNavigateToDetails(nodeId);
+        onViewManual: (nodeId: string) => {
+          // Abrir el diálogo de detalles en lugar de navegar
+          const node = nodes.find(n => n.id === nodeId);
+          if (node) {
+            setDetailsNode(node);
+            setIsDetailsDialogOpen(true);
+          }
         }
       },
       position: { 
@@ -324,7 +330,7 @@ export default function OrganizationChart({
     if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
 
     const newCargo: Cargo = {
-      idCargo: `temp-${Date.now()}`, // ID temporal, se reemplazará por el del backend
+      idCargo: "0", // ID temporal, se reemplazará por el del backend
       tituloCargo: "",
       departamento: "",
       descripcionCargo: "",
@@ -335,20 +341,25 @@ export default function OrganizationChart({
 
     // Crear el nodo para el nuevo cargo
     const newNode: Node = {
-      id: newCargo.idCargo,
+      id: newCargo.idCargo.toString(),
       data: {
         ...newCargo,
         accessLevel,
         isMaster,
-        onEdit: (nodeId) => {
+        onEdit: (nodeId:string) => {
           const node = nodes.find(n => n.id === nodeId);
           if (node) {
             setSelectedNode(node);
             setIsEditDialogOpen(true);
           }
         },
-        onViewManual: (nodeId) => {
-          onNavigateToDetails(nodeId);
+        onViewManual: (nodeId:string) => {
+          // Abrir el diálogo de detalles en lugar de navegar
+          const node = nodes.find(n => n.id === nodeId);
+          if (node) {
+            setDetailsNode(node);
+            setIsDetailsDialogOpen(true);
+          }
         }
       },
       position: { x: newCargo.posicionX, y: newCargo.posicionY },
@@ -561,12 +572,15 @@ export default function OrganizationChart({
           onClose={() => setIsEditDialogOpen(false)}
           cargo={selectedNode.data as Cargo}
           assignedUsers={assignedUsers}
+          mode="edit"
+          accessLevel={accessLevel}
+          isMaster={isMaster}
           onSave={(updatedCargo) => {
             // Actualizar el nodo en el estado local
             setNodes((prevNodes) =>
               prevNodes.map((node) => {
                 if (node.id === selectedNode.id) {
-                  return { ...node, data: updatedCargo };
+                  return { ...node, data: { ...node.data, ...updatedCargo } };
                 }
                 return node;
               })
@@ -580,6 +594,19 @@ export default function OrganizationChart({
               updatePosition(selectedNode.id, updatedCargo);
             }
           }}
+        />
+      )}
+
+      {/* Diálogo de detalles */}
+      {isDetailsDialogOpen && detailsNode && (
+        <EditPositionDialog
+          isOpen={isDetailsDialogOpen}
+          onClose={() => setIsDetailsDialogOpen(false)}
+          cargo={detailsNode.data as Cargo}
+          mode="view"
+          accessLevel={accessLevel}
+          isMaster={isMaster}
+          onSave={() => {}} // No se usa en modo visualización, pero es requerido por la interfaz
         />
       )}
     </Flex>

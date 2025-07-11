@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Container, Box, Spinner, Center, Text } from "@chakra-ui/react";
 import MyHeader from "../../components/MyHeader.tsx";
 import OrganizationChart from "./components/OrganizationChart";
-import PositionDetailsPage from "./components/PositionDetailsPage";
 import { AccessLevel } from "./types";
 import axios from "axios";
 import { Authority, WhoAmIResponse } from "../../api/global_types.tsx";
@@ -14,7 +13,6 @@ export default function OrganigramaPage() {
   const [accessLevel, setAccessLevel] = useState<AccessLevel>(AccessLevel.VIEW);
   const [isMaster, setIsMaster] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedPositionId, setSelectedPositionId] = useState<string | null>(null);
   const [organizationChartId, setOrganizationChartId] = useState<string | null>("org-1"); // ID temporal
   const { user } = useAuth();
   const endPoints = new EndPointsURL();
@@ -65,15 +63,6 @@ export default function OrganigramaPage() {
     fetchUserAccess();
   }, [user, endPoints.whoami]);
 
-  // Manejar la navegación a los detalles de una posición
-  const handleNavigateToDetails = (positionId: string) => {
-    setSelectedPositionId(positionId);
-  };
-
-  // Volver al organigrama desde la página de detalles
-  const handleBackToChart = () => {
-    setSelectedPositionId(null);
-  };
 
   return (
     <Container minW={['auto', 'container.lg', 'container.xl']} minH={"100vh"} w={"full"} h={'full'}>
@@ -87,22 +76,12 @@ export default function OrganigramaPage() {
         <Box p={8}>
           <Text>No se encontró ningún organigrama disponible.</Text>
         </Box>
-      ) : selectedPositionId ? (
-        <Box p={4}>
-          <PositionDetailsPage
-            positionId={selectedPositionId}
-            accessLevel={accessLevel}
-            isMaster={isMaster}
-            onBack={handleBackToChart}
-          />
-        </Box>
       ) : (
         <Box>
           <OrganizationChart
             accessLevel={accessLevel}
             isMaster={isMaster}
             organizationChartId={organizationChartId}
-            onNavigateToDetails={handleNavigateToDetails}
           />
         </Box>
       )}
