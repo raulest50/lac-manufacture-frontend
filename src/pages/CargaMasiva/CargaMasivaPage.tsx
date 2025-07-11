@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { 
     Container, 
     Button, 
@@ -11,8 +11,10 @@ import {
     useToast,
     FormControl,
     FormLabel,
-    FormHelperText
+    FormHelperText,
+    Icon
 } from "@chakra-ui/react";
+import { FaFileCircleCheck, FaFileCircleQuestion } from "react-icons/fa6";
 import MyHeader from "../../components/MyHeader";
 import axios, { AxiosError } from "axios";
 import EndPointsURL from "../../api/EndPointsURL";
@@ -22,7 +24,197 @@ export default function CargaMasivaPage() {
     const [productosLink, setProductosLink] = useState<string>("");
     const [isLoadingProveedores, setIsLoadingProveedores] = useState<boolean>(false);
     const [isLoadingProductos, setIsLoadingProductos] = useState<boolean>(false);
+    const [proveedoresFile, setProveedoresFile] = useState<File | null>(null);
+    const [productosFile, setProductosFile] = useState<File | null>(null);
+    const proveedoresFileInputRef = useRef<HTMLInputElement>(null);
+    const productosFileInputRef = useRef<HTMLInputElement>(null);
     const toast = useToast();
+
+    const handleProveedoresFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const lower = file.name.toLowerCase();
+            if (!lower.endsWith('.xlsx') && !lower.endsWith('.xls')) {
+                toast({
+                    title: 'Tipo de archivo no permitido',
+                    description: 'Solo se permiten archivos de Excel (.xlsx, .xls)',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                });
+                e.target.value = '';
+                return;
+            }
+            setProveedoresFile(file);
+        }
+    };
+
+    const handleProductosFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const lower = file.name.toLowerCase();
+            if (!lower.endsWith('.xlsx') && !lower.endsWith('.xls')) {
+                toast({
+                    title: 'Tipo de archivo no permitido',
+                    description: 'Solo se permiten archivos de Excel (.xlsx, .xls)',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                });
+                e.target.value = '';
+                return;
+            }
+            setProductosFile(file);
+        }
+    };
+
+    const uploadProveedoresFile = async (file: File) => {
+        setIsLoadingProveedores(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const uploadResponse = await axios.post(
+                new EndPointsURL().bulk_upload_proveedores,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    responseType: 'blob'
+                }
+            );
+
+            const blob = new Blob([uploadResponse.data]);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            const contentDisposition = uploadResponse.headers['content-disposition'];
+            let filename = 'reporte_proveedores.xlsx';
+
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch && filenameMatch[1]) {
+                    filename = filenameMatch[1];
+                }
+            }
+
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            toast({
+                title: 'Carga completada',
+                description: 'Se ha generado un reporte detallado con los resultados de la carga. Descargando...',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+
+        } catch (error) {
+            const err = error as Error | AxiosError;
+            let errorMessage = 'Ha ocurrido un error al cargar los proveedores.';
+
+            if (axios.isAxiosError(err)) {
+                errorMessage = err.response?.data?.message || err.message;
+            } else {
+                errorMessage = err.message;
+            }
+
+            toast({
+                title: 'Error en la carga',
+                description: errorMessage,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setIsLoadingProveedores(false);
+        }
+    };
+
+    const uploadProductosFile = async (file: File) => {
+        setIsLoadingProductos(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const uploadResponse = await axios.post(
+                new EndPointsURL().bulk_upload_productos,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    responseType: 'blob'
+                }
+            );
+
+            const blob = new Blob([uploadResponse.data]);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            const contentDisposition = uploadResponse.headers['content-disposition'];
+            let filename = 'reporte_productos.xlsx';
+
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch && filenameMatch[1]) {
+                    filename = filenameMatch[1];
+                }
+            }
+
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            toast({
+                title: 'Carga completada',
+                description: 'Se ha generado un reporte detallado con los resultados de la carga. Descargando...',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+
+        } catch (error) {
+            const err = error as Error | AxiosError;
+            let errorMessage = 'Ha ocurrido un error al cargar los productos.';
+
+            if (axios.isAxiosError(err)) {
+                errorMessage = err.response?.data?.message || err.message;
+            } else {
+                errorMessage = err.message;
+            }
+
+            toast({
+                title: 'Error en la carga',
+                description: errorMessage,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setTimeout(() => {
+                setIsLoadingProductos(false);
+            }, 2000);
+        }
+    };
+
+    const handleProveedoresUploadFromFile = async () => {
+        if (!proveedoresFile) return;
+        await uploadProveedoresFile(proveedoresFile);
+        setProveedoresFile(null);
+    };
+
+    const handleProductosUploadFromFile = async () => {
+        if (!productosFile) return;
+        await uploadProductosFile(productosFile);
+        setProductosFile(null);
+    };
 
 
     // Implementación de la carga masiva de proveedores
@@ -263,14 +455,14 @@ export default function CargaMasivaPage() {
                     <FormControl>
                         <FormLabel>URL del archivo Excel en Google Sheets</FormLabel>
                         <HStack spacing={4}>
-                            <Input 
+                            <Input
                                 placeholder="Ingrese el enlace de Google Sheets para carga de proveedores"
                                 value={proveedoresLink}
                                 onChange={(e) => setProveedoresLink(e.target.value)}
                                 flex={1}
                             />
-                            <Button 
-                                colorScheme="blue" 
+                            <Button
+                                colorScheme="blue"
                                 onClick={handleProveedoresUpload}
                                 isDisabled={!proveedoresLink || isLoadingProveedores}
                                 isLoading={isLoadingProveedores}
@@ -282,6 +474,33 @@ export default function CargaMasivaPage() {
                         <FormHelperText>
                             Pegue la URL de un archivo Excel compartido públicamente en Google Sheets
                         </FormHelperText>
+                    </FormControl>
+                    <FormControl mt={4}>
+                        <FormLabel>Archivo Excel local</FormLabel>
+                        <HStack spacing={4}>
+                            <Button onClick={() => proveedoresFileInputRef.current?.click()}>Seleccionar archivo</Button>
+                            <Input
+                                type="file"
+                                ref={proveedoresFileInputRef}
+                                style={{ display: 'none' }}
+                                accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                                onChange={handleProveedoresFileChange}
+                            />
+                            <Icon
+                                as={proveedoresFile ? FaFileCircleCheck : FaFileCircleQuestion}
+                                boxSize="2em"
+                                color={proveedoresFile ? 'green' : 'orange.500'}
+                            />
+                            <Button
+                                colorScheme="blue"
+                                onClick={handleProveedoresUploadFromFile}
+                                isDisabled={!proveedoresFile || isLoadingProveedores}
+                                isLoading={isLoadingProveedores}
+                                loadingText="Cargando..."
+                            >
+                                Cargar Proveedores
+                            </Button>
+                        </HStack>
                     </FormControl>
                 </Box>
 
@@ -295,14 +514,14 @@ export default function CargaMasivaPage() {
                     <FormControl>
                         <FormLabel>URL del archivo Excel en Google Sheets</FormLabel>
                         <HStack spacing={4}>
-                            <Input 
+                            <Input
                                 placeholder="Ingrese el enlace de Google Sheets para carga de productos"
                                 value={productosLink}
                                 onChange={(e) => setProductosLink(e.target.value)}
                                 flex={1}
                             />
-                            <Button 
-                                colorScheme="green" 
+                            <Button
+                                colorScheme="green"
                                 onClick={handleProductosUpload}
                                 isDisabled={!productosLink || isLoadingProductos}
                                 isLoading={isLoadingProductos}
@@ -314,6 +533,33 @@ export default function CargaMasivaPage() {
                         <FormHelperText>
                             Pegue la URL de un archivo Excel compartido públicamente en Google Sheets
                         </FormHelperText>
+                    </FormControl>
+                    <FormControl mt={4}>
+                        <FormLabel>Archivo Excel local</FormLabel>
+                        <HStack spacing={4}>
+                            <Button onClick={() => productosFileInputRef.current?.click()}>Seleccionar archivo</Button>
+                            <Input
+                                type="file"
+                                ref={productosFileInputRef}
+                                style={{ display: 'none' }}
+                                accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                                onChange={handleProductosFileChange}
+                            />
+                            <Icon
+                                as={productosFile ? FaFileCircleCheck : FaFileCircleQuestion}
+                                boxSize="2em"
+                                color={productosFile ? 'green' : 'orange.500'}
+                            />
+                            <Button
+                                colorScheme="green"
+                                onClick={handleProductosUploadFromFile}
+                                isDisabled={!productosFile || isLoadingProductos}
+                                isLoading={isLoadingProductos}
+                                loadingText="Cargando..."
+                            >
+                                Cargar Productos
+                            </Button>
+                        </HStack>
                     </FormControl>
                 </Box>
             </VStack>
