@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     Flex, 
     Button, 
@@ -29,6 +29,16 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
     const [listaItemsOrdenCompra, setListaItemsOrdenCompra] = useState<ItemOrdenCompra[]>(ocm.itemsOrdenCompra);
     const [isMateriaPrimaPickerOpen, setIsMateriaPrimaPickerOpen] = useState(false);
     const [ivaEnabled, setIvaEnabled] = useState(true);
+    const [isFormValid, setIsFormValid] = useState(false);
+
+    // Initialize ivaEnabled based on the actual VAT values in the order
+    useEffect(() => {
+        // Check if all items have VAT = 0
+        const allItemsHaveZeroIVA = ocm.itemsOrdenCompra.every(item => item.ivaCOP === 0);
+
+        // If all items have VAT = 0, disable the switch
+        setIvaEnabled(!allItemsHaveZeroIVA);
+    }, [ocm.itemsOrdenCompra]); // Only runs when the order changes
 
     // Nuevos estados para los campos adicionales
     const [condicionPago, setCondicionPago] = useState(ocm.condicionPago || "0");
@@ -42,6 +52,75 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
 
     const toast = useToast();
     const endPoints = new EndPointsURL();
+
+    // Función personalizada para comparar objetos de forma profunda
+    const deepEqual = (obj1: any, obj2: any): boolean => {
+        // Si ambos son primitivos, comparar directamente
+        if (obj1 === obj2) return true;
+
+        // Si uno es null/undefined pero el otro no, no son iguales
+        if (obj1 == null || obj2 == null) return false;
+
+        // Si no son objetos o son de diferente tipo, no son iguales
+        if (typeof obj1 !== 'object' || typeof obj2 !== 'object') return false;
+
+        // Si son arrays, verificar longitud y elementos
+        if (Array.isArray(obj1) && Array.isArray(obj2)) {
+            if (obj1.length !== obj2.length) return false;
+            return obj1.every((item, index) => deepEqual(item, obj2[index]));
+        }
+
+        // Si uno es array y el otro no, no son iguales
+        if (Array.isArray(obj1) !== Array.isArray(obj2)) return false;
+
+        // Comparar las claves de ambos objetos
+        const keys1 = Object.keys(obj1);
+        const keys2 = Object.keys(obj2);
+
+        if (keys1.length !== keys2.length) return false;
+
+        // Verificar que todas las claves de obj1 existan en obj2 y sus valores sean iguales
+        return keys1.every(key => 
+            Object.prototype.hasOwnProperty.call(obj2, key) && 
+            deepEqual(obj1[key], obj2[key])
+        );
+    };
+
+    // Función para verificar si hay cambios en la orden
+    const hasChanges = () => {
+        // Comparar la orden original con la actual
+        const originalOrder = {
+            ...ocm,
+            condicionPago: ocm.condicionPago || "0",
+            plazoPago: ocm.plazoPago || 30,
+            tiempoEntrega: ocm.tiempoEntrega || "15",
+            fechaVencimiento: ocm.fechaVencimiento 
+                ? format(new Date(ocm.fechaVencimiento), "yyyy-MM-dd") + "T00:00:00"
+                : format(new Date(), "yyyy-MM-dd") + "T00:00:00"
+        };
+
+        const currentOrder = {
+            ...ordenActual,
+            fechaVencimiento: fechaVencimiento + "T00:00:00"
+        };
+
+        return !deepEqual(originalOrder, currentOrder);
+    };
+
+    // Función para verificar si todos los inputs son válidos
+    const areInputsValid = () => {
+        // Verificar que todos los ítems tengan cantidades y precios válidos
+        return listaItemsOrdenCompra.every(item => 
+            item.cantidad > 0 && 
+            item.precioUnitario > 0
+        );
+    };
+
+    // Actualizar el estado de validación del formulario cuando cambien los datos relevantes
+    useEffect(() => {
+        const valid = hasChanges() && areInputsValid();
+        setIsFormValid(valid);
+    }, [ordenActual, listaItemsOrdenCompra, condicionPago, plazoPago, tiempoEntrega, fechaVencimiento]);
 
     // Función para actualizar los totales
     const updateTotalesAndGetValues = () => {
@@ -66,6 +145,10 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
             tiempoEntrega: tiempoEntrega,
             fechaVencimiento: fechaVencimiento + "T00:00:00"
         }));
+
+        // Actualizar la validación del formulario
+        const valid = hasChanges() && areInputsValid();
+        setIsFormValid(valid);
 
         return { calculatedSubTotal, calculatedIva, calculatedTotal };
     };
@@ -178,9 +261,23 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
     // Función para guardar los cambios
     const handleGuardarCambios = async () => {
         try {
+            // Crear una copia profunda del objeto para no modificar el estado original
+            const ordenToSend = JSON.parse(JSON.stringify(ordenActual));
+
+            // Eliminar la propiedad precioUnitarioFinal de cada ítem
+            // Esta propiedad es un método getter en el backend (ItemOrdenCompra.java) que calcula un valor,
+            // no un campo persistente. Cuando el frontend recibe los datos, este método se serializa como propiedad.
+            // Al enviar los datos de vuelta al backend, esta propiedad calculada causa un error 403 porque
+            // el backend no la reconoce como un campo que pueda ser establecido.
+            ordenToSend.itemsOrdenCompra.forEach(item => {
+                if ('precioUnitarioFinal' in item) {
+                    delete item.precioUnitarioFinal;
+                }
+            });
+
             const response = await axios.put(
                 `${endPoints.update_orden_compra}/${ordenActual.ordenCompraId}`,
-                ordenActual,
+                ordenToSend,
                 { headers: { 'Content-Type': 'application/json' } }
             );
 
@@ -275,7 +372,11 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
                 <Button colorScheme="red" onClick={onVolver}>
                     Cancelar
                 </Button>
-                <Button colorScheme="teal" onClick={handleGuardarCambios}>
+                <Button 
+                    colorScheme="teal" 
+                    onClick={handleGuardarCambios}
+                    isDisabled={!isFormValid}
+                >
                     Guardar Cambios
                 </Button>
             </Flex>

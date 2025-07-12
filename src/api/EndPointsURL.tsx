@@ -41,6 +41,7 @@ export default class EndPointsURL{
     public search_ordenc_date_estado:string;
 
     public save_orden_compra: string;
+    public update_orden_compra: string;
 
 
     // movimientos resource
@@ -139,6 +140,7 @@ export default class EndPointsURL{
         this.get_compra_items_by_compra_id = `${domain}/${compras_res}/{compraId}/items`;
         this.save_orden_compra = `${domain}/${compras_res}/save_orden_compra`;
         this.search_ordenc_date_estado = `${domain}/${compras_res}/search_ordenes_by_date_estado`;
+        this.update_orden_compra = `${domain}/${compras_res}/update_orden_compra`;
 
         // produccion endpoints
         this.save_produccion = `${domain}/${produccion_res}/save`;
