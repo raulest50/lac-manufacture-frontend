@@ -3,14 +3,14 @@ import {
     Container, Flex, FormControl, FormLabel, Input, Select,
     useToast, Text, Heading, Button, HStack, Spacer
 } from "@chakra-ui/react";
-import ProveedorCard from "./components/ProveedorCard.tsx";
+import ProveedorCard from "../../Compras/components/ProveedorCard.tsx";
 import { useState } from "react";
-import {Proveedor, ItemOCActivo, OrdenCompraActivos} from "./types.tsx";     // ← import Activo types
-import ProveedorPicker from "./components/ProveedorPicker.tsx";
-import MyDatePicker from "../../components/MyDatePicker.tsx";
+import {Proveedor, ItemOCActivo, OrdenCompraActivos} from "../../Compras/types.tsx";     // ← import Activo types
+import ProveedorPicker from "../../Compras/components/ProveedorPicker.tsx";
+import MyDatePicker from "../../../components/MyDatePicker.tsx";
 import { addDays, format } from "date-fns";
-import ListaItemsOCA from "./components/ListaItemsOCA.tsx";
-import PdfGenerator from "./pdfGenerator.tsx";
+import ListaItemsOCA from "../../Compras/components/ListaItemsOCA.tsx";
+import PdfGenerator from "../../Compras/pdfGenerator.tsx";
 
 export default function CrearOCA() {
     const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);

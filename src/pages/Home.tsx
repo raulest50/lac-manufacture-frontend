@@ -79,7 +79,7 @@ export default function Home(){
                 <SectionCard to={'/ventas'}           name={'Ventas'}               icon={FaShoppingCart}       supportedModules={[Modulo.VENTAS]} currentAccesos={roles}/>
                 <SectionCard to={'/transacciones_almacen'} name={'Transacciones de Almacen'} icon={MdWarehouse} supportedModules={[Modulo.TRANSACCIONES_ALMACEN]} currentAccesos={roles}/>
                 <SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload} supportedModules={[]} currentAccesos={roles} bgColor="red.100"/>
-                <SectionCard to={'/Activos'} name={'Activos'} icon={FaSteam}          supportedModules={[Modulo.ACTIVOS]} currentAccesos={roles}/>
+                <SectionCard to={'/Activos'} name={'Activos Fijos'} icon={FaSteam}          supportedModules={[Modulo.ACTIVOS]} currentAccesos={roles}/>
                 <SectionCard to={'/Contabilidad'} name={'Contabilidad'} icon={TbReportMoney}          supportedModules={[Modulo.CONTABILIDAD]} currentAccesos={roles}/>
                 <SectionCard to={'/Personal'} name={'Personal'} icon={PiMicrosoftTeamsLogoFill}          supportedModules={[Modulo.PERSONAL_PLANTA]} currentAccesos={roles}/>
                 <SectionCard to={'/Bintelligence'} name={'BI'} icon={MdOutlineInsights}          supportedModules={[Modulo.BINTELLIGENCE]} currentAccesos={roles}/>

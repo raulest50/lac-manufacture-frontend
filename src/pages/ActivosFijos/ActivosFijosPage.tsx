@@ -5,10 +5,11 @@ import {Container, Flex,
 
 import MyHeader from "../../components/MyHeader.tsx";
 
-import {RegistroActivosMainComp} from "./RegistroActivos/RegistroActivosMainComp.tsx";
+import {IncorporacionActivosFijos} from "./Incorporacion/IncorporacionActivosFijos.tsx";
 import {my_style_tab} from "../../styles/styles_general.tsx";
+import CrearOCA from "./OC/CrearOCA.tsx";
 
-export default function ActivosPage() {
+export default function ActivosFijosPage() {
 
 
 
@@ -22,15 +23,24 @@ export default function ActivosPage() {
 
                     <TabList>
                         <Tab sx={my_style_tab}> Incorporacion </Tab>
+                        <Tab sx={my_style_tab}> Crear OC-AF </Tab>
                         <Tab sx={my_style_tab}> Reporte </Tab>
                         <Tab sx={my_style_tab}> Categorias </Tab>
-                        <Tab sx={my_style_tab}> Traslados </Tab>
-                        <Tab sx={my_style_tab}> Mantenimientos </Tab>
+                        {/*<Tab sx={my_style_tab}> Traslados </Tab>*/}
+                        {/*<Tab sx={my_style_tab}> Mantenimientos </Tab>*/}
                     </TabList>
 
                     <TabPanels>
                         <TabPanel>
-                            <RegistroActivosMainComp />
+                            <IncorporacionActivosFijos />
+                        </TabPanel>
+
+                        <TabPanel>
+
+                        </TabPanel>
+
+                        <TabPanel>
+                            <CrearOCA />
                         </TabPanel>
 
                     </TabPanels>

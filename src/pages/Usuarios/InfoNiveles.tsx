@@ -23,8 +23,27 @@ import {
 import { SearchIcon } from '@chakra-ui/icons';
 import { Modulo } from './GestionUsuarios/types';
 
+// Interfaces para la estructura de documentación de módulos
+interface ModuleLevel {
+  level: number;
+  description: string;
+}
+
+interface ModuleDoc {
+  title: string;
+  description: string;
+  implementationDetails: boolean;
+  implementationCode?: string;
+  levels: ModuleLevel[];
+}
+
+// Tipo que mapea los valores del enum Modulo a objetos ModuleDoc
+type ModuleDocsType = {
+  [key in Modulo]: ModuleDoc;
+};
+
 // Documentación para cada módulo y nivel de acceso
-const moduleDocs = {
+const moduleDocs: ModuleDocsType = {
   [Modulo.PRODUCTOS]: {
     title: 'Módulo de Productos',
     description: 'Gestión del catálogo de productos',
@@ -186,13 +205,14 @@ useEffect(() => {
     ]
   },
   [Modulo.ACTIVOS]: {
-    title: 'Módulo de Activos',
+    title: 'Módulo de Activos Fijos',
     description: 'Gestión de activos fijos y equipamiento',
     implementationDetails: false,
     levels: [
       { level: 1, description: 'Visualización de activos.' },
-      { level: 2, description: 'Registro y modificación de activos.' },
-      { level: 3, description: 'Control total de activos.' }
+      { level: 2, description: 'nivel 1 + Crear Ordenes de compra para activos fijos' },
+      { level: 3, description: 'nivel 1 + 2 + Dar Ingreso a Activos Fijos' },
+      { level: 4, description: 'Control total de activos fijos y equipamiento' }  
     ]
   },
   [Modulo.CONTABILIDAD]: {
@@ -249,24 +269,29 @@ useEffect(() => {
 
 export default function InfoNiveles() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredModules, setFilteredModules] = useState(Object.keys(moduleDocs));
+  const [filteredModules, setFilteredModules] = useState<Modulo[]>(Object.keys(moduleDocs) as Modulo[]);
 
   useEffect(() => {
     if (searchTerm) {
-      const filtered = Object.keys(moduleDocs).filter(key => 
+      const filtered = (Object.keys(moduleDocs) as Modulo[]).filter(key => 
         key.toLowerCase().includes(searchTerm.toLowerCase()) || 
         moduleDocs[key].title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         moduleDocs[key].description.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredModules(filtered);
     } else {
-      setFilteredModules(Object.keys(moduleDocs));
+      setFilteredModules(Object.keys(moduleDocs) as Modulo[]);
     }
   }, [searchTerm]);
 
   return (
     <Box p={4}>
-      <Heading size="md" mb={4}>Documentación de Niveles de Acceso</Heading>
+      <Flex justifyContent="space-between" alignItems="center" mb={4}>
+        <Heading size="md">Documentación de Niveles de Acceso</Heading>
+        <Tag size="md" colorScheme="blue" borderRadius="full" px={3}>
+          <TagLabel>{Object.keys(moduleDocs).length} módulos</TagLabel>
+        </Tag>
+      </Flex>
 
       <Alert status="info" mb={4} variant="left-accent" borderRadius="md">
         <AlertIcon alignSelf="flex-start" mt={1} />
@@ -300,45 +325,65 @@ export default function InfoNiveles() {
           <SearchIcon color="gray.300" />
         </InputLeftElement>
         <Input 
-          placeholder="Buscar módulo..." 
+          placeholder="Buscar módulo por nombre o descripción..." 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          size="md"
+          variant="filled"
+          _hover={{ bg: "gray.100" }}
+          _focus={{ bg: "white", borderColor: "blue.500" }}
         />
       </InputGroup>
 
+      {filteredModules.length === 0 && (
+        <Alert status="info" mb={4}>
+          <AlertIcon />
+          No se encontraron módulos que coincidan con la búsqueda.
+        </Alert>
+      )}
+
       <Accordion allowMultiple>
         {filteredModules.map(moduleKey => (
-          <AccordionItem key={moduleKey}>
+          <AccordionItem key={moduleKey} mb={2} borderWidth="1px" borderRadius="md">
             <h2>
-              <AccordionButton>
+              <AccordionButton _expanded={{ bg: 'blue.50', color: 'blue.700' }}>
                 <Box flex="1" textAlign="left">
-                  <Text fontWeight="bold">{moduleDocs[moduleKey].title}</Text>
+                  <Flex alignItems="center">
+                    <Text fontWeight="bold" mr={2}>{moduleDocs[moduleKey as Modulo].title}</Text>
+                    <Tag size="sm" colorScheme="gray" borderRadius="full">
+                      <TagLabel>{moduleDocs[moduleKey as Modulo].levels.length} niveles</TagLabel>
+                    </Tag>
+                  </Flex>
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              <Text mb={4}>{moduleDocs[moduleKey].description}</Text>
+              <Text mb={4}>{moduleDocs[moduleKey as Modulo].description}</Text>
 
-              <Heading size="sm" mb={2}>Niveles de Acceso:</Heading>
-              {moduleDocs[moduleKey].levels.map(level => (
-                <Box key={level.level} mb={2} p={2} bg="gray.50" borderRadius="md">
-                  <Flex align="center">
-                    <Tag size="md" colorScheme={getColorSchemeForLevel(level.level)} mr={2}>
-                      <TagLabel>Nivel {level.level}</TagLabel>
-                    </Tag>
-                    <Text>{level.description}</Text>
-                  </Flex>
-                </Box>
-              ))}
+              <Heading size="sm" mb={3}>Niveles de Acceso:</Heading>
+              <Box borderLeft="2px solid" borderColor="gray.200" pl={4} mb={4}>
+                {moduleDocs[moduleKey as Modulo].levels.map(level => (
+                  <Box key={level.level} mb={3} p={3} bg="gray.50" borderRadius="md" 
+                       borderLeft="4px solid" borderLeftColor={getLevelColor(level.level)}
+                       boxShadow="sm" transition="all 0.2s" _hover={{ boxShadow: "md" }}>
+                    <Flex align="center">
+                      <Tag size="md" colorScheme={getColorSchemeForLevel(level.level)} mr={3}>
+                        <TagLabel>Nivel {level.level}</TagLabel>
+                      </Tag>
+                      <Text>{level.description}</Text>
+                    </Flex>
+                  </Box>
+                ))}
+              </Box>
 
-              {moduleDocs[moduleKey].implementationDetails && (
+              {moduleDocs[moduleKey as Modulo].implementationDetails && (
                 <>
                   <Divider my={4} />
                   <Heading size="sm" mb={2}>Implementación:</Heading>
                   <Box bg="gray.50" p={3} borderRadius="md" overflowX="auto">
                     <Code display="block" whiteSpace="pre" p={2}>
-                      {moduleDocs[moduleKey].implementationCode}
+                      {moduleDocs[moduleKey as Modulo].implementationCode}
                     </Code>
                   </Box>
                 </>
@@ -365,6 +410,18 @@ function getColorSchemeForLevel(level: number): string {
     case 1: return "green";
     case 2: return "blue";
     case 3: return "purple";
+    case 4: return "orange";
     default: return "gray";
+  }
+}
+
+// Función para obtener el color del borde izquierdo según el nivel
+function getLevelColor(level: number): string {
+  switch (level) {
+    case 1: return "green.500";
+    case 2: return "blue.500";
+    case 3: return "purple.500";
+    case 4: return "orange.500";
+    default: return "gray.500";
   }
 }

@@ -27,7 +27,7 @@ import MultiRoleProtectedRoute from "./components/MultiRoleProtectedRoute.tsx";
 
 import { Modulo } from "./pages/Usuarios/GestionUsuarios/types.tsx";
 import CargaMasivaPage from "./pages/CargaMasiva/CargaMasivaPage.tsx";
-import ActivosPage from "./pages/Activos/ActivosPage.tsx";
+import ActivosFijosPage from "./pages/ActivosFijos/ActivosFijosPage.tsx";
 import ContabilidadPage from "./pages/Contabilidad/ContabilidadPage.tsx";
 import PersonalPage from "./pages/Personal/PersonalPage.tsx";
 import BintelligencePage from "./pages/Bintelligence/BintelligencePage.tsx";
@@ -204,7 +204,7 @@ const router = createBrowserRouter(
                     path="activos"
                     element={
                         <MultiRoleProtectedRoute supportedModules={[Modulo.ACTIVOS]}>
-                            <ActivosPage/>
+                            <ActivosFijosPage/>
                         </MultiRoleProtectedRoute>
                     }
                 />

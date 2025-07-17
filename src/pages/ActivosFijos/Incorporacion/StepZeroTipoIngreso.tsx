@@ -1,0 +1,146 @@
+import { useState } from 'react';
+import { 
+  Button, 
+  Flex, 
+  Card, 
+  CardHeader, 
+  CardBody, 
+  Heading, 
+  Icon, 
+  Text, 
+  SimpleGrid 
+} from '@chakra-ui/react';
+import { FaFileInvoiceDollar } from 'react-icons/fa'; // Icon for "con OC"
+import { FaFileAlt } from 'react-icons/fa'; // Icon for "sin OC"
+import { FaClipboardList } from 'react-icons/fa'; // Icon for "AF Existente"
+import { IncorporacionActivoHeader, OrdenCompraActivo } from "../types.tsx";
+
+type Props = {
+    setActiveStep: (step: number) => void;
+    setOrdenCompraActivo: (ordenCompraActivo: OrdenCompraActivo) => void;
+    setIncorporacionActivoHeader: (incorporacionActivoHeader: IncorporacionActivoHeader) => void;
+};
+
+/**
+ * Primer paso, identificar Orden Compra Activo
+ *
+ * Ningun Activo se puede dar ingreso sin la correspondiente orden de
+ * compra de activos.
+ *
+ * @param setStep
+ * @constructor
+ */
+export function StepZeroTipoIngreso({ setActiveStep, setOrdenCompraActivo, setIncorporacionActivoHeader }: Props) {
+  // Declare functions for handling card clicks
+  const handleConOCClick = () => {
+    console.log("Incorporacion con OC seleccionada");
+    // Update the incorporacionActivoHeader with the selected type
+    setIncorporacionActivoHeader({ tipoIncorporacion: 'CON_OC' });
+    setActiveStep(1);
+  };
+
+  const handleSinOCClick = () => {
+    console.log("Incorporacion sin OC seleccionada");
+    // Update the incorporacionActivoHeader with the selected type
+    setIncorporacionActivoHeader({ tipoIncorporacion: 'SIN_OC' });
+    setActiveStep(1);
+  };
+
+  const handleAFExistenteClick = () => {
+    console.log("Incorporacion AF Existente seleccionada");
+    // Update the incorporacionActivoHeader with the selected type
+    setIncorporacionActivoHeader({ tipoIncorporacion: 'AF_EXISTENTE' });
+    setActiveStep(1);
+  };
+
+  return (
+    <Flex direction="column" gap={10} w="full">
+      <Heading as="h2" size="lg" textAlign="center" mb={6}>
+        Seleccione el tipo de incorporación
+      </Heading>
+
+      <SimpleGrid columns={3} spacing={8} w="full">
+        {/* Card for "Incorporacion con OC" */}
+        <Card 
+          h="250px"
+          cursor="pointer"
+          bg="blue.100"
+          _hover={{ 
+            bg: "blue.300",
+            transform: "translateY(-5px)",
+            boxShadow: "xl"
+          }}
+          _active={{ bg: "blue.800", color: "white" }}
+          transition="all 0.3s ease"
+          onClick={handleConOCClick}
+        >
+          <CardHeader borderBottom="0.1em solid" p={4}>
+            <Heading as="h3" size="md" fontFamily="Comfortaa Variable">
+              Incorporación con OC
+            </Heading>
+          </CardHeader>
+          <CardBody display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={6}>
+            <Icon as={FaFileInvoiceDollar} boxSize="5em" mb={4} />
+            <Text textAlign="center">
+              Incorporar activo fijo con orden de compra existente
+            </Text>
+          </CardBody>
+        </Card>
+
+        {/* Card for "Incorporacion sin OC" */}
+        <Card 
+          h="250px"
+          cursor="pointer"
+          bg="green.100"
+          _hover={{ 
+            bg: "green.300",
+            transform: "translateY(-5px)",
+            boxShadow: "xl"
+          }}
+          _active={{ bg: "green.800", color: "white" }}
+          transition="all 0.3s ease"
+          onClick={handleSinOCClick}
+        >
+          <CardHeader borderBottom="0.1em solid" p={4}>
+            <Heading as="h3" size="md" fontFamily="Comfortaa Variable">
+              Incorporación sin OC
+            </Heading>
+          </CardHeader>
+          <CardBody display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={6}>
+            <Icon as={FaFileAlt} boxSize="5em" mb={4} />
+            <Text textAlign="center">
+              Incorporar activo fijo sin orden de compra
+            </Text>
+          </CardBody>
+        </Card>
+
+        {/* Card for "Incorporacion AF Existente" */}
+        <Card 
+          h="250px"
+          cursor="pointer"
+          bg="purple.100"
+          _hover={{ 
+            bg: "purple.300",
+            transform: "translateY(-5px)",
+            boxShadow: "xl"
+          }}
+          _active={{ bg: "purple.800", color: "white" }}
+          transition="all 0.3s ease"
+          onClick={handleAFExistenteClick}
+        >
+          <CardHeader borderBottom="0.1em solid" p={4}>
+            <Heading as="h3" size="md" fontFamily="Comfortaa Variable">
+              Incorporación AF Existente
+            </Heading>
+          </CardHeader>
+          <CardBody display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={6}>
+            <Icon as={FaClipboardList} boxSize="5em" mb={4} />
+            <Text textAlign="center">
+              Incorporar activo fijo existente al sistema
+            </Text>
+          </CardBody>
+        </Card>
+      </SimpleGrid>
+    </Flex>
+  );
+}

@@ -8,7 +8,7 @@ type Props = {
 };
 
 /**
- * cuando se hace una orden de compra de activos, es ósible que del mismo
+ * cuando se hace una orden de compra de activos, es pósible que del mismo
  * activo se requiera varias unidades. sin embargo se debe registrar cada una
  * por separado a diferencia de como sucede con los materiales, ya que minimo
  * se debe establecer una identificacion, un lugar y un responsable para cada

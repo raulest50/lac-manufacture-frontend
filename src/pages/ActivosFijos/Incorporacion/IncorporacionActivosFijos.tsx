@@ -2,8 +2,8 @@ import {useState} from 'react';
 import {Box, Flex, StepDescription, StepNumber, StepSeparator, StepStatus, useSteps} from '@chakra-ui/react';
 import {IncorporacionActivoHeader, OrdenCompraActivo} from "../types.tsx";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
-import {StepZero} from "./StepZero.tsx";
-import {StepOne} from "./StepOne.tsx";
+import {StepZeroTipoIngreso} from "./StepZeroTipoIngreso.tsx";
+import {StepOneFormulario} from "./StepOneFormulario.tsx";
 
 
 const steps = [
@@ -13,7 +13,7 @@ const steps = [
     {title:"Cuarto", description:"Enviar y Finalizar"}
 ];
 
-export function RegistroActivosMainComp() {
+export function IncorporacionActivosFijos() {
 
     const [incorporacionActivoHeader, setIncorporacionActivoHeader] =
         useState<IncorporacionActivoHeader>({});
@@ -29,17 +29,18 @@ export function RegistroActivosMainComp() {
     function ConditionalRender(){
         if(activeStep === 0){
             return(
-                <StepZero
+                <StepZeroTipoIngreso
                     setActiveStep={setActiveStep}
                     setOrdenCompraActivo={setOrdenCompraActivo}
+                    setIncorporacionActivoHeader={setIncorporacionActivoHeader}
                 />
             )
         }
         if(activeStep === 1){
             return(
-                <StepOne
+                <StepOneFormulario
                     setActiveStep={setActiveStep}
-                    setOrdenCompraActivo={setOrdenCompraActivo}
+                    setIncorporacionActivoHeader={setIncorporacionActivoHeader}
                 />
             )
         }

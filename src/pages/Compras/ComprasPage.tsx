@@ -8,7 +8,6 @@ import MyHeader from '../../components/MyHeader';
 import {my_style_tab} from "../../styles/styles_general.tsx";
 import CrearOCM from "./CrearOCM.tsx";
 import ReporteOrdenesCompras from "./ReporteOrdenesCompras.tsx";
-import CrearOCA from "./CrearOCA.tsx";
 
 function ComprasPage() {
 
@@ -19,18 +18,13 @@ function ComprasPage() {
 
             <Tabs>
                 <TabList>
-                    <Tab sx={my_style_tab}>Crear Orden de Compra para Materiales</Tab>
-                    <Tab sx={my_style_tab}>Crear Orden de Compra para Activos</Tab>
+                    <Tab sx={my_style_tab}>Crear OC-M</Tab>
                     <Tab sx={my_style_tab}>Reportes Ordenes de Compra</Tab>
                 </TabList>
 
                 <TabPanels>
                     <TabPanel>
                         <CrearOCM/>
-                    </TabPanel>
-
-                    <TabPanel>
-                        <CrearOCA/>
                     </TabPanel>
 
                     <TabPanel>
