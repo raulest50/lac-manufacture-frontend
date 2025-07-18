@@ -24,6 +24,8 @@ const handleStyle = {
 };
 
 interface PositionNodeData extends Cargo {
+  accessLevel?: AccessLevel;
+  isMaster?: boolean;
   onEdit?: (nodeId: string) => void;
   onViewManual?: (nodeId: string) => void;
 }
@@ -40,7 +42,7 @@ export default function CargoNode(props: CargoNodeProps) {
   const isMaster = cargo.isMaster || props.isMaster;
 
   // Callback para editar el cargo
-  const handleEdit = useCallback((event) => {
+  const handleEdit = useCallback((event: React.MouseEvent) => {
     // Detener la propagación para evitar que el evento llegue al nodo
     event.stopPropagation();
 
@@ -52,7 +54,7 @@ export default function CargoNode(props: CargoNodeProps) {
   }, [props.id, props.data]);
 
   // Callback para ver el manual de funciones
-  const handleViewManual = useCallback((event) => {
+  const handleViewManual = useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
 
     // Si hay una función para ver el manual, usarla

@@ -607,8 +607,8 @@ export default function OrganizationChart({
           }}
         >
           <Controls />
-          <MiniMap />
-          <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+          {/* <MiniMap /> */}
+          {/* <Background variant={BackgroundVariant.Dots} gap={12} size={1} /> */}
         </ReactFlow>
       </Box>
 

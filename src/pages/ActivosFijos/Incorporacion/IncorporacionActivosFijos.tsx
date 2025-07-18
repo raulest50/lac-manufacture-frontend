@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Box, Flex, StepDescription, StepNumber, StepSeparator, StepStatus, useSteps} from '@chakra-ui/react';
-import {IncorporacionActivoHeader, OrdenCompraActivo} from "../types.tsx";
+import {IncorporacionActivoDta, OrdenCompraActivo} from "../types.tsx";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
 import {StepZeroTipoIngreso} from "./StepZeroTipoIngreso.tsx";
 import {StepOneFormulario} from "./StepOneFormulario.tsx";
@@ -15,8 +15,8 @@ const steps = [
 
 export function IncorporacionActivosFijos() {
 
-    const [incorporacionActivoHeader, setIncorporacionActivoHeader] =
-        useState<IncorporacionActivoHeader>({});
+    const [incorporacionActivoDta, setIncorporacionActivoDta] =
+        useState<IncorporacionActivoDta>({});
 
     const [ordenCompraActivo, setOrdenCompraActivo] = useState<OrdenCompraActivo>({});
 
@@ -32,7 +32,7 @@ export function IncorporacionActivosFijos() {
                 <StepZeroTipoIngreso
                     setActiveStep={setActiveStep}
                     setOrdenCompraActivo={setOrdenCompraActivo}
-                    setIncorporacionActivoHeader={setIncorporacionActivoHeader}
+                    setIncorporacionActivoHeader={setIncorporacionActivoDta}
                 />
             )
         }
@@ -40,7 +40,7 @@ export function IncorporacionActivosFijos() {
             return(
                 <StepOneFormulario
                     setActiveStep={setActiveStep}
-                    setIncorporacionActivoHeader={setIncorporacionActivoHeader}
+                    setIncorporacionActivoHeader={setIncorporacionActivoDta}
                 />
             )
         }

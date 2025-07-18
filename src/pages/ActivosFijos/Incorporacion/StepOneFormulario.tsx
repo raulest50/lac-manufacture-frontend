@@ -12,11 +12,11 @@ import {
 } from '@chakra-ui/react';
 import { FaFileInvoiceDollar } from 'react-icons/fa'; // Icon for "con OC"
 import { FaFileAlt } from 'react-icons/fa'; // Icon for "sin OC"
-import { IncorporacionActivoHeader } from '../types';
+import { IncorporacionActivoDta } from '../types';
 
 type Props = {
     setActiveStep: (step: number) => void;
-    setIncorporacionActivoHeader: (incorporacionActivoHeader: IncorporacionActivoHeader) => void;
+    setIncorporacionActivoHeader: (incorporacionActivoHeader: IncorporacionActivoDta) => void;
 };
 
 export function StepOneFormulario({ setActiveStep, setIncorporacionActivoHeader }: Props) {
