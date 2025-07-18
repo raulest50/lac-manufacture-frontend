@@ -105,6 +105,10 @@ const CatalogoCuentas: React.FC = () => {
         return 'green';
       case TipoCuenta.GASTO:
         return 'orange';
+      case TipoCuenta.COSTOS_VENTAS:
+        return 'teal';
+      case TipoCuenta.COSTOS_PRODUCCION:
+        return 'cyan';
       default:
         return 'gray';
     }

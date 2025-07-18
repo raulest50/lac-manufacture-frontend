@@ -24,16 +24,18 @@ const handleStyle = {
 };
 
 interface PositionNodeData extends Cargo {
-  accessLevel: AccessLevel;
-  isMaster: boolean;
   onEdit?: (nodeId: string) => void;
   onViewManual?: (nodeId: string) => void;
 }
 
-export default function PositionNode(props: NodeProps<PositionNodeData>) {
+interface CargoNodeProps extends NodeProps<PositionNodeData> {
+  accessLevel: AccessLevel;
+  isMaster: boolean;
+}
+
+export default function CargoNode(props: CargoNodeProps) {
   const cargo = props.data;
-  const accessLevel = cargo.accessLevel;
-  const isMaster = cargo.isMaster;
+  const { accessLevel, isMaster } = props;
 
   // Callback para editar el cargo
   const handleEdit = useCallback((event) => {

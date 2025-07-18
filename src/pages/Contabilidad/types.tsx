@@ -6,7 +6,9 @@ export enum TipoCuenta {
   PASIVO = 'PASIVO',
   PATRIMONIO = 'PATRIMONIO',
   INGRESO = 'INGRESO',
-  GASTO = 'GASTO'
+  GASTO = 'GASTO',
+  COSTOS_VENTAS = 'COSTOS_VENTAS',
+  COSTOS_PRODUCCION = 'COSTOS_PRODUCCION'
 }
 
 // Enum for normal balance

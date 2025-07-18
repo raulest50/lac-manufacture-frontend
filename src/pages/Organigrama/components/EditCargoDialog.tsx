@@ -49,7 +49,7 @@ interface EditPositionDialogProps {
   isMaster?: boolean; // Si el usuario es master
 }
 
-export default function EditPositionDialog({
+export default function EditCargoDialog({
   isOpen,
   onClose,
   cargo,
@@ -68,11 +68,34 @@ export default function EditPositionDialog({
   const manualInputRef = useRef<HTMLInputElement>(null);
   const endPoints = new EndPointsURL();
 
+  // Estado para controlar si el formulario es válido
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
+
   // Cargar los datos del cargo
   useEffect(() => {
     setLocalCargo(cargo);
     setManualUrl(cargo.urlDocManualFunciones || "");
   }, [cargo]);
+
+  // Función para validar los datos del cargo
+  const validarCargoData = (cargo: Cargo): boolean => {
+    // Verificar que todos los campos obligatorios estén presentes
+    return !!(
+      cargo.idCargo && 
+      cargo.tituloCargo && 
+      cargo.tituloCargo.trim() !== "" && 
+      cargo.departamento && 
+      cargo.departamento.trim() !== "" && 
+      cargo.descripcionCargo && 
+      cargo.descripcionCargo.trim() !== "" &&
+      cargo.nivel
+    );
+  };
+
+  // Efecto para validar el formulario cuando cambian los datos
+  useEffect(() => {
+    setIsFormValid(validarCargoData(localCargo));
+  }, [localCargo]);
 
   // Cargar la lista de usuarios (solo en modo edición)
   useEffect(() => {
@@ -207,7 +230,7 @@ export default function EditPositionDialog({
                 <Text>{localCargo.idCargo}</Text>
               </FormControl>
 
-              <FormControl mb={4}>
+              <FormControl mb={4} isRequired>
                 <FormLabel>Título del Cargo</FormLabel>
                 <Input
                   value={localCargo.tituloCargo}
@@ -217,7 +240,7 @@ export default function EditPositionDialog({
                 />
               </FormControl>
 
-              <FormControl mb={4}>
+              <FormControl mb={4} isRequired>
                 <FormLabel>Departamento</FormLabel>
                 <Input
                   value={localCargo.departamento}
@@ -227,7 +250,7 @@ export default function EditPositionDialog({
                 />
               </FormControl>
 
-              <FormControl mb={4}>
+              <FormControl mb={4} isRequired>
                 <FormLabel>Descripción</FormLabel>
                 <Textarea
                   value={localCargo.descripcionCargo}
@@ -238,7 +261,7 @@ export default function EditPositionDialog({
                 />
               </FormControl>
 
-              <FormControl mb={4}>
+              <FormControl mb={4} isRequired>
                 <FormLabel>Nivel Jerárquico</FormLabel>
                 <NumberInput
                   min={1}
@@ -414,7 +437,12 @@ export default function EditPositionDialog({
           {mode === 'edit' ? (
             // Botones para modo de edición
             <>
-              <Button colorScheme="blue" mr={3} onClick={handleSave}>
+              <Button 
+                colorScheme="blue" 
+                mr={3} 
+                onClick={handleSave}
+                isDisabled={!isFormValid}
+              >
                 Guardar
               </Button>
               <Button variant="ghost" onClick={onClose}>

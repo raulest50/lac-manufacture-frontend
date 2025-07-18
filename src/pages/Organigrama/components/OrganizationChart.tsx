@@ -17,14 +17,14 @@ import {
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
-import PositionNode from "./PositionNode";
+import CargoNode from "./CargoNode.tsx";
 import {AccessLevel, Cargo} from "../types";
-import EditPositionDialog from "./EditPositionDialog";
+import EditCargoDialog from "./EditCargoDialog.tsx";
 import axios from "axios";
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
 
 const nodeTypes = {
-  positionNode: PositionNode,
+  positionNode: CargoNode,
 };
 
 const endPoints = new EndPointsURL();
@@ -68,13 +68,11 @@ export default function OrganizationChart({
   const [detailsNode, setDetailsNode] = useState<Node | null>(null);
 
   // Convertir cargos a nodos para React Flow
-  const createNodesFromPositions = (cargos: Cargo[]): Node[] => {
+  const createNodesFromCargos = (cargos: Cargo[]): Node[] => {
     return cargos.map((cargo, index) => ({
       id: cargo.idCargo,
       data: { 
         ...cargo,
-        accessLevel, // Pasar el nivel de acceso al nodo
-        isMaster,    // Pasar si el usuario es master
         onEdit: (nodeId:string) => {
           // Establecer el nodo seleccionado y abrir el diálogo de edición
           const node = nodes.find(n => n.id === nodeId);
@@ -194,7 +192,7 @@ export default function OrganizationChart({
     console.log( ` es Master : ${isMaster} ` );
   }, [organizationChartId, toast, accessLevel, isMaster]);
 
-  const initialNodes = createNodesFromPositions(positions);
+  const initialNodes = createNodesFromCargos(positions);
   const initialEdges = createEdgesFromPositions(positions);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -221,7 +219,7 @@ export default function OrganizationChart({
 
   // Actualizar nodos y conexiones cuando cambian las posiciones
   useEffect(() => {
-    setNodes(createNodesFromPositions(positions));
+    setNodes(createNodesFromCargos(positions));
     setEdges(createEdgesFromPositions(positions));
 
     // Actualizar la lista de usuarios asignados
@@ -285,8 +283,11 @@ export default function OrganizationChart({
         return cargo;
       });
 
+      // Remover propiedades de UI antes de enviar al backend
+      const cleanedPositions = updatedPositions.map(({ accessLevel, isMaster, onEdit, onViewManual, ...cargo }) => cargo);
+
       // Llamar a la API para guardar los cambios
-      const response = await axios.post(endPoints.save_changes_organigrama, updatedPositions);
+      const response = await axios.post(endPoints.save_changes_organigrama, cleanedPositions);
 
       // Actualizar el estado local con los cargos guardados
       setPositions(response.data);
@@ -325,7 +326,10 @@ export default function OrganizationChart({
       }
 
       // Para cargos guardados en el backend, guardar todos los cambios
-      const response = await axios.post(endPoints.save_changes_organigrama, updatedPositions);
+      // Remover propiedades de UI antes de enviar al backend
+      const cleanedPositions = updatedPositions.map(({ accessLevel, isMaster, onEdit, onViewManual, ...cargo }) => cargo);
+
+      const response = await axios.post(endPoints.save_changes_organigrama, cleanedPositions);
 
       // Actualizar el estado local con la respuesta del servidor
       setPositions(response.data);
@@ -363,8 +367,6 @@ export default function OrganizationChart({
       id: newCargo.idCargo.toString(),
       data: {
         ...newCargo,
-        accessLevel,
-        isMaster,
         onEdit: (nodeId:string) => {
           const node = nodes.find(n => n.id === nodeId);
           if (node) {
@@ -414,8 +416,8 @@ export default function OrganizationChart({
       // Crear un FormData para enviar el cargo
       const formData = new FormData();
 
-      // Extraer el archivo del cargo y eliminarlo del objeto JSON
-      const { manualFuncionesFile, ...cargoData } = cargo;
+      // Extraer el archivo del cargo y propiedades de UI y eliminarlos del objeto JSON
+      const { manualFuncionesFile, accessLevel, isMaster, onEdit, onViewManual, ...cargoData } = cargo;
 
       // Agregar el cargo como JSON
       formData.append('cargo', JSON.stringify(cargoData));
@@ -493,8 +495,11 @@ export default function OrganizationChart({
       // Actualizar el estado local primero
       const updatedPositions = positions.filter(cargo => cargo.idCargo !== cargoId);
 
+      // Remover propiedades de UI antes de enviar al backend
+      const cleanedPositions = updatedPositions.map(({ accessLevel, isMaster, onEdit, onViewManual, ...cargo }) => cargo);
+
       // Llamar a la API para guardar los cambios (sin el cargo eliminado)
-      const response = await axios.post(endPoints.save_changes_organigrama, updatedPositions);
+      const response = await axios.post(endPoints.save_changes_organigrama, cleanedPositions);
 
       // Actualizar el estado local con la respuesta del servidor
       setPositions(response.data);
@@ -540,6 +545,17 @@ export default function OrganizationChart({
           nodesConnectable={accessLevel === AccessLevel.EDIT || isMaster}
           edgesFocusable={accessLevel === AccessLevel.EDIT || isMaster}
           fitView
+          proOptions={{
+            account: 'paid-pro',
+            hideAttribution: true
+          }}
+          defaultEdgeOptions={{
+            type: 'smoothstep'
+          }}
+          nodeProps={{
+            accessLevel: accessLevel,
+            isMaster: isMaster
+          }}
         >
           <Controls />
           <MiniMap />
@@ -586,7 +602,7 @@ export default function OrganizationChart({
       </Flex>
 
       {isEditDialogOpen && selectedNode && (
-        <EditPositionDialog
+        <EditCargoDialog
           isOpen={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
           cargo={(selectedNode.data as unknown) as Cargo}
@@ -618,7 +634,7 @@ export default function OrganizationChart({
 
       {/* Diálogo de detalles */}
       {isDetailsDialogOpen && detailsNode && (
-        <EditPositionDialog
+        <EditCargoDialog
           isOpen={isDetailsDialogOpen}
           onClose={() => setIsDetailsDialogOpen(false)}
           cargo={(detailsNode.data as unknown) as Cargo}
@@ -651,8 +667,8 @@ export default function OrganizationChart({
       // Crear un FormData para enviar el cargo
       const formData = new FormData();
 
-      // Extraer el archivo del cargo y eliminarlo del objeto JSON
-      const { manualFuncionesFile, ...cargoData } = cargo;
+      // Extraer el archivo del cargo y propiedades de UI y eliminarlos del objeto JSON
+      const { manualFuncionesFile, accessLevel, isMaster, onEdit, onViewManual, ...cargoData } = cargo;
 
       // Agregar el cargo como JSON
       formData.append('cargo', JSON.stringify(cargoData));
