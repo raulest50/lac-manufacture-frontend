@@ -240,16 +240,22 @@ export default function OrganizationChart({
         setEdges((eds) => addEdge(params, eds));
         setHasUnsavedChanges(true);
 
-        // Actualizar la relación reportTo en el backend
+        // Actualizar la relación reportTo solo localmente
         const sourceId = params.source;
         const targetId = params.target;
 
         if (sourceId && targetId) {
-          updatePositionReportTo(targetId, sourceId);
+          // Actualizar el estado local de las posiciones
+          const updatedPositions = positions.map(cargo => 
+            cargo.idCargo === targetId ? { ...cargo, jefeInmediato: sourceId } : cargo
+          );
+
+          // Actualizar el estado local
+          setPositions(updatedPositions);
         }
       }
     },
-    [accessLevel, isMaster, setEdges]
+    [accessLevel, isMaster, setEdges, positions]
   );
 
   // Guardar los cambios del organigrama
@@ -282,14 +288,53 @@ export default function OrganizationChart({
         return cargo;
       });
 
+      // Verificar si hay cargos temporales
+      const hasTempCargos = updatedPositions.some(cargo => cargo.idCargo.startsWith('temp-'));
+
+      // Si hay cargos temporales, solo actualizar el estado local
+      if (hasTempCargos) {
+        setPositions(updatedPositions);
+        setEdges(createEdgesFromPositions(updatedPositions));
+        setHasUnsavedChanges(true);
+
+        toast({
+          title: "Cambios guardados localmente",
+          description: "Hay cargos temporales que deben ser completados antes de guardar en el servidor",
+          status: "info",
+          duration: 5000,
+        });
+        return;
+      }
+
       // Remover propiedades de UI antes de enviar al backend
       const cleanedPositions = updatedPositions.map(({ accessLevel, isMaster, onEdit, onViewManual, ...cargo }) => cargo);
 
       // Llamar a la API para guardar los cambios
       const response = await axios.post(endPoints.save_changes_organigrama, cleanedPositions);
 
-      // Actualizar el estado local con los cargos guardados
-      setPositions(response.data);
+      // Verificar que la respuesta contiene todos los cargos
+      if (response.data && Array.isArray(response.data)) {
+        // Asegurarse de que todos los cargos locales estén presentes en la respuesta
+        const responseIds = response.data.map(cargo => cargo.idCargo);
+        const missingCargos = updatedPositions.filter(cargo => !responseIds.includes(cargo.idCargo));
+
+        // Si hay cargos que faltan en la respuesta, mantenerlos en el estado local
+        const finalPositions = missingCargos.length > 0 
+          ? [...response.data, ...missingCargos] 
+          : response.data;
+
+        // Actualizar el estado local con la respuesta del servidor
+        setPositions(finalPositions);
+
+        // Actualizar las conexiones
+        setEdges(createEdgesFromPositions(finalPositions));
+      } else {
+        // Si la respuesta no es válida, mantener el estado local actualizado
+        console.warn("La respuesta del servidor no contiene datos válidos");
+        setPositions(updatedPositions);
+        setEdges(createEdgesFromPositions(updatedPositions));
+      }
+
       setHasUnsavedChanges(false);
 
       toast({
@@ -307,44 +352,24 @@ export default function OrganizationChart({
     }
   };
 
-  // Actualizar la relación jefeInmediato de un cargo
-  const updatePositionReportTo = async (cargoId: string, reportToId: string) => {
+  // Actualizar la relación jefeInmediato de un cargo (solo localmente)
+  const updatePositionReportTo = (cargoId: string, reportToId: string) => {
     // Solo permitir actualizar relaciones si el usuario tiene nivel de acceso de edición o es master
     if (accessLevel !== AccessLevel.EDIT && !isMaster) return;
 
-    try {
-      // Actualizar el estado local primero
-      const updatedPositions = positions.map(cargo => 
-        cargo.idCargo === cargoId ? { ...cargo, jefeInmediato: reportToId } : cargo
-      );
+    // Actualizar el estado local
+    const updatedPositions = positions.map(cargo => 
+      cargo.idCargo === cargoId ? { ...cargo, jefeInmediato: reportToId } : cargo
+    );
 
-      // Si es un cargo temporal, solo actualizar el estado local
-      if (cargoId.startsWith('temp-')) {
-        setPositions(updatedPositions);
-        return;
-      }
+    // Actualizar el estado local inmediatamente para reflejar la conexión
+    setPositions(updatedPositions);
 
-      // Para cargos guardados en el backend, guardar todos los cambios
-      // Remover propiedades de UI antes de enviar al backend
-      const cleanedPositions = updatedPositions.map(({ accessLevel, isMaster, onEdit, onViewManual, ...cargo }) => cargo);
+    // Actualizar las conexiones localmente
+    setEdges(createEdgesFromPositions(updatedPositions));
 
-      const response = await axios.post(endPoints.save_changes_organigrama, cleanedPositions);
-
-      // Actualizar el estado local con la respuesta del servidor
-      setPositions(response.data);
-
-      // Actualizar las conexiones
-      setEdges(createEdgesFromPositions(response.data));
-
-      setHasUnsavedChanges(false);
-    } catch (error) {
-      console.error("Error al actualizar la relación jerárquica:", error);
-      toast({
-        title: "Error al actualizar la relación jerárquica",
-        status: "error",
-        duration: 3000,
-      });
-    }
+    // Marcar que hay cambios sin guardar
+    setHasUnsavedChanges(true);
   };
 
   // Agregar un nuevo cargo
@@ -455,6 +480,12 @@ export default function OrganizationChart({
         )
       );
 
+      // Actualizar las conexiones para reflejar el nuevo cargo
+      const updatedPositions = positions.map(c => 
+        c.idCargo === cargo.idCargo ? savedCargo : c
+      );
+      setEdges(createEdgesFromPositions(updatedPositions));
+
       toast({
         title: "Cargo creado correctamente",
         status: "success",
@@ -496,18 +527,39 @@ export default function OrganizationChart({
       // Actualizar el estado local primero
       const updatedPositions = positions.filter(cargo => cargo.idCargo !== cargoId);
 
+      // Guardar una copia de las posiciones actualizadas para comparar después
+      const localUpdatedPositions = [...updatedPositions];
+
       // Remover propiedades de UI antes de enviar al backend
       const cleanedPositions = updatedPositions.map(({ accessLevel, isMaster, onEdit, onViewManual, ...cargo }) => cargo);
 
       // Llamar a la API para guardar los cambios (sin el cargo eliminado)
       const response = await axios.post(endPoints.save_changes_organigrama, cleanedPositions);
 
-      // Actualizar el estado local con la respuesta del servidor
-      setPositions(response.data);
-      setNodes(prevNodes => prevNodes.filter(node => node.id !== cargoId));
-      setEdges(prevEdges => 
-        prevEdges.filter(edge => edge.source !== cargoId && edge.target !== cargoId)
-      );
+      // Verificar que la respuesta contiene todos los cargos esperados
+      if (response.data && Array.isArray(response.data)) {
+        // Asegurarse de que todos los cargos locales (excepto el eliminado) estén presentes en la respuesta
+        const responseIds = response.data.map(cargo => cargo.idCargo);
+        const missingCargos = localUpdatedPositions.filter(cargo => !responseIds.includes(cargo.idCargo));
+
+        // Si hay cargos que faltan en la respuesta, mantenerlos en el estado local
+        const finalPositions = missingCargos.length > 0 
+          ? [...response.data, ...missingCargos] 
+          : response.data;
+
+        // Actualizar el estado local con la respuesta del servidor
+        setPositions(finalPositions);
+
+        // Actualizar los nodos y las conexiones
+        setNodes(prevNodes => prevNodes.filter(node => node.id !== cargoId));
+        setEdges(createEdgesFromPositions(finalPositions));
+      } else {
+        // Si la respuesta no es válida, mantener el estado local actualizado sin el cargo eliminado
+        console.warn("La respuesta del servidor no contiene datos válidos");
+        setPositions(localUpdatedPositions);
+        setNodes(prevNodes => prevNodes.filter(node => node.id !== cargoId));
+        setEdges(createEdgesFromPositions(localUpdatedPositions));
+      }
 
       toast({
         title: "Cargo eliminado correctamente",
@@ -686,20 +738,37 @@ export default function OrganizationChart({
         }
       );
 
-      const updatedCargo = response.data;
+      // Verificar que la respuesta es válida
+      if (response.data) {
+        const updatedCargo = response.data;
 
-      // Actualizar el estado local
-      setPositions(prevCargos => 
-        prevCargos.map(c => 
+        // Actualizar el estado local
+        setPositions(prevCargos => 
+          prevCargos.map(c => 
+            c.idCargo === cargoId ? updatedCargo : c
+          )
+        );
+
+        // Actualizar las conexiones para reflejar el cargo actualizado
+        const updatedPositions = positions.map(c => 
           c.idCargo === cargoId ? updatedCargo : c
-        )
-      );
+        );
+        setEdges(createEdgesFromPositions(updatedPositions));
 
-      toast({
-        title: "Cargo actualizado correctamente",
-        status: "success",
-        duration: 3000,
-      });
+        toast({
+          title: "Cargo actualizado correctamente",
+          status: "success",
+          duration: 3000,
+        });
+      } else {
+        console.warn("La respuesta del servidor no contiene datos válidos");
+        toast({
+          title: "Error al actualizar el cargo",
+          description: "La respuesta del servidor no es válida",
+          status: "error",
+          duration: 3000,
+        });
+      }
     } catch (error) {
       console.error("Error al actualizar el cargo:", error);
       toast({

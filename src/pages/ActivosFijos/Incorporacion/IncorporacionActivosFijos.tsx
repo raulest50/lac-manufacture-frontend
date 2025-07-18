@@ -7,7 +7,7 @@ import {StepOneFormulario} from "./StepOneFormulario.tsx";
 
 
 const steps = [
-    {title:"Cero", description:"Identificacion Numero OCA"},
+    {title:"Cero", description:"Tipo de Ingreso"},
     {title:"Primero", description:"Carga Factura"},
     {title:"Tercero", description:"Formulario Incorporacion"},
     {title:"Cuarto", description:"Enviar y Finalizar"}
