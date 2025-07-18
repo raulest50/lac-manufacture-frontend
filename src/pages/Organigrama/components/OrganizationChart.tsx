@@ -73,6 +73,8 @@ export default function OrganizationChart({
       id: cargo.idCargo,
       data: { 
         ...cargo,
+        accessLevel: accessLevel,  // Añadir accessLevel
+        isMaster: isMaster,        // Añadir isMaster
         onEdit: (nodeId:string) => {
           // Establecer el nodo seleccionado y abrir el diálogo de edición
           const node = nodes.find(n => n.id === nodeId);
@@ -187,9 +189,6 @@ export default function OrganizationChart({
     };
 
     fetchOrganizationChart();
-
-    console.log( ` nivel de acceso : ${accessLevel} ` );
-    console.log( ` es Master : ${isMaster} ` );
   }, [organizationChartId, toast, accessLevel, isMaster]);
 
   const initialNodes = createNodesFromCargos(positions);
@@ -367,6 +366,8 @@ export default function OrganizationChart({
       id: newCargo.idCargo.toString(),
       data: {
         ...newCargo,
+        accessLevel: accessLevel,  // Añadir accessLevel
+        isMaster: isMaster,        // Añadir isMaster
         onEdit: (nodeId:string) => {
           const node = nodes.find(n => n.id === nodeId);
           if (node) {
@@ -551,10 +552,6 @@ export default function OrganizationChart({
           }}
           defaultEdgeOptions={{
             type: 'smoothstep'
-          }}
-          nodeProps={{
-            accessLevel: accessLevel,
-            isMaster: isMaster
           }}
         >
           <Controls />

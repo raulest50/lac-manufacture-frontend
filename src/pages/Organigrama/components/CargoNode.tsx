@@ -35,7 +35,9 @@ interface CargoNodeProps extends NodeProps<PositionNodeData> {
 
 export default function CargoNode(props: CargoNodeProps) {
   const cargo = props.data;
-  const { accessLevel, isMaster } = props;
+  // Get accessLevel and isMaster from props.data instead of props
+  const accessLevel = cargo.accessLevel || props.accessLevel;
+  const isMaster = cargo.isMaster || props.isMaster;
 
   // Callback para editar el cargo
   const handleEdit = useCallback((event) => {
