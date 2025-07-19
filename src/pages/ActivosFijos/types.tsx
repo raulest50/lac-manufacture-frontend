@@ -19,5 +19,6 @@ export interface OrdenCompraActivo{
 
 export interface IncorporacionActivoDta {
     tipoIncorporacion?: 'CON_OC' | 'SIN_OC' | 'AF_EXISTENTE';
+    id_OC_AF ?: number;
 
 }

@@ -1,12 +1,9 @@
 import { useState } from 'react';
-import {
-  Flex, 
-  Card, 
-  CardHeader,
-} from '@chakra-ui/react';
+import { Flex, useToast } from '@chakra-ui/react';
 import { IncorporacionActivoDta, OrdenCompraActivo } from "../types.tsx";
-import {TipoIngresoSelection} from "./TipoIngresoSelection.tsx";
-import {TIPO_INCORPORACION} from "../types.tsx";
+import { TipoIngresoSelection } from "./TipoIngresoSelection.tsx";
+import { TIPO_INCORPORACION } from "../types.tsx";
+import { PanelBusquedaOCFA } from "./PanelBusquedaOCFA.tsx";
 
 type Props = {
     setActiveStep: (step: number) => void;
@@ -30,6 +27,9 @@ export function StepZeroTipoIngreso({
 
   const VIEW_MODES = {SEL_TFI:0, IDENT_OC:1};
   const [viewMode, setViewMode] = useState<number>(VIEW_MODES.SEL_TFI);
+  const [ocNumber, setOcNumber] = useState<string>('');
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const toast = useToast();
 
 
     /**
@@ -51,7 +51,37 @@ export function StepZeroTipoIngreso({
     if(tipo_incorporacion === TIPO_INCORPORACION.AF_EXISTENTE){
         setActiveStep(1);
     }
+  }
 
+  const handleSearchOC = () => {
+    if (!ocNumber.trim()) {
+      toast({
+        title: "Campo requerido",
+        description: "Por favor ingrese un número de OC-AF",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setIsSearching(true);
+
+    // Simulación de búsqueda - aquí se implementaría la llamada real a la API
+    setTimeout(() => {
+      // Ejemplo de respuesta exitosa
+      const mockOrdenCompra: OrdenCompraActivo = {};
+      setOrdenCompraActivo(mockOrdenCompra);
+
+      const incorporacionData: IncorporacionActivoDta = {
+        tipoIncorporacion: TIPO_INCORPORACION.CON_OC,
+        id_OC_AF: parseInt(ocNumber)
+      };
+      setIncorporacionActivoHeader(incorporacionData);
+
+      setIsSearching(false);
+      setActiveStep(1);
+    }, 1000);
   }
 
   const ConditionalRender = () => {
@@ -62,9 +92,13 @@ export function StepZeroTipoIngreso({
     }
     if(viewMode === VIEW_MODES.IDENT_OC){
       return(
-          <Card>
-              <CardHeader bg={"blue.500"}>buscar OC-AF por ID</CardHeader>
-          </Card>
+          <PanelBusquedaOCFA 
+              ocNumber={ocNumber}
+              setOcNumber={setOcNumber}
+              isSearching={isSearching}
+              onBack={() => setViewMode(VIEW_MODES.SEL_TFI)}
+              onSearch={handleSearchOC}
+          />
       )
     }
   }

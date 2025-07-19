@@ -102,7 +102,7 @@ export function TipoIngresoSelection({setTipoIncorporacion}: Props) {
                 >
                     <CardHeader borderBottom="0.1em solid" p={4}>
                         <Heading as="h3" size="md" fontFamily="Comfortaa Variable">
-                            Incorporación AF Existente
+                            Incorporación AF Existente ó Donación
                         </Heading>
                     </CardHeader>
                     <CardBody display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={6}>
