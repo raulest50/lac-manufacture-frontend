@@ -1,4 +1,4 @@
-import { Handle, NodeProps, Position } from "@xyflow/react";
+import { Handle, NodeProps, Position, Node } from "@xyflow/react";
 import { 
   Box, 
   Flex, 
@@ -16,21 +16,23 @@ import { FaUserTie } from "react-icons/fa";
 import { MdBusinessCenter, MdEdit, MdFileDownload } from "react-icons/md";
 import { LuMousePointerClick } from "react-icons/lu";
 import { Cargo, AccessLevel } from "../types";
-import { useCallback } from "react";
+import { useCallback, type CSSProperties } from "react";
 
-const handleStyle = {
+const handleStyle: CSSProperties = {
   width: "0.8em",
   height: "0.8em",
 };
 
-interface PositionNodeData extends Cargo {
+interface PositionNodeData extends Cargo, Record<string, unknown> {
   accessLevel?: AccessLevel;
   isMaster?: boolean;
   onEdit?: (nodeId: string) => void;
   onViewManual?: (nodeId: string) => void;
 }
 
-interface CargoNodeProps extends NodeProps<PositionNodeData> {
+type CargoNodeType = Node<PositionNodeData>;
+
+interface CargoNodeProps extends NodeProps<CargoNodeType> {
   accessLevel: AccessLevel;
   isMaster: boolean;
 }
@@ -116,7 +118,7 @@ export default function CargoNode(props: CargoNodeProps) {
                 size="lg"
                 color="blue.500"
                 _hover={{ bg: "blue.50" }}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
               />
               <MenuList>
                 {(accessLevel === AccessLevel.EDIT || isMaster) && (
