@@ -52,3 +52,5 @@ production/
 
 
 *.patch
+*storybook.log
+src/stories/*
