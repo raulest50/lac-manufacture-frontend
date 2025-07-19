@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Card, CardBody, CardHeader, Flex} from '@chakra-ui/react';
-import {Activo} from "../types.tsx";
+import {Activo} from "../../types.tsx";
 
 type Props = {
     activoPreliminar: Activo;

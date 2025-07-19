@@ -2,15 +2,15 @@ import {useState} from 'react';
 import {Box, Flex, StepDescription, StepNumber, StepSeparator, StepStatus, useSteps} from '@chakra-ui/react';
 import {IncorporacionActivoDta, OrdenCompraActivo} from "../types.tsx";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
-import {StepZeroTipoIngreso} from "./StepZeroTipoIngreso.tsx";
-import {StepOneFormulario} from "./StepOneFormulario.tsx";
+import {StepZeroTipoIngreso} from "./step_zero/StepZeroTipoIngreso.tsx";
+import {StepOneFormulario} from "./step_one/StepOneFormulario.tsx";
 
 
 const steps = [
-    {title:"Cero", description:"Tipo de Ingreso"},
-    {title:"Primero", description:"Carga Factura"},
-    {title:"Tercero", description:"Formulario Incorporacion"},
-    {title:"Cuarto", description:"Enviar y Finalizar"}
+    {title:"0", description:"Tipo de Incorporacion"},
+    {title:"1", description:"Formulario de Activos"},
+    {title:"2", description:"Factura / Doc Soporte"},
+    {title:"3", description:"Validar y Enviar"}
 ];
 
 export function IncorporacionActivosFijos() {

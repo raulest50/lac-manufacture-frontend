@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { FaFileInvoiceDollar } from 'react-icons/fa'; // Icon for "con OC"
 import { FaFileAlt } from 'react-icons/fa'; // Icon for "sin OC"
-import { IncorporacionActivoDta } from '../types';
+import { IncorporacionActivoDta } from '../../types.tsx';
 
 type Props = {
     setActiveStep: (step: number) => void;

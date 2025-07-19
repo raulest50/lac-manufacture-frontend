@@ -7,7 +7,7 @@ import MyHeader from "../../components/MyHeader.tsx";
 
 import {IncorporacionActivosFijos} from "./Incorporacion/IncorporacionActivosFijos.tsx";
 import {my_style_tab} from "../../styles/styles_general.tsx";
-import CrearOCA from "./OC/CrearOCA.tsx";
+import CrearOC_AF from "./OC/CrearOC_AF.tsx";
 
 export default function ActivosFijosPage() {
 
@@ -25,7 +25,6 @@ export default function ActivosFijosPage() {
                         <Tab sx={my_style_tab}> Incorporacion </Tab>
                         <Tab sx={my_style_tab}> Crear OC-AF </Tab>
                         <Tab sx={my_style_tab}> Reporte </Tab>
-                        <Tab sx={my_style_tab}> Categorias </Tab>
                         {/*<Tab sx={my_style_tab}> Traslados </Tab>*/}
                         {/*<Tab sx={my_style_tab}> Mantenimientos </Tab>*/}
                     </TabList>
@@ -36,11 +35,11 @@ export default function ActivosFijosPage() {
                         </TabPanel>
 
                         <TabPanel>
-
+                            <CrearOC_AF />
                         </TabPanel>
 
                         <TabPanel>
-                            <CrearOCA />
+                            reportes de activos fijos
                         </TabPanel>
 
                     </TabPanels>

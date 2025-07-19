@@ -1,6 +1,6 @@
 import {Card, CardBody, CardHeader, Flex, Heading, Icon, SimpleGrid, Text} from '@chakra-ui/react';
 import {FaClipboardList, FaFileAlt, FaFileInvoiceDollar} from "react-icons/fa";
-import {TIPO_INCORPORACION} from "../types";
+import {TIPO_INCORPORACION} from "../../types.tsx";
 
 type Props = {
     setTipoIncorporacion: (tipoIncorporacion: string) => void;

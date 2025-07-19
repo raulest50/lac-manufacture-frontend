@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Flex, useToast } from '@chakra-ui/react';
-import { IncorporacionActivoDta, OrdenCompraActivo } from "../types.tsx";
+import { IncorporacionActivoDta, OrdenCompraActivo } from "../../types.tsx";
 import { TipoIngresoSelection } from "./TipoIngresoSelection.tsx";
-import { TIPO_INCORPORACION } from "../types.tsx";
+import { TIPO_INCORPORACION } from "../../types.tsx";
 import { PanelBusquedaOCFA } from "./PanelBusquedaOCFA.tsx";
 
 type Props = {

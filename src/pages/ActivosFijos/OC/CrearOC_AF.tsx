@@ -12,7 +12,7 @@ import { addDays, format } from "date-fns";
 import ListaItemsOCA from "../../Compras/components/ListaItemsOCA.tsx";
 import PdfGenerator from "../../Compras/pdfGenerator.tsx";
 
-export default function CrearOCA() {
+export default function CrearOC_AF() {
     const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);
     const [isProveedorPickerOpen, setIsProveedorPickerOpen] = useState(false);
 
