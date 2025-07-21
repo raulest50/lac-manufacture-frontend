@@ -51,10 +51,17 @@ function ProductosPage() {
                     {(user === 'master' || productosAccessLevel >= 2) && (
                         <Tab sx={my_style_tab}>Codificar Material</Tab>
                     )}
+
                     <Tab sx={my_style_tab}>Consulta</Tab>
+
                     {(user === 'master' || productosAccessLevel >= 2) && (
                         <Tab sx={my_style_tab}>Crear Terminado/Semiterminado</Tab>
                     )}
+
+                    { (user === 'master' || productosAccessLevel >= 2) && (
+                        <Tab sx={my_style_tab}>Familias</Tab>
+                    )}
+
                 </TabList>
 
                 <TabPanels>
@@ -72,6 +79,13 @@ function ProductosPage() {
                             <CodificarSemioTermiTab />
                         </TabPanel>
                     )}
+
+                    { (user === 'master' || productosAccessLevel >= 2) && (
+                        <TabPanel>
+
+                        </TabPanel>
+                    )}
+
                 </TabPanels>
             </Tabs>
         </Container>

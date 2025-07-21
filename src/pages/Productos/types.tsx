@@ -88,3 +88,9 @@ export interface ProductoSemiter {
     tipo_producto: string;
     procesoProduccion?: ProcesoProduccion; // se determina a la hora de definir el proceso - step 3
 }
+
+export interface Familia{
+     familiaId: number;
+     familiaNombre: string;
+     familiaDescripcion: string;
+}

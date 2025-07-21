@@ -1,47 +1,60 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+// src/components/SelectCurrencyTRM/SelectCurrencyTRM.stories.tsx
+import React, { useState } from 'react';
 import { SelectCurrencyTrm } from './SelectCurrencyTRM';
-import { ChakraProvider } from '@chakra-ui/react';
 
-const meta: Meta<typeof SelectCurrencyTrm> = {
-  title: 'Components/SelectCurrencyTrm',
-  component: SelectCurrencyTrm,
-  parameters: {
-    layout: 'centered',
-  },
-  decorators: [
-    (Story) => (
-      <ChakraProvider>
-        <div style={{ padding: '1rem', maxWidth: '400px' }}>
-          <Story />
-        </div>
-      </ChakraProvider>
-    ),
-  ],
+// Función auxiliar para crear el estado que necesita el componente
+const useCurrencyState = () => {
+  const [isUSD, setIsUSD] = useState(true);
+  return [isUSD, setIsUSD] as [boolean, React.Dispatch<React.SetStateAction<boolean>>];
 };
 
-export default meta;
-type Story = StoryObj<typeof SelectCurrencyTrm>;
-
-// Wrapper component to handle state
-const SelectCurrencyTrmWithState = (args: any) => {
-  const [isUSD, setIsUSD] = useState(args.initialIsUSD || false);
-  const handleUsd2Cop = (value: number) => {
-    console.log('TRM value:', value);
+// Historia por defecto
+export const Default = () => {
+  const currencyState = useCurrencyState();
+  const [currentUsd2Cop, setCurrentUsd2Cop] = useState<number>(0);
+  
+  const handleUsd2CopChange = (value: number) => {
+    setCurrentUsd2Cop(value);
+    console.log('TRM actualizada:', value);
   };
 
   return (
-    <SelectCurrencyTrm 
-      currencyIsUSD={[isUSD, setIsUSD]} 
-      useCurrentUsd2Cop={handleUsd2Cop} 
-    />
+    <div style={{ maxWidth: '500px', padding: '20px' }}>
+      <h2>Selector de Moneda y TRM</h2>
+      <SelectCurrencyTrm 
+        currencyIsUSD={currencyState}
+        useCurrentUsd2Cop={handleUsd2CopChange}
+      />
+      <div style={{ marginTop: '20px' }}>
+        <p>Moneda actual: {currencyState[0] ? 'USD' : 'COP'}</p>
+        <p>TRM actual: {currentUsd2Cop}</p>
+      </div>
+    </div>
   );
 };
 
-export const Default: Story = {
-  render: () => <SelectCurrencyTrmWithState initialIsUSD={false} />,
-};
+// Historia con valor inicial en COP
+export const InitialCOP = () => {
+  const [isUSD, setIsUSD] = useState(false);
+  const currencyState = [isUSD, setIsUSD] as [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  const [currentUsd2Cop, setCurrentUsd2Cop] = useState<number>(4000);
+  
+  const handleUsd2CopChange = (value: number) => {
+    setCurrentUsd2Cop(value);
+    console.log('TRM actualizada:', value);
+  };
 
-export const WithUSD: Story = {
-  render: () => <SelectCurrencyTrmWithState initialIsUSD={true} />,
+  return (
+    <div style={{ maxWidth: '500px', padding: '20px' }}>
+      <h2>Selector de Moneda y TRM (Inicial: COP)</h2>
+      <SelectCurrencyTrm 
+        currencyIsUSD={currencyState}
+        useCurrentUsd2Cop={handleUsd2CopChange}
+      />
+      <div style={{ marginTop: '20px' }}>
+        <p>Moneda actual: {currencyState[0] ? 'USD' : 'COP'}</p>
+        <p>TRM actual: {currentUsd2Cop}</p>
+      </div>
+    </div>
+  );
 };

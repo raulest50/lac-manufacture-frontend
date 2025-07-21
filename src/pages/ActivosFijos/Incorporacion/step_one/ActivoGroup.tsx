@@ -1,10 +1,7 @@
-import {useState} from 'react';
 import {Card, CardBody, CardHeader, Flex} from '@chakra-ui/react';
-import {Activo} from "../../types.tsx";
 
 type Props = {
-    activoPreliminar: Activo;
-    cantidad: number;
+    
 };
 
 /**
@@ -16,23 +13,19 @@ type Props = {
  * @param props
  * @constructor
  */
-export function ActivoGroup({activoPreliminar, cantidad}: Props) {
-
-    const [activos, setActivos] = useState<Activo[]>([]);
+export function ActivoGroup({}: Props) {
 
     return (
         <Flex>
-            <Card>
-                <CardHeader bg={"blue.500"}>
+            <Card
+                boxShadow='lg'
+            >
+                <CardHeader bg={"blue.200"}>
 
                 </CardHeader>
-
                 <CardBody>
                 </CardBody>
-
             </Card>
-
-
         </Flex>
     );
 }
