@@ -76,7 +76,9 @@ export interface ProcesoProduccion{
     targetNode: Node;
 }
 
-
+/**
+ * se usa en el tab de codificacion de producto terminado o semiterminado
+ */
 export interface ProductoSemiter {
     productoId: string;
     nombre: string;
@@ -87,6 +89,7 @@ export interface ProductoSemiter {
     cantidadUnidad: string;
     tipo_producto: string;
     procesoProduccion?: ProcesoProduccion; // se determina a la hora de definir el proceso - step 3
+    familia?: Familia; // solo se usa para terminado, por ello es opcional
 }
 
 export interface Familia{

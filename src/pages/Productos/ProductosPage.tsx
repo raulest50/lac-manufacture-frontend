@@ -12,6 +12,7 @@ import CodificarMaterialesTab from './CodificarMaterialesTab.tsx';
 import CodificarSemioTermiTab from "./CodificarSemioTermiTab/CodificarSemioTermiTab.tsx";
 import InformeProductosTab from './InformeProductosTab.tsx';
 import {Authority, WhoAmIResponse} from "../../api/global_types.tsx";
+import {FamiliasTab} from "./FamiliasTab.tsx";
 
 
 function ProductosPage() {
@@ -82,7 +83,7 @@ function ProductosPage() {
 
                     { (user === 'master' || productosAccessLevel >= 2) && (
                         <TabPanel>
-
+                            <FamiliasTab />
                         </TabPanel>
                     )}
 

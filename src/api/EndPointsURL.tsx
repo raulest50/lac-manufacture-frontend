@@ -19,6 +19,10 @@ export default class EndPointsURL{
     public carga_masiva_mprims: string; // el primer endpoint para carga masiva
     public consulta_productos:string; // para buscar por categorias
 
+    // familias endpoints
+    public get_familias: string;
+    public save_familia: string;
+
 
     // Proveedores resouce
     public save_proveedores:string;
@@ -126,6 +130,9 @@ export default class EndPointsURL{
         this.carga_masiva_mprims = `${domain}/${productos_res}/bulk_upload_excel`;
         this.consulta_productos = `${domain}/${productos_res}/consulta1`;
 
+        // Familias endpoints
+        this.get_familias = `${domain}/${productos_res}/familias`;
+        this.save_familia = `${domain}/${productos_res}/familias/save`;
 
         // Proveedores endpoints
         this.save_proveedores = `${domain}/${proveedores_res}/save`;

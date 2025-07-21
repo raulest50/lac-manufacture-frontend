@@ -11,6 +11,7 @@ import {my_style_tab} from "../../styles/styles_general.tsx";
 import CrearOrdenes from "./CrearOrdenes.tsx";
 import HistorialOrdenes from "./HistorialOrdenes.tsx";
 import PlaneacionProduccion from "./components/PlaneacionProduccion.tsx";
+import {SimulacionProduccionTab} from "./SimulacionProduccion/SimulacionProduccionTab.tsx";
 
 
 export default function ProduccionPage(){
@@ -22,19 +23,24 @@ export default function ProduccionPage(){
             <Tabs>
 
                 <TabList>
+                    <Tab sx={my_style_tab}> Simulacion de Produccion </Tab>
+                    <Tab sx={my_style_tab}> Creacion Manual Orden Produccion </Tab>
                     <Tab sx={my_style_tab}> Master Production Schedule (MPS) </Tab>
-                    <Tab sx={my_style_tab}> Crear Orden Produccion </Tab>
                     <Tab sx={my_style_tab}> Historial </Tab>
                 </TabList>
 
                 <TabPanels>
 
                     <TabPanel>
-                        <PlaneacionProduccion />
+                        <SimulacionProduccionTab />
                     </TabPanel>
 
                     <TabPanel>
-                        <CrearOrdenes/>
+                        <CrearOrdenes />
+                    </TabPanel>
+
+                    <TabPanel>
+                        <PlaneacionProduccion />
                     </TabPanel>
 
                     <TabPanel>
