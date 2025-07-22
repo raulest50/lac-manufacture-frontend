@@ -30,10 +30,13 @@ export function FamiliasTab() {
     const [familias, setFamilias] = useState<Familia[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+
     const [formData, setFormData] = useState({
-        nombre: '',
-        descripcion: ''
+        familiaId: '',
+        familiaNombre: '',
+        familiaDescripcion: ''
     });
+
     const [submitting, setSubmitting] = useState<boolean>(false);
     const toast = useToast();
     const endPoints = new EndPointsURL();
@@ -68,8 +71,9 @@ export function FamiliasTab() {
         try {
             setSubmitting(true);
             const newFamilia = {
-                familiaNombre: formData.nombre,
-                familiaDescripcion: formData.descripcion
+                familiaId: Number(formData.familiaId),
+                familiaNombre: formData.familiaNombre,
+                familiaDescripcion: formData.familiaDescripcion
             };
 
             await axios.post(endPoints.save_familia, newFamilia);
@@ -114,33 +118,47 @@ export function FamiliasTab() {
 
     const handleClear = () => {
         setFormData({
-            nombre: '',
-            descripcion: ''
+            familiaId: '',
+            familiaNombre: '',
+            familiaDescripcion: ''
         });
     };
 
-    const isFormValid = formData.nombre.trim() !== '' && formData.descripcion.trim() !== '';
+    const isFormValid = formData.familiaNombre.trim() !== '' && formData.familiaDescripcion.trim() !== '';
 
     return (
         <Grid templateColumns="1fr 1fr" gap={6} p={4}>
             <Box p={6} borderWidth="1px" borderRadius="lg">
                 <VStack spacing={4} align="stretch">
                     <Heading size="md" mb={4}>Nueva Familia</Heading>
+
+                    <FormControl isRequired>
+                        <FormLabel>Familia ID</FormLabel>
+                        <Input
+                            name="familiaId"
+                            value={formData.familiaId}
+                            onChange={handleInputChange}
+                            placeholder="Id de la familia"
+                            isDisabled={submitting}
+                        />
+                    </FormControl>
+
                     <FormControl isRequired>
                         <FormLabel>Nombre</FormLabel>
                         <Input
-                            name="nombre"
-                            value={formData.nombre}
+                            name="familiaNombre"
+                            value={formData.familiaNombre}
                             onChange={handleInputChange}
                             placeholder="Nombre de la familia"
                             isDisabled={submitting}
                         />
                     </FormControl>
+
                     <FormControl isRequired>
                         <FormLabel>Descripción</FormLabel>
                         <Input
-                            name="descripcion"
-                            value={formData.descripcion}
+                            name="familiaDescripcion"
+                            value={formData.familiaDescripcion}
                             onChange={handleInputChange}
                             placeholder="Descripción de la familia"
                             isDisabled={submitting}

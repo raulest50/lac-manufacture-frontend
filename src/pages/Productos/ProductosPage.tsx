@@ -45,7 +45,7 @@ function ProductosPage() {
 
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w="full" h="full">
-            <MyHeader title="Codificar Producto" />
+            <MyHeader title="Productos" />
             <Tabs isFitted gap="1em" variant="line">
                 <TabList>
                     {/* Solo mostrar las pestañas de creación si el usuario es master o tiene nivel 2 o superior */}

@@ -68,7 +68,7 @@ export default function Home(){
 
             <SimpleGrid columns={[1,1,2,3,4]} gap={'0.5em'} rowGap={'1.5em'}>
                 <SectionCard to={"/usuarios"}         name={"Roles y Usuarios"}     icon={FaUsersGear}          supportedModules={[Modulo.USUARIOS]} currentAccesos={roles}/>
-                <SectionCard to={'/producto'}         name={'Codificar Materiales y Productos'}  icon={PiDownloadDuotone}    supportedModules={[Modulo.PRODUCTOS]} currentAccesos={roles}/>
+                <SectionCard to={'/producto'}         name={'Productos'}  icon={PiDownloadDuotone}    supportedModules={[Modulo.PRODUCTOS]} currentAccesos={roles}/>
                 <SectionCard to={'/produccion'}       name={'Gestion de Produccion'}           icon={AiOutlineAudit}       supportedModules={[Modulo.PRODUCCION]} currentAccesos={roles}/>
                 <SectionCard to={'/stock'}            name={'Stock'}                icon={BsDatabaseCheck}      supportedModules={[Modulo.STOCK]} currentAccesos={roles}/>
                 <SectionCard to={'/Proveedores'}      name={'Proveedores'}          icon={FaIndustry}           supportedModules={[Modulo.PROVEEDORES]} currentAccesos={roles}/>

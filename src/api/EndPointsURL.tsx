@@ -131,8 +131,8 @@ export default class EndPointsURL{
         this.consulta_productos = `${domain}/${productos_res}/consulta1`;
 
         // Familias endpoints
-        this.get_familias = `${domain}/${productos_res}/familias`;
-        this.save_familia = `${domain}/${productos_res}/familias/save`;
+        this.get_familias = `${domain}/familias`;
+        this.save_familia = `${domain}/familias`;
 
         // Proveedores endpoints
         this.save_proveedores = `${domain}/${proveedores_res}/save`;
