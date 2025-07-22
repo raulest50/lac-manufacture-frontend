@@ -4,6 +4,15 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
+    server: {
+      proxy: {
+        '/datos-gov': {
+          target: 'https://www.datos.gov.co',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/datos-gov/, '')
+        }
+      }
+    },
     build: {
       outDir: 'dist',
       sourcemap: mode === 'development', // Keep source maps for development
@@ -12,6 +21,5 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode)
     }
-  }
-  })
-  
+  };
+});
