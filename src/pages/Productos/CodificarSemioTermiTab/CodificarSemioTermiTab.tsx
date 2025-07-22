@@ -11,10 +11,14 @@ import {
 } from "@chakra-ui/react";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
 import StepOne from "./StepOne.tsx";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {ProductoSemiter} from "../types.tsx";
 import StepTwo from "./StepTwo.tsx";
 import StepThree from "./StepThree.tsx";
+
+interface CodificarSemioTermiTabProps {
+    isActive?: boolean;
+}
 
 
 
@@ -26,7 +30,7 @@ const steps = [
 ]
 
 
-export default function CodificarSemioTermiTab() {
+export default function CodificarSemioTermiTab({ isActive = false }: CodificarSemioTermiTabProps) {
 
     const { activeStep, setActiveStep } = useSteps({
         index: 0,
@@ -38,12 +42,25 @@ export default function CodificarSemioTermiTab() {
     const [semioter2, setSemioter2] = useState<ProductoSemiter>();
     const [semioter3, setSemioter3] = useState<ProductoSemiter>();
 
+    // Estado para controlar la actualización de familias
+    const [refreshFamilias, setRefreshFamilias] = useState(0);
+
+    // Efecto para actualizar familias cuando la pestaña se activa
+    useEffect(() => {
+        if (isActive) {
+            setRefreshFamilias(prev => prev + 1);
+        }
+    }, [isActive]);
 
 
     function ConditionalRenderStep() {
         if (activeStep === 0) { // identificar la orden de compra
             return(
-                <StepOne setActiveStep={setActiveStep} setSemioter={setSemioter} />
+                <StepOne 
+                    setActiveStep={setActiveStep} 
+                    setSemioter={setSemioter} 
+                    refreshFamilias={refreshFamilias}
+                />
             );
         }
         if (activeStep === 1) { // verificar cantidades en el pedido

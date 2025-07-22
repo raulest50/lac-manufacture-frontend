@@ -20,6 +20,14 @@ function ProductosPage() {
     const { user } = useAuth();
     const endPoints = new EndPointsURL();
 
+    // Estado para rastrear la pestaña activa
+    const [tabIndex, setTabIndex] = useState(0);
+
+    // Función para manejar el cambio de pestaña
+    const handleTabChange = (index) => {
+        setTabIndex(index);
+    };
+
     useEffect(() => {
         const fetchUserAccessLevel = async () => {
             try {
@@ -46,7 +54,7 @@ function ProductosPage() {
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w="full" h="full">
             <MyHeader title="Productos" />
-            <Tabs isFitted gap="1em" variant="line">
+            <Tabs isFitted gap="1em" variant="line" index={tabIndex} onChange={handleTabChange}>
                 <TabList>
                     {/* Solo mostrar las pestañas de creación si el usuario es master o tiene nivel 2 o superior */}
                     {(user === 'master' || productosAccessLevel >= 2) && (
@@ -77,7 +85,7 @@ function ProductosPage() {
                     </TabPanel>
                     {(user === 'master' || productosAccessLevel >= 2) && (
                         <TabPanel>
-                            <CodificarSemioTermiTab />
+                            <CodificarSemioTermiTab isActive={tabIndex === 2} />
                         </TabPanel>
                     )}
 

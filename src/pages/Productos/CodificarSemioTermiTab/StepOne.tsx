@@ -13,9 +13,10 @@ import {ProductoSemiter, UNIDADES, TIPOS_PRODUCTOS, Familia} from "../types.tsx"
 interface props {
     setActiveStep: (step: number) => void;
     setSemioter: (semioter: ProductoSemiter) => void;
+    refreshFamilias?: number;
 }
 
-export default function StepOne({setActiveStep, setSemioter}: props) {
+export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0}: props) {
     // Local copy of the order's items to track verification state.
 
     const [productoId, setProductoId] = useState<string>("");
@@ -82,10 +83,11 @@ export default function StepOne({setActiveStep, setSemioter}: props) {
         }
     };
 
-    // Cargar familias cuando el componente se monta o cuando cambia el tipo de producto
+    // Cargar familias cuando el componente se monta, cuando cambia el tipo de producto,
+    // o cuando se actualiza refreshFamilias
     useEffect(() => {
         fetchFamilias();
-    }, [tipo_producto]);
+    }, [tipo_producto, refreshFamilias]);
 
     // Limpiar la selección de familia cuando se cambia a producto semiterminado
     useEffect(() => {
