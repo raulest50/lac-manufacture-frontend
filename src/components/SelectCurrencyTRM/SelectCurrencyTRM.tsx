@@ -24,13 +24,17 @@ export function SelectCurrencyTrm({
     const [loadingLatestTRM, setLoadingLatestTRM] = useState<boolean>(false);
     const [loadingTRMByDate, setLoadingTRMByDate] = useState<boolean>(false);
 
+    const TRM_BASE_URL = import.meta.env.DEV ? '/datos-gov' : 'https://www.datos.gov.co';
+
     const fetchLatestTRM = async () => {
         // Prevent multiple requests while loading
         if (loadingLatestTRM) return;
 
         try {
             setLoadingLatestTRM(true);
-            const response = await axios.get('https://www.datos.gov.co/resource/32sa-8pi3.json?$limit=1&$order=vigenciadesde DESC');
+            const response = await axios.get(
+                `${TRM_BASE_URL}/resource/32sa-8pi3.json?$limit=1&$order=vigenciadesde%20DESC`
+            );
             const trm = response.data[0].valor;
             setUsd2copState(trm);
             useCurrentUsd2Cop(Number(trm));
@@ -47,7 +51,9 @@ export function SelectCurrencyTrm({
 
         try {
             setLoadingTRMByDate(true);
-            const response = await axios.get(`https://www.datos.gov.co/resource/32sa-8pi3.json?vigenciadesde=${date}`);
+            const response = await axios.get(
+                `${TRM_BASE_URL}/resource/32sa-8pi3.json?vigenciadesde=${date}`
+            );
             if (response.data.length > 0) {
                 const trm = response.data[0].valor;
                 setUsd2copState(trm);
