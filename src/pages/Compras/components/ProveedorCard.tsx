@@ -25,7 +25,7 @@ const ProveedorCard: React.FC<ProveedorCardProps> = ({
                                                          onSearchClick,
                                                      }) => {
     return (
-        <Card variant="outline" borderColor="blue.200">
+        <Card variant="outline" borderColor="blue.200" w={"full"}>
             <CardHeader bg="blue.50">
                 <HStack>
                     <IconButton

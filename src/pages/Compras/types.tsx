@@ -119,6 +119,8 @@ export interface OrdenCompraActivos{
     condicionPago: string;
     tiempoEntrega: string;
     plazoPago: number;
+    moneda?: string;  // 'USD' o 'COP'
+    trm?: number;     // Tasa de cambio USD a COP
 }
 
 export interface ItemOCActivo{

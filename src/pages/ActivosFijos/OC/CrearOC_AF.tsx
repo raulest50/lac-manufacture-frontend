@@ -1,7 +1,7 @@
 // CrearOrdenCompraActivos.tsx
 import {
     Container, Flex, FormControl, FormLabel, Input, Select,
-    useToast, Text, Heading, Button, HStack, Spacer
+    useToast, Button, HStack, Spacer
 } from "@chakra-ui/react";
 import ProveedorCard from "../../Compras/components/ProveedorCard.tsx";
 import { useState } from "react";
@@ -11,6 +11,8 @@ import MyDatePicker from "../../../components/MyDatePicker.tsx";
 import { addDays, format } from "date-fns";
 import ListaItemsOCA from "../../Compras/components/ListaItemsOCA.tsx";
 import PdfGenerator from "../../Compras/pdfGenerator.tsx";
+// Importar el componente SelectCurrencyTrm
+import { SelectCurrencyTrm } from "../../../components/SelectCurrencyTRM/SelectCurrencyTRM";
 
 export default function CrearOC_AF() {
     const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);
@@ -27,7 +29,18 @@ export default function CrearOC_AF() {
         format(addDays(new Date(), 30), "yyyy-MM-dd")
     );
 
+    // Nuevos estados para el manejo de moneda y TRM
+    const [isUSD, setIsUSD] = useState<boolean>(false);
+    // Crear un tuple para pasar al componente SelectCurrencyTrm
+    const currencyIsUSDTuple: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = [isUSD, setIsUSD];
+    const [currentUsd2Cop, setCurrentUsd2Cop] = useState<number>(0);
+
     const toast = useToast();
+
+    // Función para actualizar el valor de TRM
+    const handleTrmUpdate = (value: number) => {
+        setCurrentUsd2Cop(value);
+    };
 
     const clearAll = () => {
         setSelectedProveedor(null);
@@ -38,68 +51,35 @@ export default function CrearOC_AF() {
         setTiempoEntrega("15");
         setFechaVencimiento(format(addDays(new Date(), 30), "yyyy-MM-dd"));
         setIsProveedorPickerOpen(false);
-    }
-
-    const generarPDF = async () => {
-        if (!selectedProveedor) {
-            toast({
-                title: "Proveedor faltante",
-                description: "Selecciona primero un proveedor antes de generar el PDF.",
-                status: "warning",
-                duration: 3000,
-                isClosable: true,
-            });
-            return;
-        }
-
-        // build the payload
-        const orden: OrdenCompraActivos = {
-            ordenCompraId: ordenCompraId || `AUTO-${Date.now()}`,
-            fechaEmision: format(new Date(), "yyyy-MM-dd"),
-            fechaVencimiento,
-            proveedor: selectedProveedor,
-            itemsOrdenCompra: listaItemsActivos,
-            subTotal: listaItemsActivos.reduce(
-                (sum, row) => sum + row.activo.precio * row.cantidad,
-                0
-            ),
-            ivaValue: listaItemsActivos.reduce(
-                (sum, row) => sum + row.activo.ivaValue * row.cantidad,
-                0
-            ),
-            totalPagar: listaItemsActivos.reduce((sum, row) => sum + row.subTotal, 0),
-            condicionPago,
-            tiempoEntrega,
-            plazoPago,
-        };
-
-        const generator = new PdfGenerator();
-        await generator.generatePDF_OCA(orden);
+        setIsUSD(false);
+        setCurrentUsd2Cop(0);
     }
 
     return (
         <Container minW={['auto','container.lg','container.xl']} w="full" h="full">
             <Flex direction="column" p={0} m={0} w="full" h="full" gap={10}>
-                <ProveedorCard
-                    selectedProveedor={selectedProveedor}
-                    onSearchClick={() => setIsProveedorPickerOpen(true)}
-                />
 
-                <Flex direction={"row"} mt={"1em"} w="full" h="full" gap={"2"} p={"1em"}>
-                    <FormControl flex={1}>
-                        <FormLabel>Orden Compra Id</FormLabel>
-                        <Input
-                            value={ordenCompraId}
-                            onChange={ (e) => {setOrdenCompraId(e.target.value)} }
+                <Flex direction={"row"} gap={2} w={"full"} h={"full"} p={"1em"} >
+                    <Flex flex={2} w={"full"}>
+                        <ProveedorCard
+                            selectedProveedor={selectedProveedor}
+                            onSearchClick={() => setIsProveedorPickerOpen(true)}
                         />
-                    </FormControl>
-                    <Spacer flex={2}/>
+                    </Flex>
+                    <Flex flex={1} w={"full"}>
+                        {/* Componente de selección de moneda y TRM */}
+                        <FormControl>
+                            <FormLabel>Moneda y TRM</FormLabel>
+                            <SelectCurrencyTrm
+                                currencyIsUSD={currencyIsUSDTuple}
+                                useCurrentUsd2Cop={handleTrmUpdate}
+                            />
+                        </FormControl>
+                    </Flex>
                 </Flex>
 
                 <Flex direction={"column"} mt={"1em"} w="full" h="full" gap={"2"} p={"1em"}>
-
                     <Flex direction={"row"} gap={"2"} >
-
                         <FormControl>
                             <FormLabel> Condicion de Pago</FormLabel>
                             <Select
@@ -140,9 +120,7 @@ export default function CrearOC_AF() {
                             defaultDate = {format(new Date(), "yyyy-MM-dd")}
                             label = {"Fecha de Vencimiento Orden"}
                         />
-
                     </Flex>
-
                 </Flex>
 
                 {/* pass down Activos list + setter */}
@@ -153,36 +131,15 @@ export default function CrearOC_AF() {
 
                 <HStack gap={20}>
                     <Button
-                        colorScheme={"blue"}
-                        variant={"solid"}
-                        onClick={generarPDF}
-                    >
-                        Generar Pdf
-                    </Button>
-                    <Button
                         colorScheme={"red"}
                         variant={"solid"}
                         onClick={clearAll}
                     >
                         Limpiar Campos
                     </Button>
+                    {/* El botón para generar PDF se ha movido al tab de búsqueda de órdenes de compra */}
                 </HStack>
 
-                <Flex
-                    direction="column"
-                    p="1em"
-                    w="full" h="full"
-                    alignItems="flex-start"
-                    boxShadow="md"
-                    bg="red.50"
-                >
-                    <Heading as="h3" size="sm">Nota importante:</Heading>
-                    <Text noOfLines={3}>
-                        La presente interfaz es de uso provisional.
-                        Es únicamente para la generación manual de órdenes de compra.
-                        Id, valores de iva entre otros deben ser asignadas manualmente.
-                    </Text>
-                </Flex>
             </Flex>
 
             <ProveedorPicker
