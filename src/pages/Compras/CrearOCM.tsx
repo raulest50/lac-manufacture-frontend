@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import {Button, Container, Flex, FormControl, FormLabel, Input, Select, useToast, Text} from '@chakra-ui/react';
 import axios from 'axios';
-import { Proveedor, Material, ItemOrdenCompra, OrdenCompraMateriales } from './types';
+import { Proveedor, Material, ItemOrdenCompra, OrdenCompraMateriales, DIVISAS } from './types';
 import EndPointsURL from '../../api/EndPointsURL';
 import ProveedorPicker from './components/ProveedorPicker.tsx';
 import ProveedorCard from './components/ProveedorCard.tsx';
@@ -11,6 +11,7 @@ import ListaItemsOCM from './components/ListaItemsOCM.tsx';
 import MyDatePicker from "../../components/MyDatePicker.tsx";
 import {format, addDays} from "date-fns";
 import { formatCOP } from '../../utils/formatters';
+import { SelectCurrencyTrm } from "../../components/SelectCurrencyTRM/SelectCurrencyTRM";
 
 const endPoints = new EndPointsURL();
 
@@ -31,6 +32,16 @@ export default function CrearOCM() {
     const [totalPagar, setTotalPagar] = useState(0);
     const [ivaEnabled, setIvaEnabled] = useState(true);
 
+    // State variables for currency and TRM
+    const [isUSD, setIsUSD] = useState<boolean>(false);
+    const currencyIsUSDTuple: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = [isUSD, setIsUSD];
+    const [currentUsd2Cop, setCurrentUsd2Cop] = useState<number>(0);
+
+    // Function to update the TRM value
+    const handleTrmUpdate = (value: number) => {
+        setCurrentUsd2Cop(value);
+    };
+
     const updateTotalesAndGetValues = () => {
         const calculatedSubTotal = listaItemsOrdenCompra.reduce(
             (sum, item) => sum + item.subTotal,
@@ -50,6 +61,8 @@ export default function CrearOCM() {
         setSelectedProveedor(null);
         setListaItemsOrdenCompra([]);
         updateTotalesAndGetValues();
+        setIsUSD(false);
+        setCurrentUsd2Cop(0);
     };
 
     const checkCantidades = () => {
@@ -158,6 +171,17 @@ export default function CrearOCM() {
             });
             return;
         }
+        // Add validation for TRM when USD is selected
+        if (isUSD && (!currentUsd2Cop || currentUsd2Cop <= 0)) {
+            toast({
+                title: 'TRM inválida',
+                description: 'Por favor, ingrese una TRM válida mayor que cero.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
 
         // Calculate totals and get the latest values:
         const { calculatedSubTotal, calculatedIva, calculatedTotal } = updateTotalesAndGetValues();
@@ -173,6 +197,8 @@ export default function CrearOCM() {
             tiempoEntrega: tiempoEntrega,
             plazoPago: plazoPago,
             estado: 0, // 0 = pendiente aprobación proveedor
+            divisas: isUSD ? DIVISAS.USD : DIVISAS.COP,
+            trm: isUSD ? currentUsd2Cop : 1, // When COP is selected, TRM should be 1
         };
         try {
             // Explicitly set the header to ensure JSON is sent.
@@ -207,10 +233,24 @@ export default function CrearOCM() {
         <Container minW={['auto', 'container.lg', 'container.xl']} w="full" h="full">
             <Flex direction="column" p={0} m={0} w="full" h="full">
 
-                <ProveedorCard
-                    selectedProveedor={selectedProveedor}
-                    onSearchClick={() => setIsProveedorPickerOpen(true)}
-                />
+                <Flex direction={"row"} gap={2} w={"full"} h={"full"} p={"1em"} >
+                    <Flex flex={2} w={"full"}>
+                        <ProveedorCard
+                            selectedProveedor={selectedProveedor}
+                            onSearchClick={() => setIsProveedorPickerOpen(true)}
+                        />
+                    </Flex>
+                    <Flex flex={1} w={"full"}>
+                        {/* Componente de selección de moneda y TRM */}
+                        <FormControl>
+                            <FormLabel>Moneda y TRM</FormLabel>
+                            <SelectCurrencyTrm
+                                currencyIsUSD={currencyIsUSDTuple}
+                                useCurrentUsd2Cop={handleTrmUpdate}
+                            />
+                        </FormControl>
+                    </Flex>
+                </Flex>
 
 
                 <Flex direction={"column"} mt={"1em"} w="full" h="full" gap={"2"} p={"1em"}>
@@ -272,6 +312,7 @@ export default function CrearOCM() {
                     onUpdateItem={handleUpdateItem}
                     ivaEnabled={ivaEnabled}
                     onToggleIva={toggleIvaForAllItems}
+                    currency={isUSD ? 'USD' : 'COP'}
                 />
 
                 <Button colorScheme="teal" onClick={crearOrdenCompraOnClick}>

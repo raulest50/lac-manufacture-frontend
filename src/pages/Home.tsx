@@ -22,16 +22,29 @@ import { FaCogs } from "react-icons/fa";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa"; // Nuevo icono para Clientes
 import { FaShoppingCart } from "react-icons/fa"; // Nuevo icono para Ventas
+import { FaMoneyBillWave } from "react-icons/fa"; // Icono para Pagos a Proveedores
 
 import '@fontsource-variable/comfortaa'
 
 import { Modulo } from "./Usuarios/GestionUsuarios/types.tsx";
+import { ModuleNotificationDTA } from "../api/ModulesNotifications.tsx";
 
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationsContext';
 
 export default function Home(){
+
     // pull out user, roles, logout from auth context
     const { user, roles, logout } = useAuth();
+    console.log('Home - Usuario actual:', user);
+    console.log('Home - Roles del usuario:', roles);
+
+    // Get the getNotificationForModule function from the notifications context
+    const { getNotificationForModule } = useNotifications();
+
+    // Log específico para la notificación de COMPRAS
+    const comprasNotification = getNotificationForModule('COMPRAS');
+    console.log('Home - Notificación COMPRAS:', comprasNotification);
 
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']}>
@@ -67,26 +80,27 @@ export default function Home(){
             </Flex>
 
             <SimpleGrid columns={[1,1,2,3,4]} gap={'0.5em'} rowGap={'1.5em'}>
-                <SectionCard to={"/usuarios"}         name={"Roles y Usuarios"}     icon={FaUsersGear}          supportedModules={[Modulo.USUARIOS]} currentAccesos={roles}/>
-                <SectionCard to={'/producto'}         name={'Productos'}  icon={PiDownloadDuotone}    supportedModules={[Modulo.PRODUCTOS]} currentAccesos={roles}/>
-                <SectionCard to={'/produccion'}       name={'Gestion de Produccion'}           icon={AiOutlineAudit}       supportedModules={[Modulo.PRODUCCION]} currentAccesos={roles}/>
-                <SectionCard to={'/stock'}            name={'Stock'}                icon={BsDatabaseCheck}      supportedModules={[Modulo.STOCK]} currentAccesos={roles}/>
-                <SectionCard to={'/Proveedores'}      name={'Proveedores'}          icon={FaIndustry}           supportedModules={[Modulo.PROVEEDORES]} currentAccesos={roles}/>
-                <SectionCard to={'/compras'}          name={'Compras'}              icon={GiBuyCard}            supportedModules={[Modulo.COMPRAS]} currentAccesos={roles}/>
-                {/*<SectionCard to={'/informes'}         name={'Informes'}             icon={TbReportSearch}       supportedModules={[Modulo.INFORMES]} currentAccesos={roles}/>*/}
-                <SectionCard to={'/asistente_produccion'}    name={'Reporte Progreso en Procesos de Produccion'} icon={GiChemicalDrop}     supportedModules={[Modulo.SEGUIMIENTO_PRODUCCION]} currentAccesos={roles}/>
-                <SectionCard to={'/clientes'}         name={'Clientes'}             icon={FaUsers}              supportedModules={[Modulo.CLIENTES]} currentAccesos={roles}/>
-                <SectionCard to={'/ventas'}           name={'Ventas'}               icon={FaShoppingCart}       supportedModules={[Modulo.VENTAS]} currentAccesos={roles}/>
-                <SectionCard to={'/transacciones_almacen'} name={'Transacciones de Almacen'} icon={MdWarehouse} supportedModules={[Modulo.TRANSACCIONES_ALMACEN]} currentAccesos={roles}/>
-                <SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload} supportedModules={[]} currentAccesos={roles} bgColor="red.100"/>
-                <SectionCard to={'/Activos'} name={'Activos Fijos'} icon={FaSteam}          supportedModules={[Modulo.ACTIVOS]} currentAccesos={roles}/>
-                <SectionCard to={'/Contabilidad'} name={'Contabilidad'} icon={TbReportMoney}          supportedModules={[Modulo.CONTABILIDAD]} currentAccesos={roles}/>
-                <SectionCard to={'/Personal'} name={'Personal'} icon={PiMicrosoftTeamsLogoFill}          supportedModules={[Modulo.PERSONAL_PLANTA]} currentAccesos={roles}/>
-                <SectionCard to={'/Bintelligence'} name={'BI'} icon={MdOutlineInsights}          supportedModules={[Modulo.BINTELLIGENCE]} currentAccesos={roles}/>
-                <SectionCard to={'/administracion_alertas'} name={'Administracion Alertas'} icon={MdNotificationsActive} supportedModules={[Modulo.ADMINISTRACION_ALERTAS]} currentAccesos={roles}/>
-                <SectionCard to={'/master_configs'} name={'Master Config'} icon={FaCogs} supportedModules={[]} currentAccesos={roles} bgColor="red.100"/>
-                <SectionCard to={'/cronograma'} name={'Cronograma'} icon={FaCalendarAlt} supportedModules={[Modulo.CRONOGRAMA]} currentAccesos={roles}/>
-                <SectionCard to={'/organigrama'} name={'Organigrama'} icon={FaSitemap} supportedModules={[Modulo.ORGANIGRAMA]} currentAccesos={roles}/>
+                <SectionCard to={"/usuarios"} name={"Roles y Usuarios"} icon={FaUsersGear} supportedModules={[Modulo.USUARIOS]} currentAccesos={roles} notification={getNotificationForModule(Modulo.USUARIOS)}/>
+                <SectionCard to={'/producto'} name={'Productos'} icon={PiDownloadDuotone} supportedModules={[Modulo.PRODUCTOS]} currentAccesos={roles} notification={getNotificationForModule(Modulo.PRODUCTOS)}/>
+                <SectionCard to={'/produccion'} name={'Gestion de Produccion'} icon={AiOutlineAudit} supportedModules={[Modulo.PRODUCCION]} currentAccesos={roles} notification={getNotificationForModule(Modulo.PRODUCCION)}/>
+                <SectionCard to={'/stock'} name={'Stock'} icon={BsDatabaseCheck} supportedModules={[Modulo.STOCK]} currentAccesos={roles} notification={getNotificationForModule(Modulo.STOCK)}/>
+                <SectionCard to={'/Proveedores'} name={'Proveedores'} icon={FaIndustry} supportedModules={[Modulo.PROVEEDORES]} currentAccesos={roles} notification={getNotificationForModule(Modulo.PROVEEDORES)}/>
+                <SectionCard to={'/compras'} name={'Compras'} icon={GiBuyCard} supportedModules={[Modulo.COMPRAS]} currentAccesos={roles} notification={getNotificationForModule(Modulo.COMPRAS)}/>
+                {/*<SectionCard to={'/informes'} name={'Informes'} icon={TbReportSearch} supportedModules={[Modulo.INFORMES]} currentAccesos={roles} notification={getNotificationForModule(Modulo.INFORMES)}/>*/}
+                <SectionCard to={'/asistente_produccion'} name={'Reporte Progreso en Procesos de Produccion'} icon={GiChemicalDrop} supportedModules={[Modulo.SEGUIMIENTO_PRODUCCION]} currentAccesos={roles} notification={getNotificationForModule(Modulo.SEGUIMIENTO_PRODUCCION)}/>
+                <SectionCard to={'/clientes'} name={'Clientes'} icon={FaUsers} supportedModules={[Modulo.CLIENTES]} currentAccesos={roles} notification={getNotificationForModule(Modulo.CLIENTES)}/>
+                <SectionCard to={'/ventas'} name={'Ventas'} icon={FaShoppingCart} supportedModules={[Modulo.VENTAS]} currentAccesos={roles} notification={getNotificationForModule(Modulo.VENTAS)}/>
+                <SectionCard to={'/transacciones_almacen'} name={'Transacciones de Almacen'} icon={MdWarehouse} supportedModules={[Modulo.TRANSACCIONES_ALMACEN]} currentAccesos={roles} notification={getNotificationForModule(Modulo.TRANSACCIONES_ALMACEN)}/>
+                <SectionCard to={'/carga_masiva'} name={'Carga Masiva de Datos'} icon={FaFileUpload} supportedModules={[]} currentAccesos={roles} bgColor="red.100" notification={getNotificationForModule('CARGA_MASIVA')}/>
+                <SectionCard to={'/Activos'} name={'Activos Fijos'} icon={FaSteam} supportedModules={[Modulo.ACTIVOS]} currentAccesos={roles} notification={getNotificationForModule(Modulo.ACTIVOS)}/>
+                <SectionCard to={'/Contabilidad'} name={'Contabilidad'} icon={TbReportMoney} supportedModules={[Modulo.CONTABILIDAD]} currentAccesos={roles} notification={getNotificationForModule(Modulo.CONTABILIDAD)}/>
+                <SectionCard to={'/Personal'} name={'Personal'} icon={PiMicrosoftTeamsLogoFill} supportedModules={[Modulo.PERSONAL_PLANTA]} currentAccesos={roles} notification={getNotificationForModule(Modulo.PERSONAL_PLANTA)}/>
+                <SectionCard to={'/Bintelligence'} name={'BI'} icon={MdOutlineInsights} supportedModules={[Modulo.BINTELLIGENCE]} currentAccesos={roles} notification={getNotificationForModule(Modulo.BINTELLIGENCE)}/>
+                <SectionCard to={'/administracion_alertas'} name={'Administracion Alertas'} icon={MdNotificationsActive} supportedModules={[Modulo.ADMINISTRACION_ALERTAS]} currentAccesos={roles} notification={getNotificationForModule(Modulo.ADMINISTRACION_ALERTAS)}/>
+                <SectionCard to={'/master_configs'} name={'Master Config'} icon={FaCogs} supportedModules={[]} currentAccesos={roles} bgColor="red.100" notification={getNotificationForModule('MASTER_CONFIGS')}/>
+                <SectionCard to={'/cronograma'} name={'Cronograma'} icon={FaCalendarAlt} supportedModules={[Modulo.CRONOGRAMA]} currentAccesos={roles} notification={getNotificationForModule(Modulo.CRONOGRAMA)}/>
+                <SectionCard to={'/organigrama'} name={'Organigrama'} icon={FaSitemap} supportedModules={[Modulo.ORGANIGRAMA]} currentAccesos={roles} notification={getNotificationForModule(Modulo.ORGANIGRAMA)}/>
+                <SectionCard to={'/pagos-proveedores'} name={'Pagos a Proveedores'} icon={FaMoneyBillWave} supportedModules={[Modulo.PAGOS_PROVEEDORES]} currentAccesos={roles} notification={getNotificationForModule(Modulo.PAGOS_PROVEEDORES)}/>
             </SimpleGrid>
         </Container>
     );

@@ -11,13 +11,14 @@ import {
     Input,
     Select
 } from '@chakra-ui/react';
-import { OrdenCompraMateriales, ItemOrdenCompra, Material } from "../types.tsx";
+import { OrdenCompraMateriales, ItemOrdenCompra, Material, DIVISAS } from "../types.tsx";
 import MateriaPrimaPicker from './MateriaPrimaPicker.tsx';
 import ListaItemsOCM from './ListaItemsOCM.tsx';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
 import MyDatePicker from "../../../components/MyDatePicker.tsx";
 import { format } from "date-fns";
+import { SelectCurrencyTrm } from "../../../components/SelectCurrencyTRM/SelectCurrencyTRM";
 
 type Props = {
     ocm: OrdenCompraMateriales;
@@ -49,6 +50,20 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
             ? format(new Date(ocm.fechaVencimiento), "yyyy-MM-dd") 
             : format(new Date(), "yyyy-MM-dd")
     );
+
+    // Estado para moneda y TRM
+    const [isUSD, setIsUSD] = useState<boolean>(ocm.divisas === DIVISAS.USD);
+    const currencyIsUSDTuple: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = [isUSD, setIsUSD];
+    const [currentUsd2Cop, setCurrentUsd2Cop] = useState<number>(ocm.trm || (isUSD ? 0 : 1));
+
+    // Función para actualizar el valor de TRM
+    const handleTrmUpdate = (value: number) => {
+        setCurrentUsd2Cop(value);
+        setOrdenActual(prev => ({
+            ...prev,
+            trm: value
+        }));
+    };
 
     const toast = useToast();
     const endPoints = new EndPointsURL();
@@ -118,9 +133,9 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
 
     // Actualizar el estado de validación del formulario cuando cambien los datos relevantes
     useEffect(() => {
-        const valid = hasChanges() && areInputsValid();
+        const valid = hasChanges() && areInputsValid() && (!isUSD || (currentUsd2Cop && currentUsd2Cop > 0));
         setIsFormValid(valid);
-    }, [ordenActual, listaItemsOrdenCompra, condicionPago, plazoPago, tiempoEntrega, fechaVencimiento]);
+    }, [ordenActual, listaItemsOrdenCompra, condicionPago, plazoPago, tiempoEntrega, fechaVencimiento, isUSD, currentUsd2Cop]);
 
     // Función para actualizar los totales
     const updateTotalesAndGetValues = () => {
@@ -143,11 +158,14 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
             condicionPago: condicionPago,
             plazoPago: plazoPago,
             tiempoEntrega: tiempoEntrega,
-            fechaVencimiento: fechaVencimiento + "T00:00:00"
+            fechaVencimiento: fechaVencimiento + "T00:00:00",
+            // Actualizar moneda y TRM
+            divisas: isUSD ? DIVISAS.USD : DIVISAS.COP,
+            trm: isUSD ? currentUsd2Cop : 1 // When COP is selected, TRM should be 1
         }));
 
         // Actualizar la validación del formulario
-        const valid = hasChanges() && areInputsValid();
+        const valid = hasChanges() && areInputsValid() && (!isUSD || (currentUsd2Cop && currentUsd2Cop > 0));
         setIsFormValid(valid);
 
         return { calculatedSubTotal, calculatedIva, calculatedTotal };
@@ -260,6 +278,18 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
 
     // Función para guardar los cambios
     const handleGuardarCambios = async () => {
+        // Add validation for TRM when USD is selected
+        if (isUSD && (!currentUsd2Cop || currentUsd2Cop <= 0)) {
+            toast({
+                title: 'TRM inválida',
+                description: 'Por favor, ingrese una TRM válida mayor que cero.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+
         try {
             // Crear una copia profunda del objeto para no modificar el estado original
             const ordenToSend = JSON.parse(JSON.stringify(ordenActual));
@@ -311,10 +341,21 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
                 </Button>
             </Flex>
 
-            <Box p={4} borderWidth="1px" borderRadius="lg">
-                <Text fontWeight="bold">Proveedor: {ordenActual.proveedor.nombre}</Text>
-                <Text>Fecha Emisión: {ordenActual.fechaEmision ? new Date(ordenActual.fechaEmision).toLocaleDateString() : '-'}</Text>
-            </Box>
+            <Flex direction="row" gap={4}>
+                <Box p={4} borderWidth="1px" borderRadius="lg" flex={2}>
+                    <Text fontWeight="bold">Proveedor: {ordenActual.proveedor.nombre}</Text>
+                    <Text>Fecha Emisión: {ordenActual.fechaEmision ? new Date(ordenActual.fechaEmision).toLocaleDateString() : '-'}</Text>
+                </Box>
+                <Flex flex={1}>
+                    <FormControl>
+                        <FormLabel>Moneda y TRM</FormLabel>
+                        <SelectCurrencyTrm
+                            currencyIsUSD={currencyIsUSDTuple}
+                            useCurrentUsd2Cop={handleTrmUpdate}
+                        />
+                    </FormControl>
+                </Flex>
+            </Flex>
 
             {/* Nuevos campos de formulario */}
             <Flex direction="row" gap={4} wrap="wrap">
@@ -366,6 +407,7 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
                 onUpdateItem={handleUpdateItem}
                 ivaEnabled={ivaEnabled}
                 onToggleIva={toggleIvaForAllItems}
+                currency={isUSD ? 'USD' : 'COP'}
             />
 
             <Flex justify="flex-end" gap={4}>

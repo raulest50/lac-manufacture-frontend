@@ -48,18 +48,20 @@ export default function StepThreeComponent({
         // Create a copy of the docIngresoDTA excluding the file property.
         const { file, ...docData } = docIngresoDTA;
 
-        // Renombrar ordenCompra a ordenCompraMateriales para que coincida con lo que espera el backend
-        const docDataWithRenamedProperty = {
-            ...docData,
-            ordenCompraMateriales: docData.ordenCompra,
-        };
-        delete docDataWithRenamedProperty.ordenCompra;
+        // Eliminar la propiedad precioUnitarioFinal de cada ítem
+        if (docData.ordenCompraMateriales && docData.ordenCompraMateriales.itemsOrdenCompra) {
+            docData.ordenCompraMateriales.itemsOrdenCompra.forEach(item => {
+                if ('precioUnitarioFinal' in item) {
+                    delete item.precioUnitarioFinal;
+                }
+            });
+        }
 
         // Build FormData.
         const formData = new FormData();
         formData.append(
             "docIngresoDTA",
-            new Blob([JSON.stringify(docDataWithRenamedProperty)], { type: "application/json" })
+            new Blob([JSON.stringify(docData)], { type: "application/json" })
         );
         formData.append("file", file);
 

@@ -147,7 +147,7 @@ export enum TipoEntidadCausante{
     OAA = "OAA", // orden de ajuste de almacen
 }
 
-export interface TransaccionAlmancen{
+export interface TransaccionAlmacen{
     transaccionId?: number;
     movimientosTransaccion: Movimiento[];
     fechaTransaccion?: string;
@@ -158,9 +158,9 @@ export interface TransaccionAlmancen{
 }
 
 export interface IngresoOCM_DTA{
-    transaccionAlmacen: TransaccionAlmancen;
-    ordenCompra: OrdenCompra;
-    user: string | undefined; // responsable del ingreso a almacen
+    transaccionAlmacen: TransaccionAlmacen;
+    ordenCompraMateriales: OrdenCompra;
+    userId: string | undefined; // responsable del ingreso a almacen
     observaciones: string;
     file: File;
 }

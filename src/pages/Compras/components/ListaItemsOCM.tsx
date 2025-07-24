@@ -28,6 +28,7 @@ interface OrdenCompraItemsProps {
     ) => void;
     ivaEnabled: boolean;
     onToggleIva: (enabled: boolean) => void;
+    currency?: string; // Nueva propiedad para la divisa
 }
 
 const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
@@ -36,6 +37,7 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                                                                onUpdateItem,
                                                                ivaEnabled,
                                                                onToggleIva,
+                                                               currency = 'COP',
                                                            }) => {
     // Calculate totals based on the items array.
     const totalSubTotal = items.reduce(
@@ -56,11 +58,11 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                         <Th>ID Materia Prima</Th>
                         <Th>Nombre</Th>
                         <Th isNumeric>Cantidad</Th>
-                        <Th isNumeric>Precio Unitario</Th>
+                        <Th isNumeric>Precio Unitario ({currency})</Th>
                         <Th isNumeric>IVA %</Th>
                         <Th isNumeric>
                             <Flex alignItems="center" justifyContent="flex-end">
-                                <Text mr={2}>IVA (COP)</Text>
+                                <Text mr={2}>IVA ({currency})</Text>
                                 <Switch 
                                     isChecked={ivaEnabled} 
                                     onChange={(e) => onToggleIva(e.target.checked)}
@@ -68,7 +70,7 @@ const ListaItemsOCM: React.FC<OrdenCompraItemsProps> = ({
                                 />
                             </Flex>
                         </Th>
-                        <Th isNumeric>Subtotal</Th>
+                        <Th isNumeric>Subtotal ({currency})</Th>
                         <Th>Acciones</Th>
                     </Tr>
                 </Thead>

@@ -9,6 +9,7 @@ window.REACT_ROUTER_SILENT_DEPRECATIONS = true;
 
 import RootLayout from "./pages/RootLayout.tsx";
 import Home from "./pages/Home.tsx"
+import { NotificationsProvider } from "./context/NotificationsContext.tsx";
 import ProductosPage from './pages/Productos/ProductosPage.tsx'
 import StockPage from "./pages/Stock/StockPage.tsx";
 import ProduccionPage from "./pages/Produccion/ProduccionPage.tsx";
@@ -38,6 +39,7 @@ import OrganigramaPage from "./pages/Organigrama/OrganigramaPage.tsx";
 import TransaccionesAlmacenPage from "./pages/TransaccionesAlmacen/TransaccionesAlmacenPage.tsx";
 import ClientesPage from "./pages/Clientes/ClientesPage.tsx";
 import VentasPage from "./pages/Ventas/VentasPage.tsx";
+import PagosProveedoresPage from "./pages/PagosProveedores/PagosProveedoresPage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -236,6 +238,15 @@ const router = createBrowserRouter(
                     }
                 />
 
+                <Route
+                    path="pagos-proveedores"
+                    element={
+                        <MultiRoleProtectedRoute supportedModules={[Modulo.PAGOS_PROVEEDORES]}>
+                            <PagosProveedoresPage/>
+                        </MultiRoleProtectedRoute>
+                    }
+                />
+
             </Route>
         </>
     ),
@@ -248,7 +259,9 @@ const router = createBrowserRouter(
 
 function App() {
     return (
-        <RouterProvider router={router} />
+        <NotificationsProvider>
+            <RouterProvider router={router} />
+        </NotificationsProvider>
     )
 }
 

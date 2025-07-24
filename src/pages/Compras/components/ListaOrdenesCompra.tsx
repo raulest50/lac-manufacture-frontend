@@ -15,6 +15,7 @@ import OrdenCompraDetails from './OrdenCompraDetails';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
 import { useAuth } from '../../../context/AuthContext';
+import { formatCOP } from '../../../utils/formatters';
 
 import CancelarOrdenDialog from './CancelarOrdenDialog';
 import ActualizarEstadoOrdenCompraDialog from "./ActualizarEstadoOrdenCompraDialog.tsx";
@@ -177,7 +178,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
                                         : '-'}
                                 </Td>
                                 <Td>{orden.proveedor ? orden.proveedor.nombre : '-'}</Td>
-                                <Td>{orden.totalPagar}</Td>
+                                <Td>{formatCOP(orden.totalPagar)}</Td>
                                 <Td>{getEstadoText(orden.estado)}</Td>
                             </Tr>
                         ))}

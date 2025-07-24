@@ -19,6 +19,9 @@ export default class EndPointsURL{
     public carga_masiva_mprims: string; // el primer endpoint para carga masiva
     public consulta_productos:string; // para buscar por categorias
 
+    // notifications endpoint
+    public module_notifications: string;
+
     // familias endpoints
     public get_familias: string;
     public save_familia: string;
@@ -185,6 +188,9 @@ export default class EndPointsURL{
         this.get_all_cargos = `${domain}/${organigrama_res}`;
         this.save_cargo_with_manual = `${domain}/${organigrama_res}/save_mfunciones`;
         this.save_changes_organigrama = `${domain}/${organigrama_res}/save_changes_organigrama`;
+
+        // notifications endpoint
+        this.module_notifications = `${domain}/notificaciones/notifications4user`;
     }
 
 

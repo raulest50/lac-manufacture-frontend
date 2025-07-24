@@ -110,8 +110,8 @@ export default function StepOneComponent({
                     idEntidadCausante: orden.ordenCompraId?.toString() || "",
                     observaciones: ""
                 },
-                ordenCompra: orden,
-                user: undefined,
+                ordenCompraMateriales: orden,
+                userId: undefined,
                 observaciones: "",
                 file: new File([], "placeholder") // Se reemplazará en StepTwo
             };

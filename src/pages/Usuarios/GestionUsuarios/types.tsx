@@ -46,5 +46,6 @@ export enum Modulo {
     ADMINISTRACION_ALERTAS = "ADMINISTRACION_ALERTAS", // ruta /administracion_alertas
     //MASTER_CONFIGS = "MASTER_CONFIGS", // ruta /master_configs
     CRONOGRAMA = "CRONOGRAMA", // ruta /cronograma
-    ORGANIGRAMA = "ORGANIGRAMA" // ruta /organigrama
+    ORGANIGRAMA = "ORGANIGRAMA", // ruta /organigrama
+    PAGOS_PROVEEDORES = "PAGOS_PROVEEDORES" // ruta /pagos-proveedores
 }

@@ -1,3 +1,4 @@
+import {Contacto} from "../Proveedores/types.tsx";
 
 export const TIPO_INCORPORACION = {
         CON_OC:'CON_OC', SIN_OC:'SIN_OC', AF_EXISTENTE:'AF_EXISTENTE'
@@ -83,4 +84,73 @@ export interface IncorporacionActivoDta {
     tipoIncorporacion?: 'CON_OC' | 'SIN_OC' | 'AF_EXISTENTE';
     id_OC_AF ?: number;
 
+}
+
+
+export interface Proveedor {
+    id: string;
+    tipoIdentificacion: number;
+    nombre: string;
+    direccion?: string;
+    regimenTributario: number;
+    ciudad?: string;
+    departamento?: string;
+    contactos: Contacto[];
+    url?: string;
+    observacion?: string;
+    categorias:number[];
+    condicionPago: string;
+    rutFile?: File;         // Optional file for RUT
+    camaraFile?: File;      // Optional file for Cámara y Comercio
+}
+
+ export interface ItemOrdenCompraActivo {
+    itemOrdenId?: number;
+    ordenCompraActivoId?: number;
+    nombre: string;
+    cantidad: number;
+    precioUnitario: number ;
+    iva: number;
+    subTotal: number;
+}
+
+export type DIVISAS = 'USD' | 'COP'; // Add other currencies as needed
+
+export interface OrdenCompraActivo {
+    ordenCompraActivoId: number;
+    fechaEmision: Date;
+    fechaVencimiento: Date;
+    proveedor: Proveedor;
+    subTotal: number;
+    iva: number;
+    totalPagar: number;
+
+    /**
+     * 0: credito
+     * 1: contado
+     */
+    condicionPago: string;
+
+    tiempoEntrega: string;
+
+    plazoPago: number;
+    /**
+     * la cotizacion principal, la que se selecciono para hacer la compra
+     */
+    cotizacionUrl: string;
+
+    /**
+     * -1: cancelada
+     *  0: pendiente liberacion
+     *  1: pendiente envio
+     *  2: pendiente recepcion
+     *  3: cerrada con éxito
+     */
+    estado: number;
+
+    divisa: DIVISAS;
+    trm: number;
+
+    facturaCompraActivoId?: number;
+    itemsOrdenCompra: ItemOrdenCompraActivo[];
 }

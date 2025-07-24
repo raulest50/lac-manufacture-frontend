@@ -1,7 +1,10 @@
 // src/components/SectionCard.tsx
-import { Card, CardHeader, CardBody, Heading, Icon } from "@chakra-ui/react";
+import { Card, CardHeader, CardBody, Heading, Icon, Box, IconButton, Popover, PopoverTrigger, PopoverContent, PopoverBody, PopoverArrow } from "@chakra-ui/react";
 import { IconType } from "react-icons";
 import { NavLink } from "react-router-dom";
+import { MdNotificationsActive } from "react-icons/md";
+import { ModuleNotificationDTA } from "../api/ModulesNotifications";
+import { useState } from "react";
 
 interface SectionCardProps {
     name: string;
@@ -13,10 +16,23 @@ interface SectionCardProps {
     currentAccesos?: string[];
     /** Background color of the card */
     bgColor?: string;
+    /** Notification for this module */
+    notification?: ModuleNotificationDTA;
 }
 
+function SectionCard({ name, icon, to, supportedModules, currentAccesos, bgColor = "blue.100", notification }: SectionCardProps) {
+    const [isOpen, setIsOpen] = useState(false);
 
-function SectionCard({ name, icon, to, supportedModules, currentAccesos, bgColor = "blue.100" }: SectionCardProps) {
+    // Log para depurar notificaciones
+    console.log(`SectionCard ${name} - notification prop:`, notification);
+
+    // Log específico para COMPRAS
+    if (supportedModules && supportedModules.includes('COMPRAS')) {
+        console.log('SectionCard COMPRAS - notification prop:', notification);
+        console.log('SectionCard COMPRAS - requireAtention:', notification?.requireAtention);
+        console.log('SectionCard COMPRAS - Condición de renderizado:', Boolean(notification && notification.requireAtention));
+    }
+
     // If supportedModules is provided, check if there's at least one module
     // in currentAccesos that is allowed, or if the user is "master".
     // If not, do not render anything.
@@ -39,11 +55,50 @@ function SectionCard({ name, icon, to, supportedModules, currentAccesos, bgColor
         ":active": {
             bg: bgColor === "red.100" ? "red.800" : "blue.800",
         },
+        position: "relative", // Necesario para posicionar el icono de notificación
+    };
+
+    // Función para manejar el clic en el icono de notificación
+    const handleNotificationClick = (e: React.MouseEvent) => {
+        console.log(`SectionCard ${name} - Notification icon clicked`);
+        e.preventDefault(); // Prevenir la navegación
+        e.stopPropagation(); // Evitar que el evento se propague
+        setIsOpen(!isOpen); // Alternar el estado del popover
     };
 
     return (
         <NavLink to={to}>
             <Card h={"full"} sx={cardStyle}>
+                {/* Icono de notificación con Popover */}
+                {notification && notification.requireAtention && (
+                    console.log(`SectionCard ${name} - Mostrando icono de notificación, requireAtention:`, notification.requireAtention),
+                    <Popover
+                        isOpen={isOpen}
+                        onClose={() => setIsOpen(false)}
+                        placement="top"
+                        closeOnBlur={true}
+                    >
+                        <PopoverTrigger>
+                            <IconButton
+                                aria-label="Notificación"
+                                icon={<MdNotificationsActive />}
+                                position="absolute"
+                                top="0.5rem"
+                                right="0.5rem"
+                                size="sm"
+                                colorScheme="red"
+                                borderRadius="full"
+                                onClick={handleNotificationClick}
+                                zIndex={1}
+                            />
+                        </PopoverTrigger>
+                        <PopoverContent>
+                            <PopoverArrow />
+                            <PopoverBody>{notification.message}</PopoverBody>
+                        </PopoverContent>
+                    </Popover>
+                )}
+
                 <CardHeader h={"40%"} borderBottom="0.1em solid" alignContent={"center"}>
                     <Heading as={"h2"} size={"sm"} fontFamily={"Comfortaa Variable"}>
                         {name}

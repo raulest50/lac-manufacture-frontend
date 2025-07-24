@@ -124,8 +124,8 @@ export default function StepTwoComponent({
                         idEntidadCausante: orden?.ordenCompraId?.toString() || "",
                         observaciones: ""
                     },
-                    ordenCompra: orden!,
-                    user: user?.toString(),
+                    ordenCompraMateriales: orden!,
+                    userId: user?.toString(),
                     observaciones: "",
                     file: file,
                 };
@@ -134,7 +134,7 @@ export default function StepTwoComponent({
             // Mantener los movimientos existentes y actualizar solo el archivo y usuario
             return {
                 ...prevState,
-                user: user?.toString(),
+                userId: user?.toString(),
                 file: file
             };
         });

@@ -105,6 +105,8 @@ export interface OrdenCompraMateriales {
      *  3: cerrada con éxito
      */
     estado: number;
+    divisas?: DIVISAS;  // COP or USD
+    trm?: number;       // Exchange rate
 }
 
 export interface OrdenCompraActivos{
@@ -139,6 +141,11 @@ export interface Activo{
     ivaPercentage: number;
 }
 
+
+export enum DIVISAS {
+    COP = "COP",
+    USD = "USD"
+}
 
 export enum TipoEnvio{
     MANUAL = "MANUAL",
