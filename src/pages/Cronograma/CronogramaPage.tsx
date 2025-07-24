@@ -1,12 +1,12 @@
 import { Container } from "@chakra-ui/react";
 import MyHeader from "../../components/MyHeader";
+import GanttDemo from "./GanttDemo";
 
 export default function CronogramaPage() {
     return (
         <Container minW={["auto", "container.lg", "container.xl"]} w="full" h="full">
             <MyHeader title="Cronograma" />
-            {/* Add your content here */}
-            <p>Página de Cronograma</p>
+            <GanttDemo />
         </Container>
     );
 }
