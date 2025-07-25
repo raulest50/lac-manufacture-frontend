@@ -4,9 +4,10 @@ import {
     getCondicionPagoText,
     getRegimenTributario,
     OrdenCompraMateriales,
-    ItemOrdenCompra, OrdenCompraActivos, ItemOCActivo,
+    ItemOrdenCompra,
 } from "./types";
 import { formatCOP } from "../../utils/formatters";
+import { OrdenCompraActivo, ItemOrdenCompraActivo } from "../ActivosFijos/types";
 
 // Extend jsPDF with properties added by jsPDF-AutoTable
 interface AutoTableProperties {
@@ -243,10 +244,10 @@ export default class PdfGenerator {
     }
 
     /**
-     * Genera un
-     * @param orden
+     * Genera un PDF para una orden de compra de activos fijos
+     * @param orden La orden de compra de activos fijos
      */
-    public async generatePDF_OCA(orden: OrdenCompraActivos): Promise<void> {
+    public async generatePDF_OCA(orden: OrdenCompraActivo): Promise<void> {
         // Create a new jsPDF instance (A4 size, mm units) and cast to our extended interface
         const doc = new jsPDF({ unit: "mm", format: "a4" }) as jsPDFWithAutoTable;
         const margin = 10;

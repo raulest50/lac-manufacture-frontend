@@ -66,7 +66,8 @@ export interface IncorporacionActivoDta {
     nombre: string;
     cantidad: number;
     precioUnitario: number ;
-    iva: number;
+    ivaPercentage: number;
+    ivaValue: number;
     subTotal: number;
 }
 

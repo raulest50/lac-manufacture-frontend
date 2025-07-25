@@ -42,6 +42,7 @@ export default function CrearOC_AF() {
     const [isUSD, setIsUSD] = useState<boolean>(false);
     const currencyIsUSDTuple: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = [isUSD, setIsUSD];
     const [currentUsd2Cop, setCurrentUsd2Cop] = useState<number>(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     const toast = useToast();
 
@@ -119,13 +120,16 @@ export default function CrearOC_AF() {
         }
 
         try {
+            // Activar estado de carga
+            setIsLoading(true);
+
             // Crear objeto de orden de compra
             const ordenCompra: OrdenCompraActivo = {
                 fechaEmision: new Date(),
                 fechaVencimiento: parse(fechaVencimiento, "yyyy-MM-dd", new Date()),
                 proveedor: selectedProveedor!,
                 subTotal: listaItemsActivos.reduce((sum, item) => sum + item.precioUnitario * item.cantidad, 0),
-                iva: listaItemsActivos.reduce((sum, item) => sum + item.iva * item.cantidad, 0),
+                iva: listaItemsActivos.reduce((sum, item) => sum + item.ivaValue * item.cantidad, 0),
                 totalPagar: listaItemsActivos.reduce((sum, item) => sum + item.subTotal, 0),
                 condicionPago: condicionPago,
                 tiempoEntrega: tiempoEntrega,
@@ -134,7 +138,10 @@ export default function CrearOC_AF() {
                 estado: 0, // pendiente liberación
                 divisa: isUSD ? 'USD' : 'COP',
                 trm: currentUsd2Cop,
-                itemsOrdenCompra: listaItemsActivos
+                itemsOrdenCompra: listaItemsActivos.map(item => ({
+                    ...item,
+                    itemOrdenId: undefined
+                }))
             };
 
             // Create FormData and append the JSON data as a Blob
@@ -173,6 +180,9 @@ export default function CrearOC_AF() {
                 duration: 5000,
                 isClosable: true,
             });
+        } finally {
+            // Desactivar estado de carga independientemente del resultado
+            setIsLoading(false);
         }
     };
 
@@ -332,6 +342,8 @@ export default function CrearOC_AF() {
                         variant={"solid"}
                         onClick={crearOCFA}
                         isDisabled={!isValidOCAF()}
+                        isLoading={isLoading}
+                        loadingText="Creando orden..."
                     >
                         Crear Orden de Compra
                     </Button>
