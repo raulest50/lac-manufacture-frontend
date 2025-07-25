@@ -36,15 +36,15 @@ export default function Home(){
 
     // pull out user, roles, logout from auth context
     const { user, roles, logout } = useAuth();
-    console.log('Home - Usuario actual:', user);
-    console.log('Home - Roles del usuario:', roles);
+//     console.log('Home - Usuario actual:', user);
+//     console.log('Home - Roles del usuario:', roles);
 
     // Get the getNotificationForModule function from the notifications context
     const { getNotificationForModule } = useNotifications();
 
     // Log específico para la notificación de COMPRAS
     const comprasNotification = getNotificationForModule('COMPRAS');
-    console.log('Home - Notificación COMPRAS:', comprasNotification);
+//     console.log('Home - Notificación COMPRAS:', comprasNotification);
 
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']}>

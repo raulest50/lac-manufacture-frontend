@@ -71,7 +71,7 @@ export default function StepThreeComponent({
                     "Content-Type": "multipart/form-data",
                 },
             });
-            console.log("DocIngreso created successfully:", response.data);
+//             console.log("DocIngreso created successfully:", response.data);
             // Optionally, proceed to the next step or update UI accordingly.
             setActiveStep(4);
         } catch (error) {

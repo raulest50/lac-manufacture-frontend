@@ -78,8 +78,8 @@ const ProveedorPicker: React.FC<ProveedorPickerProps> = ({
         if (selectedProveedorId !== null) {
             // Make sure to compare both IDs as strings
             const proveedor = proveedores.find((p) => p.id.toString() === selectedProveedorId);
-            console.log("proveedor:", proveedor);
-            console.log(proveedores)
+//             console.log("proveedor:", proveedor);
+//             console.log(proveedores)
             if (proveedor) {
                 onSelectProveedor(proveedor); // Pass the full proveedor object
             }
