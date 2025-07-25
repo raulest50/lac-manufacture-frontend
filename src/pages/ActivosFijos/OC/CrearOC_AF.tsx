@@ -1,51 +1,145 @@
 // CrearOrdenCompraActivos.tsx
 import {
     Container, Flex, FormControl, FormLabel, Input, Select,
-    useToast, Button, HStack, Spacer
+    useToast, Button, HStack
 } from "@chakra-ui/react";
 import ProveedorCard from "../../Compras/components/ProveedorCard.tsx";
-import { useState } from "react";
-import {Proveedor, ItemOCActivo, OrdenCompraActivos} from "../../Compras/types.tsx";     // ← import Activo types
+import { useState, useEffect } from "react";
+import {ItemOrdenCompraActivo, OrdenCompraActivo, Proveedor, DIVISAS} from "../types.tsx"
 import ProveedorPicker from "../../Compras/components/ProveedorPicker.tsx";
 import MyDatePicker from "../../../components/MyDatePicker.tsx";
-import { addDays, format } from "date-fns";
-import ListaItemsOCA from "../../Compras/components/ListaItemsOCA.tsx";
-import PdfGenerator from "../../Compras/pdfGenerator.tsx";
+import { addDays, format, parse } from "date-fns";
+import ListaItemsOCA from "./ListaItemsOCA.tsx";
+import axios from "axios";
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
+
 // Importar el componente SelectCurrencyTrm
 import { SelectCurrencyTrm } from "../../../components/SelectCurrencyTRM/SelectCurrencyTRM";
 
 export default function CrearOC_AF() {
+    const endpoints = new EndPointsURL();
     const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);
     const [isProveedorPickerOpen, setIsProveedorPickerOpen] = useState(false);
 
-    // NEW: state for Activos
-    const [listaItemsActivos, setListaItemsActivos] = useState<ItemOCActivo[]>([]);
+    // State for Activos
+    const [listaItemsActivos, setListaItemsActivos] = useState<ItemOrdenCompraActivo[]>([]);
 
-    const [ordenCompraId, setOrdenCompraId] = useState("");
     const [plazoPago, setPlazoPago] = useState(30);
     const [condicionPago, setCondicionPago] = useState("0");
     const [tiempoEntrega, setTiempoEntrega] = useState("15");
     const [fechaVencimiento, setFechaVencimiento] = useState(
         format(addDays(new Date(), 30), "yyyy-MM-dd")
     );
+    const [cotizacionUrl, setCotizacionUrl] = useState("");
 
-    // Nuevos estados para el manejo de moneda y TRM
+    // Estados para el manejo de moneda y TRM
     const [isUSD, setIsUSD] = useState<boolean>(false);
-    // Crear un tuple para pasar al componente SelectCurrencyTrm
     const currencyIsUSDTuple: [boolean, React.Dispatch<React.SetStateAction<boolean>>] = [isUSD, setIsUSD];
     const [currentUsd2Cop, setCurrentUsd2Cop] = useState<number>(0);
 
     const toast = useToast();
+
+    // Función para validar si la orden de compra es válida
+    const isValidOCAF = (): boolean => {
+        // Validar que haya un proveedor seleccionado
+        if (!selectedProveedor) {
+            return false;
+        }
+
+        // Validar que la lista de items no esté vacía
+        if (listaItemsActivos.length === 0) {
+            return false;
+        }
+
+        // Validar que todos los items tengan datos válidos
+        for (const item of listaItemsActivos) {
+            if (!item.nombre || item.nombre.trim() === '') {
+                return false;
+            }
+            if (item.cantidad <= 0) {
+                return false;
+            }
+            if (item.precioUnitario <= 0) {
+                return false;
+            }
+        }
+
+        // Validar otros campos requeridos
+        if (!tiempoEntrega || tiempoEntrega.trim() === '') {
+            return false;
+        }
+
+        if (condicionPago === "0" && (!plazoPago || plazoPago <= 0)) {
+            return false;
+        }
+
+        return true;
+    };
 
     // Función para actualizar el valor de TRM
     const handleTrmUpdate = (value: number) => {
         setCurrentUsd2Cop(value);
     };
 
+    const crearOCFA = async () => {
+        if (!isValidOCAF()) {
+            toast({
+                title: "Error de validación",
+                description: "Por favor complete todos los campos requeridos",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        try {
+            // Crear objeto de orden de compra
+            const ordenCompra: OrdenCompraActivo = {
+                fechaEmision: new Date(),
+                fechaVencimiento: parse(fechaVencimiento, "yyyy-MM-dd", new Date()),
+                proveedor: selectedProveedor!,
+                subTotal: listaItemsActivos.reduce((sum, item) => sum + item.precioUnitario * item.cantidad, 0),
+                iva: listaItemsActivos.reduce((sum, item) => sum + item.iva * item.cantidad, 0),
+                totalPagar: listaItemsActivos.reduce((sum, item) => sum + item.subTotal, 0),
+                condicionPago: condicionPago,
+                tiempoEntrega: tiempoEntrega,
+                plazoPago: plazoPago,
+                cotizacionUrl: cotizacionUrl,
+                estado: 0, // pendiente liberación
+                divisa: isUSD ? 'USD' : 'COP',
+                trm: currentUsd2Cop,
+                itemsOrdenCompra: listaItemsActivos
+            };
+
+            // Enviar al backend
+            const response = await axios.post(endpoints.save_orden_compra_activo, ordenCompra);
+
+            if (response.status === 201) {
+                toast({
+                    title: "Orden de compra creada",
+                    description: `Orden de compra #${response.data.ordenCompraActivoId} creada exitosamente`,
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                });
+                clearAll();
+            }
+        } catch (error) {
+            console.error("Error al crear orden de compra:", error);
+            toast({
+                title: "Error",
+                description: "Ocurrió un error al crear la orden de compra",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        }
+    };
+
     const clearAll = () => {
         setSelectedProveedor(null);
         setListaItemsActivos([]);
-        setOrdenCompraId("");
         setPlazoPago(30);
         setCondicionPago("0");
         setTiempoEntrega("15");
@@ -53,6 +147,7 @@ export default function CrearOC_AF() {
         setIsProveedorPickerOpen(false);
         setIsUSD(false);
         setCurrentUsd2Cop(0);
+        setCotizacionUrl("");
     }
 
     return (
@@ -121,6 +216,15 @@ export default function CrearOC_AF() {
                             label = {"Fecha de Vencimiento Orden"}
                         />
                     </Flex>
+
+                    <FormControl mt={4}>
+                        <FormLabel>URL de Cotización</FormLabel>
+                        <Input
+                            value={cotizacionUrl}
+                            onChange={(e) => setCotizacionUrl(e.target.value)}
+                            placeholder="https://ejemplo.com/cotizacion.pdf"
+                        />
+                    </FormControl>
                 </Flex>
 
                 {/* pass down Activos list + setter */}
@@ -137,7 +241,16 @@ export default function CrearOC_AF() {
                     >
                         Limpiar Campos
                     </Button>
-                    {/* El botón para generar PDF se ha movido al tab de búsqueda de órdenes de compra */}
+
+                    <Button
+                        colorScheme={"teal"}
+                        variant={"solid"}
+                        onClick={crearOCFA}
+                        isDisabled={!isValidOCAF()}
+                    >
+                        Crear Orden de Compra
+                    </Button>
+
                 </HStack>
 
             </Flex>

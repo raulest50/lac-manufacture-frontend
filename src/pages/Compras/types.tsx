@@ -109,38 +109,6 @@ export interface OrdenCompraMateriales {
     trm?: number;       // Exchange rate
 }
 
-export interface OrdenCompraActivos{
-    ordenCompraId: string;
-    fechaEmision: string;
-    fechaVencimiento: string;
-    proveedor: Proveedor;
-    itemsOrdenCompra: ItemOCActivo[];
-    subTotal: number;
-    ivaValue: number;
-    totalPagar: number;
-    condicionPago: string;
-    tiempoEntrega: string;
-    plazoPago: number;
-    moneda?: string;  // 'USD' o 'COP'
-    trm?: number;     // Tasa de cambio USD a COP
-}
-
-export interface ItemOCActivo{
-    itemOrdenId: number;
-    activo: Activo;
-    cantidad: number;
-    subTotal: number;
-}
-
-export interface Activo{
-    [key: string]: string | number;    // ← index signature
-    idActivo: string;
-    descripcion: string;
-    precio: number;
-    ivaValue: number;
-    ivaPercentage: number;
-}
-
 
 export enum DIVISAS {
     COP = "COP",

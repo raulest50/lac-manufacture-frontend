@@ -5,12 +5,12 @@ import {
     Button, IconButton, Flex, Text, Tfoot
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
-import { ItemOCActivo } from "../types.tsx";
+import {ItemOrdenCompraActivo} from "../types.tsx"
 import {Dispatch, FC, SetStateAction, useMemo} from "react";
 
 interface Props {
-    items: ItemOCActivo[];
-    setItems: Dispatch<SetStateAction<ItemOCActivo[]>>;
+    items: ItemOrdenCompraActivo[];
+    setItems: Dispatch<SetStateAction<ItemOrdenCompraActivo[]>>;
 }
 
 const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
@@ -20,14 +20,10 @@ const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
             ...items,
             {
                 itemOrdenId: Date.now(),
-                activo: {
-                    idActivo: "",
-                    descripcion: "",
-                    precio: 0,
-                    ivaValue: 0,
-                    ivaPercentage: 0
-                },
+                nombre: "",
                 cantidad: 1,
+                precioUnitario: 0,
+                iva: 0,
                 subTotal: 0
             }
         ]);
@@ -41,7 +37,7 @@ const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
     // update a cell and recompute IVA & subtotal
     const updateRow = (
         idx: number,
-        field: keyof ItemOCActivo["activo"] | "cantidad",
+        field: keyof Omit<ItemOrdenCompraActivo, "itemOrdenId" | "ordenCompraActivoId" | "subTotal">,
         raw: string | number
     ) => {
         const newItems = [...items];
@@ -49,29 +45,29 @@ const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
 
         if (field === "cantidad") {
             row.cantidad = Number(raw);
-        } else {
-
-            row.activo[field] = typeof raw === "string" ? raw : Number(raw);
+        } else if (field === "precioUnitario") {
+            row.precioUnitario = Number(raw);
+        } else if (field === "iva") {
+            row.iva = Number(raw);
+        } else if (field === "nombre") {
+            row.nombre = String(raw);
         }
 
-        // recompute ivaValue and subTotal
-        const { precio, ivaPercentage } = row.activo;
-        const ivaValue = precio * (ivaPercentage / 100);
-        row.activo.ivaValue = ivaValue;
-        row.subTotal = (precio + ivaValue) * row.cantidad;
+        // recompute subTotal
+        row.subTotal = (row.precioUnitario + row.iva) * row.cantidad;
 
         setItems(newItems);
     };
 
-    // 1. Totals
+    // Totals
     const { totalIva, totalBeforeIva, totalAfterIva } = useMemo(() => {
-        const totIva   = items.reduce((sum, row) => sum + row.activo.ivaValue * row.cantidad, 0);
-        const totBase  = items.reduce((sum, row) => sum + row.activo.precio    * row.cantidad, 0);
+        const totIva   = items.reduce((sum, row) => sum + row.iva * row.cantidad, 0);
+        const totBase  = items.reduce((sum, row) => sum + row.precioUnitario * row.cantidad, 0);
         const totAll   = items.reduce((sum, row) => sum + row.subTotal, 0);
         return {
-            totalIva:     totIva,
+            totalIva: totIva,
             totalBeforeIva: totBase,
-            totalAfterIva:  totAll,
+            totalAfterIva: totAll,
         };
     }, [items]);
 
@@ -87,13 +83,11 @@ const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
             <Table variant="striped" size="sm">
                 <Thead>
                     <Tr>
-                        <Th w={"15%"}>Id Activo</Th>
-                        <Th w={"30%"}>Descripción</Th>
+                        <Th w={"40%"}>Descripción</Th>
                         <Th w={"15%"} isNumeric>Precio</Th>
-                        <Th w={"10%"} isNumeric>% IVA</Th>
-                        <Th w={"10%"} isNumeric>Valor IVA</Th>
-                        <Th w={"5%"} isNumeric>Cantidad</Th>
-                        <Th w={"10%"} isNumeric>Subtotal</Th>
+                        <Th w={"15%"} isNumeric>IVA</Th>
+                        <Th w={"10%"} isNumeric>Cantidad</Th>
+                        <Th w={"15%"} isNumeric>Subtotal</Th>
                         <Th w={"5%"}>Acción</Th>
                     </Tr>
                 </Thead>
@@ -103,26 +97,17 @@ const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
                             <Td>
                                 <Input
                                     size="sm"
-                                    value={item.activo.idActivo}
+                                    value={item.nombre}
                                     onChange={e =>
-                                        updateRow(idx, "idActivo", e.target.value)
-                                    }
-                                />
-                            </Td>
-                            <Td>
-                                <Input
-                                    size="sm"
-                                    value={item.activo.descripcion}
-                                    onChange={e =>
-                                        updateRow(idx, "descripcion", e.target.value)
+                                        updateRow(idx, "nombre", e.target.value)
                                     }
                                 />
                             </Td>
                             <Td isNumeric>
                                 <NumberInput
                                     size="sm"
-                                    value={item.activo.precio}
-                                    onChange={(_, val) => updateRow(idx, "precio", val)}
+                                    value={item.precioUnitario}
+                                    onChange={(_, val) => updateRow(idx, "precioUnitario", val)}
                                     min={0}
                                 >
                                     <NumberInputField />
@@ -131,17 +116,14 @@ const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
                             <Td isNumeric>
                                 <NumberInput
                                     size="sm"
-                                    value={item.activo.ivaPercentage}
+                                    value={item.iva}
                                     onChange={(_, val) =>
-                                        updateRow(idx, "ivaPercentage", val)
+                                        updateRow(idx, "iva", val)
                                     }
                                     min={0}
                                 >
                                     <NumberInputField />
                                 </NumberInput>
-                            </Td>
-                            <Td isNumeric>
-                                {item.activo.ivaValue.toFixed(2)}
                             </Td>
                             <Td isNumeric>
                                 <NumberInput
@@ -169,7 +151,7 @@ const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
                 <Tfoot>
                     {/* Total before IVA */}
                     <Tr>
-                        <Td colSpan={6} textAlign="right">
+                        <Td colSpan={4} textAlign="right">
                             <strong>Total antes de IVA</strong>
                         </Td>
                         <Td isNumeric fontWeight="bold">
@@ -179,7 +161,7 @@ const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
                     </Tr>
                     {/* Total IVA row */}
                     <Tr>
-                        <Td colSpan={6} textAlign={"right"}>
+                        <Td colSpan={4} textAlign={"right"}>
                             <strong>Total IVA</strong>
                         </Td>
                         <Td isNumeric fontWeight="bold">
@@ -188,14 +170,13 @@ const ListaItemsOCA: FC<Props> = ({ items, setItems }) => {
                     </Tr>
                     {/* Total with IVA */}
                     <Tr>
-                        <Td colSpan={6} textAlign={"right"}>
+                        <Td colSpan={4} textAlign={"right"}>
                             <strong>Total despues de IVA</strong>
                         </Td>
                         <Td isNumeric fontWeight="bold">{totalAfterIva.toFixed(2)}</Td>
                         <Td />
                     </Tr>
                 </Tfoot>
-
             </Table>
         </Flex>
     );

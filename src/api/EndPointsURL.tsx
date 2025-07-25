@@ -83,6 +83,14 @@ export default class EndPointsURL{
     public save_cargo_with_manual: string;
     public save_changes_organigrama: string;
 
+    // activos fijos endpoints
+    public save_orden_compra_activo: string;
+    public search_ordenes_compra_activo: string;
+    public get_orden_compra_activo_by_id: string;
+    public cancel_orden_compra_activo: string;
+    public get_items_by_orden_compra_activo_id: string;
+    public update_orden_compra_activo: string;
+
     // just in case of need
     // contabilidad resource
     public get_cuentas: string;
@@ -188,6 +196,15 @@ export default class EndPointsURL{
         this.get_all_cargos = `${domain}/${organigrama_res}`;
         this.save_cargo_with_manual = `${domain}/${organigrama_res}/save_mfunciones`;
         this.save_changes_organigrama = `${domain}/${organigrama_res}/save_changes_organigrama`;
+
+        // activos fijos endpoints
+        const activos_fijos_res = 'api/activos-fijos';
+        this.save_orden_compra_activo = `${domain}/${activos_fijos_res}/save_ocaf`;
+        this.search_ordenes_compra_activo = `${domain}/${activos_fijos_res}/ocaf/search`;
+        this.get_orden_compra_activo_by_id = `${domain}/${activos_fijos_res}/ocaf/{ordenCompraActivoId}`;
+        this.cancel_orden_compra_activo = `${domain}/${activos_fijos_res}/ocaf/{ordenCompraActivoId}/cancel`;
+        this.get_items_by_orden_compra_activo_id = `${domain}/${activos_fijos_res}/ocaf/{ordenCompraActivoId}/items`;
+        this.update_orden_compra_activo = `${domain}/${activos_fijos_res}/ocaf/{ordenCompraActivoId}/update`;
 
         // notifications endpoint
         this.module_notifications = `${domain}/notificaciones/notifications4user`;

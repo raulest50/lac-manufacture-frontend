@@ -117,7 +117,7 @@ export interface Proveedor {
 export type DIVISAS = 'USD' | 'COP'; // Add other currencies as needed
 
 export interface OrdenCompraActivo {
-    ordenCompraActivoId: number;
+    ordenCompraActivoId?: number;
     fechaEmision: Date;
     fechaVencimiento: Date;
     proveedor: Proveedor;
@@ -153,4 +153,5 @@ export interface OrdenCompraActivo {
 
     facturaCompraActivoId?: number;
     itemsOrdenCompra: ItemOrdenCompraActivo[];
+
 }
