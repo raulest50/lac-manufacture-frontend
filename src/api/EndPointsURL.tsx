@@ -73,6 +73,7 @@ export default class EndPointsURL{
 
     // integrantes de personal
     public save_integrante_personal: string;
+    public search_integrantes_personal: string;
 
     // bulk uploads por link
     public bulk_upload_proveedores: string;
@@ -185,6 +186,7 @@ export default class EndPointsURL{
 
         // integrantes de personal endpoints
         this.save_integrante_personal = `${domain}/${personal_res}/save`;
+        this.search_integrantes_personal = `${domain}/${personal_res}/search`;
 
         // contabilidad endpoints
         this.get_cuentas = `${domain}/${contabilidad_res}/cuentas`;
