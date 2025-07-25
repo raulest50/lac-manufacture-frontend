@@ -333,6 +333,8 @@ export default class PdfGenerator {
         entregaY += 3;
         doc.text(`PLAZO ENTREGA: ${orden.tiempoEntrega} DIAS`, detailX, entregaY);
         entregaY += 3;
+        doc.text(`DIVISA: ${orden.divisa}${orden.divisa === 'USD' ? ` - TRM: ${formatCOP(orden.trm, 2)}` : ''}`, detailX, entregaY);
+        entregaY += 3;
         doc.text("CONDICION ENTREGA: PUESTA EN PLANTA", detailX, entregaY);
 
 
