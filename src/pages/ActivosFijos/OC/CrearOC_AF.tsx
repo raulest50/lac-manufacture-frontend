@@ -217,14 +217,23 @@ export default function CrearOC_AF() {
 
                         {/* File upload component moved here */}
                         <FormControl>
-                            <FormLabel>Archivo de Cotización (PDF)</FormLabel>
+                            <FormLabel>Archivo de Cotización (PDF) (Opcional)</FormLabel>
                             <VStack spacing={4} align="stretch" alignItems="center">
                                 <Icon
                                     as={cotizacionFile ? FaFileCircleCheck : FaFileCircleQuestion}
                                     boxSize="4em"
                                     color={cotizacionFile ? "green" : "orange.500"}
                                 />
-                                <Button onClick={() => cotizacionInputRef.current?.click()}>
+                                <Button 
+                                    onClick={() => {
+                                        // Usar setTimeout para asegurar que el click se ejecute después del renderizado
+                                        setTimeout(() => {
+                                            if (cotizacionInputRef.current) {
+                                                cotizacionInputRef.current.click();
+                                            }
+                                        }, 0);
+                                    }}
+                                >
                                     {cotizacionFile ? "Cambiar archivo" : "Seleccionar archivo"}
                                 </Button>
                                 {cotizacionFile && (
@@ -244,14 +253,15 @@ export default function CrearOC_AF() {
                                         <FormLabel mb={0}>{cotizacionFile.name}</FormLabel>
                                     </HStack>
                                 )}
-                                <Input
-                                    type="file"
-                                    ref={cotizacionInputRef}
-                                    style={{ display: 'none' }}
-                                    accept="application/pdf"
-                                    onChange={handleCotizacionChange}
-                                />
                             </VStack>
+                            {/* Mover el input fuera del VStack */}
+                            <Input
+                                type="file"
+                                ref={cotizacionInputRef}
+                                style={{ display: 'none' }}
+                                accept="application/pdf"
+                                onChange={handleCotizacionChange}
+                            />
                         </FormControl>
                     </Flex>
                 </Flex>
