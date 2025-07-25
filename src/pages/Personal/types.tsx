@@ -55,3 +55,9 @@ export enum EstadoIntegrante {
     ACTIVO = 'ACTIVO',
     INACTIVO = 'INACTIVO'
 }
+
+export function getEstadoIntegranteText(estado?: EstadoIntegrante) {
+    if (estado === EstadoIntegrante.ACTIVO) return 'Activo';
+    if (estado === EstadoIntegrante.INACTIVO) return 'Inactivo';
+    return '';
+}
