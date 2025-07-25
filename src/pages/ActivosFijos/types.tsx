@@ -97,3 +97,12 @@ export interface OrdenCompraActivo {
     facturaCompraActivoId?: number;
     itemsOrdenCompra: ItemOrdenCompraActivo[];
 }
+
+export function getEstadoOCAFText(estado: number) {
+    if (estado === -1) return 'Cancelada';
+    if (estado === 0) return 'Pendiente liberacion';
+    if (estado === 1) return 'Pendiente envio';
+    if (estado === 2) return 'Pendiente recepcion';
+    if (estado === 3) return 'Cerrada exitosamente';
+    return '';
+}
