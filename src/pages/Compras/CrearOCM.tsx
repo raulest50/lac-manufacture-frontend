@@ -207,7 +207,7 @@ export default function CrearOCM() {
                 nuevaOrdenCompra,
                 { headers: { 'Content-Type': 'application/json' } }
             );
-            console.log(response.data);
+//             console.log(response.data);
             toast({
                 title: 'Orden de compra creada',
                 description: 'La orden de compra ha sido creada exitosamente.',

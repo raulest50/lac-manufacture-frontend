@@ -64,7 +64,7 @@ export default function UserViewer({setViewMode}:Props) {
 
     const handleUserSelect = (user: User) => {
         setSelectedUser(user);
-        console.log(user.accesos);
+//         console.log(user.accesos);
         setSelectedAcceso(null);
     };
 

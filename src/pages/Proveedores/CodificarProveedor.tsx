@@ -315,7 +315,7 @@ function CodificarProveedor() {
             const response = await axios.post(endPoints.save_proveedores, formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
-            console.log('Proveedor registrado exitosamente:', response.data);
+//             console.log('Proveedor registrado exitosamente:', response.data);
 
             toast({
                 title: 'Proveedor registrado',

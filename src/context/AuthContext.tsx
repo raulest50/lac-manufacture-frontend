@@ -49,23 +49,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [roles, setRoles] = useState<string[]>([]);
 
     useEffect(() => {
-        console.log('AuthContext - Inicializando contexto de autenticación');
+//         console.log('AuthContext - Inicializando contexto de autenticación');
         const token = localStorage.getItem('authToken');
-        console.log('AuthContext - Token encontrado:', Boolean(token));
+//         console.log('AuthContext - Token encontrado:', Boolean(token));
 
         if (token) {
             // Configurar el header de autorización con el token guardado
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            console.log('AuthContext - Header de autorización configurado');
+//             console.log('AuthContext - Header de autorización configurado');
 
             // Decodificar el token para obtener el usuario y los roles
             try {
                 const decodedToken = jwtDecode<JwtPayload>(token);
-                console.log('AuthContext - Token decodificado:', decodedToken);
+//                 console.log('AuthContext - Token decodificado:', decodedToken);
 
                 // Establecer el usuario si está disponible en el token
                 if (decodedToken.sub) {
-                    console.log('AuthContext - Usuario encontrado en token:', decodedToken.sub);
+//                     console.log('AuthContext - Usuario encontrado en token:', decodedToken.sub);
                     setUser(decodedToken.sub);
                 }
 
@@ -73,15 +73,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 if (decodedToken.accesos) {
                     // Split the comma-separated string into an array of role strings
                     const userRoles = decodedToken.accesos.split(',');
-                    console.log('AuthContext - Roles encontrados en token:', userRoles);
+//                     console.log('AuthContext - Roles encontrados en token:', userRoles);
                     setRoles(userRoles);
                 } else if (decodedToken.sub === 'master') {
                     // Si el usuario es 'master', darle acceso a todo incondicionalmente
-                    console.log('AuthContext - Usuario master, asignando ROLE_MASTER');
+//                     console.log('AuthContext - Usuario master, asignando ROLE_MASTER');
                     setRoles(['ROLE_MASTER']);
                 } else {
                     // Sin accesos asignados, no debe tener acceso a ningún módulo
-                    console.log('AuthContext - No se encontraron accesos en el token');
+//                     console.log('AuthContext - No se encontraron accesos en el token');
                     setRoles([]);
                 }
             } catch (error) {
@@ -92,16 +92,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 delete axios.defaults.headers.common['Authorization'];
             }
         } else {
-            console.log('AuthContext - No se encontró token, usuario no autenticado');
+//             console.log('AuthContext - No se encontró token, usuario no autenticado');
         }
     }, []);
 
     // Login with JWT authentication
     const login = async (username: string, password: string) => {
-        console.log('AuthContext - Iniciando proceso de login para usuario:', username);
+//         console.log('AuthContext - Iniciando proceso de login para usuario:', username);
         try {
             // Usar el nuevo endpoint de autenticación JWT
-            console.log('AuthContext - Enviando solicitud a:', endPoints.login);
+//             console.log('AuthContext - Enviando solicitud a:', endPoints.login);
             const response = await fetch(endPoints.login, {
                 method: 'POST',
                 headers: {
@@ -116,32 +116,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             const authData = await response.json() as LoginResponse;
-            console.log('AuthContext - Login exitoso, datos recibidos:', { username: authData.username, tokenRecibido: Boolean(authData.token) });
+//             console.log('AuthContext - Login exitoso, datos recibidos:', { username: authData.username, tokenRecibido: Boolean(authData.token) });
 
             // Guardar el token JWT
             const token = authData.token;
 
             // Establecer el usuario desde la respuesta
             setUser(authData.username);
-            console.log('AuthContext - Usuario establecido:', authData.username);
+//             console.log('AuthContext - Usuario establecido:', authData.username);
 
             // Decodificar el token JWT para obtener los roles
             try {
                 const decodedToken = jwtDecode<JwtPayload>(token);
-                console.log('AuthContext - Token decodificado en login:', decodedToken);
+//                 console.log('AuthContext - Token decodificado en login:', decodedToken);
 
                 if (decodedToken.accesos) {
                     // Split the comma-separated string into an array of role strings
                     const userRoles = decodedToken.accesos.split(',');
-                    console.log('AuthContext - Roles encontrados en login:', userRoles);
+//                     console.log('AuthContext - Roles encontrados en login:', userRoles);
                     setRoles(userRoles);
                 } else if (authData.username === 'master') {
                     // Si el usuario es 'master', darle acceso a todo incondicionalmente
-                    console.log('AuthContext - Usuario master en login, asignando ROLE_MASTER');
+//                     console.log('AuthContext - Usuario master en login, asignando ROLE_MASTER');
                     setRoles(['ROLE_MASTER']);
                 } else {
                     // Sin accesos asignados, no debe tener acceso a ningún módulo
-                    console.log('AuthContext - No se encontraron accesos en login');
+//                     console.log('AuthContext - No se encontraron accesos en login');
                     setRoles([]);
                 }
             } catch (error) {
@@ -149,22 +149,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 // Verificar si el usuario es 'master' incluso en caso de error
                 if (authData.username === 'master') {
                     // Si el usuario es 'master', darle acceso a todo incondicionalmente
-                    console.log('AuthContext - Usuario master en caso de error, asignando ROLE_MASTER');
+//                     console.log('AuthContext - Usuario master en caso de error, asignando ROLE_MASTER');
                     setRoles(['ROLE_MASTER']);
                 } else {
                     // Sin accesos asignados en caso de error, no debe tener acceso a ningún módulo
-                    console.log('AuthContext - No se asignan roles en caso de error');
+//                     console.log('AuthContext - No se asignan roles en caso de error');
                     setRoles([]);
                 }
             }
 
             // Configurar el header de autorización para futuras peticiones
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            console.log('AuthContext - Header de autorización configurado en login');
+//             console.log('AuthContext - Header de autorización configurado en login');
 
             // Opcional: Guardar el token en localStorage para persistencia
             localStorage.setItem('authToken', token);
-            console.log('AuthContext - Token guardado en localStorage');
+//             console.log('AuthContext - Token guardado en localStorage');
 
             return authData;
         } catch (error) {
@@ -174,17 +174,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const logout = () => {
-        console.log('AuthContext - Iniciando proceso de logout');
+//         console.log('AuthContext - Iniciando proceso de logout');
         setUser(null);
-        console.log('AuthContext - Usuario establecido a null');
+//         console.log('AuthContext - Usuario establecido a null');
         setRoles([]);
-        console.log('AuthContext - Roles establecidos a array vacío');
+//         console.log('AuthContext - Roles establecidos a array vacío');
         // Eliminar el header de autorización
         delete axios.defaults.headers.common['Authorization'];
-        console.log('AuthContext - Header de autorización eliminado');
+//         console.log('AuthContext - Header de autorización eliminado');
         // Eliminar el token del localStorage
         localStorage.removeItem('authToken');
-        console.log('AuthContext - Token eliminado de localStorage');
+//         console.log('AuthContext - Token eliminado de localStorage');
     };
 
     return (

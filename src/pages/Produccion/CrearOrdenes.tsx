@@ -45,7 +45,7 @@ export default function CrearOrdenes() {
                 // Trigger a refresh in RecetaPicker to update stocks
                 if (recetaPickerRef.current) {
                     recetaPickerRef.current.refresh();
-                    console.log("entered the if refresh")
+//                     console.log("entered the if refresh")
                 }
             } catch (error) {
                 console.error('Error creating orden de producción:', error);

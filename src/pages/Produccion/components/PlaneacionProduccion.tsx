@@ -176,7 +176,7 @@ const mockTerminados: Terminado[] = [
 const PlaneacionProduccion: React.FC = () => {
   // Función para calcular órdenes de producción (sin implementar aún)
   const calcularOrdenesProduccion = () => {
-    console.log("Calculando órdenes de producción necesarias...");
+//     console.log("Calculando órdenes de producción necesarias...");
     // Aquí iría la lógica para calcular las órdenes de producción
     alert("Funcionalidad en desarrollo");
   };

@@ -24,13 +24,13 @@ function SectionCard({ name, icon, to, supportedModules, currentAccesos, bgColor
     const [isOpen, setIsOpen] = useState(false);
 
     // Log para depurar notificaciones
-    console.log(`SectionCard ${name} - notification prop:`, notification);
+//     console.log(`SectionCard ${name} - notification prop:`, notification);
 
     // Log específico para COMPRAS
     if (supportedModules && supportedModules.includes('COMPRAS')) {
-        console.log('SectionCard COMPRAS - notification prop:', notification);
-        console.log('SectionCard COMPRAS - requireAtention:', notification?.requireAtention);
-        console.log('SectionCard COMPRAS - Condición de renderizado:', Boolean(notification && notification.requireAtention));
+//         console.log('SectionCard COMPRAS - notification prop:', notification);
+//         console.log('SectionCard COMPRAS - requireAtention:', notification?.requireAtention);
+//         console.log('SectionCard COMPRAS - Condición de renderizado:', Boolean(notification && notification.requireAtention));
     }
 
     // If supportedModules is provided, check if there's at least one module
@@ -60,7 +60,7 @@ function SectionCard({ name, icon, to, supportedModules, currentAccesos, bgColor
 
     // Función para manejar el clic en el icono de notificación
     const handleNotificationClick = (e: React.MouseEvent) => {
-        console.log(`SectionCard ${name} - Notification icon clicked`);
+//         console.log(`SectionCard ${name} - Notification icon clicked`);
         e.preventDefault(); // Prevenir la navegación
         e.stopPropagation(); // Evitar que el evento se propague
         setIsOpen(!isOpen); // Alternar el estado del popover
@@ -71,7 +71,7 @@ function SectionCard({ name, icon, to, supportedModules, currentAccesos, bgColor
             <Card h={"full"} sx={cardStyle}>
                 {/* Icono de notificación con Popover */}
                 {notification && notification.requireAtention && (
-                    console.log(`SectionCard ${name} - Mostrando icono de notificación, requireAtention:`, notification.requireAtention),
+//                     console.log(`SectionCard ${name} - Mostrando icono de notificación, requireAtention:`, notification.requireAtention),
                     <Popover
                         isOpen={isOpen}
                         onClose={() => setIsOpen(false)}

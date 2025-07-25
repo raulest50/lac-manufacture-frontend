@@ -22,14 +22,14 @@ type Props = {
 export function StepOneFormulario({ setActiveStep, setIncorporacionActivoHeader }: Props) {
   // Declare functions for handling card clicks
   const handleConOCClick = () => {
-    console.log("Incorporacion con OC seleccionada");
+//     console.log("Incorporacion con OC seleccionada");
     // Update the incorporacionActivoHeader with the selected type
     setIncorporacionActivoHeader({ tipoIncorporacion: 'CON_OC' });
     setActiveStep(2);
   };
 
   const handleSinOCClick = () => {
-    console.log("Incorporacion sin OC seleccionada");
+//     console.log("Incorporacion sin OC seleccionada");
     // Update the incorporacionActivoHeader with the selected type
     setIncorporacionActivoHeader({ tipoIncorporacion: 'SIN_OC' });
     setActiveStep(2);

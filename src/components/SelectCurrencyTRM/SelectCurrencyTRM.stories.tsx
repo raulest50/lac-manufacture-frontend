@@ -15,7 +15,7 @@ export const Default = () => {
   
   const handleUsd2CopChange = (value: number) => {
     setCurrentUsd2Cop(value);
-    console.log('TRM actualizada:', value);
+//     console.log('TRM actualizada:', value);
   };
 
   return (
@@ -41,7 +41,7 @@ export const InitialCOP = () => {
   
   const handleUsd2CopChange = (value: number) => {
     setCurrentUsd2Cop(value);
-    console.log('TRM actualizada:', value);
+//     console.log('TRM actualizada:', value);
   };
 
   return (
