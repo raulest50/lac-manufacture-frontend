@@ -1,4 +1,4 @@
-import {Contacto} from "../Proveedores/types.tsx";
+import {Proveedor} from "../Compras/types.tsx";
 
 export const TIPO_INCORPORACION = {
         CON_OC:'CON_OC', SIN_OC:'SIN_OC', AF_EXISTENTE:'AF_EXISTENTE'
@@ -9,29 +9,15 @@ export enum MetodoDepreciacion {
     DB = "DB",
 }
 
+export interface DepreciacionActivo{}
+export interface MantenimientoActivo{}
+
 export interface ActivoFijo {
-    // llave primaria
     id: string;
-
-    nombre: string;
-
-    /**
-     * diferente de proveedor. ej:
-     * un proveedor puede vender laptop Dell pero no es el fabricante
-     */
-    brand?: string;
-
-    /**
-     * URL a la ficha técnica del activo
-     */
-    url?: string;
-
-    /**
-     * 0: activo
-     * 1: obsoleto
-     * 2: dado de baja
-     */
-    estado: number;
+    nombre: string; // nombre que se le desea asignar en el sistema
+    brand?: string; // ejemplo dell, fluke, lenovo etc. puede ser el mismo o diferente del proveedor segun el caso
+    url?: string; // ruta ficha tecnia, la establece el backend con el multiparfile adjunto.
+    estado: number; // 0:activo, 1:obsoleto, 2:dado de baja
 
     fechaCodificacion?: Date | string;
 
@@ -54,16 +40,7 @@ export interface ActivoFijo {
     documentosBaja?: DocumentoBajaActivo[];
 }
 
-// Interfaces relacionadas que deberían definirse según sea necesario
-interface DepreciacionActivo {
-    // Propiedades según el modelo de backend
-}
-
 interface TrasladoActivo {
-    // Propiedades según el modelo de backend
-}
-
-interface MantenimientoActivo {
     // Propiedades según el modelo de backend
 }
 
@@ -75,10 +52,6 @@ interface DocumentoBajaActivo {
     // Propiedades según el modelo de backend
 }
 
-export interface OrdenCompraActivo{
-
-}
-
 
 export interface IncorporacionActivoDta {
     tipoIncorporacion?: 'CON_OC' | 'SIN_OC' | 'AF_EXISTENTE';
@@ -86,23 +59,6 @@ export interface IncorporacionActivoDta {
 
 }
 
-
-export interface Proveedor {
-    id: string;
-    tipoIdentificacion: number;
-    nombre: string;
-    direccion?: string;
-    regimenTributario: number;
-    ciudad?: string;
-    departamento?: string;
-    contactos: Contacto[];
-    url?: string;
-    observacion?: string;
-    categorias:number[];
-    condicionPago: string;
-    rutFile?: File;         // Optional file for RUT
-    camaraFile?: File;      // Optional file for Cámara y Comercio
-}
 
  export interface ItemOrdenCompraActivo {
     itemOrdenId?: number;
@@ -124,21 +80,10 @@ export interface OrdenCompraActivo {
     subTotal: number;
     iva: number;
     totalPagar: number;
-
-    /**
-     * 0: credito
-     * 1: contado
-     */
-    condicionPago: string;
-
+    condicionPago: string; // 0:credito, 1:contado
     tiempoEntrega: string;
-
     plazoPago: number;
-    /**
-     * la cotizacion principal, la que se selecciono para hacer la compra
-     */
-    cotizacionUrl: string;
-
+    cotizacionUrl?: string; // la asigna el backend cuando se adjunta la cotizacion en pdf (multipartfile)
     /**
      * -1: cancelada
      *  0: pendiente liberacion
@@ -147,11 +92,8 @@ export interface OrdenCompraActivo {
      *  3: cerrada con éxito
      */
     estado: number;
-
     divisa: DIVISAS;
     trm: number;
-
     facturaCompraActivoId?: number;
     itemsOrdenCompra: ItemOrdenCompraActivo[];
-
 }

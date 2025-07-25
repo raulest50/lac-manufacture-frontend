@@ -1,7 +1,9 @@
 import {Card, CardBody, CardHeader, Flex} from '@chakra-ui/react';
+import {ActivoFijo, ItemOrdenCompraActivo} from "../../types.tsx";
 
 type Props = {
-    
+    itemOrdenCompraActivo: ItemOrdenCompraActivo;
+    setActivoFijoGroup: (activoFijoGroup: ActivoFijo[]) => void;
 };
 
 /**

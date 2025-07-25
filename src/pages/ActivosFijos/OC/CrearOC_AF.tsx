@@ -1,11 +1,13 @@
 // CrearOrdenCompraActivos.tsx
 import {
     Container, Flex, FormControl, FormLabel, Input, Select,
-    useToast, Button, HStack
+    useToast, Button, HStack, Icon, VStack
 } from "@chakra-ui/react";
 import ProveedorCard from "../../Compras/components/ProveedorCard.tsx";
-import { useState, useEffect } from "react";
-import {ItemOrdenCompraActivo, OrdenCompraActivo, Proveedor, DIVISAS} from "../types.tsx"
+import { useState, useRef } from "react";
+import { FaFileCircleQuestion, FaFileCircleCheck } from "react-icons/fa6";
+import {ItemOrdenCompraActivo, OrdenCompraActivo} from "../types.tsx"
+import {Proveedor} from "../../Compras/types.tsx"
 import ProveedorPicker from "../../Compras/components/ProveedorPicker.tsx";
 import MyDatePicker from "../../../components/MyDatePicker.tsx";
 import { addDays, format, parse } from "date-fns";
@@ -30,7 +32,11 @@ export default function CrearOC_AF() {
     const [fechaVencimiento, setFechaVencimiento] = useState(
         format(addDays(new Date(), 30), "yyyy-MM-dd")
     );
-    const [cotizacionUrl, setCotizacionUrl] = useState("");
+
+    // Replace cotizacionUrl with cotizacionFile
+    const [cotizacionFile, setCotizacionFile] = useState<File | null>(null);
+    // Ref for hidden file input
+    const cotizacionInputRef = useRef<HTMLInputElement>(null);
 
     // Estados para el manejo de moneda y TRM
     const [isUSD, setIsUSD] = useState<boolean>(false);
@@ -38,6 +44,25 @@ export default function CrearOC_AF() {
     const [currentUsd2Cop, setCurrentUsd2Cop] = useState<number>(0);
 
     const toast = useToast();
+
+    // Handle file selection for cotización
+    const handleCotizacionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (!file.name.toLowerCase().endsWith('.pdf')) {
+                toast({
+                    title: "Tipo de archivo no permitido",
+                    description: "Solo se permiten archivos PDF para la cotización.",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                });
+                e.target.value = "";
+                return;
+            }
+            setCotizacionFile(file);
+        }
+    };
 
     // Función para validar si la orden de compra es válida
     const isValidOCAF = (): boolean => {
@@ -105,15 +130,29 @@ export default function CrearOC_AF() {
                 condicionPago: condicionPago,
                 tiempoEntrega: tiempoEntrega,
                 plazoPago: plazoPago,
-                cotizacionUrl: cotizacionUrl,
+                cotizacionUrl: "", // This will be set by the backend
                 estado: 0, // pendiente liberación
                 divisa: isUSD ? 'USD' : 'COP',
                 trm: currentUsd2Cop,
                 itemsOrdenCompra: listaItemsActivos
             };
 
-            // Enviar al backend
-            const response = await axios.post(endpoints.save_orden_compra_activo, ordenCompra);
+            // Create FormData and append the JSON data as a Blob
+            const formData = new FormData();
+            formData.append(
+                "ordenCompraActivo",
+                new Blob([JSON.stringify(ordenCompra)], { type: "application/json" })
+            );
+
+            // Append the cotizacion file if it exists
+            if (cotizacionFile) {
+                formData.append("cotizacionFile", cotizacionFile);
+            }
+
+            // Enviar al backend con Content-Type: multipart/form-data
+            const response = await axios.post(endpoints.save_orden_compra_activo, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
 
             if (response.status === 201) {
                 toast({
@@ -147,7 +186,12 @@ export default function CrearOC_AF() {
         setIsProveedorPickerOpen(false);
         setIsUSD(false);
         setCurrentUsd2Cop(0);
-        setCotizacionUrl("");
+        setCotizacionFile(null); // Reset cotizacionFile instead of cotizacionUrl
+
+        // Reset the file input value if it exists
+        if (cotizacionInputRef.current) {
+            cotizacionInputRef.current.value = "";
+        }
     }
 
     return (
@@ -161,7 +205,7 @@ export default function CrearOC_AF() {
                             onSearchClick={() => setIsProveedorPickerOpen(true)}
                         />
                     </Flex>
-                    <Flex flex={1} w={"full"}>
+                    <Flex flex={1} w={"full"} direction={"column"} gap={4}>
                         {/* Componente de selección de moneda y TRM */}
                         <FormControl>
                             <FormLabel>Moneda y TRM</FormLabel>
@@ -169,6 +213,45 @@ export default function CrearOC_AF() {
                                 currencyIsUSD={currencyIsUSDTuple}
                                 useCurrentUsd2Cop={handleTrmUpdate}
                             />
+                        </FormControl>
+
+                        {/* File upload component moved here */}
+                        <FormControl>
+                            <FormLabel>Archivo de Cotización (PDF)</FormLabel>
+                            <VStack spacing={4} align="stretch" alignItems="center">
+                                <Icon
+                                    as={cotizacionFile ? FaFileCircleCheck : FaFileCircleQuestion}
+                                    boxSize="4em"
+                                    color={cotizacionFile ? "green" : "orange.500"}
+                                />
+                                <Button onClick={() => cotizacionInputRef.current?.click()}>
+                                    {cotizacionFile ? "Cambiar archivo" : "Seleccionar archivo"}
+                                </Button>
+                                {cotizacionFile && (
+                                    <HStack>
+                                        <Button 
+                                            size="sm" 
+                                            colorScheme="red" 
+                                            onClick={() => {
+                                                setCotizacionFile(null);
+                                                if (cotizacionInputRef.current) {
+                                                    cotizacionInputRef.current.value = "";
+                                                }
+                                            }}
+                                        >
+                                            Eliminar
+                                        </Button>
+                                        <FormLabel mb={0}>{cotizacionFile.name}</FormLabel>
+                                    </HStack>
+                                )}
+                                <Input
+                                    type="file"
+                                    ref={cotizacionInputRef}
+                                    style={{ display: 'none' }}
+                                    accept="application/pdf"
+                                    onChange={handleCotizacionChange}
+                                />
+                            </VStack>
                         </FormControl>
                     </Flex>
                 </Flex>
@@ -217,14 +300,6 @@ export default function CrearOC_AF() {
                         />
                     </Flex>
 
-                    <FormControl mt={4}>
-                        <FormLabel>URL de Cotización</FormLabel>
-                        <Input
-                            value={cotizacionUrl}
-                            onChange={(e) => setCotizacionUrl(e.target.value)}
-                            placeholder="https://ejemplo.com/cotizacion.pdf"
-                        />
-                    </FormControl>
                 </Flex>
 
                 {/* pass down Activos list + setter */}
