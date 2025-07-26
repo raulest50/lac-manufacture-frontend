@@ -50,8 +50,14 @@ export function MetodoDepreciacionComponent(props: Props) {
   }, [metodoDepreciacion, valorInicial, valorResidual, tiempoDeVida, porcentajeDB, setDepreciacion]);
 
   // Calcular los valores de depreciación para cada mes
-  const depreciacionData = useMemo(() => {
-    if (tiempoDeVida <= 0 || valorInicial <= 0) return [];
+  interface DepreciacionData {
+    meses: number[];
+    valores: number[];
+  }
+
+  const depreciacionData: DepreciacionData = useMemo(() => {
+    if (tiempoDeVida <= 0 || valorInicial <= 0)
+      return { meses: [], valores: [] };
 
     const meses = Array.from({ length: tiempoDeVida + 1 }, (_, i) => i);
     const valores = [];
@@ -91,7 +97,7 @@ export function MetodoDepreciacionComponent(props: Props) {
 
   // Opciones para el gráfico ECharts
   const chartOptions = useMemo(() => {
-    if (!depreciacionData.meses || depreciacionData.meses.length === 0) {
+    if (depreciacionData.meses.length === 0) {
       return {};
     }
 
@@ -102,7 +108,7 @@ export function MetodoDepreciacionComponent(props: Props) {
       },
       tooltip: {
         trigger: 'axis',
-        formatter: function(params) {
+        formatter: (params: Array<{ axisValue: number; data: number }>) => {
           const mes = params[0].axisValue;
           const valor = params[0].data;
           return `Mes ${mes}: $${valor.toFixed(2)}`;
@@ -177,7 +183,7 @@ export function MetodoDepreciacionComponent(props: Props) {
   }, [depreciacionData]);
 
   return (
-    <Flex direction={{ base: 'column', md: 'row' }} spacing={4} align="stretch" w="full">
+    <Flex direction={{ base: 'column', md: 'row' }} gap={4} align="stretch" w="full">
       {/* Formulario de inputs (ahora vertical) */}
       <VStack spacing={4} align="stretch" w={{ base: 'full', md: '40%' }} pr={{ md: 4 }}>
         <Box p={4} borderWidth="1px" borderRadius="lg" bg="white">
@@ -185,9 +191,11 @@ export function MetodoDepreciacionComponent(props: Props) {
 
           <FormControl mb={4}>
             <FormLabel>Método de Depreciación</FormLabel>
-            <Select 
-              value={metodoDepreciacion} 
-              onChange={(e) => setMetodoDepreciacion(e.target.value as MetodoDepreciacion)}
+            <Select
+              value={metodoDepreciacion}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setMetodoDepreciacion(e.target.value as MetodoDepreciacion)
+              }
             >
               <option value={MetodoDepreciacion.SL}>Línea Recta (SL)</option>
               <option value={MetodoDepreciacion.DB}>Balance Decreciente (DB)</option>
@@ -196,9 +204,12 @@ export function MetodoDepreciacionComponent(props: Props) {
 
           <FormControl mb={4}>
             <FormLabel>Valor Inicial</FormLabel>
-            <NumberInput 
-              value={valorInicial} 
-              onChange={(_, value) => setValorInicial(value)}
+            <NumberInput
+              value={valorInicial}
+              onChange={(
+                _valueAsString: string,
+                valueAsNumber: number
+              ) => setValorInicial(valueAsNumber)}
               min={0}
             >
               <NumberInputField />
@@ -211,9 +222,12 @@ export function MetodoDepreciacionComponent(props: Props) {
 
           <FormControl mb={4}>
             <FormLabel>Valor Residual</FormLabel>
-            <NumberInput 
-              value={valorResidual} 
-              onChange={(_, value) => setValorResidual(value)}
+            <NumberInput
+              value={valorResidual}
+              onChange={(
+                _valueAsString: string,
+                valueAsNumber: number
+              ) => setValorResidual(valueAsNumber)}
               min={0}
               max={valorInicial}
             >
@@ -227,9 +241,12 @@ export function MetodoDepreciacionComponent(props: Props) {
 
           <FormControl mb={4}>
             <FormLabel>Tiempo de Vida (meses)</FormLabel>
-            <NumberInput 
-              value={tiempoDeVida} 
-              onChange={(_, value) => setTiempoDeVida(value)}
+            <NumberInput
+              value={tiempoDeVida}
+              onChange={(
+                _valueAsString: string,
+                valueAsNumber: number
+              ) => setTiempoDeVida(valueAsNumber)}
               min={1}
             >
               <NumberInputField />
@@ -243,9 +260,12 @@ export function MetodoDepreciacionComponent(props: Props) {
           {metodoDepreciacion === MetodoDepreciacion.DB && (
             <FormControl>
               <FormLabel>Porcentaje (%)</FormLabel>
-              <NumberInput 
-                value={porcentajeDB} 
-                onChange={(_, value) => setPorcentajeDB(value)}
+              <NumberInput
+                value={porcentajeDB}
+                onChange={(
+                  _valueAsString: string,
+                  valueAsNumber: number
+                ) => setPorcentajeDB(valueAsNumber)}
                 min={0}
                 max={100}
               >
