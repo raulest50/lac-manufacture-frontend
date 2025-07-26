@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Table,
     Thead,
@@ -14,19 +14,44 @@ import {
     IconButton,
     useColorModeValue
 } from '@chakra-ui/react';
-import { FiMoreVertical, FiEye, FiXCircle } from 'react-icons/fi';
+import { FiMoreVertical, FiEye, FiXCircle, FiEdit } from 'react-icons/fi';
 import { OrdenCompraActivo, getEstadoOCAFText } from '../types';
 import { formatCOP } from '../../../utils/formatters';
+import axios from 'axios';
+import EndPointsURL from '../../../api/EndPointsURL';
+import { useAuth } from '../../../context/AuthContext';
+import DetailsOCAF from './DetailsOCAF';
+import DialogCancelarOCAF from './Dialogs/DialogCancelarOCAF';
+import DialogLiberarEnviarOCAF from './Dialogs/DialogLiberarEnviarOCAF';
 
 interface Props {
     ordenes: OrdenCompraActivo[];
 }
 
 const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes }) => {
-    // Color para el efecto hover
     const hoverBg = useColorModeValue('gray.100', 'gray.700');
+    const [selectedOrden, setSelectedOrden] = useState<OrdenCompraActivo | null>(null);
+    const [ordenToCancel, setOrdenToCancel] = useState<OrdenCompraActivo | null>(null);
+    const [ordenToUpdate, setOrdenToUpdate] = useState<OrdenCompraActivo | null>(null);
+    const [accessLevel, setAccessLevel] = useState(0);
+    const { user } = useAuth();
+    const endpoints = new EndPointsURL();
+
+    useEffect(() => {
+        const fetchAccess = async () => {
+            try {
+                const resp = await axios.get(endpoints.whoami);
+                const auth = resp.data.authorities?.find((a: any) => a.authority === 'ACCESO_ACTIVOS');
+                if (auth) setAccessLevel(parseInt(auth.nivel));
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        fetchAccess();
+    }, []);
 
     return (
+        <>
         <Box overflowX="auto" mt={4}>
             <Table variant="simple">
                 <Thead>
@@ -70,12 +95,19 @@ const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes }) => {
                                         size='sm'
                                     />
                                     <MenuList>
-                                        <MenuItem icon={<FiEye />}>
+                                        <MenuItem icon={<FiEye />} onClick={() => setSelectedOrden(orden)}>
                                             Ver detalle
                                         </MenuItem>
-                                        <MenuItem icon={<FiXCircle />}>
-                                            Cancelar orden de compra AF
-                                        </MenuItem>
+                                        {(user === 'master' || accessLevel >= 2) && (
+                                            <MenuItem icon={<FiEdit />} onClick={() => setOrdenToUpdate(orden)}>
+                                                Liberar / Enviar
+                                            </MenuItem>
+                                        )}
+                                        {(user === 'master' || accessLevel >= 2) && (
+                                            <MenuItem icon={<FiXCircle />} onClick={() => setOrdenToCancel(orden)}>
+                                                Cancelar orden de compra AF
+                                            </MenuItem>
+                                        )}
                                     </MenuList>
                                 </Menu>
                             </Td>
@@ -84,6 +116,33 @@ const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes }) => {
                 </Tbody>
             </Table>
         </Box>
+
+        {selectedOrden && (
+            <DetailsOCAF
+                isOpen={!!selectedOrden}
+                onClose={() => setSelectedOrden(null)}
+                orden={selectedOrden}
+            />
+        )}
+
+        {ordenToCancel && (
+            <DialogCancelarOCAF
+                isOpen={!!ordenToCancel}
+                onClose={() => setOrdenToCancel(null)}
+                orden={ordenToCancel}
+                onOrdenCancelada={() => setOrdenToCancel(null)}
+            />
+        )}
+
+        {ordenToUpdate && (
+            <DialogLiberarEnviarOCAF
+                isOpen={!!ordenToUpdate}
+                onClose={() => setOrdenToUpdate(null)}
+                orden={ordenToUpdate}
+                onEstadoActualizado={() => setOrdenToUpdate(null)}
+            />
+        )}
+        </>
     );
 };
 
