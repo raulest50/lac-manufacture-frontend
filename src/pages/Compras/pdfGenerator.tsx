@@ -272,7 +272,7 @@ export default class PdfGenerator {
         doc.setFontSize(14); // Reduced font size
         // Center the title (adjust x and y as needed)
         doc.text("ORDEN DE COMPRA NUMERO: ", 90, currentY + 6, { align: "center" });
-        doc.text(orden.ordenCompraId ? orden.ordenCompraId.toString() : "", 130, currentY + 6);
+        doc.text(orden.ordenCompraActivoId ? orden.ordenCompraActivoId.toString() : "", 130, currentY + 6);
 
 
         // --- Napolitana Company Info ---
@@ -395,11 +395,11 @@ export default class PdfGenerator {
 
 
         const tableColumns = ["CODIGO", "DESCRIPCION", "CANTIDAD", "PRECIO UNITARIO", "SUBTOTAL"];
-        const tableRows = orden.itemsOrdenCompra.map((item: ItemOCActivo) => [
-            item.activo.idActivo,
-            item.activo.descripcion,
+        const tableRows = orden.itemsOrdenCompra.map((item: ItemOrdenCompraActivo) => [
+            item.itemOrdenId?.toString() || "",
+            item.nombre,
             item.cantidad,
-            formatCOP(item.activo.precio, 2),
+            formatCOP(item.precioUnitario, 2),
             formatCOP(item.subTotal)
         ]);
         autoTable(doc, {
@@ -422,7 +422,7 @@ export default class PdfGenerator {
         doc.setFontSize(8);
         doc.text(`Sub Total: ${formatCOP(orden.subTotal)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`IVA: ${formatCOP(orden.ivaValue)}`, margin, totalsY);
+        doc.text(`IVA: ${formatCOP(orden.iva)}`, margin, totalsY);
         totalsY += 5;
         doc.text(`Total Pagar: ${formatCOP(orden.totalPagar)}`, margin, totalsY);
 
@@ -445,7 +445,7 @@ export default class PdfGenerator {
         //
 
         // --- Trigger Download ---
-        doc.save(`orden-compra-${orden.ordenCompraId}.pdf`);
+        doc.save(`orden-compra-${orden.ordenCompraActivoId}.pdf`);
     }
 
     /**

@@ -25,8 +25,8 @@ export default function ActivosFijosPage() {
                     <TabList>
                         <Tab sx={my_style_tab}> Incorporacion </Tab>
                         <Tab sx={my_style_tab}> Crear OC-AF </Tab>
-                        <Tab sx={my_style_tab}> Reporte </Tab>
-                        {/*<Tab sx={my_style_tab}> Traslados </Tab>*/}
+                        <Tab sx={my_style_tab}> Reportes OC-AF </Tab>
+                        <Tab sx={my_style_tab}> Reportes Activos Fijos </Tab>
                         {/*<Tab sx={my_style_tab}> Mantenimientos </Tab>*/}
                     </TabList>
 

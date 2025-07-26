@@ -27,7 +27,7 @@ export function TipoIngresoSelection({setTipoIncorporacion}: Props) {
 
     return (
         <Flex direction={"column"} gap={10} w="full">
-            <Heading as="h2" size="lg" textAlign="center" mb={6}>
+            <Heading as="h2" size="lg" textAlign="center" mb={6} fontFamily="Arimo">
                 Seleccione el tipo de incorporación
             </Heading>
 

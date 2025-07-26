@@ -20,6 +20,7 @@
     "@fontsource-variable/comfortaa": "^5.2.6",
     "@fontsource-variable/league-spartan": "^5.2.6",
     "@fontsource/anton": "^5.2.6",
+    "@fontsource/arimo": "^5.2.6",
     "@svgdotjs/svg.js": "^3.2.4",
     "@tanstack/react-table": "^8.21.3",
     "@xyflow/react": "^12.8.2",
