@@ -1,6 +1,8 @@
 // src/pages/LoginPage.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import Metaballs from '../../componentes/reactbites/Metaballs.tsx';
+import WelcomeBite from '../../componentes/reactbites/WelcomeBite.tsx';
 import { useNavigate } from 'react-router-dom';
 import {
     Button, 
@@ -248,7 +250,7 @@ export default function LoginPanel() {
                     <Image src={'/logo_exotic.svg'} />
                 </Box>
                 {viewMode === 'login' ? (
-                    <FormularioLogin 
+                    <FormularioLogin
                         username={username}
                         setUsername={setUsername}
                         password={password}
@@ -266,6 +268,10 @@ export default function LoginPanel() {
                     />
                 )}
             </Flex>
+            <Metaballs />
+            <Box mt={4}>
+                <WelcomeBite text="Bienvenido a Exotic Expert ERP" />
+            </Box>
         </Container>
     );
 }
