@@ -1,0 +1,9 @@
+.welcome-bite {
+  position: absolute;
+  bottom: 1rem;
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+  color: white;
+  z-index: 0;
+}

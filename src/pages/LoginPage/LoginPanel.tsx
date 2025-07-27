@@ -1,6 +1,8 @@
 // src/pages/LoginPage.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import Metaballs from '../../componentes/reactbites/Metaballs.tsx';
+import WelcomeBite from '../../componentes/reactbites/WelcomeBite.tsx';
 import { useNavigate } from 'react-router-dom';
 import {
     Button, 
@@ -241,14 +243,26 @@ export default function LoginPanel() {
     };
 
     return (
-        <Container minW={['auto', 'container.md', 'container.md']} w={"full"} h={"100vh"}>
-            <Flex direction={"column"} gap={7} border={"0.5px solid gray"} borderRadius={"2em"} p={"4em"}
-                  alignItems={"center"} flex={1}>
-            <Box boxSize={'3xs'}>
+        <Container position="relative" minW={['auto', 'container.md', 'container.md']} w={"full"} h={"100vh"}>
+            <Metaballs />
+            <WelcomeBite text="Bienvenido a Exotic Expert ERP" />
+            <Flex
+                direction={"column"}
+                gap={7}
+                border={"0.5px solid gray"}
+                borderRadius={"2em"}
+                p={"4em"}
+                alignItems={"center"}
+                flex={1}
+                bg="transparent"
+                position="relative"
+                zIndex={1}
+            >
+                <Box boxSize={'3xs'}>
                     <Image src={'/logo_exotic.svg'} />
                 </Box>
                 {viewMode === 'login' ? (
-                    <FormularioLogin 
+                    <FormularioLogin
                         username={username}
                         setUsername={setUsername}
                         password={password}
@@ -258,7 +272,7 @@ export default function LoginPanel() {
                         isLoading={isLoading}
                     />
                 ) : (
-                    <FormularioForgot 
+                    <FormularioForgot
                         onHandleEnviarForgot={onHandleEnviarForgot}
                         isRequestDisabled={isRequestDisabled}
                         isLoading={isForgotLoading}
