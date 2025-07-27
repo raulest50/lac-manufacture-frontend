@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import ReactECharts from 'echarts-for-react';
 
-import { MetodoDepreciacion } from "../../types.tsx";
+import { MetodoDepreciacion } from "../../../types.tsx";
 
 interface Depreciacion {
   metodo: MetodoDepreciacion;

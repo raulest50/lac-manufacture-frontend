@@ -9,11 +9,20 @@ import {
     Button,
     Text,
     Input,
-    useToast
+    useToast,
+    Box,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    Tfoot
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../../api/EndPointsURL';
-import { OrdenCompraActivo } from '../../types';
+import { OrdenCompraActivo, getEstadoOCAFText } from '../../types';
+import { formatCOP } from '../../../../utils/formatters';
 
 interface Props {
     isOpen: boolean;
@@ -75,13 +84,56 @@ const DialogCancelarOCAF: React.FC<Props> = ({ isOpen, onClose, orden, onOrdenCa
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose} size="xl" scrollBehavior="inside">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Confirmar Cancelación</ModalHeader>
                 <ModalBody>
+                    {/* Detalles de la orden */}
+                    <Box mb={4}>
+                        <Text><strong>ID:</strong> {orden.ordenCompraActivoId}</Text>
+                        <Text><strong>Fecha Emisión:</strong> {orden.fechaEmision ? new Date(orden.fechaEmision).toLocaleString() : '-'}</Text>
+                        <Text><strong>Fecha Vencimiento:</strong> {orden.fechaVencimiento ? new Date(orden.fechaVencimiento).toLocaleDateString() : '-'}</Text>
+                        <Text><strong>Proveedor:</strong> {orden.proveedor?.nombre ?? '-'}</Text>
+                        <Text><strong>Total a Pagar:</strong> {formatCOP(orden.totalPagar)}</Text>
+                        <Text><strong>Estado:</strong> {getEstadoOCAFText(orden.estado)}</Text>
+                    </Box>
+
+                    {/* Tabla de items */}
+                    {orden.itemsOrdenCompra && orden.itemsOrdenCompra.length > 0 ? (
+                        <Table variant='simple' size='sm' mb={4}>
+                            <Thead>
+                                <Tr>
+                                    <Th>Descripción</Th>
+                                    <Th isNumeric>Cantidad</Th>
+                                    <Th isNumeric>Precio Unitario</Th>
+                                    <Th isNumeric>Subtotal</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {orden.itemsOrdenCompra.map(item => (
+                                    <Tr key={item.itemOrdenId}>
+                                        <Td>{item.nombre}</Td>
+                                        <Td isNumeric>{item.cantidad}</Td>
+                                        <Td isNumeric>{formatCOP(item.precioUnitario)}</Td>
+                                        <Td isNumeric>{formatCOP(item.subTotal)}</Td>
+                                    </Tr>
+                                ))}
+                            </Tbody>
+                            <Tfoot>
+                                <Tr>
+                                    <Td colSpan={3} textAlign='right'><strong>Total a Pagar:</strong></Td>
+                                    <Td isNumeric>{formatCOP(orden.totalPagar)}</Td>
+                                </Tr>
+                            </Tfoot>
+                        </Table>
+                    ) : (
+                        <Text mb={4}>No hay items en esta orden.</Text>
+                    )}
+
+                    {/* Confirmación de cancelación */}
                     <Text mb={4}>
-                        Para confirmar la cancelación de la orden de compra, digite los 7 dígitos que ve a continuación y presione &quot;Cancelar Orden&quot;.
+                        Para confirmar la cancelación de la orden de compra, digite los 7 dígitos que ve a continuación y presione "Cancelar Orden".
                     </Text>
                     <Text fontWeight="bold" mb={4}>Código: {randomCode}</Text>
                     <Input

@@ -20,17 +20,16 @@ import { formatCOP } from '../../../utils/formatters';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
 import { useAuth } from '../../../context/AuthContext';
-import DetailsOCAF from './DetailsOCAF';
 import DialogCancelarOCAF from './Dialogs/DialogCancelarOCAF';
 import DialogLiberarEnviarOCAF from './Dialogs/DialogLiberarEnviarOCAF';
 
 interface Props {
     ordenes: OrdenCompraActivo[];
+    onEditarOrden?: (orden: OrdenCompraActivo) => void;
 }
 
-const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes }) => {
+const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes, onEditarOrden }) => {
     const hoverBg = useColorModeValue('gray.100', 'gray.700');
-    const [selectedOrden, setSelectedOrden] = useState<OrdenCompraActivo | null>(null);
     const [ordenToCancel, setOrdenToCancel] = useState<OrdenCompraActivo | null>(null);
     const [ordenToUpdate, setOrdenToUpdate] = useState<OrdenCompraActivo | null>(null);
     const [accessLevel, setAccessLevel] = useState(0);
@@ -70,6 +69,8 @@ const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes }) => {
                         <Tr 
                             key={orden.ordenCompraActivoId}
                             _hover={{ bg: hoverBg, transition: 'background-color 0.2s' }}
+                            onClick={() => onEditarOrden && onEditarOrden(orden)}
+                            style={{ cursor: 'pointer' }}
                         >
                             <Td>{orden.ordenCompraActivoId}</Td>
                             <Td>
@@ -85,7 +86,7 @@ const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes }) => {
                             <Td>{orden.proveedor ? orden.proveedor.nombre : '-'}</Td>
                             <Td>{formatCOP(orden.totalPagar)}</Td>
                             <Td>{getEstadoOCAFText(orden.estado)}</Td>
-                            <Td>
+                            <Td onClick={(e) => e.stopPropagation()}>
                                 <Menu>
                                     <MenuButton
                                         as={IconButton}
@@ -95,7 +96,7 @@ const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes }) => {
                                         size='sm'
                                     />
                                     <MenuList>
-                                        <MenuItem icon={<FiEye />} onClick={() => setSelectedOrden(orden)}>
+                                        <MenuItem icon={<FiEye />} onClick={() => onEditarOrden && onEditarOrden(orden)}>
                                             Ver detalle
                                         </MenuItem>
                                         {(user === 'master' || accessLevel >= 2) && (
@@ -116,14 +117,6 @@ const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes }) => {
                 </Tbody>
             </Table>
         </Box>
-
-        {selectedOrden && (
-            <DetailsOCAF
-                isOpen={!!selectedOrden}
-                onClose={() => setSelectedOrden(null)}
-                orden={selectedOrden}
-            />
-        )}
 
         {ordenToCancel && (
             <DialogCancelarOCAF
