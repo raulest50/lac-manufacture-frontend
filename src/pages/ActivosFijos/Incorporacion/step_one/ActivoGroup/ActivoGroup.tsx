@@ -1,5 +1,6 @@
 import {Card, CardBody, CardHeader, Flex} from '@chakra-ui/react';
-import {ActivoFijo, ItemOrdenCompraActivo} from "../../types.tsx";
+import {ActivoFijo, ItemOrdenCompraActivo} from "../../../types.tsx";
+import {MetodoDepreciacion} from "../../../types.tsx";
 
 type Props = {
     itemOrdenCompraActivo: ItemOrdenCompraActivo;
@@ -15,7 +16,7 @@ type Props = {
  * @param props
  * @constructor
  */
-export function ActivoGroup({}: Props) {
+export function ActivoGroup({itemOrdenCompraActivo, setActivoFijoGroup}: Props) {
 
     return (
         <Flex>
@@ -27,6 +28,8 @@ export function ActivoGroup({}: Props) {
                 </CardHeader>
                 <CardBody>
                 </CardBody>
+
+                <MetodoDepreciacion />
             </Card>
         </Flex>
     );

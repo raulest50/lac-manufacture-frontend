@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Flex, useToast } from '@chakra-ui/react';
+import axios from 'axios';
+import EndPointsURL from '../../../../api/EndPointsURL';
 import { IncorporacionActivoDta, OrdenCompraActivo } from "../../types.tsx";
 import { TipoIngresoSelection } from "./TipoIngresoSelection.tsx";
 import { TIPO_INCORPORACION } from "../../types.tsx";
@@ -53,7 +55,7 @@ export function StepZeroTipoIngreso({
     }
   }
 
-  const handleSearchOC = () => {
+  const handleSearchOC = async () => {
     if (!ocNumber.trim()) {
       toast({
         title: "Campo requerido",
@@ -66,12 +68,15 @@ export function StepZeroTipoIngreso({
     }
 
     setIsSearching(true);
+    const endpoints = new EndPointsURL();
 
-    // Simulación de búsqueda - aquí se implementaría la llamada real a la API
-    setTimeout(() => {
-      // Ejemplo de respuesta exitosa
-      const mockOrdenCompra: OrdenCompraActivo = {};
-      setOrdenCompraActivo(mockOrdenCompra);
+    try {
+      // Obtener los datos de la orden desde la API
+      const url = endpoints.get_orden_compra_activo_by_id.replace('{ordenCompraActivoId}', ocNumber);
+      const response = await axios.get(url);
+      const ordenCompra = response.data;
+
+      setOrdenCompraActivo(ordenCompra);
 
       const incorporacionData: IncorporacionActivoDta = {
         tipoIncorporacion: TIPO_INCORPORACION.CON_OC,
@@ -79,9 +84,19 @@ export function StepZeroTipoIngreso({
       };
       setIncorporacionActivoHeader(incorporacionData);
 
-      setIsSearching(false);
       setActiveStep(1);
-    }, 1000);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "No se pudo encontrar la orden de compra. Verifique el número e intente nuevamente.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsSearching(false);
+    }
   }
 
   const ConditionalRender = () => {

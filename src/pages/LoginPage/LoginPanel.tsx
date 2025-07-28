@@ -1,8 +1,6 @@
 // src/pages/LoginPage.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext.tsx';
-import Metaballs from '../../componentes/reactbites/Metaballs.tsx';
-import WelcomeBite from '../../componentes/reactbites/WelcomeBite.tsx';
 import { useNavigate } from 'react-router-dom';
 import {
     Button, 
@@ -53,7 +51,6 @@ const FormularioLogin: React.FC<FormularioLoginProps> = ({
     return (
         <>
             <Heading>Login Panel</Heading>
-            <WelcomeBite text="Bienvenido a Exotic Expert ERP" />
             <FormControl isRequired>
                 <FormLabel>Usuario</FormLabel>
                 <Input
@@ -244,7 +241,7 @@ export default function LoginPanel() {
     };
 
     return (
-        <Container minW={['auto', 'container.md', 'container.md']} w={"full"} h={"100vh"}>
+        <Container minW={['auto', 'container.md', 'container.md']} w={"full"} h={"100vh"} bg={"transparent"} >
             <Flex direction={"column"} gap={7} border={"0.5px solid gray"} borderRadius={"2em"} p={"4em"}
                   alignItems={"center"} flex={1}>
             <Box boxSize={'3xs'}>
@@ -269,7 +266,6 @@ export default function LoginPanel() {
                     />
                 )}
             </Flex>
-            <Metaballs />
         </Container>
     );
 }

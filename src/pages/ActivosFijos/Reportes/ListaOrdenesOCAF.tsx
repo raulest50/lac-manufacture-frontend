@@ -69,8 +69,6 @@ const ListaOrdenesOCAF: React.FC<Props> = ({ ordenes, onEditarOrden }) => {
                         <Tr 
                             key={orden.ordenCompraActivoId}
                             _hover={{ bg: hoverBg, transition: 'background-color 0.2s' }}
-                            onClick={() => onEditarOrden && onEditarOrden(orden)}
-                            style={{ cursor: 'pointer' }}
                         >
                             <Td>{orden.ordenCompraActivoId}</Td>
                             <Td>

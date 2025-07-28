@@ -2,7 +2,7 @@ import {Proveedor} from "../Compras/types.tsx";
 
 export const TIPO_INCORPORACION = {
         CON_OC:'CON_OC', SIN_OC:'SIN_OC', AF_EXISTENTE:'AF_EXISTENTE'
-    };
+    } as const;
 
 export enum MetodoDepreciacion {
     SL = "SL",

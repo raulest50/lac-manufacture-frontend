@@ -39,7 +39,7 @@ const DialogCancelarOCAF: React.FC<Props> = ({ isOpen, onClose, orden, onOrdenCa
 
     useEffect(() => {
         if (isOpen) {
-            const code = Math.floor(1000000 + Math.random() * 9000000).toString();
+            const code = Math.floor(1000 + Math.random() * 9000).toString();
             setRandomCode(code);
             setInputCode('');
         }
@@ -133,7 +133,7 @@ const DialogCancelarOCAF: React.FC<Props> = ({ isOpen, onClose, orden, onOrdenCa
 
                     {/* Confirmación de cancelación */}
                     <Text mb={4}>
-                        Para confirmar la cancelación de la orden de compra, digite los 7 dígitos que ve a continuación y presione "Cancelar Orden".
+                        Para confirmar la cancelación de la orden de compra, digite los 4 dígitos que ve a continuación y presione "Cancelar Orden".
                     </Text>
                     <Text fontWeight="bold" mb={4}>Código: {randomCode}</Text>
                     <Input
