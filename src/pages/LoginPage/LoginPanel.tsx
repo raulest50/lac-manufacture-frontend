@@ -53,6 +53,7 @@ const FormularioLogin: React.FC<FormularioLoginProps> = ({
     return (
         <>
             <Heading>Login Panel</Heading>
+            <WelcomeBite text="Bienvenido a Exotic Expert ERP" />
             <FormControl isRequired>
                 <FormLabel>Usuario</FormLabel>
                 <Input
@@ -269,9 +270,6 @@ export default function LoginPanel() {
                 )}
             </Flex>
             <Metaballs />
-            <Box mt={4}>
-                <WelcomeBite text="Bienvenido a Exotic Expert ERP" />
-            </Box>
         </Container>
     );
 }

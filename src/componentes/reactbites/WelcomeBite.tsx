@@ -12,14 +12,15 @@ export default function WelcomeBite({ text, speed = 80 }: WelcomeBiteProps) {
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
-      setDisplay(prev => prev + text[index]);
-      index++;
-      if (index >= text.length) {
+      if (index < text.length) {
+        setDisplay(prev => prev + text[index]);
+        index++;
+      } else {
         clearInterval(interval);
       }
     }, speed);
     return () => clearInterval(interval);
   }, [text, speed]);
 
-  return <Text fontSize="lg" fontWeight="bold">{display}</Text>;
+  return <Text fontSize="lg" fontWeight="bold" fontFamily="Arimo">{display}</Text>;
 }
