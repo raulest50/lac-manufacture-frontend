@@ -1,21 +1,32 @@
-// src/pages/Clientes/types.tsx
-
 export interface Cliente {
-    id: number;
+    clienteId: number;
     nombre: string;
-    ruc?: string;
-    direccion?: string;
-    telefono?: string;
-    email?: string;
-    contacto?: string;
-    estado: number; // 1: activo, 0: inactivo
+    email: string;
+    telefono: string;
+    direccion: string;
+    condicionesPago?: string;
+    limiteCredito?: number;
+    urlRut?: string;
+    urlCamComer?: string;
 }
 
 export interface ClienteFormData {
     nombre: string;
-    ruc?: string;
-    direccion?: string;
-    telefono?: string;
-    email?: string;
-    contacto?: string;
+    email: string;
+    telefono: string;
+    direccion: string;
+    condicionesPago?: string;
+    limiteCredito?: number;
+}
+
+export interface DTO_SearchCliente {
+    id: number | null;
+    nombre: string | null;
+    email: string | null;
+    searchType: SearchType;
+}
+
+export enum SearchType {
+    ID = 'ID',
+    NOMBRE_O_EMAIL = 'NOMBRE_O_EMAIL'
 }

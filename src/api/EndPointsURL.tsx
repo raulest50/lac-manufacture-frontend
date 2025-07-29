@@ -33,6 +33,12 @@ export default class EndPointsURL{
     public search_proveedores_pag :string;
     public update_proveedores:string;
 
+    // Clientes resource
+    public save_clientes:string;
+    public search_clientes:string;
+    public search_clientes_pag:string;
+    public update_clientes:string;
+
     // produccion resource
     public save_produccion:string;
     public search_ordenes_within_range:string;
@@ -153,6 +159,12 @@ export default class EndPointsURL{
         this.update_proveedores = `${domain}/${proveedores_res}/{id}`;
         this.bulk_upload_proveedores = `${domain}/api/bulk-upload/proveedores`;
         this.bulk_upload_productos = `${domain}/api/bulk-upload/products`;
+
+        // Clientes endpoints
+        this.save_clientes = `${domain}/clientes/save`;
+        this.search_clientes = `${domain}/clientes/search`;
+        this.search_clientes_pag = `${domain}/clientes/search_pag`;
+        this.update_clientes = `${domain}/clientes/{id}/with-files`;
 
         // compras endpoints
         this.byProveedorAndDate = `${domain}/${compras_res}/byProveedorAndDate`;
