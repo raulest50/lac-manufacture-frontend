@@ -16,11 +16,11 @@ import {
 
 type Props = {};
 
-export function SimulacionProduccionTab(props: Props) {
+export function WeekPlanningWizardTab(props: Props) {
     const steps = [
-        {title: 'First', description: 'Select Product'},
-        {title: 'Second', description: 'Configure Parameters'},
-        {title: 'Third', description: 'Review Results'}
+        {title: 'DefinirNecesidades', description: 'Select Product'},
+        {title: '2', description: 'Configure Parameters'},
+        {title: '3', description: 'Review Results'}
     ];
 
     const {activeStep, setActiveStep} = useSteps({

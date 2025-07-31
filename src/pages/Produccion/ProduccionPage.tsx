@@ -11,7 +11,7 @@ import {my_style_tab} from "../../styles/styles_general.tsx";
 import CrearOrdenes from "./CrearOrdenes.tsx";
 import HistorialOrdenes from "./HistorialOrdenes.tsx";
 import PlaneacionProduccion from "./components/PlaneacionProduccion.tsx";
-import {SimulacionProduccionTab} from "./SimulacionProduccion/SimulacionProduccionTab.tsx";
+import {WeekPlanningWizardTab} from "./WeekPlanningWizard/WeekPlanningWizardTab.tsx";
 
 
 export default function ProduccionPage(){
@@ -32,7 +32,7 @@ export default function ProduccionPage(){
                 <TabPanels>
 
                     <TabPanel>
-                        <SimulacionProduccionTab />
+                        <WeekPlanningWizardTab />
                     </TabPanel>
 
                     <TabPanel>

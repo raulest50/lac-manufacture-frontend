@@ -79,6 +79,12 @@ interface DocumentoBajaActivo {
     // Propiedades según el modelo de backend
 }
 
+export interface GrupoActivos {
+    id: string;
+    itemOrdenCompra: ItemOrdenCompraActivo;
+    activos: ActivoFijo[];
+}
+
 
 export interface IncorporacionActivoDta {
     tipoIncorporacion?: 'CON_OC' | 'SIN_OC' | 'AF_EXISTENTE';

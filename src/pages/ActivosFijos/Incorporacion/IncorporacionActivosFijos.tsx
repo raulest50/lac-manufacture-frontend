@@ -41,6 +41,8 @@ export function IncorporacionActivosFijos() {
                 <StepOneFormulario
                     setActiveStep={setActiveStep}
                     setIncorporacionActivoHeader={setIncorporacionActivoDta}
+                    incorporacionActivoDta={incorporacionActivoDta}
+                    ordenCompraActivo={ordenCompraActivo}
                 />
             )
         }

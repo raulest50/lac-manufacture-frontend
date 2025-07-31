@@ -1,37 +1,174 @@
-import { useState } from 'react';
-import { 
-  Button, 
-  Flex, 
-  Card, 
-  CardHeader, 
-  CardBody, 
-  Heading, 
-  Icon, 
-  Text, 
-  SimpleGrid 
+import { useState, useEffect } from 'react';
+import {
+    Button,
+    Flex,
+    SimpleGrid,
+    Box,
+    Text,
+    IconButton,
+    VStack,
+    Heading,
+    useToast,
+    Card,
+    CardBody
 } from '@chakra-ui/react';
-import { FaFileInvoiceDollar } from 'react-icons/fa'; // Icon for "con OC"
-import { FaFileAlt } from 'react-icons/fa'; // Icon for "sin OC"
-import { IncorporacionActivoDta } from '../../types.tsx';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
+import { ActivoFijo, IncorporacionActivoDta, OrdenCompraActivo, ItemOrdenCompraActivo, TIPO_INCORPORACION, GrupoActivos } from '../../types.tsx';
+import { ActivoGroup } from './ActivoGroup/ActivoGroup.tsx';
 
 type Props = {
     setActiveStep: (step: number) => void;
     setIncorporacionActivoHeader: (incorporacionActivoHeader: IncorporacionActivoDta) => void;
+    incorporacionActivoDta: IncorporacionActivoDta;
+    ordenCompraActivo: OrdenCompraActivo;
 };
 
-export function StepOneFormulario({ setActiveStep, setIncorporacionActivoHeader }: Props) {
+export function StepOneFormulario({ 
+    setActiveStep, 
+    setIncorporacionActivoHeader, 
+    incorporacionActivoDta, 
+    ordenCompraActivo 
+}: Props) {
+    const [grupos, setGrupos] = useState<GrupoActivos[]>([]);
+    const toast = useToast();
 
+    // Inicializar grupos basados en el tipo de incorporación
+    useEffect(() => {
+        if (incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.CON_OC && 
+            ordenCompraActivo.itemsOrdenCompra?.length > 0) {
+            // Crear un grupo por cada ítem de la orden de compra
+            const gruposIniciales = ordenCompraActivo.itemsOrdenCompra.map(item => ({
+                id: `grupo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                itemOrdenCompra: item,
+                activos: []
+            }));
+            setGrupos(gruposIniciales);
+        } else {
+            // Para incorporaciones SIN_OC o AF_EXISTENTE, comenzar con lista vacía
+            setGrupos([]);
+        }
+    }, [incorporacionActivoDta.tipoIncorporacion, ordenCompraActivo.itemsOrdenCompra]);
 
+    // Función para agregar un nuevo grupo (solo para SIN_OC o AF_EXISTENTE)
+    const agregarGrupo = () => {
+        // Crear un ítem de orden de compra vacío para el nuevo grupo
+        const nuevoItem: ItemOrdenCompraActivo = {
+            nombre: "Nuevo Grupo",
+            cantidad: 1,
+            precioUnitario: 0,
+            ivaPercentage: 0,
+            ivaValue: 0,
+            subTotal: 0
+        };
+
+        const nuevoGrupo: GrupoActivos = {
+            id: `grupo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            itemOrdenCompra: nuevoItem,
+            activos: []
+        };
+
+        setGrupos([...grupos, nuevoGrupo]);
+    };
+
+    // Función para eliminar un grupo
+    const eliminarGrupo = (id: string) => {
+        setGrupos(grupos.filter(grupo => grupo.id !== id));
+    };
+
+    // Función para actualizar los activos de un grupo
+    const actualizarActivosGrupo = (id: string, activos: ActivoFijo[]) => {
+        setGrupos(grupos.map(grupo => 
+            grupo.id === id ? { ...grupo, activos } : grupo
+        ));
+    };
+
+    // Función para manejar el botón "Siguiente"
+    const handleSiguiente = () => {
+        // Verificar que haya al menos un grupo con activos
+        const hayActivos = grupos.some(grupo => grupo.activos.length > 0);
+
+        if (!hayActivos) {
+            toast({
+                title: "No hay activos",
+                description: "Debe agregar al menos un activo antes de continuar.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        // Aquí se podría guardar la información de los grupos en algún estado global
+        // o enviarla al backend antes de pasar al siguiente paso
+
+        // Avanzar al siguiente paso
+        setActiveStep(2);
+    };
 
     return (
         <Flex direction="column" gap={10} w="full">
-            <Heading as="h2" size="lg" textAlign="center" mb={6}>
-                Seleccione el tipo de incorporación
-            </Heading>
+            <Box>
+                <Flex justifyContent="space-between" alignItems="center" mb={4}>
+                    <Heading size="md">Grupos de Activos Fijos</Heading>
+                    {(incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.SIN_OC || 
+                      incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.AF_EXISTENTE) && (
+                        <Button 
+                            leftIcon={<AddIcon />} 
+                            colorScheme="blue" 
+                            onClick={agregarGrupo}
+                        >
+                            Agregar Grupo
+                        </Button>
+                    )}
+                </Flex>
 
-            <SimpleGrid columns={2} spacing={8} w="full">
+                {grupos.length === 0 && (
+                    <Card>
+                        <CardBody>
+                            <Text textAlign="center" color="gray.500">
+                                {incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.CON_OC 
+                                    ? "No hay ítems en la orden de compra." 
+                                    : "No hay grupos de activos. Haga clic en 'Agregar Grupo' para crear uno."}
+                            </Text>
+                        </CardBody>
+                    </Card>
+                )}
 
-            </SimpleGrid>
+                <VStack spacing={4} align="stretch">
+                    {grupos.map((grupo) => (
+                        <Box key={grupo.id} position="relative">
+                            {(incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.SIN_OC || 
+                              incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.AF_EXISTENTE) && (
+                                <IconButton
+                                    aria-label="Eliminar grupo"
+                                    icon={<DeleteIcon />}
+                                    colorScheme="red"
+                                    size="sm"
+                                    position="absolute"
+                                    top="10px"
+                                    right="10px"
+                                    zIndex="1"
+                                    onClick={() => eliminarGrupo(grupo.id)}
+                                />
+                            )}
+                            <ActivoGroup
+                                itemOrdenCompraActivo={grupo.itemOrdenCompra}
+                                setActivoFijoGroup={(activos) => actualizarActivosGrupo(grupo.id, activos)}
+                                tipoIncorporacion={incorporacionActivoDta.tipoIncorporacion || ''}
+                            />
+                        </Box>
+                    ))}
+                </VStack>
+            </Box>
+
+            <Button
+                variant="solid"
+                colorScheme="teal"
+                onClick={handleSiguiente}
+                isDisabled={grupos.length === 0}
+            >
+                Siguiente
+            </Button>
         </Flex>
     );
 }

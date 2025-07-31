@@ -15,7 +15,7 @@ import {
 import { MetodoDepreciacionComponent } from "../MetodoDepreciacion/MetodoDepreciacion.tsx";
 
 type Props = {
-    itemOrdenCompraActivo: ItemOrdenCompraActivo;
+    itemOrdenCompraActivo?: ItemOrdenCompraActivo;
     setActivoFijoGroup: (activoFijoGroup: ActivoFijo[]) => void;
     tipoIncorporacion: string;
 };
@@ -30,21 +30,83 @@ type Props = {
  * @constructor
  */
 export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoIncorporacion }: Props) {
+    // Create a default item if none is provided
+    const defaultItem: ItemOrdenCompraActivo = {
+        nombre: "Nuevo Grupo",
+        cantidad: 1,
+        precioUnitario: 0,
+        ivaPercentage: 0,
+        ivaValue: 0,
+        subTotal: 0
+    };
+
+    // Use the provided item or the default one
+    const item = itemOrdenCompraActivo || defaultItem;
+
     const [listaActivos, setListaActivos] = useState<ActivoFijo[]>([]);
 
     // Atributos comunes para todo el grupo
     const [tipoActivo, setTipoActivo] = useState<TipoActivo>(TipoActivo.EQUIPO); // Por defecto es EQUIPO
     const [brand, setBrand] = useState<string>("");
+    const [capacidad, setCapacidad] = useState<number>(0);
+    const [unidadCapacidad, setUnidadCapacidad] = useState<UnidadesCapacidad>(UnidadesCapacidad.L);
 
     // Estado para el precio unitario editable
-    const [precioUnitario, setPrecioUnitario] = useState<number>(itemOrdenCompraActivo.precioUnitario);
+    const [precioUnitario, setPrecioUnitario] = useState<number>(item.precioUnitario);
 
     // Estado para el método de depreciación común para todo el grupo
     const [depreciacionGrupo, setDepreciacionGrupo] = useState<any>(null);
 
+    // Auto-create assets based on the quantity specified in the purchase order item
+    useEffect(() => {
+        // Only auto-create assets for CON_OC type and when the list is empty
+        // Also check if we have a valid itemOrdenCompraActivo
+        if (tipoIncorporacion === TIPO_INCORPORACION.CON_OC && 
+            listaActivos.length === 0 && 
+            itemOrdenCompraActivo) {
+
+            // Get the quantity from the order item
+            const cantidad = item.cantidad;
+
+            // Create the specified number of assets
+            const newActivos: ActivoFijo[] = [];
+            const timestamp = Date.now(); // Use a single timestamp for all IDs to avoid changing on re-renders
+
+            for (let i = 0; i < cantidad; i++) {
+                newActivos.push({
+                    id: `temp-${timestamp}-${i}`, // Temporary ID until saved to backend
+                    nombre: item.nombre,
+                    estado: 0, // Active state
+                    brand, // Apply common brand
+                    tipo: tipoActivo, // Apply common type
+                    precio: precioUnitario, // Use the edited unit price
+                    // Apply common depreciation if it exists
+                    ...(depreciacionGrupo && {
+                        valorAdquisicion: depreciacionGrupo.vi,
+                        valorResidual: depreciacionGrupo.vf,
+                        vidaUtilMeses: depreciacionGrupo.Dt,
+                        metodoDespreciacion: depreciacionGrupo.metodo
+                    }),
+                    // For production assets, initialize specific fields
+                    ...(tipoActivo === TipoActivo.PRODUCCION && {
+                        capacidad,
+                        unidadCapacidad
+                    })
+                });
+            }
+
+            // Update the state with the new assets
+            setListaActivos(newActivos);
+            setActivoFijoGroup(newActivos);
+        }
+    // Only include dependencies that should trigger asset creation
+    // Exclude listaActivos to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tipoIncorporacion, itemOrdenCompraActivo, item.cantidad, item.nombre, setActivoFijoGroup]); // Run only when these critical dependencies change
+
     // Función para calcular el subtotal basado en el precio unitario editado
     const calcularSubtotal = () => {
-        return precioUnitario * itemOrdenCompraActivo.cantidad;
+        return precioUnitario * item.cantidad;
     };
 
     // Función para actualizar los atributos comunes en todos los activos
@@ -74,7 +136,7 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
     const addActivo = () => {
         const newActivo: ActivoFijo = {
             id: `temp-${Date.now()}`, // Temporary ID until saved to backend
-            nombre: itemOrdenCompraActivo.nombre,
+            nombre: item.nombre,
             estado: 0, // Active state
             brand, // Aplicar el brand común
             tipo: tipoActivo, // Aplicar el tipo común
@@ -89,8 +151,8 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
             }),
             // Para activos de producción, inicializar campos específicos
             ...(tipoActivo === TipoActivo.PRODUCCION && {
-                capacidad: 0,
-                unidadCapacidad: UnidadesCapacidad.L
+                capacidad,
+                unidadCapacidad
             })
         };
 
@@ -133,7 +195,7 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
             <Card boxShadow='lg' mb={4}>
                 <CardHeader bg={"blue.200"} p={4}>
                     <Flex justifyContent="space-between" alignItems="center">
-                        <Heading size="md">{itemOrdenCompraActivo.nombre}</Heading>
+                        <Heading size="md">{item.nombre}</Heading>
                         <HStack spacing={2}>
                             <IconButton
                                 aria-label="Add activo"
@@ -164,15 +226,19 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                                 value={precioUnitario}
                                 onChange={(e) => {
                                     const newPrecioUnitario = parseFloat(e.target.value);
+
+                                    // Validate that the price is a positive number
+                                    if (isNaN(newPrecioUnitario) || newPrecioUnitario < 0) {
+                                        return;
+                                    }
+
                                     setPrecioUnitario(newPrecioUnitario);
 
-                                    // Actualizar el precio de todos los activos que no han sido modificados individualmente
+                                    // Actualizar el precio de todos los activos
                                     if (listaActivos.length > 0) {
                                         const updatedActivos = listaActivos.map(activo => ({
                                             ...activo,
-                                            precio: activo.precio === itemOrdenCompraActivo.precioUnitario || activo.precio === precioUnitario 
-                                                ? newPrecioUnitario 
-                                                : activo.precio
+                                            precio: newPrecioUnitario
                                         }));
                                         setListaActivos(updatedActivos);
                                         setActivoFijoGroup(updatedActivos);
@@ -227,14 +293,21 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                                             <Input 
                                                 type="number"
                                                 placeholder="Capacidad"
-                                                value={0}
+                                                value={capacidad}
                                                 onChange={(e) => {
-                                                    const capacidad = parseFloat(e.target.value);
+                                                    const newCapacidad = parseFloat(e.target.value);
+
+                                                    // Validate that the capacity is a positive number
+                                                    if (isNaN(newCapacidad) || newCapacidad < 0) {
+                                                        return;
+                                                    }
+
+                                                    setCapacidad(newCapacidad);
                                                     // Actualizar la capacidad en todos los activos
                                                     if (listaActivos.length > 0) {
                                                         const updatedActivos = listaActivos.map(activo => ({
                                                             ...activo,
-                                                            capacidad
+                                                            capacidad: newCapacidad
                                                         }));
                                                         setListaActivos(updatedActivos);
                                                         setActivoFijoGroup(updatedActivos);
@@ -247,14 +320,15 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                                         <FormControl>
                                             <FormLabel>Unidad de Capacidad</FormLabel>
                                             <Select 
-                                                value={UnidadesCapacidad.L}
+                                                value={unidadCapacidad}
                                                 onChange={(e) => {
-                                                    const unidadCapacidad = e.target.value as UnidadesCapacidad;
+                                                    const newUnidadCapacidad = e.target.value as UnidadesCapacidad;
+                                                    setUnidadCapacidad(newUnidadCapacidad);
                                                     // Actualizar la unidad de capacidad en todos los activos
                                                     if (listaActivos.length > 0) {
                                                         const updatedActivos = listaActivos.map(activo => ({
                                                             ...activo,
-                                                            unidadCapacidad
+                                                            unidadCapacidad: newUnidadCapacidad
                                                         }));
                                                         setListaActivos(updatedActivos);
                                                         setActivoFijoGroup(updatedActivos);
@@ -302,17 +376,6 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                                         <Input 
                                             value={activo.nombre} 
                                             onChange={(e) => updateActivo(index, 'nombre', e.target.value)}
-                                        />
-                                    </FormControl>
-                                </GridItem>
-                                <GridItem>
-                                    <FormControl>
-                                        <FormLabel>Precio</FormLabel>
-                                        <Input 
-                                            type="number"
-                                            placeholder="Precio"
-                                            value={activo.precio || precioUnitario}
-                                            onChange={(e) => updateActivo(index, 'precio', parseFloat(e.target.value))}
                                         />
                                     </FormControl>
                                 </GridItem>
