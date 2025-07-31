@@ -9,6 +9,23 @@ export enum MetodoDepreciacion {
     DB = "DB",
 }
 
+// Nuevo enum para TipoActivo que reemplaza el string
+export enum TipoActivo {
+    PRODUCCION = "PRODUCCION",
+    MOBILIARIO = "MOBILIARIO",
+    EQUIPO = "EQUIPO"
+}
+
+// Nuevo enum para UnidadesCapacidad
+export enum UnidadesCapacidad {
+    L = "L",
+    KG = "KG",
+    TON = "TON",
+    M3 = "M3",
+    W = "W",
+    HP = "HP"
+}
+
 export interface DepreciacionActivo{}
 export interface MantenimientoActivo{}
 
@@ -19,8 +36,18 @@ export interface ActivoFijo {
     url?: string; // ruta ficha tecnia, la establece el backend con el multiparfile adjunto.
     estado: number; // 0:activo, 1:obsoleto, 2:dado de baja
 
-    fechaCodificacion?: Date | string;
+    // Tipo de activo fijo (ahora usando el enum)
+    tipo?: TipoActivo;
 
+    // Campos para activos de producción (ahora disponibles para todos los tipos)
+    capacidad?: number;
+    unidadCapacidad?: UnidadesCapacidad;
+
+    // Campos para ubicación y responsable
+    ubicacion?: string;
+    responsable?: string;
+
+    fechaCodificacion?: Date | string;
     fechaBaja?: Date | string;
 
     // Campos para integración contable
@@ -29,14 +56,14 @@ export interface ActivoFijo {
     vidaUtilMeses?: number;
     metodoDespreciacion?: string; // "LINEAL", "SUMA_DIGITOS", etc.
 
+    // Precio (nuevo campo solicitado)
+    precio?: number;
+    divisa?: DIVISAS;
+
     depreciaciones?: DepreciacionActivo[];
-
     traslados?: TrasladoActivo[];
-
     mantenimientos?: MantenimientoActivo[];
-
     lineaIncorporacion?: IncorporacionActivoLine;
-
     documentosBaja?: DocumentoBajaActivo[];
 }
 

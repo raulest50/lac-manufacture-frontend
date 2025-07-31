@@ -57,6 +57,7 @@ export function StepZeroTipoIngreso({
 
   const handleSearchOC = async () => {
     if (!ocNumber.trim()) {
+
       toast({
         title: "Campo requerido",
         description: "Por favor ingrese un número de OC-AF",
