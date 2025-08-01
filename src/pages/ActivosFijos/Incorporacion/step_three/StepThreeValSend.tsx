@@ -14,6 +14,8 @@ import {
     CardHeader,
     CardBody,
 } from '@chakra-ui/react';
+import axios from "axios";
+import EndPointsURL from "../../../../api/EndPointsURL";
 import { IncorporacionActivoDto, OrdenCompraActivo, TIPO_INCORPORACION } from '../../types.tsx';
 
 type Props = {
@@ -31,28 +33,54 @@ export function StepThreeValSend({
     const toast = useToast();
 
     // Función para finalizar la incorporación
-    const handleFinalizarIncorporacion = () => {
+    const handleFinalizarIncorporacion = async () => {
         setIsSubmitting(true);
+        const endpoints = new EndPointsURL();
 
-        // Aquí se implementaría la llamada al backend para guardar la transacción
-        // La interfaz enviaría:
-        // - incorporacionActivoDto: datos generales de la incorporación
-        // - ordenCompraActivo: datos de la orden de compra (si aplica)
-        // - documentoSoporte: archivo adjunto en el paso anterior
+        try {
+            const formData = new FormData();
 
-        // Simulamos una operación exitosa después de un tiempo
-        setTimeout(() => {
+            const { documentoSoporte, ...dto } = incorporacionActivoDto;
+            formData.append(
+                "incorporacionDto",
+                new Blob([JSON.stringify(dto)], { type: "application/json" })
+            );
+
+            if (incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.CON_OC && ordenCompraActivo) {
+                formData.append(
+                    "ordenCompraActivo",
+                    new Blob([JSON.stringify(ordenCompraActivo)], { type: "application/json" })
+                );
+            }
+
+            if (documentoSoporte) {
+                formData.append("documentoSoporte", documentoSoporte);
+            }
+
+            const response = await axios.post(endpoints.incorporar_activos_fijos, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+
             toast({
                 title: "Incorporación exitosa",
-                description: "Los activos fijos han sido incorporados correctamente.",
+                description: `ID de incorporación: ${response.data.incorporacionId}`,
                 status: "success",
                 duration: 5000,
                 isClosable: true,
             });
-            setIsSubmitting(false);
-            // Aquí se podría redirigir a otra página o reiniciar el proceso
             setActiveStep(0);
-        }, 2000);
+        } catch (error) {
+            console.error(error);
+            toast({
+                title: "Error al incorporar",
+                description: "No se pudo completar la incorporación de activos.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
