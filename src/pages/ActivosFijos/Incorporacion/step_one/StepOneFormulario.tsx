@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     Button,
     Flex,
@@ -13,20 +13,20 @@ import {
     CardBody
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
-import { ActivoFijo, IncorporacionActivoDta, OrdenCompraActivo, ItemOrdenCompraActivo, TIPO_INCORPORACION, GrupoActivos } from '../../types.tsx';
+import { ActivoFijo, IncorporacionActivoDto, OrdenCompraActivo, ItemOrdenCompraActivo, TIPO_INCORPORACION, GrupoActivos, TipoActivo } from '../../types.tsx';
 import { ActivoGroup } from './ActivoGroup/ActivoGroup.tsx';
 
 type Props = {
     setActiveStep: (step: number) => void;
-    setIncorporacionActivoHeader: (incorporacionActivoHeader: IncorporacionActivoDta) => void;
-    incorporacionActivoDta: IncorporacionActivoDta;
+    setIncorporacionActivoHeader: (incorporacionActivoHeader: IncorporacionActivoDto) => void;
+    incorporacionActivoDto: IncorporacionActivoDto;
     ordenCompraActivo: OrdenCompraActivo;
 };
 
 export function StepOneFormulario({ 
     setActiveStep, 
     setIncorporacionActivoHeader, 
-    incorporacionActivoDta, 
+    incorporacionActivoDto, 
     ordenCompraActivo 
 }: Props) {
     const [grupos, setGrupos] = useState<GrupoActivos[]>([]);
@@ -34,7 +34,7 @@ export function StepOneFormulario({
 
     // Inicializar grupos basados en el tipo de incorporación
     useEffect(() => {
-        if (incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.CON_OC && 
+        if (incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.CON_OC && 
             ordenCompraActivo.itemsOrdenCompra?.length > 0) {
             // Crear un grupo por cada ítem de la orden de compra
             const gruposIniciales = ordenCompraActivo.itemsOrdenCompra.map(item => ({
@@ -47,7 +47,7 @@ export function StepOneFormulario({
             // Para incorporaciones SIN_OC o AF_EXISTENTE, comenzar con lista vacía
             setGrupos([]);
         }
-    }, [incorporacionActivoDta.tipoIncorporacion, ordenCompraActivo.itemsOrdenCompra]);
+    }, [incorporacionActivoDto.tipoIncorporacion, ordenCompraActivo.itemsOrdenCompra]);
 
     // Función para agregar un nuevo grupo (solo para SIN_OC o AF_EXISTENTE)
     const agregarGrupo = () => {
@@ -82,15 +82,53 @@ export function StepOneFormulario({
         ));
     };
 
-    // Función para manejar el botón "Siguiente"
-    const handleSiguiente = () => {
+    // Función para validar si todos los grupos tienen datos completos
+    const validarGrupos = (): boolean => {
+        // Verificar que haya al menos un grupo
+        if (grupos.length === 0) {
+            return false;
+        }
+
         // Verificar que haya al menos un grupo con activos
         const hayActivos = grupos.some(grupo => grupo.activos.length > 0);
-
         if (!hayActivos) {
+            return false;
+        }
+
+        // Verificar que todos los activos tengan los datos requeridos
+        for (const grupo of grupos) {
+            for (const activo of grupo.activos) {
+                // Verificar campos obligatorios
+                if (!activo.id || !activo.nombre) {
+                    return false;
+                }
+
+                // Verificar campos específicos según el tipo de activo
+                if (activo.tipo === TipoActivo.PRODUCCION) {
+                    if (activo.capacidad === undefined || activo.unidadCapacidad === undefined) {
+                        return false;
+                    }
+                }
+
+                // Verificar que tenga precio
+                if (activo.precio === undefined || activo.precio <= 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    };
+
+    // Calcular si el formulario es válido usando useMemo para evitar recálculos innecesarios
+    const esFormularioValido = useMemo(() => validarGrupos(), [grupos]);
+
+    // Función para manejar el botón "Siguiente"
+    const handleSiguiente = () => {
+        if (!esFormularioValido) {
             toast({
-                title: "No hay activos",
-                description: "Debe agregar al menos un activo antes de continuar.",
+                title: "Datos incompletos",
+                description: "Todos los grupos deben tener al menos un activo con todos los datos requeridos.",
                 status: "warning",
                 duration: 3000,
                 isClosable: true,
@@ -98,8 +136,11 @@ export function StepOneFormulario({
             return;
         }
 
-        // Aquí se podría guardar la información de los grupos en algún estado global
-        // o enviarla al backend antes de pasar al siguiente paso
+        // Actualizar el DTO con los grupos de activos siguiendo el patrón pipeline
+        setIncorporacionActivoHeader({
+            ...incorporacionActivoDto,
+            gruposActivos: grupos
+        });
 
         // Avanzar al siguiente paso
         setActiveStep(2);
@@ -165,7 +206,7 @@ export function StepOneFormulario({
                 variant="solid"
                 colorScheme="teal"
                 onClick={handleSiguiente}
-                isDisabled={grupos.length === 0}
+                isDisabled={!esFormularioValido}
             >
                 Siguiente
             </Button>

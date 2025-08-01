@@ -13,6 +13,7 @@ import CodificarSemioTermiTab from "./CodificarSemioTermiTab/CodificarSemioTermi
 import InformeProductosTab from './InformeProductosTab.tsx';
 import {Authority, WhoAmIResponse} from "../../api/global_types.tsx";
 import {FamiliasTab} from "./FamiliasTab.tsx";
+import DefinicionProcesosTab from './DefinicionProcesosTab.tsx';
 
 
 function ProductosPage() {
@@ -71,6 +72,10 @@ function ProductosPage() {
                         <Tab sx={my_style_tab}>Familias</Tab>
                     )}
 
+                    { (user === 'master' || productosAccessLevel >= 2) && (
+                        <Tab sx={my_style_tab}>Definición de Procesos</Tab>
+                    )}
+
                 </TabList>
 
                 <TabPanels>
@@ -92,6 +97,12 @@ function ProductosPage() {
                     { (user === 'master' || productosAccessLevel >= 2) && (
                         <TabPanel>
                             <FamiliasTab />
+                        </TabPanel>
+                    )}
+
+                    { (user === 'master' || productosAccessLevel >= 2) && (
+                        <TabPanel>
+                            <DefinicionProcesosTab />
                         </TabPanel>
                     )}
 

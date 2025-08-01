@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Flex, useToast } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../../api/EndPointsURL';
-import { IncorporacionActivoDta, OrdenCompraActivo } from "../../types.tsx";
+import { IncorporacionActivoDto, OrdenCompraActivo } from "../../types.tsx";
 import { TipoIngresoSelection } from "./TipoIngresoSelection.tsx";
 import { TIPO_INCORPORACION } from "../../types.tsx";
 import { PanelBusquedaOCFA } from "./PanelBusquedaOCFA.tsx";
@@ -10,7 +10,7 @@ import { PanelBusquedaOCFA } from "./PanelBusquedaOCFA.tsx";
 type Props = {
     setActiveStep: (step: number) => void;
     setOrdenCompraActivo: (ordenCompraActivo: OrdenCompraActivo) => void;
-    setIncorporacionActivoHeader: (incorporacionActivoHeader: IncorporacionActivoDta) => void;
+    setIncorporacionActivoHeader: (incorporacionActivoHeader: IncorporacionActivoDto) => void;
 };
 
 /**
@@ -79,7 +79,7 @@ export function StepZeroTipoIngreso({
 
       setOrdenCompraActivo(ordenCompra);
 
-      const incorporacionData: IncorporacionActivoDta = {
+      const incorporacionData: IncorporacionActivoDto = {
         tipoIncorporacion: TIPO_INCORPORACION.CON_OC,
         id_OC_AF: parseInt(ocNumber)
       };

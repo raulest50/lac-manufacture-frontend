@@ -86,10 +86,12 @@ export interface GrupoActivos {
 }
 
 
-export interface IncorporacionActivoDta {
+export interface IncorporacionActivoDto {
     tipoIncorporacion?: 'CON_OC' | 'SIN_OC' | 'AF_EXISTENTE';
     id_OC_AF ?: number;
-
+    documentoSoporte?: File;  // Documento soporte (factura) para la incorporación
+    userId?: string;          // ID del usuario que realiza la incorporación
+    gruposActivos?: GrupoActivos[]; // Grupos de activos a incorporar
 }
 
 

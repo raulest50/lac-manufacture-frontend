@@ -1,9 +1,11 @@
 import {useState} from 'react';
 import {Box, Flex, StepDescription, StepNumber, StepSeparator, StepStatus, useSteps} from '@chakra-ui/react';
-import {IncorporacionActivoDta, OrdenCompraActivo} from "../types.tsx";
+import {IncorporacionActivoDto, OrdenCompraActivo} from "../types.tsx";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
 import {StepZeroTipoIngreso} from "./step_zero/StepZeroTipoIngreso.tsx";
 import {StepOneFormulario} from "./step_one/StepOneFormulario.tsx";
+import {StepTwoDocSuppIaf} from "./step_two/StepTwoDocSuppIAF.tsx";
+import {StepThreeValSend} from "./step_three/StepThreeValSend.tsx";
 
 
 const steps = [
@@ -15,8 +17,8 @@ const steps = [
 
 export function IncorporacionActivosFijos() {
 
-    const [incorporacionActivoDta, setIncorporacionActivoDta] =
-        useState<IncorporacionActivoDta>({});
+    const [incorporacionActivoDto, setIncorporacionActivoDto] =
+        useState<IncorporacionActivoDto>({});
 
     const [ordenCompraActivo, setOrdenCompraActivo] = useState<OrdenCompraActivo>({});
 
@@ -32,7 +34,7 @@ export function IncorporacionActivosFijos() {
                 <StepZeroTipoIngreso
                     setActiveStep={setActiveStep}
                     setOrdenCompraActivo={setOrdenCompraActivo}
-                    setIncorporacionActivoHeader={setIncorporacionActivoDta}
+                    setIncorporacionActivoHeader={setIncorporacionActivoDto}
                 />
             )
         }
@@ -40,8 +42,27 @@ export function IncorporacionActivosFijos() {
             return(
                 <StepOneFormulario
                     setActiveStep={setActiveStep}
-                    setIncorporacionActivoHeader={setIncorporacionActivoDta}
-                    incorporacionActivoDta={incorporacionActivoDta}
+                    setIncorporacionActivoHeader={setIncorporacionActivoDto}
+                    incorporacionActivoDto={incorporacionActivoDto}
+                    ordenCompraActivo={ordenCompraActivo}
+                />
+            )
+        }
+        if(activeStep === 2){
+            return(
+                <StepTwoDocSuppIaf
+                    setActiveStep={setActiveStep}
+                    setIncorporacionActivoHeader={setIncorporacionActivoDto}
+                    incorporacionActivoDto={incorporacionActivoDto}
+                    ordenCompraActivo={ordenCompraActivo}
+                />
+            )
+        }
+        if(activeStep === 3){
+            return(
+                <StepThreeValSend
+                    setActiveStep={setActiveStep}
+                    incorporacionActivoDto={incorporacionActivoDto}
                     ordenCompraActivo={ordenCompraActivo}
                 />
             )

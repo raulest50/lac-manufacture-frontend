@@ -31,7 +31,7 @@ function normalizeExt(ext: string) {
   return ext.startsWith(".") ? ext.toLowerCase() : `.${ext.toLowerCase()}`;
 }
 
-export default function FileChooser({
+export function FileChooser({
   title,
   description,
   showLinkInput = true,
@@ -152,7 +152,7 @@ export default function FileChooser({
           />
           <Icon as={file ? FaFileCircleCheck : FaFileCircleQuestion} boxSize="2em" color={file ? "green" : "orange.500"} />
           {file && (
-            <Text fontSize="sm" noOfLines={1}">
+            <Text fontSize="sm" noOfLines={1}>
               {file.name}
             </Text>
           )}
