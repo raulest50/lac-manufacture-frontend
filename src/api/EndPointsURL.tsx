@@ -97,6 +97,7 @@ export default class EndPointsURL{
     public cancel_orden_compra_activo: string;
     public get_items_by_orden_compra_activo_id: string;
     public update_orden_compra_activo: string;
+    public incorporar_activos_fijos: string;
 
     // just in case of need
     // contabilidad resource
@@ -219,6 +220,7 @@ export default class EndPointsURL{
         this.cancel_orden_compra_activo = `${domain}/${activos_fijos_res}/ocaf/{ordenCompraActivoId}/cancel`;
         this.get_items_by_orden_compra_activo_id = `${domain}/${activos_fijos_res}/ocaf/{ordenCompraActivoId}/items`;
         this.update_orden_compra_activo = `${domain}/${activos_fijos_res}/ocaf/{ordenCompraActivoId}/update`;
+        this.incorporar_activos_fijos = `${domain}/${activos_fijos_res}/incorporar`;
 
         // notifications endpoint
         this.module_notifications = `${domain}/notificaciones/notifications4user`;
