@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Card, CardBody, CardHeader, Flex, IconButton, Text, Box, HStack, Heading, 
   FormControl, FormLabel, Input, Select, Divider, Grid, GridItem
@@ -143,6 +143,12 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
 
     // No necesitamos un useEffect para actualizar los atributos comunes
     // Los handlers de onChange ya se encargan de actualizar los activos
+
+    // Handler for depreciation changes using useCallback to prevent infinite loops
+    const handleDepreciacionChange = useCallback((depreciacion) => {
+        setDepreciacionGrupo(depreciacion);
+        updateCommonAttributes(undefined, undefined, depreciacion);
+    }, []);
 
     // Function to add a new activo
     const addActivo = () => {
@@ -447,10 +453,7 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                         <Box p={4} borderWidth="1px" borderRadius="md" bg="gray.50" mb={4}>
                             <Text fontWeight="bold" mb={2}>Método de Depreciación (común para todo el grupo)</Text>
                             <MetodoDepreciacionComponent 
-                                setDepreciacion={(depreciacion) => {
-                                    setDepreciacionGrupo(depreciacion);
-                                    updateCommonAttributes(undefined, undefined, depreciacion);
-                                }}
+                                setDepreciacion={handleDepreciacionChange}
                                 initialValue={calcularPrecioConIVA()}
                                 initialResidualValue={0}
                             />
