@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import {
     Flex,
     Step,
@@ -14,28 +14,54 @@ import {
     Box
 } from '@chakra-ui/react';
 
+// Import step components
+import { StepOneWPlanningWiz } from './StepOneWPlanningWiz/StepOneWPlanningWiz';
+import { StepTwoCapProd } from './StepTwoWPlanningWiz/StepTwoCapProd';
+import { StepThreeResults } from './StepThreeWPlanningWiz/StepThreeResults';
+
 type Props = {};
 
 export function WeekPlanningWizardTab(props: Props) {
     const steps = [
-        {title: 'DefinirNecesidades', description: 'Select Product'},
-        {title: '2', description: 'Configure Parameters'},
-        {title: '3', description: 'Review Results'}
+        { title: 'DefinirNecesidades', description: 'Select Product' },
+        { title: 'CapacidadProducción', description: 'Configure Parameters' },
+        { title: 'Resultados', description: 'Review Results' }
     ];
 
-    const {activeStep, setActiveStep} = useSteps({
+    const { activeStep, setActiveStep } = useSteps({
         index: 0,
         count: steps.length,
     });
 
-    const [activeStepIndex, setActiveStepIndex] = useState(0);
-
+    // Renderizado condicional basado en el paso activo
     const ConditionalRender = () => {
-        
-        
-        
-    }
-    
+        switch (activeStep) {
+            case 0:
+                // Arquitectura de control delegado: Pasamos setActiveStep a los hijos
+                return (
+                    <StepOneWPlanningWiz 
+                        onNext={() => setActiveStep(activeStep + 1)} 
+                    />
+                );
+            case 1:
+                return (
+                    <StepTwoCapProd 
+                        onNext={() => setActiveStep(activeStep + 1)} 
+                        onPrev={() => setActiveStep(activeStep - 1)} 
+                    />
+                );
+            case 2:
+                return (
+                    <StepThreeResults 
+                        onPrev={() => setActiveStep(activeStep - 1)} 
+                        onFinish={() => console.log('Finalizar proceso')} 
+                    />
+                );
+            default:
+                return <StepOneWPlanningWiz onNext={() => setActiveStep(1)} />;
+        }
+    };
+
     return (
         <Flex direction="column" width="100%">
             <Stepper index={activeStep} gap='0'>
@@ -57,7 +83,9 @@ export function WeekPlanningWizardTab(props: Props) {
                 ))}
             </Stepper>
 
-            <ConditionalRender/>
+            <Box mt={8} mb={4}>
+                <ConditionalRender/>
+            </Box>
 
         </Flex>
     );
