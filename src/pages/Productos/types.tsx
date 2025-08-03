@@ -4,6 +4,8 @@ export const UNIDADES = {L:"L", KG:"KG", U:"U"};
 export const TIPOS_MATERIALES = {materiaPrima: 1, materialDeEmpaque: 2};
 export const IVA_VALUES = {'iva_0':0, 'iva_5':5,'iva_19':19, };
 
+import type {ActivoFijo} from '../ActivosFijos/types';
+
 /**
  * interfaces para la codificacion de materias primas
  */
@@ -101,9 +103,11 @@ export interface Familia{
 export interface RecursoProduccion {
     id?: number;
     nombre: string;
+    descripcion: string;
     capacidadTotal?: number;
     cantidadDisponible?: number;
     capacidadPorHora?: number;
     turnos?: number;
     horasPorTurno?: number;
+    activosFijos?: ActivoFijo[];
 }

@@ -5,38 +5,43 @@ import axios from 'axios';
 import EndPointsURL from '../../api/EndPointsURL';
 import {input_style} from '../../styles/styles_general';
 import {RecursoProduccion} from './types';
+import RPAFmanager from './RPAFmanager';
+import {ActivoFijo} from '../ActivosFijos/types';
 
 function CrearRecursoProduccion() {
     const [nombre, setNombre] = useState('');
-    const [capacidadTotal, setCapacidadTotal] = useState('');
-    const [cantidadDisponible, setCantidadDisponible] = useState('');
-    const [capacidadPorHora, setCapacidadPorHora] = useState('');
-    const [turnos, setTurnos] = useState('');
-    const [horasPorTurno, setHorasPorTurno] = useState('');
+    const [descripcion, setDescripcion] = useState('');
+    const [activos, setActivos] = useState<ActivoFijo[]>([]);
 
     const toast = useToast();
     const endPoints = new EndPointsURL();
 
     const clearFields = () => {
         setNombre('');
-        setCapacidadTotal('');
-        setCantidadDisponible('');
-        setCapacidadPorHora('');
-        setTurnos('');
-        setHorasPorTurno('');
+        setDescripcion('');
+        setActivos([]);
     };
 
     const handleSubmit = async () => {
         const recurso: RecursoProduccion = {
             nombre,
-            capacidadTotal: capacidadTotal ? parseFloat(capacidadTotal) : undefined,
-            cantidadDisponible: cantidadDisponible ? parseInt(cantidadDisponible) : undefined,
-            capacidadPorHora: capacidadPorHora ? parseFloat(capacidadPorHora) : undefined,
-            turnos: turnos ? parseInt(turnos) : undefined,
-            horasPorTurno: horasPorTurno ? parseFloat(horasPorTurno) : undefined,
+            descripcion,
         };
         try {
-            await axios.post(endPoints.save_recurso_produccion, recurso);
+            const resp = await axios.post(endPoints.save_recurso_produccion, recurso);
+            const saved: RecursoProduccion = resp.data;
+            for(const af of activos){
+                try{
+                    const getUrl = endPoints.get_activo_fijo.replace('{id}', af.id);
+                    const updUrl = endPoints.update_activo_fijo.replace('{id}', af.id);
+                    const resAf = await axios.get(getUrl);
+                    const fullAf = resAf.data;
+                    fullAf.tipoRecurso = {id: saved.id};
+                    await axios.put(updUrl, fullAf);
+                }catch(err){
+                    // ignore individual errors
+                }
+            }
             toast({
                 title: 'Recurso creado',
                 status: 'success',
@@ -63,26 +68,11 @@ function CrearRecursoProduccion() {
                     <FormLabel>Nombre</FormLabel>
                     <Input value={nombre} onChange={(e) => setNombre(e.target.value)} sx={input_style} />
                 </FormControl>
-                <FormControl>
-                    <FormLabel>Capacidad Total</FormLabel>
-                    <Input type="number" value={capacidadTotal} onChange={(e) => setCapacidadTotal(e.target.value)} sx={input_style} />
+                <FormControl isRequired>
+                    <FormLabel>Descripción</FormLabel>
+                    <Input value={descripcion} onChange={(e)=>setDescripcion(e.target.value)} sx={input_style} />
                 </FormControl>
-                <FormControl>
-                    <FormLabel>Cantidad Disponible</FormLabel>
-                    <Input type="number" value={cantidadDisponible} onChange={(e) => setCantidadDisponible(e.target.value)} sx={input_style} />
-                </FormControl>
-                <FormControl>
-                    <FormLabel>Capacidad por Hora</FormLabel>
-                    <Input type="number" value={capacidadPorHora} onChange={(e) => setCapacidadPorHora(e.target.value)} sx={input_style} />
-                </FormControl>
-                <FormControl>
-                    <FormLabel>Turnos</FormLabel>
-                    <Input type="number" value={turnos} onChange={(e) => setTurnos(e.target.value)} sx={input_style} />
-                </FormControl>
-                <FormControl>
-                    <FormLabel>Horas por Turno</FormLabel>
-                    <Input type="number" value={horasPorTurno} onChange={(e) => setHorasPorTurno(e.target.value)} sx={input_style} />
-                </FormControl>
+                <RPAFmanager activos={activos} onChange={setActivos} />
                 <Button colorScheme="teal" onClick={handleSubmit}>Guardar</Button>
                 <Button colorScheme="orange" onClick={clearFields}>Limpiar</Button>
             </VStack>
