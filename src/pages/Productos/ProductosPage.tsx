@@ -1,33 +1,22 @@
-
-import { useState, useEffect } from 'react';
-import { Container, Tabs, TabList, TabPanels, TabPanel, Tab } from '@chakra-ui/react';
+import {useState, useEffect} from 'react';
+import {Container} from '@chakra-ui/react';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
+import {useAuth} from '../../context/AuthContext';
 import EndPointsURL from '../../api/EndPointsURL';
 
 import MyHeader from '../../components/MyHeader.tsx';
-import { my_style_tab } from '../../styles/styles_general.tsx';
-
-import CodificarMaterialesTab from './CodificarMaterialesTab.tsx';
-import CodificarSemioTermiTab from "./CodificarSemioTermiTab/CodificarSemioTermiTab.tsx";
-import InformeProductosTab from './InformeProductosTab.tsx';
-import {Authority, WhoAmIResponse} from "../../api/global_types.tsx";
-import {FamiliasTab} from "./FamiliasTab.tsx";
-import DefinicionProcesosTab from './DefinicionProcesosTab.tsx';
-
+import {Authority, WhoAmIResponse} from '../../api/global_types.tsx';
+import ProductosMenuSelection from './ProductosMenuSelection';
+import BasicOperationsTabs from './BasicOperationsTabs';
+import TerminadosSemiterminadosTabs from './TerminadosSemiterminadosTabs';
+import DefinicionProcesosTabs from './DefinicionProcesosTabs';
 
 function ProductosPage() {
     const [productosAccessLevel, setProductosAccessLevel] = useState<number>(0);
     const { user } = useAuth();
     const endPoints = new EndPointsURL();
 
-    // Estado para rastrear la pestaña activa
-    const [tabIndex, setTabIndex] = useState(0);
-
-    // Función para manejar el cambio de pestaña
-    const handleTabChange = (index) => {
-        setTabIndex(index);
-    };
+    const [viewMode, setViewMode] = useState<'menu' | 'basic' | 'terminados' | 'procesos'>('menu');
 
     useEffect(() => {
         const fetchUserAccessLevel = async () => {
@@ -37,10 +26,9 @@ function ProductosPage() {
 
                 // Buscar la autoridad para el módulo PRODUCTOS
                 const productosAuthority = authorities.find(
-                    (auth:Authority) => auth.authority === "ACCESO_PRODUCTOS"
+                    (auth:Authority) => auth.authority === "ACCESO_PRODUCTOS",
                 );
 
-                // Si se encuentra, establecer el nivel de acceso
                 if (productosAuthority) {
                     setProductosAccessLevel(parseInt(productosAuthority.nivel));
                 }
@@ -52,62 +40,41 @@ function ProductosPage() {
         fetchUserAccessLevel();
     }, []);
 
+    function renderContent() {
+        switch (viewMode) {
+            case 'basic':
+                return (
+                    <BasicOperationsTabs
+                        user={user}
+                        productosAccessLevel={productosAccessLevel}
+                        onBack={() => setViewMode('menu')}
+                    />
+                );
+            case 'terminados':
+                return (
+                    <TerminadosSemiterminadosTabs
+                        user={user}
+                        productosAccessLevel={productosAccessLevel}
+                        onBack={() => setViewMode('menu')}
+                    />
+                );
+            case 'procesos':
+                return <DefinicionProcesosTabs onBack={() => setViewMode('menu')} />;
+            default:
+                return (
+                    <ProductosMenuSelection
+                        setViewMode={setViewMode}
+                        user={user}
+                        productosAccessLevel={productosAccessLevel}
+                    />
+                );
+        }
+    }
+
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w="full" h="full">
             <MyHeader title="Productos" />
-            <Tabs isFitted gap="1em" variant="line" index={tabIndex} onChange={handleTabChange}>
-                <TabList>
-                    {/* Solo mostrar las pestañas de creación si el usuario es master o tiene nivel 2 o superior */}
-                    {(user === 'master' || productosAccessLevel >= 2) && (
-                        <Tab sx={my_style_tab}>Codificar Material</Tab>
-                    )}
-
-                    <Tab sx={my_style_tab}>Consulta</Tab>
-
-                    {(user === 'master' || productosAccessLevel >= 2) && (
-                        <Tab sx={my_style_tab}>Crear Terminado/Semiterminado</Tab>
-                    )}
-
-                    { (user === 'master' || productosAccessLevel >= 2) && (
-                        <Tab sx={my_style_tab}>Familias</Tab>
-                    )}
-
-                    { (user === 'master' || productosAccessLevel >= 2) && (
-                        <Tab sx={my_style_tab}>Definición de Procesos</Tab>
-                    )}
-
-                </TabList>
-
-                <TabPanels>
-                    {/* Solo renderizar los paneles de creación si el usuario es master o tiene nivel 2 o superior */}
-                    {(user === 'master' || productosAccessLevel >= 2) && (
-                        <TabPanel>
-                            <CodificarMaterialesTab />
-                        </TabPanel>
-                    )}
-                    <TabPanel>
-                        <InformeProductosTab />
-                    </TabPanel>
-                    {(user === 'master' || productosAccessLevel >= 2) && (
-                        <TabPanel>
-                            <CodificarSemioTermiTab isActive={tabIndex === 2} />
-                        </TabPanel>
-                    )}
-
-                    { (user === 'master' || productosAccessLevel >= 2) && (
-                        <TabPanel>
-                            <FamiliasTab />
-                        </TabPanel>
-                    )}
-
-                    { (user === 'master' || productosAccessLevel >= 2) && (
-                        <TabPanel>
-                            <DefinicionProcesosTab />
-                        </TabPanel>
-                    )}
-
-                </TabPanels>
-            </Tabs>
+            {renderContent()}
         </Container>
     );
 }
