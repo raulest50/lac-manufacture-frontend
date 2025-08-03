@@ -16,7 +16,12 @@ import {
 } from '@chakra-ui/react';
 import axios from "axios";
 import EndPointsURL from "../../../../api/EndPointsURL";
-import { IncorporacionActivoDto, OrdenCompraActivo, TIPO_INCORPORACION } from '../../types.tsx';
+import {
+    IncorporacionActivoDto,
+    ItemOrdenCompraActivo,
+    OrdenCompraActivo,
+    TIPO_INCORPORACION
+} from '../../types.tsx';
 
 type Props = {
     setActiveStep: (step: number) => void;
@@ -32,6 +37,14 @@ export function StepThreeValSend({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const toast = useToast();
 
+    // Elimina propiedades no soportadas por el backend
+    const sanitizeItem = (
+        item: ItemOrdenCompraActivo & { precioUnitarioFinal?: number }
+    ): ItemOrdenCompraActivo => {
+        const { precioUnitarioFinal, ...clean } = item;
+        return clean;
+    };
+
     // Función para finalizar la incorporación
     const handleFinalizarIncorporacion = async () => {
         setIsSubmitting(true);
@@ -41,22 +54,22 @@ export function StepThreeValSend({
             const formData = new FormData();
 
             const { documentoSoporte, gruposActivos = [], ...rest } = incorporacionActivoDto;
-            const gruposSinId = gruposActivos.map(({ id: _id, ...g }) => g);
+            const gruposSinId = gruposActivos.map(({ id: _id, itemOrdenCompra, ...g }) => ({
+                ...g,
+                itemOrdenCompra: sanitizeItem(itemOrdenCompra)
+            }));
             const dto = { ...rest, gruposActivos: gruposSinId };
             formData.append(
                 "incorporacionDto",
                 new Blob([JSON.stringify(dto)], { type: "application/json" })
             );
 
-            if (incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.CON_OC && ordenCompraActivo) {
+            if (
+                incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.CON_OC &&
+                ordenCompraActivo
+            ) {
                 const { itemsOrdenCompra = [], ...ordenRest } = ordenCompraActivo;
-                const itemsLimpios = itemsOrdenCompra.map(item => {
-                    const itemCopy = {...item};
-                    if ('precioUnitarioFinal' in itemCopy) {
-                        delete itemCopy.precioUnitarioFinal;
-                    }
-                    return itemCopy;
-                });
+                const itemsLimpios = itemsOrdenCompra.map(sanitizeItem);
                 const ordenLimpia = { ...ordenRest, itemsOrdenCompra: itemsLimpios };
                 formData.append(
                     "ordenCompraActivo",
