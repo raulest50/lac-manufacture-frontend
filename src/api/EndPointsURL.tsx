@@ -49,6 +49,9 @@ export default class EndPointsURL{
 
     // recursos de produccion
     public save_recurso_produccion:string;
+    public search_recurso_produccion:string;
+    public update_recurso_produccion:string;
+    public activos_fijos_disponibles_rp:string;
 
 
     // compras resource
@@ -101,6 +104,8 @@ export default class EndPointsURL{
     public get_items_by_orden_compra_activo_id: string;
     public update_orden_compra_activo: string;
     public incorporar_activos_fijos: string;
+    public get_activo_fijo: string;
+    public update_activo_fijo: string;
 
     // just in case of need
     // contabilidad resource
@@ -188,6 +193,9 @@ export default class EndPointsURL{
 
         // recursos de produccion endpoints
         this.save_recurso_produccion = `${domain}/${recursos_produccion_res}`;
+        this.search_recurso_produccion = `${domain}/${recursos_produccion_res}/search`;
+        this.update_recurso_produccion = `${domain}/${recursos_produccion_res}/update`;
+        this.activos_fijos_disponibles_rp = `${domain}/${recursos_produccion_res}/activos-fijos-disponibles`;
 
         // movimientos endpoints
         this.search_products_with_stock = `${domain}/${movimientos_res}/search_products_with_stock`;
@@ -228,6 +236,8 @@ export default class EndPointsURL{
         this.get_items_by_orden_compra_activo_id = `${domain}/${activos_fijos_res}/ocaf/{ordenCompraActivoId}/items`;
         this.update_orden_compra_activo = `${domain}/${activos_fijos_res}/ocaf/{ordenCompraActivoId}/update`;
         this.incorporar_activos_fijos = `${domain}/${activos_fijos_res}/incorporar`;
+        this.get_activo_fijo = `${domain}/${activos_fijos_res}/{id}`;
+        this.update_activo_fijo = `${domain}/${activos_fijos_res}/{id}`;
 
         // notifications endpoint
         this.module_notifications = `${domain}/notificaciones/notifications4user`;

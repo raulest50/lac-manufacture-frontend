@@ -46,6 +46,11 @@ export interface ActivoFijo {
     // Campos para ubicación y responsable
     ubicacion?: string;
     responsable?: string;
+    /**
+     * Recurso de producción al que está asignado el activo.
+     * En la mayoría de los casos solo se requiere el identificador.
+     */
+    tipoRecurso?: { id?: number; nombre?: string };
 
     fechaCodificacion?: Date | string;
     fechaBaja?: Date | string;
