@@ -50,7 +50,13 @@ export function StepThreeValSend({
 
             if (incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.CON_OC && ordenCompraActivo) {
                 const { itemsOrdenCompra = [], ...ordenRest } = ordenCompraActivo;
-                const itemsLimpios = itemsOrdenCompra.map(({ precioUnitarioFinal: _precioUnitarioFinal, ...item }) => item);
+                const itemsLimpios = itemsOrdenCompra.map(item => {
+                    const itemCopy = {...item};
+                    if ('precioUnitarioFinal' in itemCopy) {
+                        delete itemCopy.precioUnitarioFinal;
+                    }
+                    return itemCopy;
+                });
                 const ordenLimpia = { ...ordenRest, itemsOrdenCompra: itemsLimpios };
                 formData.append(
                     "ordenCompraActivo",
