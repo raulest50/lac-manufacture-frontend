@@ -214,18 +214,15 @@ export function MetodoDepreciacionComponent(props: Props) {
             <FormLabel>Valor Inicial</FormLabel>
             <NumberInput
               value={valorInicial}
-              onChange={(
-                _valueAsString: string,
-                valueAsNumber: number
-              ) => setValorInicial(valueAsNumber)}
+              isReadOnly={true}
               min={0}
+              bg="gray.100" // Indicación visual de que es de solo lectura
             >
               <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
             </NumberInput>
+            <Text fontSize="sm" color="gray.500" mt={1}>
+              Este valor se toma automáticamente del "Valor unitario con IVA" del grupo
+            </Text>
           </FormControl>
 
           <FormControl mb={4}>

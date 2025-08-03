@@ -54,6 +54,13 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
     // Estado para el precio unitario editable
     const [precioUnitario, setPrecioUnitario] = useState<number>(item.precioUnitario);
 
+    // Estado para el porcentaje de IVA editable
+    const [ivaPercentage, setIvaPercentage] = useState<number>(
+        tipoIncorporacion === TIPO_INCORPORACION.CON_OC 
+            ? item.ivaPercentage 
+            : 19 // Default 19% for SIN_OC and AF_EXISTENTE
+    );
+
     // Estado para el método de depreciación común para todo el grupo
     const [depreciacionGrupo, setDepreciacionGrupo] = useState<any>(null);
 
@@ -111,7 +118,7 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
 
     // Función para calcular el precio con IVA incluido
     const calcularPrecioConIVA = () => {
-        return precioUnitario * (1 + item.ivaPercentage / 100);
+        return precioUnitario * (1 + ivaPercentage / 100);
     };
 
     // Función para actualizar los atributos comunes en todos los activos
@@ -256,8 +263,34 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
 
                         {/* Información de IVA */}
                         <Flex alignItems="center" mb={2}>
-                            <Text mr={2}>IVA ({item.ivaPercentage}%): $</Text>
-                            <Text>{(precioUnitario * item.ivaPercentage / 100).toFixed(2)}</Text>
+                            <Text mr={2}>IVA (%): </Text>
+                            <Input 
+                                type="number"
+                                value={ivaPercentage}
+                                onChange={(e) => {
+                                    const newIvaPercentage = parseFloat(e.target.value);
+
+                                    // Validate that the IVA percentage is a non-negative number
+                                    if (isNaN(newIvaPercentage) || newIvaPercentage < 0) {
+                                        return;
+                                    }
+
+                                    setIvaPercentage(newIvaPercentage);
+
+                                    // Actualizar el precio de todos los activos con el nuevo IVA
+                                    if (listaActivos.length > 0) {
+                                        const updatedActivos = listaActivos.map(activo => ({
+                                            ...activo,
+                                            precio: calcularPrecioConIVA()
+                                        }));
+                                        setListaActivos(updatedActivos);
+                                        setActivoFijoGroup(updatedActivos);
+                                    }
+                                }}
+                                size="sm"
+                                width="70px"
+                            />
+                            <Text ml={2}>Valor IVA: ${(precioUnitario * ivaPercentage / 100).toFixed(2)}</Text>
                         </Flex>
 
                         {/* Valor con IVA */}
