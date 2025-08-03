@@ -97,3 +97,13 @@ export interface Familia{
      familiaNombre: string;
      familiaDescripcion: string;
 }
+
+export interface RecursoProduccion {
+    id?: number;
+    nombre: string;
+    capacidadTotal?: number;
+    cantidadDisponible?: number;
+    capacidadPorHora?: number;
+    turnos?: number;
+    horasPorTurno?: number;
+}
