@@ -40,7 +40,9 @@ export function StepThreeValSend({
         try {
             const formData = new FormData();
 
-            const { documentoSoporte, ...dto } = incorporacionActivoDto;
+            const { documentoSoporte, gruposActivos = [], ...rest } = incorporacionActivoDto;
+            const gruposSinId = gruposActivos.map(({ id, ...g }) => g);
+            const dto = { ...rest, gruposActivos: gruposSinId };
             formData.append(
                 "incorporacionDto",
                 new Blob([JSON.stringify(dto)], { type: "application/json" })
