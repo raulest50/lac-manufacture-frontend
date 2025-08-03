@@ -79,7 +79,7 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                     estado: 0, // Active state
                     brand, // Apply common brand
                     tipo: tipoActivo, // Apply common type
-                    precio: precioUnitario, // Use the edited unit price
+                    precio: calcularPrecioConIVA(), // Use the price with IVA included
                     // Apply common depreciation if it exists
                     ...(depreciacionGrupo && {
                         valorAdquisicion: depreciacionGrupo.vi,
@@ -107,6 +107,11 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
     // Función para calcular el subtotal basado en el precio unitario editado
     const calcularSubtotal = () => {
         return precioUnitario * item.cantidad;
+    };
+
+    // Función para calcular el precio con IVA incluido
+    const calcularPrecioConIVA = () => {
+        return precioUnitario * (1 + item.ivaPercentage / 100);
     };
 
     // Función para actualizar los atributos comunes en todos los activos
@@ -140,8 +145,8 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
             estado: 0, // Active state
             brand, // Aplicar el brand común
             tipo: tipoActivo, // Aplicar el tipo común
-            // Usar el precio unitario editado en lugar del original
-            precio: precioUnitario,
+            // Usar el precio unitario con IVA incluido
+            precio: calcularPrecioConIVA(),
             // Aplicar la depreciación común si existe
             ...(depreciacionGrupo && {
                 valorAdquisicion: depreciacionGrupo.vi,
@@ -220,7 +225,7 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                     <Box mb={4}>
                         <Text fontWeight="bold">Cantidad de activos: {listaActivos.length}</Text>
                         <Flex alignItems="center" mb={2}>
-                            <Text mr={2}>Valor unitario Adquisicion: $</Text>
+                            <Text mr={2}>Valor unitario sin IVA: $</Text>
                             <Input 
                                 type="number"
                                 value={precioUnitario}
@@ -234,11 +239,11 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
 
                                     setPrecioUnitario(newPrecioUnitario);
 
-                                    // Actualizar el precio de todos los activos
+                                    // Actualizar el precio de todos los activos con IVA incluido
                                     if (listaActivos.length > 0) {
                                         const updatedActivos = listaActivos.map(activo => ({
                                             ...activo,
-                                            precio: newPrecioUnitario
+                                            precio: calcularPrecioConIVA()
                                         }));
                                         setListaActivos(updatedActivos);
                                         setActivoFijoGroup(updatedActivos);
@@ -247,6 +252,18 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                                 size="sm"
                                 width="100px"
                             />
+                        </Flex>
+
+                        {/* Información de IVA */}
+                        <Flex alignItems="center" mb={2}>
+                            <Text mr={2}>IVA ({item.ivaPercentage}%): $</Text>
+                            <Text>{(precioUnitario * item.ivaPercentage / 100).toFixed(2)}</Text>
+                        </Flex>
+
+                        {/* Valor con IVA */}
+                        <Flex alignItems="center" mb={2}>
+                            <Text mr={2} fontWeight="bold">Valor unitario con IVA: $</Text>
+                            <Text fontWeight="bold">{calcularPrecioConIVA().toFixed(2)}</Text>
                         </Flex>
                     </Box>
 
@@ -401,7 +418,7 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                                     setDepreciacionGrupo(depreciacion);
                                     updateCommonAttributes(undefined, undefined, depreciacion);
                                 }}
-                                initialValue={precioUnitario}
+                                initialValue={calcularPrecioConIVA()}
                                 initialResidualValue={0}
                             />
                         </Box>
