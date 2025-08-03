@@ -41,7 +41,7 @@ export function StepThreeValSend({
             const formData = new FormData();
 
             const { documentoSoporte, gruposActivos = [], ...rest } = incorporacionActivoDto;
-            const gruposSinId = gruposActivos.map(({ id, ...g }) => g);
+            const gruposSinId = gruposActivos.map(({ id: _id, ...g }) => g);
             const dto = { ...rest, gruposActivos: gruposSinId };
             formData.append(
                 "incorporacionDto",
@@ -49,9 +49,12 @@ export function StepThreeValSend({
             );
 
             if (incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.CON_OC && ordenCompraActivo) {
+                const { itemsOrdenCompra = [], ...ordenRest } = ordenCompraActivo;
+                const itemsLimpios = itemsOrdenCompra.map(({ precioUnitarioFinal: _precioUnitarioFinal, ...item }) => item);
+                const ordenLimpia = { ...ordenRest, itemsOrdenCompra: itemsLimpios };
                 formData.append(
                     "ordenCompraActivo",
-                    new Blob([JSON.stringify(ordenCompraActivo)], { type: "application/json" })
+                    new Blob([JSON.stringify(ordenLimpia)], { type: "application/json" })
                 );
             }
 
