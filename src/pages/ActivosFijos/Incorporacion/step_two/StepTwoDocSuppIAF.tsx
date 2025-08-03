@@ -9,7 +9,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 
-import { IncorporacionActivoDto, OrdenCompraActivo } from '../../types.tsx';
+import { IncorporacionActivoDto } from '../../types.tsx';
 import { useAuth } from '../../../../context/AuthContext.tsx';
 import { DocSuppUploader } from '../../../../components/DocSuppUploader/DocSuppUploader.tsx';
 
@@ -17,14 +17,12 @@ type Props = {
     setActiveStep: (step: number) => void;
     setIncorporacionActivoHeader: (incorporacionActivoDto: IncorporacionActivoDto) => void;
     incorporacionActivoDto: IncorporacionActivoDto;
-    ordenCompraActivo?: OrdenCompraActivo;
 };
 
 export function StepTwoDocSuppIaf({
     setActiveStep,
     setIncorporacionActivoHeader,
-    incorporacionActivoDto,
-    ordenCompraActivo
+    incorporacionActivoDto
 }: Props) {
     const { user } = useAuth();
     const [file, setFile] = useState<File | null>(null);

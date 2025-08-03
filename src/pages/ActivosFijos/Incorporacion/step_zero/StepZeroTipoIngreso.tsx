@@ -47,10 +47,18 @@ export function StepZeroTipoIngreso({
     }
 
     if(tipo_incorporacion === TIPO_INCORPORACION.SIN_OC){
+        const incorporacionData: IncorporacionActivoDto = {
+            tipoIncorporacion: TIPO_INCORPORACION.SIN_OC
+        };
+        setIncorporacionActivoHeader(incorporacionData);
         setActiveStep(1);
     }
 
     if(tipo_incorporacion === TIPO_INCORPORACION.AF_EXISTENTE){
+        const incorporacionData: IncorporacionActivoDto = {
+            tipoIncorporacion: TIPO_INCORPORACION.AF_EXISTENTE
+        };
+        setIncorporacionActivoHeader(incorporacionData);
         setActiveStep(1);
     }
   }

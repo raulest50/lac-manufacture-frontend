@@ -400,7 +400,9 @@ export function ActivoGroup({ itemOrdenCompraActivo, setActivoFijoGroup, tipoInc
                                 setDepreciacion={(depreciacion) => {
                                     setDepreciacionGrupo(depreciacion);
                                     updateCommonAttributes(undefined, undefined, depreciacion);
-                                }} 
+                                }}
+                                initialValue={precioUnitario}
+                                initialResidualValue={0}
                             />
                         </Box>
                     )}

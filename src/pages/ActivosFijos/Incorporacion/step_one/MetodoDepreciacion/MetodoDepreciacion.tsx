@@ -27,16 +27,24 @@ interface Depreciacion {
 
 type Props = {
   setDepreciacion: (depreciacion: Depreciacion) => void;
+  initialValue?: number; // Valor inicial opcional
+  initialResidualValue?: number; // Valor residual opcional
 };
 
 export function MetodoDepreciacionComponent(props: Props) {
-  const { setDepreciacion } = props;
+  const { setDepreciacion, initialValue = 1000, initialResidualValue = 0 } = props;
 
   const [metodoDepreciacion, setMetodoDepreciacion] = useState<MetodoDepreciacion>(MetodoDepreciacion.SL);
-  const [valorInicial, setValorInicial] = useState<number>(1000);
-  const [valorResidual, setValorResidual] = useState<number>(100);
+  const [valorInicial, setValorInicial] = useState<number>(initialValue);
+  const [valorResidual, setValorResidual] = useState<number>(initialResidualValue);
   const [tiempoDeVida, setTiempoDeVida] = useState<number>(36);
   const [porcentajeDB, setPorcentajeDB] = useState<number>(20);
+
+  // Actualizar los valores cuando cambien las props
+  useEffect(() => {
+    setValorInicial(initialValue);
+    setValorResidual(initialResidualValue);
+  }, [initialValue, initialResidualValue]);
 
   // Actualizar el estado de depreciación cuando cambie cualquier valor
   useEffect(() => {

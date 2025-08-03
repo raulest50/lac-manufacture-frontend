@@ -151,8 +151,8 @@ export function StepOneFormulario({
             <Box>
                 <Flex justifyContent="space-between" alignItems="center" mb={4}>
                     <Heading size="md">Grupos de Activos Fijos</Heading>
-                    {(incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.SIN_OC || 
-                      incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.AF_EXISTENTE) && (
+                    {(incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.SIN_OC || 
+                      incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.AF_EXISTENTE) && (
                         <Button 
                             leftIcon={<AddIcon />} 
                             colorScheme="blue" 
@@ -167,7 +167,7 @@ export function StepOneFormulario({
                     <Card>
                         <CardBody>
                             <Text textAlign="center" color="gray.500">
-                                {incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.CON_OC 
+                                {incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.CON_OC 
                                     ? "No hay ítems en la orden de compra." 
                                     : "No hay grupos de activos. Haga clic en 'Agregar Grupo' para crear uno."}
                             </Text>
@@ -178,8 +178,8 @@ export function StepOneFormulario({
                 <VStack spacing={4} align="stretch">
                     {grupos.map((grupo) => (
                         <Box key={grupo.id} position="relative">
-                            {(incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.SIN_OC || 
-                              incorporacionActivoDta.tipoIncorporacion === TIPO_INCORPORACION.AF_EXISTENTE) && (
+                            {(incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.SIN_OC || 
+                              incorporacionActivoDto.tipoIncorporacion === TIPO_INCORPORACION.AF_EXISTENTE) && (
                                 <IconButton
                                     aria-label="Eliminar grupo"
                                     icon={<DeleteIcon />}
@@ -195,7 +195,7 @@ export function StepOneFormulario({
                             <ActivoGroup
                                 itemOrdenCompraActivo={grupo.itemOrdenCompra}
                                 setActivoFijoGroup={(activos) => actualizarActivosGrupo(grupo.id, activos)}
-                                tipoIncorporacion={incorporacionActivoDta.tipoIncorporacion || ''}
+                                tipoIncorporacion={incorporacionActivoDto.tipoIncorporacion || ''}
                             />
                         </Box>
                     ))}

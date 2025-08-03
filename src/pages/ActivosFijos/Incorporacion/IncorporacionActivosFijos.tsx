@@ -54,7 +54,6 @@ export function IncorporacionActivosFijos() {
                     setActiveStep={setActiveStep}
                     setIncorporacionActivoHeader={setIncorporacionActivoDto}
                     incorporacionActivoDto={incorporacionActivoDto}
-                    ordenCompraActivo={ordenCompraActivo}
                 />
             )
         }
