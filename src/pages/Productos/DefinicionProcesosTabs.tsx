@@ -1,6 +1,7 @@
 import {Button, Flex, Tab, TabList, TabPanel, TabPanels, Tabs} from '@chakra-ui/react';
 import {FaArrowLeft} from 'react-icons/fa';
 import DefinicionProcesosTab from './DefinicionProcesosTab';
+import CrearRecursoProduccion from './CrearRecursoProduccion';
 import {my_style_tab} from '../../styles/styles_general.tsx';
 
 interface Props {
@@ -16,10 +17,14 @@ export function DefinicionProcesosTabs({onBack}: Props) {
             <Tabs isFitted gap="1em" variant="line">
                 <TabList>
                     <Tab sx={my_style_tab}>Definición de Procesos</Tab>
+                    <Tab sx={my_style_tab}>Recursos Producción</Tab>
                 </TabList>
                 <TabPanels>
                     <TabPanel>
                         <DefinicionProcesosTab />
+                    </TabPanel>
+                    <TabPanel>
+                        <CrearRecursoProduccion />
                     </TabPanel>
                 </TabPanels>
             </Tabs>

@@ -47,6 +47,9 @@ export default class EndPointsURL{
     public orden_produccion_update_estado:string;
     public search_ordenes_by_responsable:string;
 
+    // recursos de produccion
+    public save_recurso_produccion:string;
+
 
     // compras resource
     public byProveedorAndDate:string;
@@ -131,6 +134,7 @@ export default class EndPointsURL{
         const contabilidad_res = 'api/contabilidad';
         const auth_res = 'api/auth';
         const personal_res = 'integrantes-personal';
+        const recursos_produccion_res = 'api/recursos-produccion';
 
         // productos endpoints
         this.search_mprima = `${domain}/${productos_res}/search_mprima`;
@@ -181,6 +185,9 @@ export default class EndPointsURL{
         this.orden_seguimiento_update_estado = `${domain}/${produccion_res}/orden_seguimiento/{id}/update_estado`;
         this.orden_produccion_update_estado = `${domain}/${produccion_res}/orden_produccion/{id}/update_estado`;
         this.search_ordenes_by_responsable = `${domain}/${produccion_res}/ordenes_produccion/responsable/{responsableId}`;
+
+        // recursos de produccion endpoints
+        this.save_recurso_produccion = `${domain}/${recursos_produccion_res}`;
 
         // movimientos endpoints
         this.search_products_with_stock = `${domain}/${movimientos_res}/search_products_with_stock`;
