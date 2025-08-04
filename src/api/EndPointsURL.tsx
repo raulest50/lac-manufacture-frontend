@@ -111,6 +111,7 @@ export default class EndPointsURL{
     public incorporar_activos_fijos: string;
     public get_activo_fijo: string;
     public update_activo_fijo: string;
+    public search_activos_fijos: string;
 
     // just in case of need
     // contabilidad resource
@@ -249,6 +250,7 @@ export default class EndPointsURL{
         this.incorporar_activos_fijos = `${domain}/${activos_fijos_res}/incorporar`;
         this.get_activo_fijo = `${domain}/${activos_fijos_res}/{id}`;
         this.update_activo_fijo = `${domain}/${activos_fijos_res}/{id}`;
+        this.search_activos_fijos = `${domain}/${activos_fijos_res}/search`;
 
         // notifications endpoint
         this.module_notifications = `${domain}/notificaciones/notifications4user`;
