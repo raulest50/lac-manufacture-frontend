@@ -9,6 +9,7 @@ import {IncorporacionActivosFijos} from "./Incorporacion/IncorporacionActivosFij
 import {my_style_tab} from "../../styles/styles_general.tsx";
 import CrearOC_AF from "./OC/CrearOC_AF.tsx";
 import {ReportesTabAf} from "./Reportes/ReportesTabAF.tsx";
+import ReportesActivosFijosTab from "./Reportes/ReportesActivosFijosTab";
 
 export default function ActivosFijosPage() {
 
@@ -41,6 +42,10 @@ export default function ActivosFijosPage() {
 
                         <TabPanel>
                             <ReportesTabAf />
+                        </TabPanel>
+
+                        <TabPanel>
+                            <ReportesActivosFijosTab />
                         </TabPanel>
 
                     </TabPanels>
