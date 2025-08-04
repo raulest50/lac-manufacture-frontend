@@ -105,9 +105,14 @@ export function StepOneFormulario({
 
                 // Verificar campos específicos según el tipo de activo
                 if (activo.tipo === TipoActivo.PRODUCCION) {
-                    if (activo.capacidad === undefined || activo.unidadCapacidad === undefined) {
+                    // Solo validar los campos que son relevantes para la incorporación
+                    if (activo.capacidad === undefined || 
+                        activo.capacidad <= 0 || 
+                        activo.unidadCapacidad === undefined) {
                         return false;
                     }
+                    // No verificar campos relacionados con RecursoProduccion
+                    // ya que esa relación se establecerá en el backend
                 }
 
                 // Verificar que tenga precio
