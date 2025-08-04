@@ -111,3 +111,11 @@ export interface RecursoProduccion {
     horasPorTurno?: number;
     activosFijos?: ActivoFijo[];
 }
+
+export interface ProcesoProduccionEntity {
+    procesoId?: number;
+    nombre: string;
+    recursosRequeridos: RecursoProduccion[];
+    setUpTime: number;
+    processTime: number;
+}
