@@ -17,6 +17,7 @@ import {
 import axios from "axios";
 import EndPointsURL from "../../../../api/EndPointsURL";
 import {
+    ActivoFijo,
     IncorporacionActivoDto,
     ItemOrdenCompraActivo,
     OrdenCompraActivo,
@@ -45,6 +46,37 @@ export function StepThreeValSend({
         return clean;
     };
 
+    /**
+     * QUICKFIX TEMPORAL: Transforma un ActivoFijo para que sea compatible con el backend
+     * 
+     * Ajusta los nombres de campos y elimina campos no reconocidos por el backend:
+     * - Renombra 'tipo' a 'tipoActivo'
+     * - Renombra 'unidadCapacidad' a 'unidadesCapacidad'
+     * - Elimina 'precio' y 'divisa' que no existen en el backend
+     * 
+     * Solución a largo plazo: Alinear los modelos del frontend y backend
+     * para usar los mismos nombres de campos.
+     */
+    const sanitizeActivo = (activo: ActivoFijo): any => {
+        if (!activo) return activo;
+
+        // Desestructurar para extraer campos que necesitan ser renombrados o eliminados
+        const { 
+            tipo, 
+            precio, 
+            divisa, 
+            unidadCapacidad,
+            ...rest 
+        } = activo;
+
+        // Crear un nuevo objeto con los campos correctamente nombrados para el backend
+        return {
+            ...rest,
+            tipoActivo: tipo, // Renombrar 'tipo' a 'tipoActivo'
+            ...(unidadCapacidad ? { unidadesCapacidad: unidadCapacidad } : {}) // Renombrar si existe
+        };
+    };
+
     // Función para finalizar la incorporación
     const handleFinalizarIncorporacion = async () => {
         setIsSubmitting(true);
@@ -54,9 +86,11 @@ export function StepThreeValSend({
             const formData = new FormData();
 
             const { documentoSoporte, gruposActivos = [], ...rest } = incorporacionActivoDto;
-            const gruposSinId = gruposActivos.map(({ id: _id, itemOrdenCompra, ...g }) => ({
+            const gruposSinId = gruposActivos.map(({ id: _id, itemOrdenCompra, activos, ...g }) => ({
                 ...g,
-                itemOrdenCompra: sanitizeItem(itemOrdenCompra)
+                itemOrdenCompra: sanitizeItem(itemOrdenCompra),
+                // Aplicar sanitizeActivo a cada activo en el grupo
+                activos: activos.map(sanitizeActivo)
             }));
             const dto = { ...rest, gruposActivos: gruposSinId };
             formData.append(
