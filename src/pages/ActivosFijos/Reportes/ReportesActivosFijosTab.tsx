@@ -1,3 +1,12 @@
+/**
+ * QUICKFIX TEMPORAL: Se han implementado tres mejoras para evitar el error "Cannot read properties of undefined (reading 'map')":
+ * 1. En la función buscarActivos: Se usa optional chaining (?.) y valores por defecto para asegurar que data.content sea siempre un array
+ * 2. En la función buscarActivos: Se inicializa activos como array vacío en caso de error
+ * 3. En el JSX: Se verifica que activos sea un array antes de llamar a map()
+ * 
+ * Solución a largo plazo: Implementar un manejo de errores más robusto y consistente en toda la aplicación,
+ * posiblemente con un componente ErrorBoundary personalizado.
+ */
 import { useState } from 'react';
 import {
     Button,
@@ -29,7 +38,9 @@ const getEstadoText = (estado?: number) => {
 
 export default function ReportesActivosFijosTab() {
     const [valorBusqueda, setValorBusqueda] = useState('');
-    const [tipoBusqueda, setTipoBusqueda] = useState('NOMBRE');
+    // QUICKFIX TEMPORAL: Cambiado de 'NOMBRE' a 'POR_NOMBRE' para alinear con los valores de enum en el backend
+    // El backend espera valores con prefijo "POR_" en DTO_SearchActivoFijo.TipoBusqueda
+    const [tipoBusqueda, setTipoBusqueda] = useState('POR_NOMBRE');
     const [tipoActivo, setTipoActivo] = useState('');
     const [soloActivos, setSoloActivos] = useState(true);
     const [activos, setActivos] = useState<ActivoFijo[]>([]);
@@ -54,11 +65,16 @@ export default function ReportesActivosFijosTab() {
             });
 
             const data = resp.data;
-            setActivos(data.content);
-            setTotalPages(data.totalPages);
-            setPage(data.number);
+            // Asegurar que content siempre sea un array
+            setActivos(data?.content || []);
+            setTotalPages(data?.totalPages || 0);
+            setPage(data?.number || 0);
         } catch (e) {
             console.error(e);
+            // Establecer activos como array vacío en caso de error para evitar el error "Cannot read properties of undefined (reading 'map')"
+            setActivos([]);
+            setTotalPages(0);
+            setPage(0);
         } finally {
             setLoading(false);
         }
@@ -80,12 +96,13 @@ export default function ReportesActivosFijosTab() {
                         onChange={(e) => setTipoBusqueda(e.target.value)}
                         width="200px"
                     >
-                        <option value="ID">ID</option>
-                        <option value="NOMBRE">Nombre</option>
-                        <option value="UBICACION">Ubicación</option>
-                        <option value="RESPONSABLE">Responsable</option>
-                        <option value="MARCA">Marca</option>
-                        <option value="CAPACIDAD">Capacidad</option>
+                        {/* QUICKFIX TEMPORAL: Valores actualizados con prefijo "POR_" para coincidir con el backend */}
+                        <option value="POR_ID">ID</option>
+                        <option value="POR_NOMBRE">Nombre</option>
+                        <option value="POR_UBICACION">Ubicación</option>
+                        <option value="POR_RESPONSABLE">Responsable</option>
+                        <option value="POR_MARCA">Marca</option>
+                        <option value="POR_CAPACIDAD">Capacidad</option>
                     </Select>
                     <Select
                         placeholder="Tipo Activo"
@@ -131,7 +148,8 @@ export default function ReportesActivosFijosTab() {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {activos.map((a) => (
+                                {/* Verificar que activos sea un array antes de llamar a map() */}
+                                {Array.isArray(activos) && activos.map((a) => (
                                     <Tr key={a.id}>
                                         <Td>{a.id}</Td>
                                         <Td>{a.nombre}</Td>
@@ -165,4 +183,3 @@ export default function ReportesActivosFijosTab() {
         </Container>
     );
 }
-
