@@ -19,9 +19,11 @@ export default function AFpickerRP({isOpen, onClose, onConfirm, alreadySelected}
   const [selected, setSelected] = useState<ActivoFijo[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
   const pageSize = 10;
 
   const fetchAvailable = async (pageNumber:number) => {
+    setLoading(true);
     const dto = {nombreBusqueda: searchText, page: pageNumber, size: pageSize};
     try{
       const res = await axios.post(endpoints.activos_fijos_disponibles_rp, dto);
@@ -34,6 +36,8 @@ export default function AFpickerRP({isOpen, onClose, onConfirm, alreadySelected}
     }catch(e){
       setAvailable([]);
       setTotalPages(1);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -68,7 +72,13 @@ export default function AFpickerRP({isOpen, onClose, onConfirm, alreadySelected}
             <Box flex={1}>
               <Flex mb={2} gap={2}>
                 <Input placeholder='Buscar' value={searchText} onChange={(e)=>setSearchText(e.target.value)} />
-                <Button onClick={()=>fetchAvailable(0)}>Buscar</Button>
+                <Button 
+                  onClick={()=>fetchAvailable(0)} 
+                  isLoading={loading} 
+                  loadingText="Buscando..."
+                >
+                  Buscar
+                </Button>
               </Flex>
               <Table size='sm'>
                 <Thead><Tr><Th>ID</Th><Th>Nombre</Th><Th></Th></Tr></Thead>
@@ -83,7 +93,7 @@ export default function AFpickerRP({isOpen, onClose, onConfirm, alreadySelected}
                 </Tbody>
               </Table>
               {totalPages>1 && (
-                <MyPagination page={page} totalPages={totalPages} loading={false} handlePageChange={fetchAvailable} />
+                <MyPagination page={page} totalPages={totalPages} loading={loading} handlePageChange={fetchAvailable} />
               )}
             </Box>
             <Box flex={1}>
@@ -110,4 +120,3 @@ export default function AFpickerRP({isOpen, onClose, onConfirm, alreadySelected}
     </Modal>
   );
 }
-

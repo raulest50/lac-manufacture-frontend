@@ -56,7 +56,8 @@ export default function ReportesActivosFijosTab() {
             const dto = {
                 tipoBusqueda,
                 valorBusqueda,
-                tipoActivo: tipoActivo || null,
+                // Si tipoActivo está vacío, significa que se seleccionó "Todas las categorias"
+                tipoActivo: tipoActivo && tipoActivo.trim() ? tipoActivo : null,
                 soloActivos,
             };
 
@@ -105,7 +106,7 @@ export default function ReportesActivosFijosTab() {
                         <option value="POR_CAPACIDAD">Capacidad</option>
                     </Select>
                     <Select
-                        placeholder="Tipo Activo"
+                        placeholder="Todas las categorias"
                         value={tipoActivo}
                         onChange={(e) => setTipoActivo(e.target.value)}
                         width="200px"
@@ -124,6 +125,8 @@ export default function ReportesActivosFijosTab() {
                         variant="solid"
                         colorScheme="teal"
                         onClick={() => buscarActivos()}
+                        isLoading={loading}
+                        loadingText="Buscando..."
                     >
                         Buscar
                     </Button>

@@ -51,7 +51,7 @@ export default function DetalleModRecProd({recurso, setEstado, refreshSearch}:Pr
         <FormLabel>Descripción</FormLabel>
         <Input value={recursoData.descripcion} onChange={e=>setRecursoData({...recursoData, descripcion:e.target.value})} isDisabled={!editMode} />
       </FormControl>
-      <RPAFmanager recursoId={recursoData.id} activos={recursoData.activosFijos || []} onChange={handleActivosChange} />
+      <RPAFmanager recursoId={recursoData.id} activos={recursoData.activosFijos || []} onChange={handleActivosChange} editMode={editMode} />
       <Flex mt={4} gap={2}>
         {editMode ? (
           <>
@@ -65,4 +65,3 @@ export default function DetalleModRecProd({recurso, setEstado, refreshSearch}:Pr
     </Box>
   );
 }
-

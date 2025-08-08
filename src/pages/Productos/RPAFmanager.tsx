@@ -9,9 +9,10 @@ interface Props {
   recursoId?: number;
   activos: ActivoFijo[];
   onChange: (activos: ActivoFijo[]) => void;
+  editMode?: boolean;
 }
 
-export default function RPAFmanager({recursoId, activos, onChange}: Props){
+export default function RPAFmanager({recursoId, activos, onChange, editMode = true}: Props){
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const toast = useToast();
   const endpoints = new EndPointsURL();
@@ -58,7 +59,7 @@ export default function RPAFmanager({recursoId, activos, onChange}: Props){
   return (
     <Box>
       <Flex justify="space-between" mb={2}>
-        <Button colorScheme='teal' size='sm' onClick={()=>setIsPickerOpen(true)}>Agregar Activo Fijo</Button>
+        <Button colorScheme='teal' size='sm' onClick={()=>setIsPickerOpen(true)} isDisabled={!editMode}>Agregar Activo Fijo</Button>
       </Flex>
       <Table size='sm'>
         <Thead>
@@ -73,7 +74,7 @@ export default function RPAFmanager({recursoId, activos, onChange}: Props){
             <Tr key={af.id}>
               <Td>{af.id}</Td>
               <Td>{af.nombre}</Td>
-              <Td><Button size='xs' colorScheme='red' onClick={()=>handleRemove(af)}>Remover</Button></Td>
+              <Td><Button size='xs' colorScheme='red' onClick={()=>handleRemove(af)} isDisabled={!editMode}>Remover</Button></Td>
             </Tr>
           ))}
         </Tbody>
@@ -87,4 +88,3 @@ export default function RPAFmanager({recursoId, activos, onChange}: Props){
     </Box>
   );
 }
-
