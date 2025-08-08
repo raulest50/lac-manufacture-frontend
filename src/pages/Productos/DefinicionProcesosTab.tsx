@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {
   Box,
   Heading,
@@ -7,48 +7,22 @@ import {
   Input,
   VStack,
   Button,
-  CheckboxGroup,
-  Checkbox,
-  Stack,
   useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../api/EndPointsURL';
 import {input_style} from '../../styles/styles_general';
 import {RecursoProduccion, ProcesoProduccionEntity} from './types';
+import PPRPmanager from './PPRPmanager';
 
 function DefinicionProcesosTab() {
   const [nombre, setNombre] = useState('');
   const [setUpTime, setSetUpTime] = useState<number>(0);
   const [processTime, setProcessTime] = useState<number>(0);
-  const [recursos, setRecursos] = useState<RecursoProduccion[]>([]);
-  const [recursosSel, setRecursosSel] = useState<string[]>([]);
+  const [recursosSel, setRecursosSel] = useState<RecursoProduccion[]>([]);
 
   const toast = useToast();
   const endPoints = new EndPointsURL();
-
-  useEffect(() => {
-    const fetchRecursos = async () => {
-      try {
-        const dto = {
-          tipoBusqueda: 'POR_NOMBRE',
-          valorBusqueda: '',
-          page: 0,
-          size: 100,
-        };
-        const res = await axios.post(endPoints.search_recurso_produccion, dto);
-        setRecursos(res.data.content);
-      } catch (e) {
-        toast({
-          title: 'Error al cargar recursos',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    };
-    fetchRecursos();
-  }, []);
 
   const clearFields = () => {
     setNombre('');
@@ -60,7 +34,7 @@ function DefinicionProcesosTab() {
   const handleSubmit = async () => {
     const proceso: ProcesoProduccionEntity = {
       nombre,
-      recursosRequeridos: recursosSel.map((id) => ({id: Number(id)})) as RecursoProduccion[],
+      recursosRequeridos: recursosSel.map((r) => ({id: r.id})) as RecursoProduccion[],
       setUpTime,
       processTime,
     };
@@ -114,18 +88,7 @@ function DefinicionProcesosTab() {
         </FormControl>
         <FormControl>
           <FormLabel>Recursos Requeridos</FormLabel>
-          <CheckboxGroup
-            value={recursosSel}
-            onChange={(vals) => setRecursosSel(vals as string[])}
-          >
-            <Stack spacing={2}>
-              {recursos.map((r) => (
-                <Checkbox key={r.id} value={String(r.id)}>
-                  {r.nombre}
-                </Checkbox>
-              ))}
-            </Stack>
-          </CheckboxGroup>
+          <PPRPmanager recursos={recursosSel} onChange={setRecursosSel} />
         </FormControl>
         <Button colorScheme="teal" onClick={handleSubmit}>
           Guardar
