@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
-import EndPointsURL from '../../api/EndPointsURL';
+import EndPointsURL from '../../../api/EndPointsURL.tsx';
 import {
     Flex,
     Grid,
@@ -24,7 +24,7 @@ import {
     Text
 } from '@chakra-ui/react';
 
-import {Familia} from './types.tsx';
+import {Familia} from '../types.tsx';
 
 export function FamiliasTab() {
     const [familias, setFamilias] = useState<Familia[]>([]);

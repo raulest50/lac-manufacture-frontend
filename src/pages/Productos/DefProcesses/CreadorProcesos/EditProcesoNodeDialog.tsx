@@ -13,7 +13,7 @@ import {
     Textarea, Icon, HStack, Select,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { ProcesoNodeData } from "./types"; // adjust the import path as needed
+import { ProcesoNodeData } from "./types.tsx"; // adjust the import path as needed
 
 import { MdLabel } from "react-icons/md";
 import { MdOutlineAutoStories } from "react-icons/md";

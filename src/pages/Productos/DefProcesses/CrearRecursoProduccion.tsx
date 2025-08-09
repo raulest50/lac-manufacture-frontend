@@ -2,11 +2,11 @@ import {useState} from 'react';
 import {Box, Button, FormControl, FormLabel, Heading, Input, VStack, useToast} from '@chakra-ui/react';
 import axios from 'axios';
 
-import EndPointsURL from '../../api/EndPointsURL';
-import {input_style} from '../../styles/styles_general';
-import {RecursoProduccion} from './types';
-import RPAFmanager from './RPAFmanager';
-import {ActivoFijo} from '../ActivosFijos/types';
+import EndPointsURL from '../../../api/EndPointsURL.tsx';
+import {input_style} from '../../../styles/styles_general.tsx';
+import {RecursoProduccion} from '../types.tsx';
+import RPAFmanager from './RPAFmanager.tsx';
+import {ActivoFijo} from '../../ActivosFijos/types.tsx';
 
 function CrearRecursoProduccion() {
     const [nombre, setNombre] = useState('');

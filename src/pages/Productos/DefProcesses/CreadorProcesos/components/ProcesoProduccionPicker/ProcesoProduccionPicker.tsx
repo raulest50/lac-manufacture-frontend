@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react';
 import {Flex, Select, useToast} from '@chakra-ui/react';
 import axios from 'axios';
-import EndPointsURL from '../../../../api/EndPointsURL';
-import {ProcesoProduccionEntity} from '../../types';
-import MyPagination from '../../../../components/MyPagination';
+import EndPointsURL from '../../../../../../api/EndPointsURL.tsx';
+import {ProcesoProduccionEntity} from '../../../../types.tsx';
+import MyPagination from '../../../../../../components/MyPagination.tsx';
 
 interface Props {
     onSelect?: (proceso: ProcesoProduccionEntity | null) => void;

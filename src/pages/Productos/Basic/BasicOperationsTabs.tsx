@@ -1,9 +1,9 @@
 import {useState} from 'react';
 import {Button, Flex, Tab, TabList, TabPanel, TabPanels, Tabs} from '@chakra-ui/react';
 import {FaArrowLeft} from 'react-icons/fa';
-import CodificarMaterialesTab from './CodificarMaterialesTab';
-import InformeProductosTab from './InformeProductosTab';
-import {my_style_tab} from '../../styles/styles_general.tsx';
+import CodificarMaterialesTab from './CodificarMaterialesTab.tsx';
+import InformeProductosTab from './InformeProductosTab.tsx';
+import {my_style_tab} from '../../../styles/styles_general.tsx';
 
 interface Props {
     user: string | null;

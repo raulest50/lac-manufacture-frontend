@@ -1,10 +1,10 @@
 import {useState} from 'react';
 import {Button, Flex, Tab, TabList, TabPanel, TabPanels, Tabs} from '@chakra-ui/react';
 import {FaArrowLeft} from 'react-icons/fa';
-import CodificarSemioTermiTab from './CodificarSemioTermiTab/CodificarSemioTermiTab';
-import {FamiliasTab} from './FamiliasTab';
-import InformeProductosTab from './InformeProductosTab';
-import {my_style_tab} from '../../styles/styles_general.tsx';
+import CodificarSemioTermiTab from './CodificarSemioTermiTab/CodificarSemioTermiTab.tsx';
+import {FamiliasTab} from './FamiliasTab.tsx';
+import InformeProductosTab from '../Basic/InformeProductosTab.tsx';
+import {my_style_tab} from '../../../styles/styles_general.tsx';
 
 interface Props {
     user: string | null;

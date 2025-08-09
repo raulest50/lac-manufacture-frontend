@@ -5,14 +5,14 @@ import {
     useToast,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import {Material, Producto} from "../types.tsx";
+import {Material, Producto} from "../../types.tsx";
 import { ArrowBackIcon, EditIcon } from '@chakra-ui/icons';
 import axios from 'axios';
-import EndPointsURL from "../../../api/EndPointsURL.tsx";
-import { useAuth } from '../../../context/AuthContext';
-import {IVA_VALUES} from "../types.tsx";
+import EndPointsURL from "../../../../api/EndPointsURL.tsx";
+import { useAuth } from '../../../../context/AuthContext.tsx';
+import {IVA_VALUES} from "../../types.tsx";
 
-import {Authority} from "../../../api/global_types.tsx";
+import {Authority} from "../../../../api/global_types.tsx";
 
 type Props = {
     producto: Producto;

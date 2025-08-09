@@ -1,10 +1,10 @@
 import {Box, Button, Flex, FormControl, FormLabel, Heading, Input, useToast} from '@chakra-ui/react';
 import {useState} from 'react';
 import axios from 'axios';
-import EndPointsURL from '../../api/EndPointsURL';
-import {RecursoProduccion} from './types';
-import RPAFmanager from './RPAFmanager';
-import {ActivoFijo} from '../ActivosFijos/types';
+import EndPointsURL from '../../../api/EndPointsURL.tsx';
+import {RecursoProduccion} from '../types.tsx';
+import RPAFmanager from './RPAFmanager.tsx';
+import {ActivoFijo} from '../../ActivosFijos/types.tsx';
 
 interface Props {
   recurso: RecursoProduccion;

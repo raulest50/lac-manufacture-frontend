@@ -1,10 +1,10 @@
 import {useState} from 'react';
 import {Box, Button, Flex, FormControl, FormLabel, Input, Select, Table, Tbody, Td, Th, Thead, Tr, useToast} from '@chakra-ui/react';
 import axios from 'axios';
-import EndPointsURL from '../../api/EndPointsURL';
-import MyPagination from '../../components/MyPagination';
-import DetalleModRecProd from './DetalleModRecProd';
-import {RecursoProduccion} from './types';
+import EndPointsURL from '../../../api/EndPointsURL.tsx';
+import MyPagination from '../../../components/MyPagination.tsx';
+import DetalleModRecProd from './DetalleModRecProd.tsx';
+import {RecursoProduccion} from '../types.tsx';
 
 enum TipoBusqueda{ ID='POR_ID', NOMBRE='POR_NOMBRE' }
 

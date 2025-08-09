@@ -7,9 +7,9 @@ import EndPointsURL from '../../api/EndPointsURL';
 import MyHeader from '../../components/MyHeader.tsx';
 import {Authority, WhoAmIResponse} from '../../api/global_types.tsx';
 import ProductosMenuSelection from './ProductosMenuSelection';
-import BasicOperationsTabs from './BasicOperationsTabs';
-import TerminadosSemiterminadosTabs from './TerminadosSemiterminadosTabs';
-import DefinicionProcesosTabs from './DefinicionProcesosTabs';
+import BasicOperationsTabs from './Basic/BasicOperationsTabs.tsx';
+import TerminadosSemiterminadosTabs from './DefSemiTer/TerminadosSemiterminadosTabs.tsx';
+import DefinicionProcesosTabs from './DefProcesses/DefinicionProcesosTabs.tsx';
 
 function ProductosPage() {
     const [productosAccessLevel, setProductosAccessLevel] = useState<number>(0);

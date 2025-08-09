@@ -1,9 +1,9 @@
 import {Button, Flex, Tab, TabList, TabPanel, TabPanels, Tabs} from '@chakra-ui/react';
 import {FaArrowLeft} from 'react-icons/fa';
-import DefinicionProcesosTab from './DefinicionProcesosTab';
-import CrearRecursoProduccion from './CrearRecursoProduccion';
-import ConsultaRecursosProduccion from './ConsultaRecursosProduccion';
-import {my_style_tab} from '../../styles/styles_general.tsx';
+import DefinicionProcesosTab from './DefinicionProcesosTab.tsx';
+import CrearRecursoProduccion from './CrearRecursoProduccion.tsx';
+import ConsultaRecursosProduccion from './ConsultaRecursosProduccion.tsx';
+import {my_style_tab} from '../../../styles/styles_general.tsx';
 
 interface Props {
     onBack: () => void;

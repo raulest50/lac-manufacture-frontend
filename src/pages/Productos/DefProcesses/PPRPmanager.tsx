@@ -1,7 +1,7 @@
 import {Box, Button, Flex, Table, Tbody, Td, Th, Thead, Tr} from '@chakra-ui/react';
 import {useState} from 'react';
-import {RecursoProduccion} from './types';
-import RecursoProduccionPicker from './RecursoProduccionPicker';
+import {RecursoProduccion} from '../types.tsx';
+import RecursoProduccionPicker from './RecursoProduccionPicker.tsx';
 
 interface Props {
   recursos: RecursoProduccion[];

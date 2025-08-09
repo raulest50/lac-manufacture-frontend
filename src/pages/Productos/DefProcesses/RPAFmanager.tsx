@@ -1,9 +1,9 @@
 import {Box, Button, Flex, Table, Tbody, Td, Th, Thead, Tr, useToast} from '@chakra-ui/react';
 import {useState} from 'react';
 import axios from 'axios';
-import EndPointsURL from '../../api/EndPointsURL';
-import {ActivoFijo} from '../ActivosFijos/types';
-import AFpickerRP from './AFpickerRP';
+import EndPointsURL from '../../../api/EndPointsURL.tsx';
+import {ActivoFijo} from '../../ActivosFijos/types.tsx';
+import AFpickerRP from './AFpickerRP.tsx';
 
 interface Props {
   recursoId?: number;

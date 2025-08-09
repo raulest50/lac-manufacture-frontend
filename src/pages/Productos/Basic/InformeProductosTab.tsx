@@ -17,10 +17,10 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import axios from "axios";
-import MyPagination from "../../components/MyPagination";
-import { Producto } from "./types";
-import EndPointsURL from "../../api/EndPointsURL";
-import DetalleProducto from "./consulta/DetalleProducto";
+import MyPagination from "../../../components/MyPagination.tsx";
+import { Producto } from "../types.tsx";
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
+import DetalleProducto from "../DefSemiTer/consulta/DetalleProducto.tsx";
 
 const endpoints = new EndPointsURL();
 

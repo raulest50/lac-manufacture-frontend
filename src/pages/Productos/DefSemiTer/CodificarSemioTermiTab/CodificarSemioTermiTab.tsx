@@ -12,7 +12,7 @@ import {
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
 import StepOne from "./StepOne.tsx";
 import {useState, useEffect} from "react";
-import {ProductoSemiter} from "../types.tsx";
+import {ProductoSemiter} from "../../types.tsx";
 import StepTwo from "./StepTwo.tsx";
 import StepThree from "./StepThree.tsx";
 

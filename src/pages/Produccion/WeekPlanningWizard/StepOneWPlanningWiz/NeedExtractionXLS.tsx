@@ -32,6 +32,10 @@ export function NeedExtractionXls({ file }: Props) {
   const [codeColumn, setCodeColumn] = useState<string>('');
   const [descriptionColumn, setDescriptionColumn] = useState<string>('');
   const [quantityColumn, setQuantityColumn] = useState<string>('');
+  // Nuevos estados para los inputs adicionales
+  const [billedQuantityColumn, setBilledQuantityColumn] = useState<string>('');
+  const [availableColumn, setAvailableColumn] = useState<string>('');
+  const [minStockColumn, setMinStockColumn] = useState<string>('');
 
   // Función para validar si el archivo es un Excel
   const isValidExcelFile = (file: File | null): boolean => {
@@ -49,7 +53,10 @@ export function NeedExtractionXls({ file }: Props) {
     console.log('Hoja seleccionada:', sheetName);
     console.log('Columna de código:', codeColumn);
     console.log('Columna de descripción:', descriptionColumn);
-    console.log('Columna de cantidad:', quantityColumn);
+    console.log('Columna de cantidad digitada:', quantityColumn);
+    console.log('Columna de cantidad facturada:', billedQuantityColumn);
+    console.log('Columna de disponible:', availableColumn);
+    console.log('Columna de stock mínimo:', minStockColumn);
   };
 
   const isValid = isValidExcelFile(file);
@@ -101,7 +108,7 @@ export function NeedExtractionXls({ file }: Props) {
           </FormControl>
 
           <FormControl isDisabled={!isValid}>
-            <FormLabel>Columna de Cantidad</FormLabel>
+            <FormLabel>Columna de Cantidad Digitada</FormLabel>
             <Input 
               placeholder="Ej: C" 
               value={quantityColumn}
@@ -110,9 +117,39 @@ export function NeedExtractionXls({ file }: Props) {
           </FormControl>
         </SimpleGrid>
 
+        {/* Nueva fila con grid de 3 columnas para los inputs adicionales */}
+        <SimpleGrid columns={3} spacing={4}>
+          <FormControl isDisabled={!isValid}>
+            <FormLabel>Columna de Cantidad Facturada</FormLabel>
+            <Input 
+              placeholder="Ej: D" 
+              value={billedQuantityColumn}
+              onChange={(e) => setBilledQuantityColumn(e.target.value)}
+            />
+          </FormControl>
+
+          <FormControl isDisabled={!isValid}>
+            <FormLabel>Columna de Disponible</FormLabel>
+            <Input 
+              placeholder="Ej: E" 
+              value={availableColumn}
+              onChange={(e) => setAvailableColumn(e.target.value)}
+            />
+          </FormControl>
+
+          <FormControl isDisabled={!isValid}>
+            <FormLabel>Columna de Stock Mínimo</FormLabel>
+            <Input 
+              placeholder="Ej: F" 
+              value={minStockColumn}
+              onChange={(e) => setMinStockColumn(e.target.value)}
+            />
+          </FormControl>
+        </SimpleGrid>
+
         <Button 
           colorScheme="blue" 
-          isDisabled={!isValid || !sheetName || !codeColumn || !descriptionColumn || !quantityColumn}
+          isDisabled={!isValid || !sheetName || !codeColumn || !descriptionColumn || !quantityColumn || !billedQuantityColumn || !availableColumn || !minStockColumn}
           onClick={handleExtraction}
           width="fit-content"
         >

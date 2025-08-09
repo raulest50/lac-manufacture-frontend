@@ -16,12 +16,12 @@ import {
 } from '@chakra-ui/react';
 import axios, { AxiosError } from 'axios';
 
-import { input_style } from "../../styles/styles_general";
-import {Material, UNIDADES, TIPOS_PRODUCTOS, TIPOS_MATERIALES} from "./types";
+import { input_style } from "../../../styles/styles_general.tsx";
+import {Material, UNIDADES, TIPOS_PRODUCTOS, TIPOS_MATERIALES} from "../types.tsx";
 
 import { FaFileUpload } from "react-icons/fa";
-import EndPointsURL from "../../api/EndPointsURL";
-import {IVA_VALUES} from "./types.tsx"
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
+import {IVA_VALUES} from "../types.tsx"
 
 function CodificarMaterialesTab() {
     const [nombre, setNombre] = useState('');

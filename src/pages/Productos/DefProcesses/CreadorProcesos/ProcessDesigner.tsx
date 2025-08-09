@@ -14,12 +14,12 @@ import {
     addEdge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode";
-import ProcesoNode from "./Nodos/ProcesoNode";
-import { ProcesoNodeData } from "./types";
-import { ProductoSemiter } from "../types";
-import TargetNode from "./Nodos/TargetNode";
-import EditProcesoNodeDialog from "./EditProcesoNodeDialog";
+import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
+import ProcesoNode from "./Nodos/ProcesoNode.tsx";
+import { ProcesoNodeData } from "./types.tsx";
+import { ProductoSemiter } from "../../types.tsx";
+import TargetNode from "./Nodos/TargetNode.tsx";
+import EditProcesoNodeDialog from "./EditProcesoNodeDialog.tsx";
 import { Stat, StatLabel, StatNumber } from "@chakra-ui/icons";
 
 
