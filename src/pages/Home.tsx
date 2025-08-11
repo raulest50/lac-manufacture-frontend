@@ -1,5 +1,5 @@
 // src/pages/Home.tsx
-import {SimpleGrid, Flex, Heading, Button, Spacer, Container, Text, Box} from "@chakra-ui/react";
+import {SimpleGrid, Flex, Heading, Button, Spacer, Container, Text, Box, HStack, Tooltip} from "@chakra-ui/react";
 import SectionCard from "../components/SectionCard.tsx";
 import { PiDownloadDuotone } from "react-icons/pi";
 import { BsDatabaseCheck } from "react-icons/bs";
@@ -23,6 +23,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa"; // Nuevo icono para Clientes
 import { FaShoppingCart } from "react-icons/fa"; // Nuevo icono para Ventas
 import { FaMoneyBillWave } from "react-icons/fa"; // Icono para Pagos a Proveedores
+import { MdRefresh } from "react-icons/md"; // Icono para el botón de actualizar
 
 import '@fontsource-variable/comfortaa'
 
@@ -40,7 +41,7 @@ export default function Home(){
 //     console.log('Home - Roles del usuario:', roles);
 
     // Get the getNotificationForModule function from the notifications context
-    const { getNotificationForModule } = useNotifications();
+    const { getNotificationForModule, refreshNotifications } = useNotifications();
 
     // Log específico para la notificación de COMPRAS
     const comprasNotification = getNotificationForModule('COMPRAS');
@@ -54,29 +55,41 @@ export default function Home(){
                     Inicio
                 </Heading>
                 <Spacer flex={2}/>
-                <Box
-                    transform="skewX(-20deg)" // Skews the entire outer box
-                    pl="1em"
-                    pr="1em"
-                    mr="2em"
-                    backgroundColor="green.200"
-                    alignContent={'center'}
-                >
-                    <Box transform="skewX(10deg)"> {/* Counter-skews the content */}
-                        <Text as="h3" size="xl" fontFamily="Comfortaa Variable">
-                            Usuario: {user}
-                        </Text>
+                <HStack spacing={2}>
+                    <Box
+                        transform="skewX(-20deg)" // Skews the entire outer box
+                        pl="1em"
+                        pr="1em"
+                        backgroundColor="green.200"
+                        alignContent={'center'}
+                    >
+                        <Box transform="skewX(10deg)"> {/* Counter-skews the content */}
+                            <Text as="h3" size="xl" fontFamily="Comfortaa Variable">
+                                Usuario: {user}
+                            </Text>
+                        </Box>
                     </Box>
-                </Box>
-                <Button
-                    flex={1}
-                    size={'lg'}
-                    colorScheme={'green'}
-                    variant={'ghost'}
-                    onClick={logout}
-                >
-                    Cerrar Sesion
-                </Button>
+                    <Tooltip label="Actualizar notificaciones">
+                        <Button
+                            size={'md'}
+                            colorScheme={'blue'}
+                            variant={'ghost'}
+                            onClick={refreshNotifications}
+                            leftIcon={<MdRefresh />}
+                            aria-label="Actualizar notificaciones"
+                        >
+                            Actualizar
+                        </Button>
+                    </Tooltip>
+                    <Button
+                        size={'lg'}
+                        colorScheme={'green'}
+                        variant={'ghost'}
+                        onClick={logout}
+                    >
+                        Cerrar Sesion
+                    </Button>
+                </HStack>
             </Flex>
 
             <SimpleGrid columns={[1,1,2,3,4]} gap={'0.5em'} rowGap={'1.5em'}>
