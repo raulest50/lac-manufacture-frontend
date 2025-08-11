@@ -4,6 +4,7 @@ import {
   Heading,
   FormControl,
   FormLabel,
+  FormHelperText,
   Input,
   VStack,
   Button,
@@ -19,6 +20,7 @@ function DefinicionProcesosTab() {
   const [nombre, setNombre] = useState('');
   const [setUpTime, setSetUpTime] = useState<number>(0);
   const [processTime, setProcessTime] = useState<number>(0);
+  const [nivelAcceso, setNivelAcceso] = useState<number>(1); // Valor predeterminado: 1 (nivel básico)
   const [recursosSel, setRecursosSel] = useState<RecursoProduccion[]>([]);
 
   const toast = useToast();
@@ -28,6 +30,7 @@ function DefinicionProcesosTab() {
     setNombre('');
     setSetUpTime(0);
     setProcessTime(0);
+    setNivelAcceso(1); // Resetear a valor predeterminado
     setRecursosSel([]);
   };
 
@@ -37,6 +40,7 @@ function DefinicionProcesosTab() {
       recursosRequeridos: recursosSel.map((r) => ({id: r.id})) as RecursoProduccion[],
       setUpTime,
       processTime,
+      nivelAcceso,
     };
     try {
       await axios.post(endPoints.save_proceso_produccion, proceso);
@@ -87,6 +91,18 @@ function DefinicionProcesosTab() {
           />
         </FormControl>
         <FormControl>
+          <FormLabel>Nivel de Acceso</FormLabel>
+          <Input
+            type="number"
+            value={nivelAcceso}
+            onChange={(e) => setNivelAcceso(Number(e.target.value))}
+            sx={input_style}
+          />
+          <FormHelperText>
+            Define qué usuarios pueden ver este proceso según su nivel de acceso
+          </FormHelperText>
+        </FormControl>
+        <FormControl>
           <FormLabel>Recursos Requeridos</FormLabel>
           <PPRPmanager recursos={recursosSel} onChange={setRecursosSel} />
         </FormControl>
@@ -102,4 +118,3 @@ function DefinicionProcesosTab() {
 }
 
 export default DefinicionProcesosTab;
-

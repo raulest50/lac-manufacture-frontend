@@ -118,4 +118,5 @@ export interface ProcesoProduccionEntity {
     recursosRequeridos: RecursoProduccion[];
     setUpTime: number;
     processTime: number;
+    nivelAcceso?: number; // Define qué usuarios pueden ver este proceso según su nivel de acceso
 }

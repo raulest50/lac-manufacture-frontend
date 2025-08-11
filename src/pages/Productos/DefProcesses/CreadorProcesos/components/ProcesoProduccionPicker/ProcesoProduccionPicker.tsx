@@ -1,90 +1,210 @@
+import {
+  Box, 
+  Button, 
+  Flex, 
+  Input, 
+  Modal, 
+  ModalBody, 
+  ModalCloseButton, 
+  ModalContent, 
+  ModalFooter, 
+  ModalHeader, 
+  ModalOverlay, 
+  Table, 
+  Tbody, 
+  Td, 
+  Th, 
+  Thead, 
+  Tr,
+  useToast
+} from '@chakra-ui/react';
 import {useEffect, useState} from 'react';
-import {Flex, Select, useToast} from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../../../../api/EndPointsURL.tsx';
 import {ProcesoProduccionEntity} from '../../../../types.tsx';
 import MyPagination from '../../../../../../components/MyPagination.tsx';
 
 interface Props {
-    onSelect?: (proceso: ProcesoProduccionEntity | null) => void;
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (procesos: ProcesoProduccionEntity[]) => void;
+  alreadySelected: ProcesoProduccionEntity[];
 }
 
-export function ProcesoProduccionPicker({onSelect}: Props) {
-    const endPoints = new EndPointsURL();
-    const toast = useToast();
+export function ProcesoProduccionPicker({isOpen, onClose, onConfirm, alreadySelected}: Props) {
+  const endPoints = new EndPointsURL();
+  const toast = useToast();
 
-    const [procesos, setProcesos] = useState<ProcesoProduccionEntity[]>([]);
-    const [selectedId, setSelectedId] = useState<number | ''>('');
-    const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
-    const [loading, setLoading] = useState(false);
-    const pageSize = 10;
+  const [searchText, setSearchText] = useState('');
+  const [available, setAvailable] = useState<ProcesoProduccionEntity[]>([]);
+  const [selected, setSelected] = useState<ProcesoProduccionEntity[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const pageSize = 10;
 
-    const fetchProcesos = async (pageNumber: number) => {
-        setLoading(true);
-        try {
-            const res = await axios.get(endPoints.get_procesos_produccion_pag, {
-                params: {page: pageNumber, size: pageSize},
-            });
-            setProcesos(res.data.content || []);
-            setTotalPages(res.data.totalPages || 1);
-            setPage(pageNumber);
-        } catch (e) {
-            toast({
-                title: 'Error',
-                description: 'No se pudieron obtener los procesos.',
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-            });
-            setProcesos([]);
-            setTotalPages(1);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchAvailable = async (pageNumber: number) => {
+    setLoading(true);
+    try {
+      // Usamos el endpoint de paginación existente
+      const res = await axios.get(endPoints.get_procesos_produccion_pag, {
+        params: {page: pageNumber, size: pageSize},
+      });
 
-    useEffect(() => {
-        fetchProcesos(0);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+      let list: ProcesoProduccionEntity[] = res.data.content || [];
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const id = e.target.value;
-        const numericId = id === '' ? '' : Number(id);
-        setSelectedId(numericId);
-        const proceso = procesos.find(p => p.procesoId === Number(id)) || null;
-        onSelect?.(proceso);
-    };
+      // Filtrar por texto de búsqueda si hay alguno (filtrado en el cliente)
+      if (searchText) {
+        list = list.filter(p => 
+          p.nombre.toLowerCase().includes(searchText.toLowerCase())
+        );
+      }
 
-    const handlePageChange = (newPage: number) => {
-        if (newPage >= 0 && newPage < totalPages) {
-            fetchProcesos(newPage);
-        }
-    };
+      // Filtrar los que ya están seleccionados
+      const ids = new Set([...alreadySelected, ...selected].map(p => p.procesoId));
+      list = list.filter(p => !ids.has(p.procesoId));
 
-    return (
-        <Flex direction="column" w="full">
-            <Select
-                placeholder={loading ? 'Cargando...' : 'Seleccione un proceso'}
-                value={selectedId}
-                onChange={handleChange}
-                isDisabled={loading}
-            >
-                {procesos.map(p => (
-                    <option key={p.procesoId} value={p.procesoId}>
-                        {p.nombre}
-                    </option>
-                ))}
-            </Select>
-            {totalPages > 1 && (
-                <MyPagination
-                    page={page}
-                    totalPages={totalPages}
-                    loading={loading}
-                    handlePageChange={handlePageChange}
+      setAvailable(list);
+      setTotalPages(res.data.totalPages || 1);
+      setPage(pageNumber);
+    } catch (e) {
+      toast({
+        title: 'Error',
+        description: 'No se pudieron obtener los procesos.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      setAvailable([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { 
+    if (isOpen) {
+      fetchAvailable(0);
+      setSelected([]);
+    }
+  }, [isOpen]);
+
+  const handleAdd = (proceso: ProcesoProduccionEntity) => {
+    setSelected([...selected, proceso]);
+    setAvailable(available.filter(p => p.procesoId !== proceso.procesoId));
+  };
+
+  const handleRemove = (proceso: ProcesoProduccionEntity) => {
+    const newSelected = selected.filter(p => p.procesoId !== proceso.procesoId);
+    setSelected(newSelected);
+    fetchAvailable(page);
+  };
+
+  const handleAccept = () => {
+    onConfirm(selected);
+    setSelected([]);
+    setAvailable([]);
+    onClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="6xl">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Seleccionar Procesos de Producción</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Flex gap={4}>
+            {/* Panel izquierdo - Procesos disponibles */}
+            <Box flex={1}>
+              <Flex mb={2} gap={2}>
+                <Input 
+                  placeholder='Buscar por nombre' 
+                  value={searchText} 
+                  onChange={(e) => setSearchText(e.target.value)} 
                 />
-            )}
-        </Flex>
-    );
+                <Button
+                  onClick={() => fetchAvailable(0)}
+                  isLoading={loading}
+                  loadingText="Buscando..."
+                >
+                  Buscar
+                </Button>
+              </Flex>
+              <Table size='sm'>
+                <Thead>
+                  <Tr>
+                    <Th>ID</Th>
+                    <Th>Nombre</Th>
+                    <Th>Tiempo de Proceso</Th>
+                    <Th>Nivel de Acceso</Th>
+                    <Th></Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {available.map(proceso => (
+                    <Tr key={proceso.procesoId}>
+                      <Td>{proceso.procesoId}</Td>
+                      <Td>{proceso.nombre}</Td>
+                      <Td>{proceso.processTime} min</Td>
+                      <Td>{proceso.nivelAcceso !== undefined ? proceso.nivelAcceso : '-'}</Td>
+                      <Td>
+                        <Button size='xs' onClick={() => handleAdd(proceso)}>+</Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+              {totalPages > 1 && (
+                <MyPagination 
+                  page={page} 
+                  totalPages={totalPages} 
+                  loading={loading} 
+                  handlePageChange={fetchAvailable} 
+                />
+              )}
+            </Box>
+
+            {/* Panel derecho - Procesos seleccionados */}
+            <Box flex={1}>
+              <Table size='sm'>
+                <Thead>
+                  <Tr>
+                    <Th>ID</Th>
+                    <Th>Nombre</Th>
+                    <Th>Tiempo de Proceso</Th>
+                    <Th>Nivel de Acceso</Th>
+                    <Th></Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {selected.map(proceso => (
+                    <Tr key={proceso.procesoId}>
+                      <Td>{proceso.procesoId}</Td>
+                      <Td>{proceso.nombre}</Td>
+                      <Td>{proceso.processTime} min</Td>
+                      <Td>{proceso.nivelAcceso !== undefined ? proceso.nivelAcceso : '-'}</Td>
+                      <Td>
+                        <Button 
+                          size='xs' 
+                          colorScheme='red' 
+                          onClick={() => handleRemove(proceso)}
+                        >
+                          -
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </Box>
+          </Flex>
+        </ModalBody>
+        <ModalFooter>
+          <Button mr={3} onClick={onClose}>Cancelar</Button>
+          <Button colorScheme='teal' onClick={handleAccept}>Aceptar</Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
 }
