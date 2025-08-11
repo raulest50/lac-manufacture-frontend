@@ -38,3 +38,37 @@ export interface FiltrosPago {
   proveedorId?: number;
   metodo?: MetodoPago;
 }
+
+// ===============================
+// Transacciones de almacén para contabilización
+// ===============================
+
+export enum EstadoContable {
+  PENDIENTE = 'PENDIENTE',
+  CONTABILIZADA = 'CONTABILIZADA',
+  NO_APLICA = 'NO_APLICA',
+}
+
+export interface TransaccionAlmacen {
+  transaccionId: number;
+  fechaTransaccion: string;
+  estadoContable: EstadoContable;
+  tipoEntidadCausante: string;
+  idEntidadCausante: number;
+}
+
+export interface DTO_SearchTransaccionAlmacen {
+  estadoContable?: EstadoContable;
+  fechaInicio?: string;
+  fechaFin?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number;
+  size: number;
+}
