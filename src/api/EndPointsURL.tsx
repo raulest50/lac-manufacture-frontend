@@ -129,6 +129,7 @@ export default class EndPointsURL{
     // public get_balance_comprobacion: string;
     // public get_balance_general: string;
     // public get_estado_resultados: string;
+    public search_transacciones_almacen: string;
 
     public domain: string;
 
@@ -232,6 +233,7 @@ export default class EndPointsURL{
         this.get_cuentas = `${domain}/${contabilidad_res}/cuentas`;
         this.get_libro_mayor = `${domain}/${contabilidad_res}/libro-mayor`;
         this.get_periodos = `${domain}/${contabilidad_res}/periodos`;
+        this.search_transacciones_almacen = `${domain}/${contabilidad_res}/transacciones`;
 
         // organigrama endpoints
         const organigrama_res = 'organigrama';
