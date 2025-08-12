@@ -6,8 +6,8 @@ import {
 } from "@chakra-ui/react";
 import {useState, useEffect} from "react";
 import axios from 'axios';
-import EndPointsURL from '../../../../api/EndPointsURL.tsx';
-import {ProductoSemiter, UNIDADES, TIPOS_PRODUCTOS, Familia} from "../../types.tsx";
+import EndPointsURL from '../../../../../api/EndPointsURL.tsx';
+import {ProductoSemiter, UNIDADES, TIPOS_PRODUCTOS, Familia} from "../../../types.tsx";
 
 
 interface props {

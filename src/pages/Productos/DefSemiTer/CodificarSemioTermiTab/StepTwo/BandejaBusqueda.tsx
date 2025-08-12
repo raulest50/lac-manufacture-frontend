@@ -1,6 +1,6 @@
 // BandejaBusqueda.tsx
 import React, { useState } from "react";
-import { Producto, TIPOS_PRODUCTOS } from "../types";
+import { Producto, TIPOS_PRODUCTOS } from "../../../types.tsx";
 import {
     Box,
     Button,
@@ -9,11 +9,11 @@ import {
     FormLabel,
     Input,
     Select,
-    Text,
     Spinner,
 } from "@chakra-ui/react";
 import axios from "axios";
-import EndPointsURL from "../../../api/EndPointsURL";
+import EndPointsURL from "../../../../../api/EndPointsURL.tsx";
+import ItemBandejaBusqueda from "./ItemBandejaBusqueda.tsx";
 
 const endPoints = new EndPointsURL();
 
@@ -102,30 +102,11 @@ const BandejaBusqueda: React.FC<BandejaBusquedaProps> = ({ onAddInsumo }) => {
             ) : (
                 <Flex wrap="wrap" gap={4} direction="column" alignItems="center">
                     {results.map((producto) => (
-                        <Box
+                        <ItemBandejaBusqueda
                             key={producto.productoId}
-                            borderWidth="1px"
-                            borderRadius="md"
-                            p={4}
-                            w="full"
-                        >
-                            <Text fontWeight="bold">ID: {producto.productoId}</Text>
-                            <Flex direction="row" gap={10}>
-                                <Text>Nombre: {producto.nombre}</Text>
-                                <Text>Costo: {producto.costo}</Text>
-                            </Flex>
-                            <Flex direction="row" gap={10}>
-                                <Text>Tipo Unidades: {producto.tipoUnidades}</Text>
-                                <Text>Cantidad Unidad: {producto.cantidadUnidad}</Text>
-                            </Flex>
-                            <Button
-                                mt={2}
-                                colorScheme="green"
-                                onClick={() => onAddInsumo(producto)}
-                            >
-                                Agregar
-                            </Button>
-                        </Box>
+                            producto={producto}
+                            onAddInsumo={onAddInsumo}
+                        />
                     ))}
                 </Flex>
             )}

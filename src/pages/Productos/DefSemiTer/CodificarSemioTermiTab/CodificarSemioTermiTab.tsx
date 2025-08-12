@@ -10,11 +10,11 @@ import {
     useSteps,
 } from "@chakra-ui/react";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
-import StepOne from "./StepOne.tsx";
+import StepOne from "./StepOne/StepOne.tsx";
 import {useState, useEffect} from "react";
 import {ProductoSemiter} from "../../types.tsx";
-import StepTwo from "./StepTwo.tsx";
-import StepThree from "./StepThree.tsx";
+import StepTwo from "./StepTwo/StepTwo.tsx";
+import StepThree from "./StepThree/StepThree.tsx";
 
 interface CodificarSemioTermiTabProps {
     isActive?: boolean;
