@@ -32,7 +32,7 @@ function CodificarMaterialesTab() {
     const [codigo, setCodigo] = useState('');
     const [url_ftecnica, setUrl_ftecnica] = useState('');
     const [tipoMaterial, setTipoMaterial] = useState(TIPOS_MATERIALES.materiaPrima);
-    const [inventareable, setInventareable] = useState(false);
+    const [inventareable, setInventareable] = useState(true);
 
     const [ivaPercentage, setIvaPercentage] = useState(0);
 
@@ -51,7 +51,7 @@ function CodificarMaterialesTab() {
         setIvaPercentage(0);
         setTipoMaterial(TIPOS_MATERIALES.materiaPrima);
         setTipo_unidad(UNIDADES.KG);
-        setInventareable(false);
+        setInventareable(true);
     };
 
     // Validate data: all fields must be non-empty, codigo numeric, cantidad positive, and a PDF file must be loaded.

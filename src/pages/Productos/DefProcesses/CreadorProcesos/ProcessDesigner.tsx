@@ -68,6 +68,15 @@ export default function ProcessDesigner({ semioter2, setSemiter3, onValidityChan
     const initialNodes: Node[] = [...getMatPrimasNodes(semioter2), getTargetNode(semioter2)];
     const initialEdges: Edge[] = [];
 
+    // Opciones predeterminadas para los edges (conexiones)
+    const defaultEdgeOptions = {
+        style: { 
+            strokeWidth: 3,        // Aumentar el grosor (valor anterior: 1)
+            stroke: '#333333',     // Color más oscuro (anterior: #b1b1b7)
+        },
+        animated: true,            // Mantener la animación para mejor visibilidad
+    };
+
     //const toast = useToast();
 
     const zeroProcesoNode = {
@@ -266,6 +275,7 @@ export default function ProcessDesigner({ semioter2, setSemiter3, onValidityChan
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
                     nodeTypes={nodeTypes}
+                    defaultEdgeOptions={defaultEdgeOptions}
                     onSelectionChange={({ nodes: selectedNodes, edges: selectedEdges }) => {
                         if (selectedNodes.length > 0) setSelectedElement(selectedNodes[0]);
                         else if (selectedEdges.length > 0) setSelectedElement(selectedEdges[0]);

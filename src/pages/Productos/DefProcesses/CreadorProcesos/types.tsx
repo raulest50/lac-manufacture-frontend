@@ -6,7 +6,6 @@ export interface ProcesoNodeData {
     instrucciones?: string;
     nombreProceso?: string;
     unidadesTiempo?: string;
+    procesoId?: number; // Agregar el ID del proceso seleccionado
     [key: string]: unknown;
 }
-
-
