@@ -17,10 +17,12 @@ import "@xyflow/react/dist/style.css";
 import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
 import ProcesoNode from "./Nodos/ProcesoNode.tsx";
 import { ProcesoNodeData } from "./types.tsx";
-import { ProductoSemiter } from "../../types.tsx";
+import { ProductoSemiter, ProcesoProduccionEntity } from "../../types.tsx";
 import TargetNode from "./Nodos/TargetNode.tsx";
 import EditProcesoNodeDialog from "./EditProcesoNodeDialog.tsx";
 import { Stat, StatLabel, StatNumber } from "@chakra-ui/icons";
+// Importar el ProcesoProduccionPicker
+import { ProcesoProduccionPicker } from "./components/ProcesoProduccionPicker/ProcesoProduccionPicker.tsx";
 
 
 const nodeTypes = {
@@ -92,6 +94,9 @@ export default function ProcessDesigner({ semioter2, setSemiter3, onValidityChan
     // State to control the edit dialog.
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
+    // Estado para controlar el modal del picker de procesos
+    const [isProcesoPickerOpen, setIsProcesoPickerOpen] = useState(false);
+
     const onConnect = useCallback(
         (params: Connection) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
@@ -122,23 +127,38 @@ export default function ProcessDesigner({ semioter2, setSemiter3, onValidityChan
         [nodes, edges]
     );
 
+    // Modificar para abrir el picker en lugar de crear un nodo directamente
     const agregarProcesoOnClick = () => {
-        const nextId = String(Number(lastNode.id) + 1);
-        const nextNode = {
-            id: nextId,
-            data: {
-                label: `Node ${nextId}`,
-                unidadesTiempo: "1",
-                tiempo: "",
-                nombreProceso: "",
-                instrucciones: "",
-                descripcionSalida: "",
-            },
-            position: { x: 200, y: lastNode.position.y + 50 },
-            type: "procesoNode",
-        };
-        setNodes([...nodes, nextNode]);
-        setLastNode(nextNode);
+        setIsProcesoPickerOpen(true);
+    };
+
+    // Función para manejar los procesos seleccionados del picker
+    const handleProcessSelection = (procesos: ProcesoProduccionEntity[]) => {
+        const newNodes = procesos.map((proceso, index) => {
+            const nextId = String(Number(lastNode.id) + index + 1);
+            return {
+                id: nextId,
+                data: {
+                    label: proceso.nombre,
+                    unidadesTiempo: "1", // Default value
+                    tiempo: String(proceso.processTime),
+                    nombreProceso: proceso.nombre,
+                    instrucciones: "", // Este campo podría venir del backend en el futuro
+                    descripcionSalida: "",
+                    procesoId: proceso.procesoId, // Guardar el ID del proceso seleccionado
+                },
+                position: { 
+                    x: 200, 
+                    y: lastNode.position.y + (50 * (index + 1)) 
+                },
+                type: "procesoNode",
+            };
+        });
+
+        if (newNodes.length > 0) {
+            setNodes([...nodes, ...newNodes]);
+            setLastNode(newNodes[newNodes.length - 1]);
+        }
     };
 
     const deleteNodeById = (id: string) => {
@@ -337,6 +357,14 @@ export default function ProcessDesigner({ semioter2, setSemiter3, onValidityChan
                         }}
                     />
                 )}
+
+            {/* Agregar el componente ProcesoProduccionPicker */}
+            <ProcesoProduccionPicker 
+                isOpen={isProcesoPickerOpen}
+                onClose={() => setIsProcesoPickerOpen(false)}
+                onConfirm={handleProcessSelection}
+                alreadySelected={[]}
+            />
         </Flex>
     );
 }
