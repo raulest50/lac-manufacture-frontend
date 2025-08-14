@@ -10,8 +10,8 @@ import ItemBandejaSeleccion from "./ItemBandejaSeleccion.tsx";
 
 interface BandejaSeleccionProps {
     selectedInsumos: Insumo[];
-    onUpdateCantidad: (productoId: number, newCantidad: number) => void;
-    onRemoveInsumo: (productoId: number) => void;
+    onUpdateCantidad: (productoId: string, newCantidad: number) => void;
+    onRemoveInsumo: (productoId: string) => void;
 }
 
 const BandejaSeleccion: React.FC<BandejaSeleccionProps> = ({

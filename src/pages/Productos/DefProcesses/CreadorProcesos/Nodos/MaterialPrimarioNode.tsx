@@ -4,8 +4,8 @@ import {Box, Flex, Text, Icon } from "@chakra-ui/react";
 import { PiCubeFocusThin } from "react-icons/pi";
 
 const handleStyle = {
-    width:"0.8em",
-    height:"0.8em",
+    width:"1.5em",
+    height:"1.5em",
 }
 
 

@@ -4,8 +4,8 @@ import { GrCubes } from "react-icons/gr";
 
 
 const handleStyle = {
-    width:"0.8em",
-    height:"0.8em",
+    width:"1.5em",
+    height:"1.5em",
 }
 
 

@@ -25,8 +25,8 @@ import { FiLayers, FiPackage, FiMinus } from "react-icons/fi"; // Semi / Termina
 
 interface ItemBandejaSeleccionProps {
     insumo: Insumo;
-    onUpdateCantidad: (productoId: number, newCantidad: number) => void;
-    onRemoveInsumo: (productoId: number) => void;
+    onUpdateCantidad: (productoId: string, newCantidad: number) => void;
+    onRemoveInsumo: (productoId: string) => void;
 }
 
 type MetaTipo = {
@@ -125,10 +125,9 @@ const ItemBandejaSeleccion: React.FC<ItemBandejaSeleccionProps> = ({
                             min={0}
                             value={insumo.cantidadRequerida}
                             onChange={(_vStr, vNum) =>
-                                // Nota: el tipo de productoId en props es number, mantengo la firma original.
+                                // Nota: el tipo de productoId en props es string, que coincide con la definición en Producto.
                                 onUpdateCantidad(
-                                    // sin cambiar tu lógica original:
-                                    (producto.productoId as unknown) as number,
+                                    producto.productoId,
                                     Number.isFinite(vNum) ? vNum : 0
                                 )
                             }
@@ -152,7 +151,7 @@ const ItemBandejaSeleccion: React.FC<ItemBandejaSeleccionProps> = ({
                             size="sm"
                             borderRadius="full"
                             onClick={() =>
-                                onRemoveInsumo((producto.productoId as unknown) as number)
+                                onRemoveInsumo(producto.productoId)
                             }
                             _active={{ transform: "scale(0.96)" }}
                         />
