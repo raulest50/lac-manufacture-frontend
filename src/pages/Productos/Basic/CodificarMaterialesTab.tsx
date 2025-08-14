@@ -12,7 +12,8 @@ import {
     Select,
     Flex,
     HStack,
-    IconButton
+    IconButton,
+    Switch
 } from '@chakra-ui/react';
 import axios, { AxiosError } from 'axios';
 
@@ -31,6 +32,7 @@ function CodificarMaterialesTab() {
     const [codigo, setCodigo] = useState('');
     const [url_ftecnica, setUrl_ftecnica] = useState('');
     const [tipoMaterial, setTipoMaterial] = useState(TIPOS_MATERIALES.materiaPrima);
+    const [inventareable, setInventareable] = useState(false);
 
     const [ivaPercentage, setIvaPercentage] = useState(0);
 
@@ -49,6 +51,7 @@ function CodificarMaterialesTab() {
         setIvaPercentage(0);
         setTipoMaterial(TIPOS_MATERIALES.materiaPrima);
         setTipo_unidad(UNIDADES.KG);
+        setInventareable(false);
     };
 
     // Validate data: all fields must be non-empty, codigo numeric, cantidad positive, and a PDF file must be loaded.
@@ -171,6 +174,7 @@ function CodificarMaterialesTab() {
             cantidadUnidad: cantidad_unidad,
             tipo_producto: TIPOS_PRODUCTOS.materiaPrima,
             tipoMaterial: tipoMaterial,
+            inventareable,
             ivaPercentual: ivaPercentage
         };
 
@@ -327,6 +331,13 @@ function CodificarMaterialesTab() {
                                 </Select>
                             </FormControl>
                         </Flex>
+                    </GridItem>
+
+                    <GridItem colSpan={1}>
+                        <FormControl display="flex" alignItems="center">
+                            <FormLabel mb="0">Inventareable</FormLabel>
+                            <Switch isChecked={inventareable} onChange={(e) => setInventareable(e.target.checked)} />
+                        </FormControl>
                     </GridItem>
 
                     <GridItem colSpan={3}>

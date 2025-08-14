@@ -21,6 +21,7 @@ export interface Producto{
     nombre: string;
     observaciones?: string;
     costo: number;
+    inventareable?: boolean;
     tipoUnidades: string;
     cantidadUnidad: string;
     fechaCreacion?: string;
