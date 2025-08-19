@@ -37,7 +37,10 @@ function DefinicionProcesosTab() {
   const handleSubmit = async () => {
     const proceso: ProcesoProduccionEntity = {
       nombre,
-      recursosRequeridos: recursosSel.map((r) => ({id: r.id})) as RecursoProduccion[],
+      recursosRequeridos: recursosSel.map((r) => ({
+        id: r.id,
+        cantidad: r.cantidad || 1  // Incluir la cantidad
+      })) as RecursoProduccion[],
       setUpTime,
       processTime,
       nivelAcceso,

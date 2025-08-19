@@ -1,4 +1,4 @@
-import {Box, Button, Flex, Table, Tbody, Td, Th, Thead, Tr} from '@chakra-ui/react';
+import {Box, Button, Flex, Table, Tbody, Td, Th, Thead, Tr, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper} from '@chakra-ui/react';
 import {useState} from 'react';
 import {RecursoProduccion} from '../types.tsx';
 import RecursoProduccionPicker from './RecursoProduccionPicker.tsx';
@@ -17,7 +17,27 @@ export default function PPRPmanager({recursos, onChange, editMode = true}: Props
   };
 
   const assignRecursos = (lista: RecursoProduccion[]) => {
-    onChange([...recursos, ...lista]);
+    // Asignar cantidad inicial de 1 a cada recurso nuevo
+    const nuevosRecursos = lista.map(r => ({...r, cantidad: 1}));
+    onChange([...recursos, ...nuevosRecursos]);
+  };
+
+  const handleCantidadChange = (id: number | undefined, nuevaCantidad: number) => {
+    if (!id) return;
+
+    // Asegurar que la cantidad no sea menor a 1
+    const cantidad = Math.max(1, nuevaCantidad);
+
+    // Verificar que no exceda la cantidad de activos fijos disponibles
+    const recurso = recursos.find(r => r.id === id);
+    if (recurso && recurso.cantidadDisponible && cantidad > recurso.cantidadDisponible) {
+      // No permitir exceder la cantidad disponible
+      return;
+    }
+
+    onChange(recursos.map(r => 
+      r.id === id ? {...r, cantidad} : r
+    ));
   };
 
   return (
@@ -30,6 +50,8 @@ export default function PPRPmanager({recursos, onChange, editMode = true}: Props
           <Tr>
             <Th>ID</Th>
             <Th>Nombre</Th>
+            <Th>Cantidad</Th>
+            <Th>Disponibles</Th>
             <Th></Th>
           </Tr>
         </Thead>
@@ -38,6 +60,23 @@ export default function PPRPmanager({recursos, onChange, editMode = true}: Props
             <Tr key={r.id}>
               <Td>{r.id}</Td>
               <Td>{r.nombre}</Td>
+              <Td>
+                <NumberInput 
+                  size="sm" 
+                  min={1} 
+                  max={r.cantidadDisponible || 999} 
+                  value={r.cantidad || 1}
+                  onChange={(_, valueAsNumber) => handleCantidadChange(r.id, valueAsNumber)}
+                  isDisabled={!editMode}
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </Td>
+              <Td>{r.cantidadDisponible || 'N/A'}</Td>
               <Td><Button size='xs' colorScheme='red' onClick={()=>handleRemove(r)} isDisabled={!editMode}>Remover</Button></Td>
             </Tr>
           ))}
@@ -52,4 +91,3 @@ export default function PPRPmanager({recursos, onChange, editMode = true}: Props
     </Box>
   );
 }
-

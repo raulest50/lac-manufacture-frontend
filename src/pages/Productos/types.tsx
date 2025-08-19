@@ -105,6 +105,7 @@ export interface RecursoProduccion {
     id?: number;
     nombre: string;
     descripcion: string;
+    cantidad?: number; // Nuevo campo para la cantidad requerida
     capacidadTotal?: number;
     cantidadDisponible?: number;
     capacidadPorHora?: number;
