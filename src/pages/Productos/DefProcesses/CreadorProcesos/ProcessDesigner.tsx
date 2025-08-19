@@ -17,7 +17,7 @@ import "@xyflow/react/dist/style.css";
 import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
 import ProcesoNode from "./Nodos/ProcesoNode.tsx";
 import { ProcesoNodeData } from "./types.tsx";
-import { ProductoSemiter, ProcesoProduccionEntity } from "../../types.tsx";
+import { ProductoSemiter, ProcesoProduccionEntity, ProcesoProduccionCompleto, ProcesoProduccionNode } from "../../types.tsx";
 import TargetNode from "./Nodos/TargetNode.tsx";
 import EditProcesoNodeDialog from "./EditProcesoNodeDialog.tsx";
 import { Stat, StatLabel, StatNumber } from "@chakra-ui/icons";
@@ -34,10 +34,11 @@ const nodeTypes = {
 interface Props {
     semioter2: ProductoSemiter;
     setSemiter3: (semioter3: ProductoSemiter) => void;
+    rendimientoTeorico: number;
     onValidityChange?: (isValid: boolean) => void;
 }
 
-export default function ProcessDesigner({ semioter2, setSemiter3, onValidityChange }: Props) {
+export default function ProcessDesigner({ semioter2, setSemiter3, rendimientoTeorico, onValidityChange }: Props) {
     // Create nodes for each material (insumo) from ProductoSemiter.
     // Use a fallback empty array if insumos is undefined.
     const getMatPrimasNodes = (semi: ProductoSemiter): Node[] =>
@@ -110,6 +111,20 @@ export default function ProcessDesigner({ semioter2, setSemiter3, onValidityChan
         (params: Connection) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
     );
+
+    useEffect(() => {
+        const procesos: ProcesoProduccionNode[] = nodes.map((n) => ({
+            id: n.id,
+            data: n.data,
+            type: n.type,
+            targetIds: edges.filter((e) => e.source === n.id).map((e) => e.target),
+        }));
+        const procesoCompleto: ProcesoProduccionCompleto = {
+            procesosProduccion: procesos,
+            rendimientoTeorico,
+        };
+        setSemiter3({ ...semioter2, procesoProduccionCompleto: procesoCompleto });
+    }, [nodes, edges, rendimientoTeorico, semioter2, setSemiter3]);
 
     // Validate connection rules.
     const isValidConnection = useCallback(

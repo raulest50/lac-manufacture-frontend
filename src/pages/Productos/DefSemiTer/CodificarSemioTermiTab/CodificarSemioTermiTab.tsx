@@ -15,6 +15,7 @@ import {useState, useEffect} from "react";
 import {ProductoSemiter} from "../../types.tsx";
 import StepTwo from "./StepTwo/StepTwo.tsx";
 import StepThree from "./StepThree/StepThree.tsx";
+import StepFour from "./StepFour/StepFour.tsx";
 
 interface CodificarSemioTermiTabProps {
     isActive?: boolean;
@@ -23,10 +24,10 @@ interface CodificarSemioTermiTabProps {
 
 
 const steps = [
-    { title: 'Primero', description: 'Definir Insumos y Otros Campos' },
-    { title: 'Segundo', description: 'Definir Proceso de Produccion' },
-    { title: 'Tercero', description: 'Definir Parametros de Salida' },
-    { title: 'Cuarto', description: 'Finalizacion' },
+    { title: 'Primero', description: 'Definir Producto' },
+    { title: 'Segundo', description: 'Definir Insumos' },
+    { title: 'Tercero', description: 'Definir Proceso de Produccion' },
+    { title: 'Cuarto', description: 'Confirmación' },
 ]
 
 
@@ -68,22 +69,24 @@ export default function CodificarSemioTermiTab({ isActive = false }: CodificarSe
                 <StepTwo setActiveStep={setActiveStep} semioter={semioter!} setSemioter2={setSemioter2}/>
             );
         }
-        if (activeStep === 2) { // subir documento soporte
+        if (activeStep === 2) { // definir proceso de produccion
             return(
                 <StepThree setActiveStep={setActiveStep} semioter2={semioter2!} setSemioter3={setSemioter3}/>
             );
         }
-        if (activeStep === 3) { // verificar los datos y enviar a backend
+        if (activeStep === 3) { // confirmar y guardar
             return(
-                <></>
-            );
-        }
-        if (activeStep === 4){ // ventana de finalizacion, no se hace nada, solo notifica al usuario
-            return(
-                <></>
+                <StepFour setActiveStep={setActiveStep} semioter3={semioter3!} onReset={handleReset} />
             );
         }
     }
+
+    const handleReset = () => {
+        setSemioter(undefined);
+        setSemioter2(undefined);
+        setSemioter3(undefined);
+        setActiveStep(0);
+    };
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>

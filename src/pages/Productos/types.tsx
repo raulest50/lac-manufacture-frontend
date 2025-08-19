@@ -79,6 +79,18 @@ export interface ProcesoProduccion{
     targetNode: Node;
 }
 
+export interface ProcesoProduccionNode {
+    id: string;
+    data: unknown;
+    type?: string;
+    targetIds: string[];
+}
+
+export interface ProcesoProduccionCompleto {
+    procesosProduccion: ProcesoProduccionNode[];
+    rendimientoTeorico: number;
+}
+
 /**
  * se usa en el tab de codificacion de producto terminado o semiterminado
  */
@@ -91,7 +103,7 @@ export interface ProductoSemiter {
     tipoUnidades: string;
     cantidadUnidad: string;
     tipo_producto: string;
-    procesoProduccion?: ProcesoProduccion; // se determina a la hora de definir el proceso - step 3
+    procesoProduccionCompleto?: ProcesoProduccionCompleto; // se determina a la hora de definir el proceso - step 3
     categoria?: Categoria; // solo se usa para terminado, por ello es opcional
 }
 
