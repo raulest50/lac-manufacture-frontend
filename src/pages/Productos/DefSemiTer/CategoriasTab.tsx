@@ -24,39 +24,39 @@ import {
     Text
 } from '@chakra-ui/react';
 
-import {Familia} from '../types.tsx';
+import {Categoria} from '../types.tsx';
 
-export function FamiliasTab() {
-    const [familias, setFamilias] = useState<Familia[]>([]);
+export function CategoriasTab() {
+    const [categorias, setCategorias] = useState<Categoria[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
-        familiaId: '',
-        familiaNombre: '',
-        familiaDescripcion: ''
+        categoriaId: '',
+        categoriaNombre: '',
+        categoriaDescripcion: ''
     });
 
     const [submitting, setSubmitting] = useState<boolean>(false);
     const toast = useToast();
     const endPoints = new EndPointsURL();
 
-    const fetchFamilias = async () => {
+    const fetchCategorias = async () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await axios.get(endPoints.get_familias);
-            setFamilias(response.data);
+            const response = await axios.get(endPoints.get_categorias);
+            setCategorias(response.data);
         } catch (error) {
-            console.error('Error fetching familias:', error);
-            setError('Error al cargar las familias. Por favor, intente nuevamente.');
+            console.error('Error fetching categorias:', error);
+            setError('Error al cargar las categorías. Por favor, intente nuevamente.');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchFamilias();
+        fetchCategorias();
     }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,29 +70,29 @@ export function FamiliasTab() {
     const handleSubmit = async () => {
         try {
             setSubmitting(true);
-            const newFamilia = {
-                familiaId: Number(formData.familiaId),
-                familiaNombre: formData.familiaNombre,
-                familiaDescripcion: formData.familiaDescripcion
+            const newCategoria = {
+                categoriaId: Number(formData.categoriaId),
+                categoriaNombre: formData.categoriaNombre,
+                categoriaDescripcion: formData.categoriaDescripcion
             };
 
-            await axios.post(endPoints.save_familia, newFamilia);
+            await axios.post(endPoints.save_categoria, newCategoria);
 
             toast({
-                title: 'Familia creada',
-                description: 'La familia ha sido creada exitosamente',
+                title: 'Categoría creada',
+                description: 'La categoría ha sido creada exitosamente',
                 status: 'success',
                 duration: 3000,
                 isClosable: true,
             });
 
             handleClear();
-            fetchFamilias(); // Recargar la lista después de crear
+            fetchCategorias(); // Recargar la lista después de crear
         } catch (error) {
-            console.error('Error creating familia:', error);
+            console.error('Error creating categoria:', error);
 
             // Manejo mejorado de excepciones
-            let errorMessage = 'No se pudo crear la familia. Por favor, intente nuevamente.';
+            let errorMessage = 'No se pudo crear la categoría. Por favor, intente nuevamente.';
 
             // Extraer el mensaje de error específico del backend
             if (axios.isAxiosError(error) && error.response) {
@@ -118,27 +118,27 @@ export function FamiliasTab() {
 
     const handleClear = () => {
         setFormData({
-            familiaId: '',
-            familiaNombre: '',
-            familiaDescripcion: ''
+            categoriaId: '',
+            categoriaNombre: '',
+            categoriaDescripcion: ''
         });
     };
 
-    const isFormValid = formData.familiaNombre.trim() !== '' && formData.familiaDescripcion.trim() !== '';
+    const isFormValid = formData.categoriaNombre.trim() !== '' && formData.categoriaDescripcion.trim() !== '';
 
     return (
         <Grid templateColumns="1fr 1fr" gap={6} p={4}>
             <Box p={6} borderWidth="1px" borderRadius="lg">
                 <VStack spacing={4} align="stretch">
-                    <Heading size="md" mb={4}>Nueva Familia</Heading>
+                    <Heading size="md" mb={4}>Nueva Categoría</Heading>
 
                     <FormControl isRequired>
-                        <FormLabel>Familia ID</FormLabel>
+                        <FormLabel>Categoría ID</FormLabel>
                         <Input
-                            name="familiaId"
-                            value={formData.familiaId}
+                            name="categoriaId"
+                            value={formData.categoriaId}
                             onChange={handleInputChange}
-                            placeholder="Id de la familia"
+                            placeholder="Id de la categoría"
                             isDisabled={submitting}
                         />
                     </FormControl>
@@ -146,10 +146,10 @@ export function FamiliasTab() {
                     <FormControl isRequired>
                         <FormLabel>Nombre</FormLabel>
                         <Input
-                            name="familiaNombre"
-                            value={formData.familiaNombre}
+                            name="categoriaNombre"
+                            value={formData.categoriaNombre}
                             onChange={handleInputChange}
-                            placeholder="Nombre de la familia"
+                            placeholder="Nombre de la categoría"
                             isDisabled={submitting}
                         />
                     </FormControl>
@@ -157,10 +157,10 @@ export function FamiliasTab() {
                     <FormControl isRequired>
                         <FormLabel>Descripción</FormLabel>
                         <Input
-                            name="familiaDescripcion"
-                            value={formData.familiaDescripcion}
+                            name="categoriaDescripcion"
+                            value={formData.categoriaDescripcion}
                             onChange={handleInputChange}
-                            placeholder="Descripción de la familia"
+                            placeholder="Descripción de la categoría"
                             isDisabled={submitting}
                         />
                     </FormControl>
@@ -179,7 +179,7 @@ export function FamiliasTab() {
                 </VStack>
             </Box>
             <Box p={6} borderWidth="1px" borderRadius="lg">
-                <Heading size="md" mb={4}>Familias Existentes</Heading>
+                <Heading size="md" mb={4}>Categorías Existentes</Heading>
 
                 {loading && <Spinner size="md" />}
 
@@ -190,14 +190,14 @@ export function FamiliasTab() {
                     </Alert>
                 )}
 
-                {!loading && !error && familias.length === 0 && (
+                {!loading && !error && categorias.length === 0 && (
                     <Alert status="info" mb={4}>
                         <AlertIcon />
-                        <Text>No hay familias registradas. Cree una nueva familia utilizando el formulario.</Text>
+                        <Text>No hay categorías registradas. Cree una nueva categoría utilizando el formulario.</Text>
                     </Alert>
                 )}
 
-                {!loading && !error && familias.length > 0 && (
+                {!loading && !error && categorias.length > 0 && (
                     <Table variant="simple">
                         <Thead>
                             <Tr>
@@ -207,11 +207,11 @@ export function FamiliasTab() {
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {familias.map((familia) => (
-                                <Tr key={familia.familiaId}>
-                                    <Td>{familia.familiaId}</Td>
-                                    <Td>{familia.familiaNombre}</Td>
-                                    <Td>{familia.familiaDescripcion}</Td>
+                            {categorias.map((categoria) => (
+                                <Tr key={categoria.categoriaId}>
+                                    <Td>{categoria.categoriaId}</Td>
+                                    <Td>{categoria.categoriaNombre}</Td>
+                                    <Td>{categoria.categoriaDescripcion}</Td>
                                 </Tr>
                             ))}
                         </Tbody>

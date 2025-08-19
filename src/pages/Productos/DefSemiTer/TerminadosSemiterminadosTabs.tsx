@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Button, Flex, Tab, TabList, TabPanel, TabPanels, Tabs} from '@chakra-ui/react';
 import {FaArrowLeft} from 'react-icons/fa';
 import CodificarSemioTermiTab from './CodificarSemioTermiTab/CodificarSemioTermiTab.tsx';
-import {FamiliasTab} from './FamiliasTab.tsx';
+import {CategoriasTab} from './CategoriasTab.tsx';
 import InformeProductosTab from '../Basic/InformeProductosTab.tsx';
 import {my_style_tab} from '../../../styles/styles_general.tsx';
 
@@ -26,7 +26,7 @@ export function TerminadosSemiterminadosTabs({user, productosAccessLevel, onBack
                         <Tab sx={my_style_tab}>Codificar Terminado/Semiterminado</Tab>
                     )}
                     {(user === 'master' || productosAccessLevel >= 2) && (
-                        <Tab sx={my_style_tab}>Familias</Tab>
+                        <Tab sx={my_style_tab}>Categorías</Tab>
                     )}
                     <Tab sx={my_style_tab}>Consulta</Tab>
                 </TabList>
@@ -39,7 +39,7 @@ export function TerminadosSemiterminadosTabs({user, productosAccessLevel, onBack
                     )}
                     {(user === 'master' || productosAccessLevel >= 2) && (
                         <TabPanel>
-                            <FamiliasTab />
+                            <CategoriasTab />
                         </TabPanel>
                     )}
                     <TabPanel>

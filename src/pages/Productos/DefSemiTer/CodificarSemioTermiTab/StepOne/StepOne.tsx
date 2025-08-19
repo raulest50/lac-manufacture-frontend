@@ -7,16 +7,16 @@ import {
 import {useState, useEffect} from "react";
 import axios from 'axios';
 import EndPointsURL from '../../../../../api/EndPointsURL.tsx';
-import {ProductoSemiter, UNIDADES, TIPOS_PRODUCTOS, Familia} from "../../../types.tsx";
+import {ProductoSemiter, UNIDADES, TIPOS_PRODUCTOS, Categoria} from "../../../types.tsx";
 
 
 interface props {
     setActiveStep: (step: number) => void;
     setSemioter: (semioter: ProductoSemiter) => void;
-    refreshFamilias?: number;
+    refreshCategorias?: number;
 }
 
-export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0}: props) {
+export default function StepOne({setActiveStep, setSemioter, refreshCategorias = 0}: props) {
     // Local copy of the order's items to track verification state.
 
     const [productoId, setProductoId] = useState<string>("");
@@ -26,39 +26,39 @@ export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0
     const [observaciones, setObservaciones] = useState<string>("");
     const [tipo_producto, setTipo_producto] = useState<string>(TIPOS_PRODUCTOS.terminado);
 
-    // Estados para manejar familias
-    const [familiasDisponibles, setFamiliasDisponibles] = useState<Familia[]>([]);
-    const [selectedFamiliaId, setSelectedFamiliaId] = useState<number | null>(null);
-    const [loadingFamilias, setLoadingFamilias] = useState<boolean>(false);
-    const [errorFamilias, setErrorFamilias] = useState<string | null>(null);
+    // Estados para manejar categorías
+    const [categoriasDisponibles, setCategoriasDisponibles] = useState<Categoria[]>([]);
+    const [selectedCategoriaId, setSelectedCategoriaId] = useState<number | null>(null);
+    const [loadingCategorias, setLoadingCategorias] = useState<boolean>(false);
+    const [errorCategorias, setErrorCategorias] = useState<string | null>(null);
 
     const endPoints = new EndPointsURL();
     const toast = useToast();
 
-    // Función para cargar las familias
-    const fetchFamilias = async () => {
+    // Función para cargar las categorías
+    const fetchCategorias = async () => {
         if (tipo_producto === TIPOS_PRODUCTOS.terminado) {
             try {
-                setLoadingFamilias(true);
-                setErrorFamilias(null);
-                const response = await axios.get(endPoints.get_familias);
-                setFamiliasDisponibles(response.data);
+                setLoadingCategorias(true);
+                setErrorCategorias(null);
+                const response = await axios.get(endPoints.get_categorias);
+                setCategoriasDisponibles(response.data);
 
-                // Si no hay familias, mostrar un mensaje
+                // Si no hay categorías, mostrar un mensaje
                 if (response.data.length === 0) {
                     toast({
                         title: "Advertencia",
-                        description: "No hay familias disponibles. Por favor, cree una familia primero.",
+                        description: "No hay categorías disponibles. Por favor, cree una categoría primero.",
                         status: "warning",
                         duration: 5000,
                         isClosable: true,
                     });
                 }
             } catch (error) {
-                console.error('Error fetching familias:', error);
+                console.error('Error fetching categorias:', error);
 
                 // Manejo mejorado de excepciones
-                let errorMessage = 'Error al cargar las familias';
+                let errorMessage = 'Error al cargar las categorías';
 
                 // Extraer el mensaje de error específico del backend
                 if (axios.isAxiosError(error) && error.response) {
@@ -69,7 +69,7 @@ export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0
                     }
                 }
 
-                setErrorFamilias(errorMessage);
+                setErrorCategorias(errorMessage);
                 toast({
                     title: "Error",
                     description: errorMessage,
@@ -78,21 +78,21 @@ export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0
                     isClosable: true,
                 });
             } finally {
-                setLoadingFamilias(false);
+                setLoadingCategorias(false);
             }
         }
     };
 
-    // Cargar familias cuando el componente se monta, cuando cambia el tipo de producto,
-    // o cuando se actualiza refreshFamilias
+    // Cargar categorías cuando el componente se monta, cuando cambia el tipo de producto,
+    // o cuando se actualiza refreshCategorias
     useEffect(() => {
-        fetchFamilias();
-    }, [tipo_producto, refreshFamilias]);
+        fetchCategorias();
+    }, [tipo_producto, refreshCategorias]);
 
-    // Limpiar la selección de familia cuando se cambia a producto semiterminado
+    // Limpiar la selección de categoría cuando se cambia a producto semiterminado
     useEffect(() => {
         if (tipo_producto !== TIPOS_PRODUCTOS.terminado) {
-            setSelectedFamiliaId(null);
+            setSelectedCategoriaId(null);
         }
     }, [tipo_producto]);
 
@@ -101,7 +101,7 @@ export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0
         setNombre("");
         setCantidadUnidad("");
         setObservaciones("");
-        setSelectedFamiliaId(null);
+        setSelectedCategoriaId(null);
     }
 
     const ValidarDatos = (): boolean => {
@@ -174,11 +174,11 @@ export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0
         }
         */
 
-        // Validar que se haya seleccionado una familia para productos terminados
-        if (tipo_producto === TIPOS_PRODUCTOS.terminado && !selectedFamiliaId) {
+        // Validar que se haya seleccionado una categoría para productos terminados
+        if (tipo_producto === TIPOS_PRODUCTOS.terminado && !selectedCategoriaId) {
             toast({
                 title: "Validación",
-                description: "Debe seleccionar una familia para productos terminados.",
+                description: "Debe seleccionar una categoría para productos terminados.",
                 status: "warning",
                 duration: 3000,
                 isClosable: true,
@@ -191,8 +191,8 @@ export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0
 
     const onClickSiguiente = () => {
         if(ValidarDatos()){
-            // Encontrar la familia seleccionada
-            const selectedFamilia = familiasDisponibles.find(f => f.familiaId === selectedFamiliaId);
+            // Encontrar la categoría seleccionada
+            const selectedCategoria = categoriasDisponibles.find(f => f.categoriaId === selectedCategoriaId);
 
             const semioter: ProductoSemiter = {
                 productoId: productoId!,
@@ -201,7 +201,7 @@ export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0
                 tipoUnidades: tipoUnidades,
                 cantidadUnidad: cantidadUnidad!,
                 tipo_producto: tipo_producto,
-                familia: tipo_producto === TIPOS_PRODUCTOS.terminado ? selectedFamilia : undefined
+                categoria: tipo_producto === TIPOS_PRODUCTOS.terminado ? selectedCategoria : undefined
             };
             setSemioter(semioter);
             setActiveStep(1);
@@ -274,28 +274,28 @@ export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0
 
                 <GridItem colSpan={1} display={tipo_producto === TIPOS_PRODUCTOS.terminado ? "flex" : "none"}>
                     <FormControl isRequired={tipo_producto === TIPOS_PRODUCTOS.terminado}>
-                        <FormLabel>Familia</FormLabel>
+                        <FormLabel>Categoría</FormLabel>
                         <Select
-                            value={selectedFamiliaId || ""}
-                            onChange={(e) => setSelectedFamiliaId(Number(e.target.value))}
-                            isDisabled={loadingFamilias || familiasDisponibles.length === 0}
-                            placeholder="Seleccione una familia"
+                            value={selectedCategoriaId || ""}
+                            onChange={(e) => setSelectedCategoriaId(Number(e.target.value))}
+                            isDisabled={loadingCategorias || categoriasDisponibles.length === 0}
+                            placeholder="Seleccione una categoría"
                         >
-                            {familiasDisponibles.map((familia) => (
-                                <option key={familia.familiaId} value={familia.familiaId}>
-                                    {familia.familiaNombre}
+                            {categoriasDisponibles.map((categoria) => (
+                                <option key={categoria.categoriaId} value={categoria.categoriaId}>
+                                    {categoria.categoriaNombre}
                                 </option>
                             ))}
                         </Select>
-                        {loadingFamilias && <Spinner size="sm" ml={2} />}
-                        {errorFamilias && (
+                        {loadingCategorias && <Spinner size="sm" ml={2} />}
+                        {errorCategorias && (
                             <Text color="red.500" fontSize="sm" mt={1}>
-                                {errorFamilias}
+                                {errorCategorias}
                             </Text>
                         )}
-                        {!loadingFamilias && !errorFamilias && familiasDisponibles.length === 0 && (
+                        {!loadingCategorias && !errorCategorias && categoriasDisponibles.length === 0 && (
                             <Text color="orange.500" fontSize="sm" mt={1}>
-                                No hay familias disponibles. Por favor, cree una familia primero.
+                                No hay categorías disponibles. Por favor, cree una categoría primero.
                             </Text>
                         )}
                     </FormControl>
@@ -329,8 +329,8 @@ export default function StepOne({setActiveStep, setSemioter, refreshFamilias = 0
                     colorScheme={"teal"}
                     onClick={onClickSiguiente}
                     isDisabled={
-                        tipo_producto === TIPOS_PRODUCTOS.terminado && 
-                        (familiasDisponibles.length === 0 || !selectedFamiliaId)
+                        tipo_producto === TIPOS_PRODUCTOS.terminado &&
+                        (categoriasDisponibles.length === 0 || !selectedCategoriaId)
                     }
                 >
                     Siguiente
