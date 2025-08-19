@@ -22,9 +22,9 @@ export default class EndPointsURL{
     // notifications endpoint
     public module_notifications: string;
 
-    // familias endpoints
-    public get_familias: string;
-    public save_familia: string;
+    // categorias endpoints
+    public get_categorias: string;
+    public save_categoria: string;
 
 
     // Proveedores resouce
@@ -166,9 +166,9 @@ export default class EndPointsURL{
         this.carga_masiva_mprims = `${domain}/${productos_res}/bulk_upload_excel`;
         this.consulta_productos = `${domain}/${productos_res}/consulta1`;
 
-        // Familias endpoints
-        this.get_familias = `${domain}/familias`;
-        this.save_familia = `${domain}/familias`;
+        // Categorias endpoints
+        this.get_categorias = `${domain}/categorias`;
+        this.save_categoria = `${domain}/categorias`;
 
         // Proveedores endpoints
         this.save_proveedores = `${domain}/${proveedores_res}/save`;

@@ -42,13 +42,13 @@ export default function CodificarSemioTermiTab({ isActive = false }: CodificarSe
     const [semioter2, setSemioter2] = useState<ProductoSemiter>();
     const [semioter3, setSemioter3] = useState<ProductoSemiter>();
 
-    // Estado para controlar la actualización de familias
-    const [refreshFamilias, setRefreshFamilias] = useState(0);
+    // Estado para controlar la actualización de categorías
+    const [refreshCategorias, setRefreshCategorias] = useState(0);
 
-    // Efecto para actualizar familias cuando la pestaña se activa
+    // Efecto para actualizar categorías cuando la pestaña se activa
     useEffect(() => {
         if (isActive) {
-            setRefreshFamilias(prev => prev + 1);
+            setRefreshCategorias(prev => prev + 1);
         }
     }, [isActive]);
 
@@ -59,7 +59,7 @@ export default function CodificarSemioTermiTab({ isActive = false }: CodificarSe
                 <StepOne 
                     setActiveStep={setActiveStep} 
                     setSemioter={setSemioter} 
-                    refreshFamilias={refreshFamilias}
+                    refreshCategorias={refreshCategorias}
                 />
             );
         }

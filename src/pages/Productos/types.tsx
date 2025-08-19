@@ -92,13 +92,13 @@ export interface ProductoSemiter {
     cantidadUnidad: string;
     tipo_producto: string;
     procesoProduccion?: ProcesoProduccion; // se determina a la hora de definir el proceso - step 3
-    familia?: Familia; // solo se usa para terminado, por ello es opcional
+    categoria?: Categoria; // solo se usa para terminado, por ello es opcional
 }
 
-export interface Familia{
-     familiaId: number;
-     familiaNombre: string;
-     familiaDescripcion: string;
+export interface Categoria{
+     categoriaId: number;
+     categoriaNombre: string;
+     categoriaDescripcion: string;
 }
 
 export interface RecursoProduccion {

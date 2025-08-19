@@ -61,7 +61,7 @@ export function ProductosMenuSelection({setViewMode, user, productosAccessLevel}
                     </CardHeader>
                     <CardBody display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={6}>
                         <Icon as={FaBoxOpen} boxSize="5em" mb={4} />
-                        <Text textAlign="center">Gestionar terminados, semiterminados y familias</Text>
+                        <Text textAlign="center">Gestionar terminados, semiterminados y categorías</Text>
                     </CardBody>
                 </Card>
 
