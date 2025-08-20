@@ -30,7 +30,7 @@ import {
 import { FaFileCircleCheck, FaFileCircleXmark, FaTrash, FaCheck, FaFilter } from 'react-icons/fa6';
 import { useState, useEffect } from 'react';
 import { NecesidadItem, Nececidades } from '../../PlanningWizTypes';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 type Props = {
   /**
@@ -95,22 +95,19 @@ export function NeedExtractionXls({ file, onDataProcessed }: Props) {
     setError(null);
 
     try {
-      // Leer el archivo Excel
+      // Leer el archivo Excel con exceljs
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { type: 'array' });
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(data);
 
       // Verificar si la hoja especificada existe
-      if (!workbook.SheetNames.includes(sheetName)) {
+      const worksheet = workbook.getWorksheet(sheetName);
+      if (!worksheet) {
         throw new Error(`La hoja "${sheetName}" no existe en el archivo`);
       }
 
-      const worksheet = workbook.Sheets[sheetName];
-
-      // Convertir a JSON
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 'A' });
-
       // Verificar estructura del archivo
-      if (jsonData.length < 2) {
+      if (worksheet.rowCount < 2) {
         throw new Error('El archivo no contiene suficientes datos');
       }
 
@@ -118,14 +115,27 @@ export function NeedExtractionXls({ file, onDataProcessed }: Props) {
       const extractedItems: NecesidadItem[] = [];
       const uniqueCategories = new Set<string>();
 
-      // Empezar desde la segunda fila (índice 1) para omitir los encabezados
-      for (let i = 1; i < jsonData.length; i++) {
-        const row = jsonData[i];
+      // Convertir letras de columna a números (A=1, B=2, etc.)
+      const getColumnNumber = (colLetter: string): number => {
+        return colLetter.toUpperCase().charCodeAt(0) - 64; // A=65 ASCII, así que A-64=1
+      };
 
-        const codigo = row[codeColumn];
-        const nombre = row[nameColumn];
-        const necesidad = parseFloat(row[needColumn]) || 0;
-        const categoria = row[categoryColumn];
+      const codeColNum = getColumnNumber(codeColumn);
+      const nameColNum = getColumnNumber(nameColumn);
+      const needColNum = getColumnNumber(needColumn);
+      const categoryColNum = getColumnNumber(categoryColumn);
+
+      // Empezar desde la segunda fila para omitir los encabezados
+      worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+        if (rowNumber === 1) return; // Omitir la primera fila (encabezados)
+
+        const codigo = row.getCell(codeColNum).value?.toString();
+        const nombre = row.getCell(nameColNum).value?.toString();
+        const necesidadValue = row.getCell(needColNum).value;
+        const necesidad = typeof necesidadValue === 'number' 
+          ? necesidadValue 
+          : parseFloat(necesidadValue?.toString() || '0');
+        const categoria = row.getCell(categoryColNum).value?.toString();
 
         if (codigo && nombre && necesidad && categoria) {
           extractedItems.push({
@@ -138,7 +148,7 @@ export function NeedExtractionXls({ file, onDataProcessed }: Props) {
 
           uniqueCategories.add(categoria);
         }
-      }
+      });
 
       // Actualizar estados
       setItems(extractedItems);
