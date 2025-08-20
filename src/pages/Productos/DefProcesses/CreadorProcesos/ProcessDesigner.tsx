@@ -17,7 +17,7 @@ import "@xyflow/react/dist/style.css";
 import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
 import ProcesoNode from "./Nodos/ProcesoNode.tsx";
 import { ProcesoNodeData } from "./types.tsx";
-import { ProductoSemiter, ProcesoProduccionEntity, ProcesoProduccionCompleto, ProcesoProduccionNode } from "../../types.tsx";
+import { ProductoSemiter, ProcesoProduccionEntity, ProcesoDiseñado, ProcesoProduccionNode } from "../../types.tsx";
 import TargetNode from "./Nodos/TargetNode.tsx";
 import EditProcesoNodeDialog from "./EditProcesoNodeDialog.tsx";
 import { Stat, StatLabel, StatNumber } from "@chakra-ui/icons";
@@ -33,12 +33,11 @@ const nodeTypes = {
 
 interface Props {
     semioter2: ProductoSemiter;
-    setSemiter3: (semioter3: ProductoSemiter) => void;
-    rendimientoTeorico: number;
+    onProcessChange?: (proceso: ProcesoDiseñado) => void;
     onValidityChange?: (isValid: boolean) => void;
 }
 
-export default function ProcessDesigner({ semioter2, setSemiter3, rendimientoTeorico, onValidityChange }: Props) {
+export default function ProcessDesigner({ semioter2, onProcessChange, onValidityChange }: Props) {
     // Create nodes for each material (insumo) from ProductoSemiter.
     // Use a fallback empty array if insumos is undefined.
     const getMatPrimasNodes = (semi: ProductoSemiter): Node[] =>
@@ -119,12 +118,9 @@ export default function ProcessDesigner({ semioter2, setSemiter3, rendimientoTeo
             type: n.type,
             targetIds: edges.filter((e) => e.source === n.id).map((e) => e.target),
         }));
-        const procesoCompleto: ProcesoProduccionCompleto = {
-            procesosProduccion: procesos,
-            rendimientoTeorico,
-        };
-        setSemiter3({ ...semioter2, procesoProduccionCompleto: procesoCompleto });
-    }, [nodes, edges, rendimientoTeorico, semioter2, setSemiter3]);
+        const proceso: ProcesoDiseñado = { procesosProduccion: procesos };
+        onProcessChange?.(proceso);
+    }, [nodes, edges, onProcessChange]);
 
     // Validate connection rules.
     const isValidConnection = useCallback(
