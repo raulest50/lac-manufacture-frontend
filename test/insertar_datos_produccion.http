@@ -1,0 +1,191 @@
+POST http://localhost:3000/api/produccion/lote
+Content-Type: application/json
+
+{
+  "procesos": [
+    { "codigo": "PROC-MARM", "descripcion": "Marmitas base neutra" },
+    { "codigo": "PROC-MIX",  "descripcion": "Mezcla concentrados" },
+    { "codigo": "PROC-EMP",  "descripcion": "Ensamble empaque" },
+    { "codigo": "PROC-PROD", "descripcion": "Producción completa" }
+  ],
+
+  "materiales": [
+    { "codigo": "NT200",  "descripcion": "Tambor neutro 200L" },
+    { "codigo": "FRA-A", "descripcion": "Fragancia A" },
+    { "codigo": "FRA-B", "descripcion": "Fragancia B" },
+    { "codigo": "FRA-C", "descripcion": "Fragancia C" },
+    { "codigo": "FRA-D", "descripcion": "Fragancia D" },
+    { "codigo": "FRA-E", "descripcion": "Fragancia E" },
+    { "codigo": "ENV-1L", "descripcion": "Envase plástico 1 L (unidad)" },
+    { "codigo": "TAP-1L", "descripcion": "Tapa plástica 1 L (unidad)" },
+    { "codigo": "ET-A",  "descripcion": "Etiqueta Tratamiento A (unidad)" },
+    { "codigo": "ET-B",  "descripcion": "Etiqueta Tratamiento B (unidad)" },
+    { "codigo": "ET-C",  "descripcion": "Etiqueta Tratamiento C (unidad)" },
+    { "codigo": "ET-D",  "descripcion": "Etiqueta Tratamiento D (unidad)" },
+    { "codigo": "ET-E",  "descripcion": "Etiqueta Tratamiento E (unidad)" }
+  ],
+
+  "semiterminados": [
+    {
+      "codigo": "CONC-A",
+      "descripcion": "Concentrado A",
+      "proceso": "PROC-MIX",
+      "insumos": [
+        { "material": "NT200", "cantidad": 1 },
+        { "material": "FRA-A", "cantidad": 1 }
+      ],
+      "salida": { "cantidad": 1, "unidad": "tambor" }
+    },
+    {
+      "codigo": "CONC-B",
+      "descripcion": "Concentrado B",
+      "proceso": "PROC-MIX",
+      "insumos": [
+        { "material": "NT200", "cantidad": 1 },
+        { "material": "FRA-B", "cantidad": 1 }
+      ],
+      "salida": { "cantidad": 1, "unidad": "tambor" }
+    },
+    {
+      "codigo": "CONC-C",
+      "descripcion": "Concentrado C",
+      "proceso": "PROC-MIX",
+      "insumos": [
+        { "material": "NT200", "cantidad": 1 },
+        { "material": "FRA-C", "cantidad": 1 }
+      ],
+      "salida": { "cantidad": 1, "unidad": "tambor" }
+    },
+    {
+      "codigo": "CONC-D",
+      "descripcion": "Concentrado D",
+      "proceso": "PROC-MIX",
+      "insumos": [
+        { "material": "NT200", "cantidad": 1 },
+        { "material": "FRA-D", "cantidad": 1 }
+      ],
+      "salida": { "cantidad": 1, "unidad": "tambor" }
+    },
+    {
+      "codigo": "CONC-E",
+      "descripcion": "Concentrado E",
+      "proceso": "PROC-MIX",
+      "insumos": [
+        { "material": "NT200", "cantidad": 1 },
+        { "material": "FRA-E", "cantidad": 1 }
+      ],
+      "salida": { "cantidad": 1, "unidad": "tambor" }
+    },
+
+    {
+      "codigo": "KIT-A",
+      "descripcion": "Kit empaque A",
+      "proceso": "PROC-EMP",
+      "insumos": [
+        { "material": "ENV-1L", "cantidad": 190 },
+        { "material": "TAP-1L", "cantidad": 190 },
+        { "material": "ET-A",   "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "juego empaque" }
+    },
+    {
+      "codigo": "KIT-B",
+      "descripcion": "Kit empaque B",
+      "proceso": "PROC-EMP",
+      "insumos": [
+        { "material": "ENV-1L", "cantidad": 190 },
+        { "material": "TAP-1L", "cantidad": 190 },
+        { "material": "ET-B",   "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "juego empaque" }
+    },
+    {
+      "codigo": "KIT-C",
+      "descripcion": "Kit empaque C",
+      "proceso": "PROC-EMP",
+      "insumos": [
+        { "material": "ENV-1L", "cantidad": 190 },
+        { "material": "TAP-1L", "cantidad": 190 },
+        { "material": "ET-C",   "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "juego empaque" }
+    },
+    {
+      "codigo": "KIT-D",
+      "descripcion": "Kit empaque D",
+      "proceso": "PROC-EMP",
+      "insumos": [
+        { "material": "ENV-1L", "cantidad": 190 },
+        { "material": "TAP-1L", "cantidad": 190 },
+        { "material": "ET-D",   "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "juego empaque" }
+    },
+    {
+      "codigo": "KIT-E",
+      "descripcion": "Kit empaque E",
+      "proceso": "PROC-EMP",
+      "insumos": [
+        { "material": "ENV-1L", "cantidad": 190 },
+        { "material": "TAP-1L", "cantidad": 190 },
+        { "material": "ET-E",   "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "juego empaque" }
+    }
+  ],
+
+  "terminados": [
+    {
+      "codigo": "TRAT-A",
+      "descripcion": "Tratamiento A",
+      "proceso": "PROC-PROD",
+      "insumos": [
+        { "semiTerminado": "CONC-A", "cantidad": 1 },
+        { "semiTerminado": "KIT-A",  "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "unidad" }
+    },
+    {
+      "codigo": "TRAT-B",
+      "descripcion": "Tratamiento B",
+      "proceso": "PROC-PROD",
+      "insumos": [
+        { "semiTerminado": "CONC-B", "cantidad": 1 },
+        { "semiTerminado": "KIT-B",  "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "unidad" }
+    },
+    {
+      "codigo": "TRAT-C",
+      "descripcion": "Tratamiento C",
+      "proceso": "PROC-PROD",
+      "insumos": [
+        { "semiTerminado": "CONC-C", "cantidad": 1 },
+        { "semiTerminado": "KIT-C",  "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "unidad" }
+    },
+    {
+      "codigo": "TRAT-D",
+      "descripcion": "Tratamiento D",
+      "proceso": "PROC-PROD",
+      "insumos": [
+        { "semiTerminado": "CONC-D", "cantidad": 1 },
+        { "semiTerminado": "KIT-D",  "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "unidad" }
+    },
+    {
+      "codigo": "TRAT-E",
+      "descripcion": "Tratamiento E",
+      "proceso": "PROC-PROD",
+      "insumos": [
+        { "semiTerminado": "CONC-E", "cantidad": 1 },
+        { "semiTerminado": "KIT-E",  "cantidad": 190 }
+      ],
+      "salida": { "cantidad": 190, "unidad": "unidad" }
+    }
+  ]
+}
+
+###
