@@ -105,6 +105,7 @@ export interface ProductoSemiter {
     tipo_producto: string;
     procesoProduccionCompleto?: ProcesoProduccionCompleto; // se determina a la hora de definir el proceso - step 3
     categoria?: Categoria; // solo se usa para terminado, por ello es opcional
+    inventareable?: boolean; // true para terminados, false para semiterminados
 }
 
 export interface Categoria{

@@ -201,7 +201,8 @@ export default function StepOne({setActiveStep, setSemioter, refreshCategorias =
                 tipoUnidades: tipoUnidades,
                 cantidadUnidad: cantidadUnidad!,
                 tipo_producto: tipo_producto,
-                categoria: tipo_producto === TIPOS_PRODUCTOS.terminado ? selectedCategoria : undefined
+                categoria: tipo_producto === TIPOS_PRODUCTOS.terminado ? selectedCategoria : undefined,
+                inventareable: tipo_producto === TIPOS_PRODUCTOS.terminado
             };
             setSemioter(semioter);
             setActiveStep(1);
