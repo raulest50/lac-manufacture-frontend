@@ -86,8 +86,11 @@ export interface ProcesoProduccionNode {
     targetIds: string[];
 }
 
-export interface ProcesoProduccionCompleto {
+export interface ProcesoDiseñado {
     procesosProduccion: ProcesoProduccionNode[];
+}
+
+export interface ProcesoProduccionCompleto extends ProcesoDiseñado {
     rendimientoTeorico: number;
 }
 

@@ -1,4 +1,4 @@
-import { ProductoSemiter } from "../../../types.tsx";
+import { ProductoSemiter, ProcesoDiseñado, ProcesoProduccionCompleto } from "../../../types.tsx";
 import ProcessDesigner from "../../../DefProcesses/CreadorProcesos/ProcessDesigner.tsx";
 import { Button, Flex, FormControl, FormLabel, NumberInput, NumberInputField } from "@chakra-ui/react";
 import { useState } from "react";
@@ -13,8 +13,14 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
     // Local state to store whether the process definition is valid.
     const [isProcessValid, setIsProcessValid] = useState(false);
     const [rendimientoTeorico, setRendimientoTeorico] = useState<number>(0);
+    const [proceso, setProceso] = useState<ProcesoDiseñado>({ procesosProduccion: [] });
 
     const onClickSiguiente = () => {
+        const procesoCompleto: ProcesoProduccionCompleto = {
+            ...proceso,
+            rendimientoTeorico,
+        };
+        setSemioter3({ ...semioter2, procesoProduccionCompleto: procesoCompleto });
         setActiveStep(3);
     };
 
@@ -37,8 +43,7 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
 
             <ProcessDesigner
                 semioter2={semioter2}
-                setSemiter3={setSemioter3}
-                rendimientoTeorico={rendimientoTeorico}
+                onProcessChange={setProceso}
                 onValidityChange={setIsProcessValid}
             />
 
