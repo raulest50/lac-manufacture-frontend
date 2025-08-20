@@ -11,7 +11,8 @@ import {
     StepTitle,
     Stepper,
     useSteps,
-    Box
+    Box,
+    useToast
 } from '@chakra-ui/react';
 
 // Import step components
@@ -19,13 +20,24 @@ import { StepOneWPlanningWiz } from './StepOneWPlanningWiz/StepOneWPlanningWiz';
 import { StepTwoCapProd } from './StepTwoWPlanningWiz/StepTwoCapProd';
 import { StepThreeResults } from './StepThreeWPlanningWiz/StepThreeResults';
 
+// Import types
+import { Nececidades, CapProductiva, MPS } from './PlanningWizTypes';
+
 type Props = {};
 
 export function WeekPlanningWizardTab(props: Props) {
+    // Estado para almacenar los datos de cada paso
+    const [necesidades, setNecesidades] = useState<Nececidades | null>(null);
+    const [capacidadProductiva, setCapacidadProductiva] = useState<CapProductiva | null>(null);
+    const [resultados, setResultados] = useState<MPS | null>(null);
+
+    // Toast para notificaciones
+    const toast = useToast();
+
     const steps = [
-        { title: 'DefinirNecesidades', description: 'Select Product' },
-        { title: 'CapacidadProducción', description: 'Configure Parameters' },
-        { title: 'Resultados', description: 'Review Results' }
+        { title: 'Definir Necesidades', description: 'Seleccionar Productos' },
+        { title: 'Capacidad Producción', description: 'Configurar Parámetros' },
+        { title: 'Resultados', description: 'Revisar Resultados' }
     ];
 
     const { activeStep, setActiveStep } = useSteps({
@@ -33,32 +45,85 @@ export function WeekPlanningWizardTab(props: Props) {
         count: steps.length,
     });
 
+    // Función para manejar los datos de necesidades
+    const handleNecesidadesProcessed = (data: Nececidades) => {
+        setNecesidades(data);
+        toast({
+            title: 'Necesidades procesadas',
+            description: `Se han procesado ${data.items.length} items de necesidad`,
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        });
+    };
+
+    // Función para manejar los datos de capacidad productiva
+    const handleCapacidadProcessed = (data: CapProductiva) => {
+        setCapacidadProductiva(data);
+        toast({
+            title: 'Capacidad productiva configurada',
+            description: 'Los parámetros de capacidad han sido guardados',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        });
+    };
+
+    // Función para manejar los resultados
+    const handleResultadosProcessed = (data: MPS) => {
+        setResultados(data);
+        toast({
+            title: 'Resultados generados',
+            description: 'El plan maestro de producción ha sido generado',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        });
+    };
+
+    // Función para finalizar el proceso
+    const handleFinish = () => {
+        toast({
+            title: 'Proceso finalizado',
+            description: 'El plan maestro de producción ha sido finalizado',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+        });
+        console.log('Finalizar proceso con datos:', { necesidades, capacidadProductiva, resultados });
+    };
+
     // Renderizado condicional basado en el paso activo
     const ConditionalRender = () => {
         switch (activeStep) {
             case 0:
-                // Arquitectura de control delegado: Pasamos setActiveStep a los hijos
                 return (
                     <StepOneWPlanningWiz 
                         onNext={() => setActiveStep(activeStep + 1)} 
+                        onDataProcessed={handleNecesidadesProcessed}
                     />
                 );
             case 1:
                 return (
                     <StepTwoCapProd 
                         onNext={() => setActiveStep(activeStep + 1)} 
-                        onPrev={() => setActiveStep(activeStep - 1)} 
+                        onPrev={() => setActiveStep(activeStep - 1)}
+                        necesidades={necesidades}
+                        onDataProcessed={handleCapacidadProcessed}
                     />
                 );
             case 2:
                 return (
                     <StepThreeResults 
                         onPrev={() => setActiveStep(activeStep - 1)} 
-                        onFinish={() => console.log('Finalizar proceso')} 
+                        onFinish={handleFinish}
+                        necesidades={necesidades}
+                        capacidadProductiva={capacidadProductiva}
+                        onDataProcessed={handleResultadosProcessed}
                     />
                 );
             default:
-                return <StepOneWPlanningWiz onNext={() => setActiveStep(1)} />;
+                return <StepOneWPlanningWiz onNext={() => setActiveStep(1)} onDataProcessed={handleNecesidadesProcessed} />;
         }
     };
 
