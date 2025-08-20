@@ -164,3 +164,26 @@ export interface IngresoOCM_DTA{
     observaciones: string;
     file: File;
 }
+
+// ===== Dispensación de Materiales =====
+
+export interface LoteDispensacion {
+    loteId: number;
+    batchNumber: string;
+    cantidadDisponible: number;
+}
+
+export interface ItemDispensacionDTO {
+    seguimientoId: number;
+    producto: Producto;
+    lote: LoteDispensacion;
+    /** Cantidad sugerida por el backend */
+    cantidadSugerida: number;
+    /** Cantidad que se va a dispensar (editable por el usuario) */
+    cantidad: number;
+}
+
+export interface DispensacionDTO {
+    ordenProduccionId: number;
+    items: ItemDispensacionDTO[];
+}
