@@ -12,6 +12,7 @@ import {
     useEdgesState,
     Connection,
     addEdge,
+    ConnectionMode,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
@@ -287,6 +288,8 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
                     onConnect={onConnect}
                     nodeTypes={nodeTypes}
                     defaultEdgeOptions={defaultEdgeOptions}
+                    connectionMode={ConnectionMode.Loose}
+                    connectOnClick
                     onSelectionChange={({ nodes: selectedNodes, edges: selectedEdges }) => {
                         if (selectedNodes.length > 0) setSelectedElement(selectedNodes[0]);
                         else if (selectedEdges.length > 0) setSelectedElement(selectedEdges[0]);
