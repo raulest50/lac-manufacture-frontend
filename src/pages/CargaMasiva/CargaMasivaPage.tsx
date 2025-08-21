@@ -1,18 +1,24 @@
 import { useState, useRef } from "react";
-import { 
-    Container, 
-    Button, 
-    Input, 
-    VStack, 
-    HStack, 
-    Text, 
-    Divider, 
+import {
+    Container,
+    Button,
+    Input,
+    VStack,
+    HStack,
+    Text,
+    Divider,
     Box,
     useToast,
     FormControl,
     FormLabel,
     FormHelperText,
-    Icon
+    Icon,
+    SimpleGrid,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
+    NumberIncrementStepper,
+    NumberDecrementStepper
 } from "@chakra-ui/react";
 import { FaFileCircleCheck, FaFileCircleQuestion } from "react-icons/fa6";
 import MyHeader from "../../components/MyHeader";
@@ -29,6 +35,30 @@ export default function CargaMasivaPage() {
     const proveedoresFileInputRef = useRef<HTMLInputElement>(null);
     const productosFileInputRef = useRef<HTMLInputElement>(null);
     const toast = useToast();
+
+    interface ProductMapping {
+        descripcion: number;
+        unidadMedida: number;
+        stock: number;
+        productoId: number;
+        iva: number;
+        puntoReorden: number;
+        costoUnitario: number;
+    }
+
+    const [mapping, setMapping] = useState<ProductMapping>({
+        descripcion: 1,
+        unidadMedida: 3,
+        stock: 6,
+        productoId: 7,
+        iva: 8,
+        puntoReorden: 9,
+        costoUnitario: 10
+    });
+
+    const handleMappingChange = (field: keyof ProductMapping, value: number) => {
+        setMapping(prev => ({ ...prev, [field]: value }));
+    };
 
     const handleProveedoresFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -140,6 +170,7 @@ export default function CargaMasivaPage() {
         try {
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('mapping', new Blob([JSON.stringify(mapping)], { type: 'application/json' }));
 
             const uploadResponse = await axios.post(
                 new EndPointsURL().bulk_upload_productos,
@@ -363,10 +394,11 @@ export default function CargaMasivaPage() {
 
             // Crear un objeto FormData para enviar el archivo
             const formData = new FormData();
-            const file = new File([response.data], "productos.xlsx", { 
-                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+            const file = new File([response.data], "productos.xlsx", {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             });
             formData.append("file", file);
+            formData.append("mapping", new Blob([JSON.stringify(mapping)], { type: "application/json" }));
 
             // Enviar el archivo al backend
             const uploadResponse = await axios.post(
@@ -561,6 +593,81 @@ export default function CargaMasivaPage() {
                             </Button>
                         </HStack>
                     </FormControl>
+                    <Box mt={6}>
+                        <Text fontWeight="semibold" mb={2}>Mapeo de Columnas (0-based)</Text>
+                        <SimpleGrid columns={[1, 2, 3]} spacing={4}>
+                            <FormControl>
+                                <FormLabel fontSize="sm">Descripción</FormLabel>
+                                <NumberInput min={0} value={mapping.descripcion} onChange={(_, v) => handleMappingChange('descripcion', v)}>
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel fontSize="sm">Unidad de Medida</FormLabel>
+                                <NumberInput min={0} value={mapping.unidadMedida} onChange={(_, v) => handleMappingChange('unidadMedida', v)}>
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel fontSize="sm">Stock</FormLabel>
+                                <NumberInput min={0} value={mapping.stock} onChange={(_, v) => handleMappingChange('stock', v)}>
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel fontSize="sm">Producto ID</FormLabel>
+                                <NumberInput min={0} value={mapping.productoId} onChange={(_, v) => handleMappingChange('productoId', v)}>
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel fontSize="sm">IVA</FormLabel>
+                                <NumberInput min={0} value={mapping.iva} onChange={(_, v) => handleMappingChange('iva', v)}>
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel fontSize="sm">Punto de Reorden</FormLabel>
+                                <NumberInput min={0} value={mapping.puntoReorden} onChange={(_, v) => handleMappingChange('puntoReorden', v)}>
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel fontSize="sm">Costo Unitario</FormLabel>
+                                <NumberInput min={0} value={mapping.costoUnitario} onChange={(_, v) => handleMappingChange('costoUnitario', v)}>
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
+                            </FormControl>
+                        </SimpleGrid>
+                    </Box>
                 </Box>
             </VStack>
         </Container>
