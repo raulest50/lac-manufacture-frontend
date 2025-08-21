@@ -17,10 +17,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
 import ProcesoNode from "./Nodos/ProcesoNode.tsx";
-import { ProcesoNodeData } from "./types.tsx";
 import { ProductoSemiter, ProcesoProduccionEntity, ProcesoDiseñado, ProcesoProduccionNode } from "../../types.tsx";
 import TargetNode from "./Nodos/TargetNode.tsx";
-import EditProcesoNodeDialog from "./EditProcesoNodeDialog.tsx";
 import { Stat, StatLabel, StatNumber } from "@chakra-ui/icons";
 // Importar el ProcesoProduccionPicker
 import { ProcesoProduccionPicker } from "./components/ProcesoProduccionPicker/ProcesoProduccionPicker.tsx";
@@ -100,9 +98,6 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
 
     // Track the selected element (node or edge) from React Flow.
     const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null);
-
-    // State to control the edit dialog.
-    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     // Estado para controlar el modal del picker de procesos
     const [isProcesoPickerOpen, setIsProcesoPickerOpen] = useState(false);
@@ -205,43 +200,33 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
 
     // --- New: Compute process validity without showing toast ---
     const computeValidity = (nodes: Node[], edges: Edge[]): boolean => {
-        let valid = true;
-        // Check Material Prima nodes: must have at least one outgoing edge.
+        // Raw-material nodes must have at least one outgoing edge.
         const materialNodes = nodes.filter((node) => node.type === "materialPrimarioNode");
         for (const node of materialNodes) {
             if (!edges.some((edge) => edge.source === node.id)) {
-                valid = false;
+                return false;
             }
         }
-        // Check Target nodes: must have at least one incoming edge.
+
+        // Process nodes must have exactly one incoming and one outgoing edge.
+        const processNodes = nodes.filter((node) => node.type === "procesoNode");
+        for (const node of processNodes) {
+            const incoming = edges.filter((edge) => edge.target === node.id).length;
+            const outgoing = edges.filter((edge) => edge.source === node.id).length;
+            if (incoming !== 1 || outgoing !== 1) {
+                return false;
+            }
+        }
+
+        // Target nodes must have at least one incoming edge.
         const targetNodes = nodes.filter((node) => node.type === "targetNode");
         for (const node of targetNodes) {
             if (!edges.some((edge) => edge.target === node.id)) {
-                valid = false;
+                return false;
             }
         }
-        // Check Process nodes: must have one incoming, one outgoing, and non-empty fields.
-        const processNodes = nodes.filter((node) => node.type === "procesoNode");
-        for (const node of processNodes) {
-            if (
-                !edges.some((edge) => edge.target === node.id) ||
-                !edges.some((edge) => edge.source === node.id)
-            ) {
-                valid = false;
-            }
-            const processData = node.data as { nombreProceso?: string; tiempo?: string; instrucciones?: string };
-            if (
-                !processData.nombreProceso ||
-                processData.nombreProceso.trim() === "" ||
-                !processData.tiempo ||
-                processData.tiempo.trim() === "" ||
-                !processData.instrucciones ||
-                processData.instrucciones.trim() === ""
-            ) {
-                valid = false;
-            }
-        }
-        return valid;
+
+        return true;
     };
 
     // --- New: useEffect to call onValidityChange whenever nodes or edges change ---
@@ -331,26 +316,6 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
                     Eliminar Seleccion
                 </Button>
 
-                <Button
-                    variant="solid"
-                    colorScheme="blue"
-                    isDisabled={
-                        !selectedElement ||
-                        (("data" in selectedElement) && (selectedElement as Node).type !== "procesoNode")
-                    }
-                    onClick={() => {
-                        if (
-                            selectedElement &&
-                            "data" in selectedElement &&
-                            (selectedElement as Node).type === "procesoNode"
-                        ) {
-                            setIsEditDialogOpen(true);
-                        }
-                    }}
-                >
-                    Editar
-                </Button>
-
                 <Center height="50px">
                     <Divider orientation="vertical" />
                 </Center>
@@ -360,30 +325,8 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
                     <StatNumber>{semioter2.costo} ( $ COP)</StatNumber>
                 </Stat>
             </Flex>
-
-            {isEditDialogOpen &&
-                selectedElement &&
-                "data" in selectedElement &&
-                (selectedElement as Node).type === "procesoNode" && (
-                    <EditProcesoNodeDialog<ProcesoNodeData>
-                        isOpen={isEditDialogOpen}
-                        onClose={() => setIsEditDialogOpen(false)}
-                        nodeData={(selectedElement as Node<ProcesoNodeData>).data}
-                        onSave={(newData) => {
-                            setNodes((prevNodes) =>
-                                prevNodes.map((node) => {
-                                    if (node.id === selectedElement.id) {
-                                        return { ...node, data: { ...node.data, ...newData } };
-                                    }
-                                    return node;
-                                })
-                            );
-                        }}
-                    />
-                )}
-
             {/* Agregar el componente ProcesoProduccionPicker */}
-            <ProcesoProduccionPicker 
+            <ProcesoProduccionPicker
                 isOpen={isProcesoPickerOpen}
                 onClose={() => setIsProcesoPickerOpen(false)}
                 onConfirm={handleProcessSelection}
