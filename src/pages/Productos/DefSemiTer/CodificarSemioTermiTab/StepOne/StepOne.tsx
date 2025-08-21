@@ -2,7 +2,7 @@
 import {
     Button,
     Flex, FormControl, FormLabel, GridItem, HStack, Input, Select, SimpleGrid, Textarea, useToast,
-    Spinner, Text, Alert, AlertIcon
+    Spinner, Text
 } from "@chakra-ui/react";
 import {useState, useEffect} from "react";
 import axios from 'axios';
@@ -245,6 +245,7 @@ export default function StepOne({setActiveStep, setSemioter, refreshCategorias =
                             <option value={UNIDADES.KG}>{UNIDADES.KG}</option>
                             <option value={UNIDADES.L}>{UNIDADES.L}</option>
                             <option value={UNIDADES.U}>{UNIDADES.U}</option>
+                            <option value={UNIDADES.G}>{UNIDADES.G}</option>
                         </Select>
                         <FormControl flex="4" isRequired>
                             <FormLabel>Contenido por envase</FormLabel>

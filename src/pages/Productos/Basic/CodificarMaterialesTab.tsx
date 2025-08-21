@@ -287,6 +287,7 @@ function CodificarMaterialesTab() {
                                 <option value={UNIDADES.KG}>{UNIDADES.KG}</option>
                                 <option value={UNIDADES.L}>{UNIDADES.L}</option>
                                 <option value={UNIDADES.U}>{UNIDADES.U}</option>
+                                <option value={UNIDADES.G}>{UNIDADES.G}</option>
                             </Select>
                             <FormControl flex="4" isRequired>
                                 <FormLabel>Cantidad por Unidad</FormLabel>
