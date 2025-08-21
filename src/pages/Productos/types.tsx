@@ -1,6 +1,6 @@
 
 export const TIPOS_PRODUCTOS = {materiaPrima: "M", semiTerminado:"S", terminado:"T"};
-export const UNIDADES = {L:"L", KG:"KG", U:"U"};
+export const UNIDADES = {L:"L", KG:"KG", U:"U", G:"G"};
 export const TIPOS_MATERIALES = {materiaPrima: 1, materialDeEmpaque: 2};
 export const IVA_VALUES = {'iva_0':0, 'iva_5':5,'iva_19':19, };
 
