@@ -37,6 +37,7 @@ export default function CargaMasivaPage() {
     const toast = useToast();
 
     interface ProductMapping {
+        sheetName: string;
         descripcion: number | string;
         unidadMedida: number | string;
         stock: number | string;
@@ -47,6 +48,7 @@ export default function CargaMasivaPage() {
     }
 
     const [mapping, setMapping] = useState<ProductMapping>({
+        sheetName: "inventario",
         descripcion: 3,
         unidadMedida: 5,
         stock: 8,
@@ -592,6 +594,14 @@ export default function CargaMasivaPage() {
                                 Cargar Productos
                             </Button>
                         </HStack>
+                    </FormControl>
+                    <FormControl mt={4}>
+                        <FormLabel>Hoja de datos</FormLabel>
+                        <Input
+                            value={mapping.sheetName}
+                            onChange={(e) => handleMappingChange('sheetName', e.target.value)}
+                            placeholder="inventario"
+                        />
                     </FormControl>
                     <Box mt={6}>
                         <Text fontWeight="semibold" mb={2}>Mapeo de Columnas (0-based)</Text>
