@@ -208,12 +208,12 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
             }
         }
 
-        // Process nodes must have exactly one incoming and one outgoing edge.
+        // Process nodes must have at least one incoming and exactly one outgoing edge.
         const processNodes = nodes.filter((node) => node.type === "procesoNode");
         for (const node of processNodes) {
             const incoming = edges.filter((edge) => edge.target === node.id).length;
             const outgoing = edges.filter((edge) => edge.source === node.id).length;
-            if (incoming !== 1 || outgoing !== 1) {
+            if (incoming < 1 || outgoing !== 1) {
                 return false;
             }
         }

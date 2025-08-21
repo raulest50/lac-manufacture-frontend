@@ -37,26 +37,26 @@ export default function CargaMasivaPage() {
     const toast = useToast();
 
     interface ProductMapping {
-        descripcion: number;
-        unidadMedida: number;
-        stock: number;
-        productoId: number;
-        iva: number;
-        puntoReorden: number;
-        costoUnitario: number;
+        descripcion: number | string;
+        unidadMedida: number | string;
+        stock: number | string;
+        productoId: number | string;
+        iva: number | string;
+        puntoReorden: number | string;
+        costoUnitario: number | string;
     }
 
     const [mapping, setMapping] = useState<ProductMapping>({
-        descripcion: 1,
-        unidadMedida: 3,
-        stock: 6,
-        productoId: 7,
-        iva: 8,
+        descripcion: 3,
+        unidadMedida: 5,
+        stock: 8,
+        productoId: 1,
+        iva: 11,
         puntoReorden: 9,
-        costoUnitario: 10
+        costoUnitario: 12
     });
 
-    const handleMappingChange = (field: keyof ProductMapping, value: number) => {
+    const handleMappingChange = (field: keyof ProductMapping, value: number | string) => {
         setMapping(prev => ({ ...prev, [field]: value }));
     };
 
