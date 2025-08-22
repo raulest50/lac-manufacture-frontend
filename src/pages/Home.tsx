@@ -1,6 +1,7 @@
 // src/pages/Home.tsx
 import {SimpleGrid, Flex, Heading, Button, Spacer, Container, Text, Box, HStack, Tooltip} from "@chakra-ui/react";
 import SectionCard from "../components/SectionCard.tsx";
+import SplitText from "../components/SplitText.tsx";
 import { PiDownloadDuotone } from "react-icons/pi";
 import { BsDatabaseCheck } from "react-icons/bs";
 import { AiOutlineAudit } from "react-icons/ai";
@@ -65,9 +66,7 @@ export default function Home(){
                         alignContent={'center'}
                     >
                         <Box transform="skewX(10deg)">
-                            <Text as="h3" size="xl" fontFamily="Comfortaa Variable">
-                                Version: Beta 1.1
-                            </Text>
+                            <SplitText text="Version: Beta 1.1" />
                         </Box>
                     </Box>
 
