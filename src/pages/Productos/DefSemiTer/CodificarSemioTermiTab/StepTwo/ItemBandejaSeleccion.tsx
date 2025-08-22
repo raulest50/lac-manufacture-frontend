@@ -20,29 +20,16 @@ import {
 import { Insumo } from "../../../types.tsx";
 
 // Icons
-import { BiTestTube } from "react-icons/bi";            // Materia Prima
-import { FiLayers, FiPackage, FiMinus } from "react-icons/fi"; // Semi / Terminado / Remove
+import { FiMinus } from "react-icons/fi";
+
+// Shared helpers
+import { metaPorTipo } from "./meta";
 
 interface ItemBandejaSeleccionProps {
     insumo: Insumo;
     onUpdateCantidad: (productoId: string, newCantidad: number) => void;
     onRemoveInsumo: (productoId: string) => void;
 }
-
-type MetaTipo = {
-    label: string;
-    scheme: "teal" | "purple" | "orange" | "gray";
-    icon: React.ElementType;
-};
-
-const metaPorTipo = (tipo: string): MetaTipo => {
-    switch (tipo) {
-        case "M": return { label: "Materia prima", scheme: "teal",   icon: BiTestTube };
-        case "S": return { label: "Semiterminado", scheme: "purple", icon: FiLayers };
-        case "T": return { label: "Terminado",     scheme: "orange", icon: FiPackage };
-        default:  return { label: "Producto",      scheme: "gray",   icon: FiPackage };
-    }
-};
 
 const ItemBandejaSeleccion: React.FC<ItemBandejaSeleccionProps> = ({
                                                                        insumo,
@@ -77,22 +64,22 @@ const ItemBandejaSeleccion: React.FC<ItemBandejaSeleccionProps> = ({
             _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
         >
             {/* Acento vertical */}
-            <Box position="absolute" left={0} top={0} bottom={0} w="6px" bg={`${meta.scheme}.400`} />
+            <Box position="absolute" left={0} top={0} bottom={0} w="6px" bg={meta.accentColor} />
 
             <Flex align="center" gap={4} px={4} py={3}>
                 {/* Icono por tipo */}
                 <Box
-                    bg={`${meta.scheme}.50`}
+                    bg={meta.accentColor}
                     borderWidth="1px"
-                    borderColor={`${meta.scheme}.200`}
-                    color={`${meta.scheme}.600`}
+                    borderColor={meta.accentColor}
+                    color="white"
                     rounded="lg"
                     p={2.5}
                     minW="42px"
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    _groupHover={{ bg: `${meta.scheme}.100` }}
+                    _groupHover={{ bg: meta.accentColor }}
                 >
                     <Icon as={meta.icon} boxSize={5} />
                 </Box>
