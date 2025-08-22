@@ -56,6 +56,21 @@ export default function Home(){
                 </Heading>
                 <Spacer flex={2}/>
                 <HStack spacing={2}>
+                    {/* Box para mostrar la versión */}
+                    <Box
+                        transform="skewX(-20deg)"
+                        pl="1em"
+                        pr="1em"
+                        backgroundColor="purple.200"
+                        alignContent={'center'}
+                    >
+                        <Box transform="skewX(10deg)">
+                            <Text as="h3" size="xl" fontFamily="Comfortaa Variable">
+                                Version: Beta 1.1
+                            </Text>
+                        </Box>
+                    </Box>
+
                     <Box
                         transform="skewX(-20deg)" // Skews the entire outer box
                         pl="1em"
