@@ -54,6 +54,7 @@ const OrdenCompraDetails: React.FC<OrdenCompraDetailsProps> = ({ isOpen, onClose
                         <Text><strong>Condición de Pago:</strong> {getCondicionPagoText(orden.condicionPago)}</Text>
                         <Text><strong>Tiempo de Entrega:</strong> {orden.tiempoEntrega}</Text>
                         <Text><strong>Plazo de Pago:</strong> {orden.plazoPago}</Text>
+                        <Text><strong>Observaciones:</strong> {orden.observaciones || '-'}</Text>
                     </Box>
                     <Box>
                         <Text fontWeight="bold" mb={2}>Items de la Orden</Text>

@@ -9,7 +9,8 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Select
+    Select,
+    Textarea
 } from '@chakra-ui/react';
 import { OrdenCompraMateriales, ItemOrdenCompra, Material, DIVISAS } from "../types.tsx";
 import MateriaPrimaPicker from './MateriaPrimaPicker.tsx';
@@ -26,8 +27,12 @@ type Props = {
 };
 
 export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
-    const [ordenActual, setOrdenActual] = useState<OrdenCompraMateriales>({...ocm});
+    const [ordenActual, setOrdenActual] = useState<OrdenCompraMateriales>({
+        ...ocm,
+        observaciones: ocm.observaciones || "",
+    });
     const [listaItemsOrdenCompra, setListaItemsOrdenCompra] = useState<ItemOrdenCompra[]>(ocm.itemsOrdenCompra);
+    const [observaciones, setObservaciones] = useState(ocm.observaciones || "");
     const [isMateriaPrimaPickerOpen, setIsMateriaPrimaPickerOpen] = useState(false);
     const [ivaEnabled, setIvaEnabled] = useState(true);
     const [isFormValid, setIsFormValid] = useState(false);
@@ -109,9 +114,10 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
             condicionPago: ocm.condicionPago || "0",
             plazoPago: ocm.plazoPago || 30,
             tiempoEntrega: ocm.tiempoEntrega || "15",
-            fechaVencimiento: ocm.fechaVencimiento 
+            fechaVencimiento: ocm.fechaVencimiento
                 ? format(new Date(ocm.fechaVencimiento), "yyyy-MM-dd") + "T00:00:00"
-                : format(new Date(), "yyyy-MM-dd") + "T00:00:00"
+                : format(new Date(), "yyyy-MM-dd") + "T00:00:00",
+            observaciones: ocm.observaciones || "",
         };
 
         const currentOrder = {
@@ -159,6 +165,7 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
             plazoPago: plazoPago,
             tiempoEntrega: tiempoEntrega,
             fechaVencimiento: fechaVencimiento + "T00:00:00",
+            observaciones: observaciones,
             // Actualizar moneda y TRM
             divisas: isUSD ? DIVISAS.USD : DIVISAS.COP,
             trm: isUSD ? currentUsd2Cop : 1 // When COP is selected, TRM should be 1
@@ -273,6 +280,15 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
         setOrdenActual(prev => ({
             ...prev,
             fechaVencimiento: date + "T00:00:00"
+        }));
+    };
+
+    const handleObservacionesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const value = e.target.value;
+        setObservaciones(value);
+        setOrdenActual(prev => ({
+            ...prev,
+            observaciones: value,
         }));
     };
 
@@ -396,6 +412,15 @@ export function EditarOcmSeleccionada({ ocm, onVolver }: Props) {
                     label={"Fecha de Vencimiento Orden"}
                 />
             </Flex>
+
+            <FormControl>
+                <FormLabel>Observaciones</FormLabel>
+                <Textarea
+                    value={observaciones}
+                    onChange={handleObservacionesChange}
+                    placeholder="Ingrese observaciones"
+                />
+            </FormControl>
 
             <Button colorScheme="blue" onClick={() => setIsMateriaPrimaPickerOpen(true)}>
                 Agregar Material
