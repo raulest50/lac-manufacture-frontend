@@ -78,10 +78,9 @@ export default function Home(){
                         alignContent={'center'}
                     >
                         <Box transform="skewX(10deg)"> {/* Counter-skews the content */}
-                            <Text as="h3" size="xl" fontFamily="Comfortaa Variable">
-                                Usuario: {user}
-                            </Text>
+                            <SplitText text={ "Usuario : " + user } />
                         </Box>
+
                     </Box>
                     <Tooltip label="Actualizar notificaciones">
                         <Button
