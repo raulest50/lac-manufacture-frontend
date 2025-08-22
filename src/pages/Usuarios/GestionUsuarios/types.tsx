@@ -44,7 +44,7 @@ export enum Modulo {
     BINTELLIGENCE = "BINTELLIGENCE", // ruta /Bintelligence
     //CARGA_MASIVA = "CARGA_MASIVA", // ruta /carga_masiva
     ADMINISTRACION_ALERTAS = "ADMINISTRACION_ALERTAS", // ruta /administracion_alertas
-    //MASTER_CONFIGS = "MASTER_CONFIGS", // ruta /master_configs
+    //MASTER_DIRECTIVES = "MASTER_DIRECTIVES", // ruta /master_directives
     CRONOGRAMA = "CRONOGRAMA", // ruta /cronograma
     ORGANIGRAMA = "ORGANIGRAMA", // ruta /organigrama
     PAGOS_PROVEEDORES = "PAGOS_PROVEEDORES" // ruta /pagos-proveedores
