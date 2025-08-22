@@ -28,9 +28,9 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => 
         setCosto(totalCost);
     }, [selectedInsumos]);
 
-    // Validate if we can continue: at least 2 insumos and each with cantidadRequerida > 0
+    // Validate if we can continue: at least 1 insumo and each with cantidadRequerida > 0
     const validoContinuar = (): boolean => {
-        if (selectedInsumos.length < 2) return false;
+        if (selectedInsumos.length < 1) return false;
         for (const insumo of selectedInsumos) {
             if (isNaN(insumo.cantidadRequerida) || insumo.cantidadRequerida <= 0) {
                 return false;
@@ -89,7 +89,7 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => 
             toast({
                 title: "Validación fallida",
                 description:
-                    "Debe seleccionar al menos 2 insumos y cada uno debe tener una cantidad requerida mayor a 0.",
+                    "Debe seleccionar al menos 1 insumo y cada uno debe tener una cantidad requerida mayor a 0.",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
