@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import {Box, Flex, Button, Heading, Divider, Center} from "@chakra-ui/react";
 import {
     ReactFlow,
@@ -13,6 +13,8 @@ import {
     Connection,
     addEdge,
     ConnectionMode,
+    ReactFlowProvider,
+    useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
@@ -36,7 +38,7 @@ interface Props {
     onValidityChange?: (isValid: boolean) => void;
 }
 
-export default function ProcessDesigner({ semioter2, onProcessChange, onValidityChange }: Props) {
+function ProcessDesignerContent({ semioter2, onProcessChange, onValidityChange }: Props) {
     // Create nodes for each material (insumo) from ProductoSemiter.
     // Use a fallback empty array if insumos is undefined.
     const getMatPrimasNodes = (semi: ProductoSemiter): Node[] =>
@@ -96,6 +98,10 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
+    const boxRef = useRef<HTMLDivElement>(null);
+    const [isFullScreen, setIsFullScreen] = useState(false);
+    const { fitView } = useReactFlow();
+
     // Track the selected element (node or edge) from React Flow.
     const [selectedElement, setSelectedElement] = useState<Node | Edge | null>(null);
 
@@ -147,6 +153,21 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
     const agregarProcesoOnClick = () => {
         setIsProcesoPickerOpen(true);
     };
+
+    const toggleFullScreen = () => {
+        const element = boxRef.current;
+        if (!element) return;
+        if (isFullScreen) {
+            document.exitFullscreen?.();
+        } else {
+            element.requestFullscreen?.();
+        }
+        setIsFullScreen((prev) => !prev);
+    };
+
+    useEffect(() => {
+        fitView();
+    }, [isFullScreen, fitView]);
 
     // Función para manejar los procesos seleccionados del picker
     const handleProcessSelection = (procesos: ProcesoProduccionEntity[]) => {
@@ -264,7 +285,23 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
 
             <Divider />
 
-            <Box w="fill" style={{ height: "50vh", border: "1px solid black" }}>
+            <Box
+                w="fill"
+                ref={boxRef}
+                style={
+                    isFullScreen
+                        ? {
+                              width: "100vw",
+                              height: "100vh",
+                              position: "fixed",
+                              top: 0,
+                              left: 0,
+                              zIndex: 9999,
+                              border: "1px solid black",
+                          }
+                        : { height: "50vh", border: "1px solid black" }
+                }
+            >
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
@@ -290,6 +327,10 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
             <Flex direction="row" gap={5} alignItems={"center"}>
                 <Button variant="solid" colorScheme="teal" onClick={agregarProcesoOnClick}>
                     Agregar Proceso
+                </Button>
+
+                <Button variant="solid" onClick={toggleFullScreen}>
+                    {isFullScreen ? "Salir" : "Pantalla completa"}
                 </Button>
 
                 <Button variant="solid" colorScheme="red" onClick={removeAllProcessNodes}>
@@ -333,5 +374,13 @@ export default function ProcessDesigner({ semioter2, onProcessChange, onValidity
                 alreadySelected={[]}
             />
         </Flex>
+    );
+}
+
+export default function ProcessDesigner(props: Props) {
+    return (
+        <ReactFlowProvider>
+            <ProcessDesignerContent {...props} />
+        </ReactFlowProvider>
     );
 }
