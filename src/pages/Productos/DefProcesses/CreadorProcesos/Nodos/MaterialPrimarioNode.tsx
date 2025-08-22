@@ -26,16 +26,16 @@ export default function MaterialPrimarioNode(props: NodeProps) {
           <Text fontWeight={"bold"}>{String(data.label)}</Text>
         </Box>
 
-        <Icon w="3em" h="3em" color={"tomato"} as={PiCubeFocusThin} />
-
-        <Text
-          fontWeight={"bold"}
-          borderTop={"2px solid black"}
-          w={"full"}
-          pt={"0.3em"}
+        <Flex
+          align="center"
+          gap={2}
+          borderTop="2px solid black"
+          w="full"
+          pt="0.3em"
         >
-          {` ${data.cantidad} ${data.tipo_unidad}`}
-        </Text>
+          <Icon w="3em" h="3em" color="tomato" as={PiCubeFocusThin} />
+          <Text fontWeight="bold">{`${data.cantidad} ${data.tipo_unidad}`}</Text>
+        </Flex>
 
         <Box bgColor={"green.300"} w={"full"} p={"0.3em"}>
           <Text fontWeight={"bold"}> Material Primario </Text>
