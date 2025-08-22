@@ -125,6 +125,7 @@ export interface OrdenCompraActivo {
     tiempoEntrega: string;
     plazoPago: number;
     cotizacionUrl?: string; // la asigna el backend cuando se adjunta la cotizacion en pdf (multipartfile)
+    observaciones?: string;
     /**
      * -1: cancelada
      *  0: pendiente liberacion

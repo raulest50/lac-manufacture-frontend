@@ -97,6 +97,7 @@ export interface OrdenCompraMateriales {
     condicionPago: string;
     tiempoEntrega: string;
     plazoPago: number;
+    observaciones?: string;
     /**
      * -1: cancelada
      *  0: pendiente liberacion
