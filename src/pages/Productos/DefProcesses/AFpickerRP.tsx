@@ -71,10 +71,19 @@ export default function AFpickerRP({isOpen, onClose, onConfirm, alreadySelected}
           <Flex gap={4}>
             <Box flex={1}>
               <Flex mb={2} gap={2}>
-                <Input placeholder='Buscar' value={searchText} onChange={(e)=>setSearchText(e.target.value)} />
-                <Button 
-                  onClick={()=>fetchAvailable(0)} 
-                  isLoading={loading} 
+                <Input
+                  placeholder='Buscar'
+                  value={searchText}
+                  onChange={(e)=>setSearchText(e.target.value)}
+                  onKeyDown={(e)=>{
+                    if(e.key==='Enter'){
+                      fetchAvailable(0);
+                    }
+                  }}
+                />
+                <Button
+                  onClick={()=>fetchAvailable(0)}
+                  isLoading={loading}
                   loadingText="Buscando..."
                 >
                   Buscar
