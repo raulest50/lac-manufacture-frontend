@@ -34,6 +34,8 @@ export default function StepFour({ setActiveStep, semioter3, onReset }: Props) {
     const handleGuardar = async () => {
         try {
             setLoading(true);
+            // Agregar este console.log para imprimir el payload completo
+            console.log('Payload enviado al backend para producto terminado/semiterminado:', JSON.stringify(semioter3, null, 2));
             await axios.post(endPoints.save_producto, semioter3);
             toast({
                 title: "Producto guardado",

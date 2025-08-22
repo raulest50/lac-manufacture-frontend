@@ -178,6 +178,9 @@ function CodificarMaterialesTab() {
             ivaPercentual: ivaPercentage
         };
 
+        // Log the payload being sent to the backend
+        console.log('Payload enviado al backend para material:', JSON.stringify(materiaPrima, null, 2));
+
         // Create a FormData object and append the materiaPrima as a Blob with correct MIME type.
         const formData = new FormData();
         formData.append(

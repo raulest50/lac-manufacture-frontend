@@ -49,13 +49,13 @@ export default function CargaMasivaPage() {
 
     const [mapping, setMapping] = useState<ProductMapping>({
         sheetName: "inventario",
-        descripcion: 3,
-        unidadMedida: 5,
-        stock: 8,
-        productoId: 1,
-        iva: 11,
-        puntoReorden: 9,
-        costoUnitario: 12
+        descripcion: 2,
+        unidadMedida: 4,
+        stock: 7,
+        productoId: 0,
+        iva: 10,
+        puntoReorden: 8,
+        costoUnitario: 11
     });
 
     const handleMappingChange = (field: keyof ProductMapping, value: number | string) => {
