@@ -33,7 +33,7 @@ import ContabilidadPage from "./pages/Contabilidad/ContabilidadPage.tsx";
 import PersonalPage from "./pages/Personal/PersonalPage.tsx";
 import BintelligencePage from "./pages/Bintelligence/BintelligencePage.tsx";
 import AdministracionAlertasPage from "./pages/AdministracionAlertas/AdministracionAlertasPage.tsx";
-import MasterConfigsPage from "./pages/MasterConfigs/MasterConfigsPage.tsx";
+import MasterDirectivesPage from "./pages/MasterDirectives/MasterDirectivesPage.tsx";
 import CronogramaPage from "./pages/Cronograma/CronogramaPage.tsx";
 import OrganigramaPage from "./pages/Organigrama/OrganigramaPage.tsx";
 import TransaccionesAlmacenPage from "./pages/TransaccionesAlmacen/TransaccionesAlmacenPage.tsx";
@@ -176,10 +176,10 @@ const router = createBrowserRouter(
                 />
 
                 <Route
-                    path="master_configs"
+                    path="master_directives"
                     element={
                         <MultiRoleProtectedRoute supportedModules={[""]}>
-                            <MasterConfigsPage/>
+                            <MasterDirectivesPage/>
                         </MultiRoleProtectedRoute>
                     }
                 />

@@ -131,6 +131,10 @@ export default class EndPointsURL{
     // public get_estado_resultados: string;
     public search_transacciones_almacen: string;
 
+    // master directives endpoints
+    public get_master_directives: string;
+    public update_master_directive: string;
+
     public domain: string;
 
     constructor() {
@@ -234,6 +238,10 @@ export default class EndPointsURL{
         this.get_libro_mayor = `${domain}/${contabilidad_res}/libro-mayor`;
         this.get_periodos = `${domain}/${contabilidad_res}/periodos`;
         this.search_transacciones_almacen = `${domain}/${contabilidad_res}/transacciones`;
+
+        // master directives endpoints
+        this.get_master_directives = `${domain}/api/master-directives`;
+        this.update_master_directive = `${domain}/api/master-directives/update`;
 
         // organigrama endpoints
         const organigrama_res = 'organigrama';
