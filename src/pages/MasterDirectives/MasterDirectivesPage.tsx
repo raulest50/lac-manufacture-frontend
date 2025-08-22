@@ -16,6 +16,7 @@ import {
     HStack,
     Text,
     Spinner,
+    useToast,
 } from "@chakra-ui/react";
 import { FaCircleExclamation } from "react-icons/fa6";
 import axios from "axios";
@@ -47,6 +48,7 @@ export default function MasterDirectivesPage() {
     const [selectedGroup, setSelectedGroup] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
     const endPoints = useMemo(() => new EndPointsURL(), []);
+    const toast = useToast();
 
     useEffect(() => {
         const fetchDirectives = async () => {
@@ -63,12 +65,18 @@ export default function MasterDirectivesPage() {
                 setSelectedGroup(groups[0] ?? "");
             } catch (err) {
                 console.error("Error fetching master directives", err);
+                toast({
+                    title: "Failed to load master directives",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                });
             } finally {
                 setLoading(false);
             }
         };
         fetchDirectives();
-    }, [endPoints]);
+    }, [endPoints, toast]);
 
     const groups = Array.from(new Set(directives.map(d => d.current.grupo)));
     const isAnyUpdating = directives.some(d => d.isUpdating);
@@ -142,6 +150,12 @@ export default function MasterDirectivesPage() {
                         : d
                 )
             );
+            toast({
+                title: "Directive updated successfully",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+            });
         } catch (err) {
             console.error("Error updating master directive", err);
             setDirectives(prev =>
@@ -151,6 +165,12 @@ export default function MasterDirectivesPage() {
                         : d
                 )
             );
+            toast({
+                title: "Failed to update directive",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
 
