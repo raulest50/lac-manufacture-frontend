@@ -9,8 +9,8 @@ import { BiRename } from "react-icons/bi";
 import { PiClockCountdownFill } from "react-icons/pi";
 
 const handleStyle = {
-    width:"1.5em",
-    height:"1.5em",
+    width:"2em",
+    height:"2em",
 }
 
 export default function ProcesoNode(props: NodeProps) {

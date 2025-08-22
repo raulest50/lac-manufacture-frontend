@@ -4,8 +4,8 @@ import { Box, Flex, Text, Icon } from "@chakra-ui/react";
 import { PiCubeFocusThin } from "react-icons/pi";
 
 const handleStyle = {
-  width: "1em",
-  height: "1em",
+  width: "2em",
+  height: "2em",
 };
 
 export default function MaterialPrimarioNode(props: NodeProps) {
@@ -52,4 +52,3 @@ export default function MaterialPrimarioNode(props: NodeProps) {
     </Box>
   );
 }
-
