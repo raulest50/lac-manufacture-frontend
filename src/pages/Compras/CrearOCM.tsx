@@ -1,6 +1,6 @@
 // ./CrearOrdenCompra.tsx
 import { useState } from 'react';
-import {Button, Container, Flex, FormControl, FormLabel, Input, Select, useToast, Text} from '@chakra-ui/react';
+import {Button, Container, Flex, FormControl, FormLabel, Input, Select, Textarea, useToast, Text} from '@chakra-ui/react';
 import axios from 'axios';
 import { Proveedor, Material, ItemOrdenCompra, OrdenCompraMateriales, DIVISAS } from './types';
 import EndPointsURL from '../../api/EndPointsURL';
@@ -26,6 +26,7 @@ export default function CrearOCM() {
     const [condicionPago, setCondicionPago] = useState("0");
     const [tiempoEntrega, setTiempoEntrega] = useState("15");
     const [fechaVencimiento, setFechaVencimiento] = useState(format(addDays(new Date(), 30), "yyyy-MM-dd"));
+    const [observaciones, setObservaciones] = useState("");
 
     const [subTotal, setSubTotal] = useState(0);
     const [iva19, setIva19] = useState(0);
@@ -63,6 +64,7 @@ export default function CrearOCM() {
         updateTotalesAndGetValues();
         setIsUSD(false);
         setCurrentUsd2Cop(0);
+        setObservaciones("");
     };
 
     const checkCantidades = () => {
@@ -196,6 +198,7 @@ export default function CrearOCM() {
             condicionPago: condicionPago,
             tiempoEntrega: tiempoEntrega,
             plazoPago: plazoPago,
+            observaciones: observaciones,
             estado: 0, // 0 = pendiente aprobación proveedor
             divisas: isUSD ? DIVISAS.USD : DIVISAS.COP,
             trm: isUSD ? currentUsd2Cop : 1, // When COP is selected, TRM should be 1
@@ -298,6 +301,15 @@ export default function CrearOCM() {
                         />
 
                     </Flex>
+
+                    <FormControl mt={2}>
+                        <FormLabel>Observaciones</FormLabel>
+                        <Textarea
+                            value={observaciones}
+                            onChange={(e) => setObservaciones(e.target.value)}
+                            placeholder="Ingrese observaciones"
+                        />
+                    </FormControl>
 
                 </Flex>
 

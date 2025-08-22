@@ -212,11 +212,14 @@ export default class PdfGenerator {
         totalsY += leyendaLines.length * 4;
 
         // --- Observaciones ---
-        // doc.setFont("helvetica", "bold");
-        // doc.text("OBSERVACIONES", margin, totalsY);
-        // totalsY += 5;
-        // doc.rect(margin, totalsY, 190, 20); // a smaller rectangle for observations
-        //
+        doc.setFont("helvetica", "bold");
+        doc.text("OBSERVACIONES", margin, totalsY);
+        totalsY += 5;
+        doc.setFont("helvetica", "normal");
+        const obs = orden.observaciones ? orden.observaciones : "";
+        const obsLines = doc.splitTextToSize(obs, 190);
+        doc.text(obsLines, margin, totalsY);
+        totalsY += obsLines.length * 4;
 
         // --- Trigger Download ---
         //doc.save(`orden-compra-${orden.ordenCompraId}.pdf`);
@@ -438,11 +441,14 @@ export default class PdfGenerator {
         totalsY += leyendaLines.length * 4;
 
         // --- Observaciones ---
-        // doc.setFont("helvetica", "bold");
-        // doc.text("OBSERVACIONES", margin, totalsY);
-        // totalsY += 5;
-        // doc.rect(margin, totalsY, 190, 20); // a smaller rectangle for observations
-        //
+        doc.setFont("helvetica", "bold");
+        doc.text("OBSERVACIONES", margin, totalsY);
+        totalsY += 5;
+        doc.setFont("helvetica", "normal");
+        const obs = orden.observaciones ? orden.observaciones : "";
+        const obsLines = doc.splitTextToSize(obs, 190);
+        doc.text(obsLines, margin, totalsY);
+        totalsY += obsLines.length * 4;
 
         // --- Trigger Download ---
         doc.save(`orden-compra-${orden.ordenCompraActivoId}.pdf`);
