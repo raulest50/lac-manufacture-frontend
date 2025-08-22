@@ -118,10 +118,15 @@ export function ProcesoProduccionPicker({isOpen, onClose, onConfirm, alreadySele
             {/* Panel izquierdo - Procesos disponibles */}
             <Box flex={1}>
               <Flex mb={2} gap={2}>
-                <Input 
-                  placeholder='Buscar por nombre' 
-                  value={searchText} 
-                  onChange={(e) => setSearchText(e.target.value)} 
+                <Input
+                  placeholder='Buscar por nombre'
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      fetchAvailable(0);
+                    }
+                  }}
                 />
                 <Button
                   onClick={() => fetchAvailable(0)}

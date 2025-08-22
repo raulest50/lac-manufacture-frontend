@@ -71,7 +71,16 @@ export default function RecursoProduccionPicker({isOpen, onClose, onConfirm, alr
           <Flex gap={4}>
             <Box flex={1}>
               <Flex mb={2} gap={2}>
-                <Input placeholder='Buscar' value={searchText} onChange={(e)=>setSearchText(e.target.value)} />
+                <Input
+                  placeholder='Buscar'
+                  value={searchText}
+                  onChange={(e)=>setSearchText(e.target.value)}
+                  onKeyDown={(e)=>{
+                    if(e.key==='Enter'){
+                      fetchAvailable(0);
+                    }
+                  }}
+                />
                 <Button
                   onClick={()=>fetchAvailable(0)}
                   isLoading={loading}

@@ -96,6 +96,11 @@ export default function InformeProductosTab() {
                         onChange={(e) => setSearchText(e.target.value)}
                         placeholder="Enter product name"
                         isDisabled={chkbox.length === 0}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleSearch();
+                            }
+                        }}
                     />
                 </FormControl>
 

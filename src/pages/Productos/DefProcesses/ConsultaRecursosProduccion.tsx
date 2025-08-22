@@ -64,7 +64,15 @@ function PanelBusqueda({setEstado,setRecursoSel,setRefreshFn}:PanelProps){
         <Flex gap={4} alignItems="end">
           <FormControl flex={2}>
             <FormLabel>{searchType===TipoBusqueda.ID? 'ID' : 'Nombre'}</FormLabel>
-            <Input value={searchText} onChange={e=>setSearchText(e.target.value)} />
+            <Input
+              value={searchText}
+              onChange={e=>setSearchText(e.target.value)}
+              onKeyDown={(e)=>{
+                if(e.key==='Enter'){
+                  handleSearch();
+                }
+              }}
+            />
           </FormControl>
           <FormControl flex={1}>
             <FormLabel>Tipo de Búsqueda</FormLabel>

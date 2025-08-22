@@ -71,6 +71,11 @@ const BandejaBusqueda: React.FC<BandejaBusquedaProps> = ({ onAddInsumo }) => {
                             value={searchString}
                             onChange={(e) => setSearchString(e.target.value)}
                             placeholder="Ingrese término de búsqueda..."
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    handleSearch(0);
+                                }
+                            }}
                         />
                     </FormControl>
                     <Button colorScheme="teal" onClick={() => handleSearch(0)}>
