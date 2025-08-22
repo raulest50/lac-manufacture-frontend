@@ -14,6 +14,7 @@ import {
 import axios from "axios";
 import EndPointsURL from "../../../../../api/EndPointsURL.tsx";
 import ItemBandejaBusqueda from "./ItemBandejaBusqueda.tsx";
+import MyPagination from "../../../../../components/MyPagination.tsx";
 
 const endPoints = new EndPointsURL();
 
@@ -28,25 +29,32 @@ const BandejaBusqueda: React.FC<BandejaBusquedaProps> = ({ onAddInsumo }) => {
     const [clasificacion, setClasificacion] = useState(TIPOS_PRODUCTOS.materiaPrima);
     const [results, setResults] = useState<Producto[]>([]);
     const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const pageSize = 10;
 
     // Function to perform search against the backend
-    const handleSearch = async () => {
+    const handleSearch = async (pageNumber = 0) => {
         setLoading(true);
+        setPage(pageNumber);
         try {
             const response = await axios.get(endPoints.search_p4_receta_v2, {
                 params: {
                     searchTerm: searchString,
                     tipoBusqueda: tipoBusqueda.toUpperCase(), // expecting "NOMBRE" or "ID"
                     clasificacion: clasificacion,
-                    page: 0,
-                    size: 10,
+                    page: pageNumber,
+                    size: pageSize,
                 },
             });
             const data = response.data;
             // Assume the results are returned in data.content
             setResults(data.content);
+            setTotalPages(data.totalPages);
         } catch (error) {
             console.error("Error during search", error);
+            setResults([]);
+            setTotalPages(1);
         } finally {
             setLoading(false);
         }
@@ -65,7 +73,7 @@ const BandejaBusqueda: React.FC<BandejaBusquedaProps> = ({ onAddInsumo }) => {
                             placeholder="Ingrese término de búsqueda..."
                         />
                     </FormControl>
-                    <Button colorScheme="teal" onClick={handleSearch}>
+                    <Button colorScheme="teal" onClick={() => handleSearch(0)}>
                         Buscar
                     </Button>
                 </Flex>
@@ -100,15 +108,23 @@ const BandejaBusqueda: React.FC<BandejaBusquedaProps> = ({ onAddInsumo }) => {
                     <Spinner />
                 </Flex>
             ) : (
-                <Flex wrap="wrap" gap={4} direction="column" alignItems="center">
-                    {results.map((producto) => (
-                        <ItemBandejaBusqueda
-                            key={producto.productoId}
-                            producto={producto}
-                            onAddInsumo={onAddInsumo}
-                        />
-                    ))}
-                </Flex>
+                <>
+                    <Flex wrap="wrap" gap={4} direction="column" alignItems="center">
+                        {results.map((producto) => (
+                            <ItemBandejaBusqueda
+                                key={producto.productoId}
+                                producto={producto}
+                                onAddInsumo={onAddInsumo}
+                            />
+                        ))}
+                    </Flex>
+                    <MyPagination
+                        page={page}
+                        totalPages={totalPages}
+                        loading={loading}
+                        handlePageChange={handleSearch}
+                    />
+                </>
             )}
         </Box>
     );
