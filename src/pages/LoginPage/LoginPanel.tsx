@@ -20,6 +20,7 @@ import {
 import axios from 'axios';
 import EndPointsURL from '../../api/EndPointsURL.tsx';
 import SplashCursor from '../../components/SplashCursor.tsx';
+import { ClickSpark } from "@appletosolutions/reactbits";
 
 // TypeScript interfaces for component props
 interface FormularioLoginProps {
@@ -242,33 +243,43 @@ export default function LoginPanel() {
     };
 
     return (
-        <SplashCursor>
-            <Container minW={['auto', 'container.md', 'container.md']} w={"full"} h={"100vh"} bg={"transparent"} >
-                <Flex direction={"column"} gap={7} border={"0.5px solid gray"} borderRadius={"2em"} p={"4em"}
-                      alignItems={"center"} flex={1}>
-                <Box boxSize={'3xs'}>
-                        <Image src={'/logo_exotic.svg'} />
-                    </Box>
-                    {viewMode === 'login' ? (
-                        <FormularioLogin
-                            username={username}
-                            setUsername={setUsername}
-                            password={password}
-                            setPassword={setPassword}
-                            handleLogin={handleLogin}
-                            setViewMode={setViewMode}
-                            isLoading={isLoading}
-                        />
-                    ) : (
-                        <FormularioForgot
-                            onHandleEnviarForgot={onHandleEnviarForgot}
-                            isRequestDisabled={isRequestDisabled}
-                            isLoading={isForgotLoading}
-                            setViewMode={setViewMode}
-                        />
-                    )}
-                </Flex>
-            </Container>
-        </SplashCursor>
+        <ClickSpark
+            sparkColor="#3182CE"
+            sparkSize={12}
+            sparkRadius={24}
+            sparkCount={14}
+            duration={800}
+            easing="ease-out"
+            extraScale={1.5}
+        >
+            <SplashCursor>
+                <Container minW={['auto', 'container.md', 'container.md']} w={"full"} h={"100vh"} bg={"transparent"} >
+                    <Flex direction={"column"} gap={7} border={"0.5px solid gray"} borderRadius={"2em"} p={"4em"}
+                          alignItems={"center"} flex={1}>
+                    <Box boxSize={'3xs'}>
+                            <Image src={'/logo_exotic.svg'} />
+                        </Box>
+                        {viewMode === 'login' ? (
+                            <FormularioLogin
+                                username={username}
+                                setUsername={setUsername}
+                                password={password}
+                                setPassword={setPassword}
+                                handleLogin={handleLogin}
+                                setViewMode={setViewMode}
+                                isLoading={isLoading}
+                            />
+                        ) : (
+                            <FormularioForgot
+                                onHandleEnviarForgot={onHandleEnviarForgot}
+                                isRequestDisabled={isRequestDisabled}
+                                isLoading={isForgotLoading}
+                                setViewMode={setViewMode}
+                            />
+                        )}
+                    </Flex>
+                </Container>
+            </SplashCursor>
+        </ClickSpark>
     );
 }
