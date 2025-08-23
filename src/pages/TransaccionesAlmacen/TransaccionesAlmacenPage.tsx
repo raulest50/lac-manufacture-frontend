@@ -4,9 +4,13 @@ import AsistenteIngresoMercancia from "./AsistenteIngresoOCM/AsistenteIngresoMer
 import {AsistenteDispensacion} from "./AsistenteDispensacion/AsistenteDispensacion.tsx";
 import {AsistenteDispensacionDirecta} from "./AsistenteDispensacionDirecta/AsistenteDispensacionDirecta.tsx";
 import {AsistenteBackflushDirecto} from "./AsistenteBackflushDirecto/AsistenteBackflushDirecto.tsx";
+import { useMasterDirectives } from "../../context/MasterDirectivesContext.tsx";
 
 
 export default function TransaccionesAlmacenPage(){
+    const directives = useMasterDirectives();
+    const showDispensacionDirecta = directives["Permitir Consumo No Planificado"] === true;
+    const showBackflushDirecto = directives["Permitir Backflush No Planificado"] === true;
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
@@ -16,8 +20,8 @@ export default function TransaccionesAlmacenPage(){
                     <Tab> Ingreso OCM </Tab>
                     <Tab> Dispensacion </Tab>
                     <Tab> Ingreso Producto Terminado </Tab>
-                    <Tab> Dispensacion Directa (provisional) </Tab>
-                    <Tab> Backflush Directo (provisional) </Tab>
+                    {showDispensacionDirecta && <Tab> Dispensacion Directa (provisional) </Tab>}
+                    {showBackflushDirecto && <Tab> Backflush Directo (provisional) </Tab>}
                 </TabList>
                 <TabPanels>
 
@@ -33,13 +37,17 @@ export default function TransaccionesAlmacenPage(){
                         <AsistenteIngresoMercancia />
                     </TabPanel>
 
-                    <TabPanel>
-                        <AsistenteDispensacionDirecta />
-                    </TabPanel>
+                    {showDispensacionDirecta && (
+                        <TabPanel>
+                            <AsistenteDispensacionDirecta />
+                        </TabPanel>
+                    )}
 
-                    <TabPanel>
-                        <AsistenteBackflushDirecto />
-                    </TabPanel>
+                    {showBackflushDirecto && (
+                        <TabPanel>
+                            <AsistenteBackflushDirecto />
+                        </TabPanel>
+                    )}
 
                 </TabPanels>
             </Tabs>

@@ -10,6 +10,7 @@ window.REACT_ROUTER_SILENT_DEPRECATIONS = true;
 import RootLayout from "./pages/RootLayout.tsx";
 import Home from "./pages/Home.tsx"
 import { NotificationsProvider } from "./context/NotificationsContext.tsx";
+import { MasterDirectivesProvider } from "./context/MasterDirectivesContext.tsx";
 import ProductosPage from './pages/Productos/ProductosPage.tsx'
 import StockPage from "./pages/Stock/StockPage.tsx";
 import ProduccionPage from "./pages/Produccion/ProduccionPage.tsx";
@@ -259,9 +260,11 @@ const router = createBrowserRouter(
 
 function App() {
     return (
-        <NotificationsProvider>
-            <RouterProvider router={router} />
-        </NotificationsProvider>
+        <MasterDirectivesProvider>
+            <NotificationsProvider>
+                <RouterProvider router={router} />
+            </NotificationsProvider>
+        </MasterDirectivesProvider>
     )
 }
 
