@@ -76,6 +76,9 @@ export default class EndPointsURL{
     public save_doc_ingreso_oc: string;
     public backflush_no_planificado: string;
 
+    public dispensacion_no_planificada: string;
+    public recomendar_lotes_multiple: string;
+
 
 
     // user resources (solo autenticacion)
@@ -227,6 +230,8 @@ export default class EndPointsURL{
 
         this.save_doc_ingreso_oc = `${domain}/${movimientos_res}/save_doc_ingreso_oc`;
         this.backflush_no_planificado = `${domain}/${movimientos_res}/backflush_no_planificado`;
+        this.dispensacion_no_planificada = `${domain}/${movimientos_res}/dispensacion-no-planificada`;
+        this.recomendar_lotes_multiple = `${domain}/${movimientos_res}/recomendar-lotes-multiple`;
 
         // user endpoints
         this.whoami = `${domain}/${auth_res}/whoami`;
