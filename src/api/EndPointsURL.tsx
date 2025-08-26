@@ -136,6 +136,10 @@ export default class EndPointsURL{
     public get_master_directives: string;
     public update_master_directive: string;
 
+    public get_master_directive(nombre: string): string {
+        return `${this.domain}/api/master-directives/${encodeURIComponent(nombre)}`;
+    }
+
     public domain: string;
 
     constructor() {

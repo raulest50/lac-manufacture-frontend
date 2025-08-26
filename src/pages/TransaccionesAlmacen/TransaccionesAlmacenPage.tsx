@@ -4,13 +4,40 @@ import AsistenteIngresoMercancia from "./AsistenteIngresoOCM/AsistenteIngresoMer
 import {AsistenteDispensacion} from "./AsistenteDispensacion/AsistenteDispensacion.tsx";
 import {AsistenteDispensacionDirecta} from "./AsistenteDispensacionDirecta/AsistenteDispensacionDirecta.tsx";
 import {AsistenteBackflushDirecto} from "./AsistenteBackflushDirecto/AsistenteBackflushDirecto.tsx";
-import { useMasterDirectives } from "../../context/MasterDirectivesContext.tsx";
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import EndPointsURL from "../../api/EndPointsURL";
+import { useAuth } from "../../context/AuthContext";
 
 
 export default function TransaccionesAlmacenPage(){
-    const directives = useMasterDirectives();
-    const showDispensacionDirecta = directives["Permitir Consumo No Planificado"] === true;
-    const showBackflushDirecto = directives["Permitir Backflush No Planificado"] === true;
+    const [showDispensacionDirecta, setShowDispensacionDirecta] = useState(false);
+    const [showBackflushDirecto, setShowBackflushDirecto] = useState(false);
+    const { user } = useAuth();
+    const endPoints = useMemo(() => new EndPointsURL(), []);
+
+    useEffect(() => {
+        if (!user) return;
+
+        const fetchDirective = async (nombre: string) => {
+            try {
+                const res = await axios.get<{ valor: string }>(endPoints.get_master_directive(nombre));
+                return res.data.valor;
+            } catch (error) {
+                console.error(`Error fetching directive ${nombre}`, error);
+                return null;
+            }
+        };
+
+        const loadDirectives = async () => {
+            const disp = await fetchDirective("Permitir Consumo No Planificado");
+            const back = await fetchDirective("Permitir Backflush No Planificado");
+            setShowDispensacionDirecta(disp === "true");
+            setShowBackflushDirecto(back === "true");
+        };
+
+        loadDirectives();
+    }, [user, endPoints]);
 
     return(
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
