@@ -74,6 +74,7 @@ export default class EndPointsURL{
     public exportar_inventario_excel: string;
 
     public save_doc_ingreso_oc: string;
+    public backflush_no_planificado: string;
 
     public dispensacion_no_planificada: string;
     public recomendar_lotes_multiple: string;
@@ -228,6 +229,7 @@ export default class EndPointsURL{
         this.exportar_inventario_excel = `${domain}/inventario/exportar-excel`;
 
         this.save_doc_ingreso_oc = `${domain}/${movimientos_res}/save_doc_ingreso_oc`;
+        this.backflush_no_planificado = `${domain}/${movimientos_res}/backflush_no_planificado`;
         this.dispensacion_no_planificada = `${domain}/${movimientos_res}/dispensacion-no-planificada`;
         this.recomendar_lotes_multiple = `${domain}/${movimientos_res}/recomendar-lotes-multiple`;
 
