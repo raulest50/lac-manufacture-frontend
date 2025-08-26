@@ -88,7 +88,7 @@ function ListaProductos({
                                             <Td>{item.producto.tipoUnidades}</Td>
                                             <Td>
                                                 <Menu>
-                                                    <MenuButton as={Button} size="sm">Menu</MenuButton>
+                                                    <MenuButton as={Button} size="sm" colorScheme="teal">Menu</MenuButton>
                                                     <MenuList>
                                                         <MenuItem onClick={() => handleDownloadExcel(item.producto.productoId)}>
                                                             Descargar Excel de movimientos

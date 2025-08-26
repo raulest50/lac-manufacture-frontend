@@ -77,6 +77,25 @@ function Inventario() {
         setPageProductos(page);
     };
 
+    const handleDownloadInventario = async () => {
+        try {
+            const response = await axios.post(
+                endPoints.exportar_inventario_excel,
+                { categories: [], searchTerm },
+                { responseType: 'blob' }
+            );
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'inventario.xlsx');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error('Error downloading Excel:', error);
+        }
+    };
+
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'} >
                 <VStack h={'full'} w={'full'} >
@@ -100,6 +119,7 @@ function Inventario() {
                                         setPageProductos(0);
                                         handleSearch();
                                     }}>Buscar</Button>
+                                    <Button colorScheme="teal" onClick={handleDownloadInventario}>Reporte inventario</Button>
                                 </HStack>
                             </FormControl>
                             <Box w={"full"} mt={4}>
