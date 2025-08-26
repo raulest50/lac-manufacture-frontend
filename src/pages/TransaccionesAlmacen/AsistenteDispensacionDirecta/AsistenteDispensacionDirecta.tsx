@@ -1,30 +1,16 @@
-import {Box, Container, Flex, Text, Heading, Alert, AlertIcon, AlertTitle, AlertDescription} from '@chakra-ui/react';
+import StepOneComponent from './StepOneComponent';
+import StepTwoComponent from './StepTwoComponent';
+import {useState} from 'react';
+import {DispensacionDirectaDetalleItem} from '../types';
 
-export function AsistenteDispensacionDirecta() {
-    return (
-        <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
-            <Flex direction='column' gap={4} align="center" justify="center" py={10}>
-                <Heading size="lg" color="teal.600">Dispensación Directa</Heading>
-                <Alert 
-                    status="info" 
-                    variant="subtle" 
-                    flexDirection="column" 
-                    alignItems="center" 
-                    justifyContent="center" 
-                    textAlign="center" 
-                    borderRadius="md"
-                    p={6}
-                >
-                    <AlertIcon boxSize="40px" mr={0} />
-                    <AlertTitle mt={4} mb={1} fontSize="lg">
-                        Módulo en Desarrollo
-                    </AlertTitle>
-                    <AlertDescription maxWidth="md">
-                        Esta funcionalidad se encuentra actualmente en desarrollo. 
-                        Pronto estará disponible la dispensación directa de materiales.
-                    </AlertDescription>
-                </Alert>
-            </Flex>
-        </Container>
+export function AsistenteDispensacionDirecta(){
+    const [viewMode, setViewMode] = useState(0);
+    const [dispensacion, setDispensacion] = useState<DispensacionDirectaDetalleItem[]>([]);
+
+    return viewMode === 0 ? (
+        <StepOneComponent setViewMode={setViewMode} setDispensacion={setDispensacion} />
+    ) : (
+        <StepTwoComponent setViewMode={setViewMode} items={dispensacion} setItems={setDispensacion} />
     );
 }
+

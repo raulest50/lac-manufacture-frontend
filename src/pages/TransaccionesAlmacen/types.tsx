@@ -187,3 +187,33 @@ export interface DispensacionDTO {
     ordenProduccionId: number;
     items: ItemDispensacionDTO[];
 }
+
+// ===== Dispensación No Planificada =====
+
+/** Item básico solicitado por el usuario para la dispensación directa */
+export interface DispensacionDirectaItem {
+    material: Material;
+    cantidad: number;
+}
+
+/** Item detallado luego de la recomendación de lotes */
+export interface DispensacionDirectaDetalleItem {
+    material: Material;
+    loteId: number | null;
+    /** Cantidad sugerida por el backend */
+    cantidadSugerida: number;
+    /** Cantidad final a dispensar (editable) */
+    cantidad: number;
+}
+
+export interface DispensacionNoPlanificadaItemDTO {
+    productoId: string;
+    cantidad: number;
+    loteId?: number;
+}
+
+export interface DispensacionNoPlanificadaDTO {
+    observaciones: string;
+    usuarioId: number;
+    items: DispensacionNoPlanificadaItemDTO[];
+}
