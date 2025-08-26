@@ -1,13 +1,17 @@
 
-import {Container, Tabs, TabList, Tab, TabPanels, TabPanel
+import {
+    Container,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
 } from "@chakra-ui/react";
-
 
 import MyHeader from '../../components/MyHeader.tsx';
 import Inventario from "./Inventario.tsx";
 
-import {my_style_tab} from "../../styles/styles_general.tsx";
-import InventarioEnTransito from "./InventarioEnTransito.tsx";
+import { my_style_tab } from "../../styles/styles_general.tsx";
 
 
 export default function StockPage() {
@@ -19,18 +23,11 @@ export default function StockPage() {
             <Tabs>
                 <TabList>
                     <Tab sx={my_style_tab}>Inventario</Tab>
-                    <Tab sx={my_style_tab}>Inventario En Transito</Tab>
                 </TabList>
                 <TabPanels>
-
                     <TabPanel>
-                        <Inventario/>
+                        <Inventario />
                     </TabPanel>
-
-                    <TabPanel>
-                        <InventarioEnTransito/>
-                    </TabPanel>
-
                 </TabPanels>
             </Tabs>
 
