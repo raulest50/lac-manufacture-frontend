@@ -1,12 +1,13 @@
-import React, { createContext, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { ModuleNotificationDTA, useModuleNotifications } from '../api/ModulesNotifications';
+import { Modulo } from '../pages/Usuarios/GestionUsuarios/types.tsx';
 
 interface NotificationsContextType {
     notifications: ModuleNotificationDTA[];
     loading: boolean;
     error: string | null;
     refreshNotifications: () => void;
-    getNotificationForModule: (moduleName: string) => ModuleNotificationDTA | undefined;
+    getNotificationForModule: (moduleName: Modulo) => ModuleNotificationDTA | undefined;
 }
 
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
@@ -15,15 +16,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 //     console.log('NotificationsProvider - Inicializando contexto');
     const notificationsData = useModuleNotifications();
 
-    useEffect(() => {
-//         console.log('NotificationsContext - Notificaciones actualizadas:', notificationsData.notifications);
-        // Verificar específicamente la notificación de COMPRAS
-        const comprasNotification = notificationsData.notifications.find(n => n.modulo === 'COMPRAS');
-//         console.log('NotificationsContext - Notificación COMPRAS:', comprasNotification);
-    }, [notificationsData.notifications]);
-
     // Función para obtener la notificación correspondiente a un módulo
-    const getNotificationForModule = (moduleName: string): ModuleNotificationDTA | undefined => {
+    const getNotificationForModule = (moduleName: Modulo): ModuleNotificationDTA | undefined => {
 //         console.log(`getNotificationForModule - Buscando notificación para: ${moduleName}`);
 
         const notification = notificationsData.notifications.find(
