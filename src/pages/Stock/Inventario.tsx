@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {Box, useToast} from '@chakra-ui/react';
 
 import {
-    Container, VStack, HStack, Flex,
+    Container, VStack, HStack,
     FormControl, Input,
     Button,
     Select
@@ -18,10 +18,9 @@ import axios from 'axios';
 
 const endPoints = new EndPointsURL();
 
-import { ProductStockDTO, Movimiento } from './types.tsx';
+import { ProductStockDTO } from './types.tsx';
 import EndPointsURL from "../../api/EndPointsURL.tsx";
 import ListaProductos from './ListaProductos';
-import ListaMovimientos from './ListaMovimientos';
 
 function Inventario() {
 
@@ -30,15 +29,9 @@ function Inventario() {
     const [searchTerm, setSearchTerm] = useState('');
     const [tipoBusqueda, setTipoBusqueda] = useState('NOMBRE'); // 'NOMBRE' or 'ID'
     const [productos, setProductos] = useState<ProductStockDTO[]>([]);
-    const [selectedProducto, setSelectedProducto] = useState<ProductStockDTO | null>(null);
     const [pageProductos, setPageProductos] = useState(0);
     const [totalPagesProductos, setTotalPagesProductos] = useState(0);
     const [loadingProductos, setLoadingProductos] = useState(false);
-
-    const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
-    const [pageMovimientos, setPageMovimientos] = useState(0);
-    const [totalPagesMovimientos, setTotalPagesMovimientos] = useState(0);
-    const [loadingMovimientos, setLoadingMovimientos] = useState(false);
 
     const handleSearch = async () => {
         setLoadingProductos(true);
@@ -80,47 +73,8 @@ function Inventario() {
         }
     };
 
-    const handleProductoClick = (producto: ProductStockDTO) => {
-        setSelectedProducto(producto);
-        setPageMovimientos(0);
-        fetchMovimientos(producto.producto.productoId, 0);
-    };
-
-    const fetchMovimientos = async (productoId: number, page: number) => {
-        setLoadingMovimientos(true);
-        try {
-            const response = await axios.get(endPoints.get_movimientos_by_producto, {
-                params: {
-                    productoId,
-                    page,
-                    size: 10,
-                },
-            });
-            setMovimientos(response.data.content);
-            setTotalPagesMovimientos(response.data.totalPages);
-        } catch (error) {
-            console.error('Error fetching movimientos:', error);
-            toast({
-                title: 'Error',
-                description: 'Failed to fetch movimientos.',
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-            });
-        } finally {
-            setLoadingMovimientos(false);
-        }
-    };
-
     const handlePageChangeProductos = (page: number) => {
         setPageProductos(page);
-    };
-
-    const handlePageChangeMovimientos = (page: number) => {
-        setPageMovimientos(page);
-        if (selectedProducto) {
-            fetchMovimientos(selectedProducto.producto.productoId, page);
-        }
     };
 
     return (
@@ -148,37 +102,18 @@ function Inventario() {
                                     }}>Buscar</Button>
                                 </HStack>
                             </FormControl>
-                            <Flex w={"full"} mt={4} direction={"row"}>
-                                {/* Left Panel: Product List */}
-                                <Box minW={0} flex={1}>
-                                    <ListaProductos
-                                        productos={productos}
-                                        loadingProductos={loadingProductos}
-                                        selectedProducto={selectedProducto}
-                                        pageProductos={pageProductos}
-                                        totalPagesProductos={totalPagesProductos}
-                                        handleProductoClick={handleProductoClick}
-                                        handlePageChangeProductos={handlePageChangeProductos}
-                                    />
-                                </Box >
-                                <Box minW={0} flex={1} >
-                                    <ListaMovimientos
-                                        selectedProducto={selectedProducto}
-                                        movimientos={movimientos}
-                                        loadingMovimientos={loadingMovimientos}
-                                        pageMovimientos={pageMovimientos}
-                                        totalPagesMovimientos={totalPagesMovimientos}
-                                        handlePageChangeMovimientos={handlePageChangeMovimientos}
-                                    />
-                                </Box>
-                            </Flex>
+                            <Box w={"full"} mt={4}>
+                                <ListaProductos
+                                    productos={productos}
+                                    loadingProductos={loadingProductos}
+                                    pageProductos={pageProductos}
+                                    totalPagesProductos={totalPagesProductos}
+                                    handlePageChangeProductos={handlePageChangeProductos}
+                                />
+                            </Box>
                     </VStack>
         </Container>
     );
 }
 
 export default Inventario;
-
-
-
-{/* Right Panel: Movimientos */}
