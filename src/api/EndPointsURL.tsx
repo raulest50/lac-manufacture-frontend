@@ -71,6 +71,7 @@ export default class EndPointsURL{
     // movimientos resource
     public search_products_with_stock:string;
     public get_movimientos_by_producto:string;
+    public exportar_movimientos_excel: string;
 
     public save_doc_ingreso_oc: string;
 
@@ -217,6 +218,7 @@ export default class EndPointsURL{
         // movimientos endpoints
         this.search_products_with_stock = `${domain}/${movimientos_res}/search_products_with_stock`;
         this.get_movimientos_by_producto = `${domain}/${movimientos_res}/get_movimientos_by_producto`;
+        this.exportar_movimientos_excel = `${domain}/${movimientos_res}/exportar-movimientos-excel`;
 
         this.save_doc_ingreso_oc = `${domain}/${movimientos_res}/save_doc_ingreso_oc`;
 
