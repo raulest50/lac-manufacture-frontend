@@ -1,5 +1,5 @@
 // src/pages/Home.tsx
-import {SimpleGrid, Flex, Heading, Button, Spacer, Container, Text, Box, HStack, Tooltip} from "@chakra-ui/react";
+import {SimpleGrid, Flex, Heading, Button, Spacer, Container, Box, HStack, Tooltip} from "@chakra-ui/react";
 import SectionCard from "../components/SectionCard.tsx";
 import SplitText from "../components/SplitText.tsx";
 import { PiDownloadDuotone } from "react-icons/pi";

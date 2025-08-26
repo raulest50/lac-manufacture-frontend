@@ -47,8 +47,8 @@ export default function TransaccionesAlmacenPage(){
                     <Tab> Ingreso OCM </Tab>
                     <Tab> Dispensacion </Tab>
                     <Tab> Ingreso Producto Terminado </Tab>
-                    {showDispensacionDirecta && <Tab> Dispensacion Directa (provisional) </Tab>}
-                    {showBackflushDirecto && <Tab> Backflush Directo (provisional) </Tab>}
+                    {showDispensacionDirecta && <Tab> Dispensacion Directa </Tab>}
+                    {showBackflushDirecto && <Tab> Backflush Directo </Tab>}
                 </TabList>
                 <TabPanels>
 
