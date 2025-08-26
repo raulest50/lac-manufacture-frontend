@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import EndPointsURL from './EndPointsURL';
 import { useAuth } from '../context/AuthContext';
+import { Modulo } from '../pages/Usuarios/GestionUsuarios/types.tsx';
 
 export interface ModuleNotificationDTA {
-    modulo: string;
+    modulo: Modulo;
     requireAtention: boolean;
     message: string;
 }
@@ -32,10 +33,6 @@ export function useModuleNotifications() {
                 // Llamar al endpoint real con el username como parámetro
                 const response = await axios.get(url);
 //                 console.log('fetchNotifications - Respuesta:', response.data); // Log de la respuesta
-
-                // Verificar si hay notificación para COMPRAS
-                const comprasNotification = response.data.find((n: ModuleNotificationDTA) => n.modulo === 'COMPRAS');
-//                 console.log('fetchNotifications - Notificación COMPRAS:', comprasNotification);
 
                 setNotifications(response.data);
             } else {
