@@ -33,14 +33,14 @@ function Inventario() {
     const [totalPagesProductos, setTotalPagesProductos] = useState(0);
     const [loadingProductos, setLoadingProductos] = useState(false);
 
-    const handleSearch = async () => {
+    const handleSearch = async (page = pageProductos) => {
         setLoadingProductos(true);
         try {
             const response = await axios.get(endPoints.search_products_with_stock, {
                 params: {
                     searchTerm,
                     tipoBusqueda,
-                    page: pageProductos,
+                    page,
                     size: 10,
                 },
             });
@@ -62,19 +62,20 @@ function Inventario() {
 
     useEffect(() => {
         if (searchTerm !== '') {
-            handleSearch();
+            handleSearch(pageProductos);
         }
     }, [pageProductos]);
 
     const onKeyPress_InputBuscar = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
+            handleSearch(0);
             setPageProductos(0);
-            handleSearch();
         }
     };
 
     const handlePageChangeProductos = (page: number) => {
         setPageProductos(page);
+        handleSearch(page);
     };
 
     const handleDownloadInventario = async () => {
@@ -116,8 +117,8 @@ function Inventario() {
                                         <option value="ID">ID</option>
                                     </Select>
                                     <Button onClick={() => {
+                                        handleSearch(0);
                                         setPageProductos(0);
-                                        handleSearch();
                                     }}>Buscar</Button>
                                     <Button colorScheme="teal" onClick={handleDownloadInventario}>Reporte inventario</Button>
                                 </HStack>
