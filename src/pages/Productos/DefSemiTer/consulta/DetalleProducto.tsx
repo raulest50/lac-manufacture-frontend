@@ -2,7 +2,7 @@ import {
     Flex, Box, Heading, Text, Button, VStack, HStack, 
     Grid, GridItem, Card, CardHeader, CardBody, 
     FormControl, Select, Input, Textarea,
-    useToast,
+    useToast, useDisclosure,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import {Material, Producto} from "../../types.tsx";
@@ -13,6 +13,7 @@ import { useAuth } from '../../../../context/AuthContext.tsx';
 import {IVA_VALUES} from "../../types.tsx";
 
 import {Authority} from "../../../../api/global_types.tsx";
+import DeleteProductoDialog from './DeleteProductoDialog.tsx';
 
 type Props = {
     producto: Producto;
@@ -34,6 +35,44 @@ export default function DetalleProducto({producto, setEstado, setProductoSelecci
     const toast = useToast();
     const endPoints = new EndPointsURL();
     const { user } = useAuth();
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+
+    const handleDeleteProduct = async () => {
+        try {
+            const url = endPoints.update_producto.replace('{productoId}', producto.productoId);
+            await axios.delete(url);
+            toast({
+                title: 'Producto eliminado',
+                description: 'El material se eliminó correctamente.',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+            setEstado(0);
+            if (typeof refreshSearch === 'function') {
+                refreshSearch();
+            }
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 409) {
+                toast({
+                    title: 'No se puede eliminar el material',
+                    description: error.response.data?.error ||
+                        'No se puede eliminar el material porque está referenciado en ítems de órdenes de compra y/o transacciones de almacén',
+                    status: 'warning',
+                    duration: 5000,
+                    isClosable: true,
+                });
+            } else {
+                toast({
+                    title: 'Error',
+                    description: 'Ocurrió un error al eliminar el material.',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }
+        }
+    };
 
     // Obtener el nivel de acceso del usuario para el módulo PRODUCTOS
     useEffect(() => {
@@ -250,8 +289,13 @@ export default function DetalleProducto({producto, setEstado, setProductoSelecci
                 )}
                 {editMode && (
                     <HStack>
-                        <Button 
-                            colorScheme="red" 
+                        {isMaterial && (
+                            <Button colorScheme="red" onClick={onDeleteOpen}>
+                                Eliminar
+                            </Button>
+                        )}
+                        <Button
+                            colorScheme="red"
                             variant="outline"
                             onClick={() => {
                                 setEditMode(false);
@@ -260,8 +304,8 @@ export default function DetalleProducto({producto, setEstado, setProductoSelecci
                         >
                             Cancelar
                         </Button>
-                        <Button 
-                            colorScheme="green" 
+                        <Button
+                            colorScheme="green"
                             onClick={handleSaveChanges}
                             isDisabled={!isFormValid || !hasChanges}
                         >
@@ -390,6 +434,11 @@ export default function DetalleProducto({producto, setEstado, setProductoSelecci
                     )}
                 </CardBody>
             </Card>
+            <DeleteProductoDialog
+                isOpen={isDeleteOpen}
+                onClose={onDeleteClose}
+                onConfirm={handleDeleteProduct}
+            />
         </Box>
     );
 }
