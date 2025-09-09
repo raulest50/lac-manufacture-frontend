@@ -5,8 +5,9 @@ import {
     getRegimenTributario,
     OrdenCompraMateriales,
     ItemOrdenCompra,
+    DIVISAS,
 } from "./types";
-import { formatCOP } from "../../utils/formatters";
+import { formatCOP, formatCurrency } from "../../utils/formatters";
 import { OrdenCompraActivo, ItemOrdenCompraActivo } from "../ActivosFijos/types";
 
 // Extend jsPDF with properties added by jsPDF-AutoTable
@@ -110,6 +111,11 @@ export default class PdfGenerator {
         entregaY += 3;
         doc.text(`PLAZO ENTREGA ${orden.tiempoEntrega} DIAS`, detailX, entregaY);
         entregaY += 3;
+        if (orden.divisas && orden.divisas !== DIVISAS.COP) {
+            const trmText = orden.trm ? ` - TRM: ${formatCurrency(orden.trm, DIVISAS.COP, 2)}` : '';
+            doc.text(`DIVISA: ${orden.divisas}${trmText}`, detailX, entregaY);
+            entregaY += 3;
+        }
         doc.text("CONDICION ENTREGA: PUESTA EN PLANTA", detailX, entregaY);
 
 
@@ -169,12 +175,13 @@ export default class PdfGenerator {
 
 
         const tableColumns = ["CODIGO", "DESCRIPCION", "CANTIDAD", "PRECIO UNITARIO", "SUBTOTAL"];
+        const currency = orden.divisas ?? DIVISAS.COP;
         const tableRows = orden.itemsOrdenCompra.map((item: ItemOrdenCompra) => [
             item.material.productoId,
             item.material.nombre,
             item.cantidad,
-            formatCOP(item.precioUnitario, 2),
-            formatCOP(item.subTotal)
+            formatCurrency(item.precioUnitario, currency, 2),
+            formatCurrency(item.subTotal, currency)
         ]);
         autoTable(doc, {
             head: [tableColumns],
@@ -194,11 +201,11 @@ export default class PdfGenerator {
         let totalsY = finalY + 5;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
-        doc.text(`Sub Total: ${formatCOP(orden.subTotal)}`, margin, totalsY);
+        doc.text(`Sub Total: ${formatCurrency(orden.subTotal, currency)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`IVA: ${formatCOP(orden.ivaCOP)}`, margin, totalsY);
+        doc.text(`IVA: ${formatCurrency(orden.ivaCOP, currency)}`, margin, totalsY);
         totalsY += 5;
-        doc.text(`Total Pagar: ${formatCOP(orden.totalPagar)}`, margin, totalsY);
+        doc.text(`Total Pagar: ${formatCurrency(orden.totalPagar, currency)}`, margin, totalsY);
 
 
         // --- Leyenda ---
