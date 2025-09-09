@@ -66,74 +66,6 @@ export function SelectCurrencyTrm({
         }
     }
 
-    const ConditionalRender = (
-        
-    ) => {
-        if(tipoTRM == TIPO_TRM.ACTUAL){
-            return(
-                <Flex>
-                    <Input
-                        value={usd2copState}
-                        onChange={(e) => {
-                            setUsd2copState(e.target.value);
-                            useCurrentUsd2Cop(Number(e.target.value));
-                        }}
-                        readOnly={true}
-                        // onFocus={() => fetchLatestTRM()}
-                    />
-                    <IconButton
-                        aria-label='Fetch latest TRM'
-                        icon={loadingLatestTRM ? <Spinner size="sm" /> : <RepeatIcon/>}
-                        onClick={() => fetchLatestTRM()}
-                        isDisabled={loadingLatestTRM}
-                    />
-                </Flex>
-            );
-        }
-        if(tipoTRM == TIPO_TRM.FECHA){
-            return(
-                <Flex flex={3}>
-                    <Input
-                        flex={2}
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        // onBlur={() => fetchTRMbyDate()}
-                    />
-                    <Input
-                        flex={2}
-                        value={usd2copState}
-                        onChange={(e) => {
-                            setUsd2copState(e.target.value);
-                            useCurrentUsd2Cop(Number(e.target.value));
-                        }}
-                        readOnly={true}
-                    />
-                    <IconButton
-                        flex={1}
-                        aria-label='Fetch TRM by Date'
-                        icon={loadingTRMByDate ? <Spinner size="sm" /> : <RepeatIcon/>}
-                        onClick={() => fetchTRMbyDate()}
-                        isDisabled={loadingTRMByDate}
-                    />
-                </Flex>
-            );
-        }
-        if(tipoTRM == TIPO_TRM.ARBITRARIA){
-            return(
-                <Flex flex={3}>
-                    <Input
-                        value={usd2copState}
-                        onChange={(e) => {
-                            setUsd2copState(e.target.value);
-                            useCurrentUsd2Cop(Number(e.target.value));
-                        }}
-                    />
-                </Flex>
-            );
-        }
-    }
-
     return (
         <Flex direction={"column"} flex={3}>
             <Select
@@ -160,11 +92,64 @@ export function SelectCurrencyTrm({
                 >
                     <option value={TIPO_TRM.ACTUAL} >{TIPO_TRM.ACTUAL}</option>
                     <option value={TIPO_TRM.FECHA} >{TIPO_TRM.FECHA}</option>
-                    {/*<option value={TIPO_TRM.ARBITRARIA} >{TIPO_TRM.ARBITRARIA}</option>*/}
+                    <option value={TIPO_TRM.ARBITRARIA} >{TIPO_TRM.ARBITRARIA}</option>
                 </Select>
-
-                <ConditionalRender/>
-
+                {tipoTRM === TIPO_TRM.ACTUAL && (
+                    <Flex>
+                        <Input
+                            value={usd2copState}
+                            onChange={(e) => {
+                                setUsd2copState(e.target.value);
+                                useCurrentUsd2Cop(Number(e.target.value));
+                            }}
+                            readOnly={true}
+                        />
+                        <IconButton
+                            aria-label='Fetch latest TRM'
+                            icon={loadingLatestTRM ? <Spinner size="sm" /> : <RepeatIcon/>}
+                            onClick={() => fetchLatestTRM()}
+                            isDisabled={loadingLatestTRM}
+                        />
+                    </Flex>
+                )}
+                {tipoTRM === TIPO_TRM.FECHA && (
+                    <Flex flex={3}>
+                        <Input
+                            flex={2}
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                        />
+                        <Input
+                            flex={2}
+                            value={usd2copState}
+                            onChange={(e) => {
+                                setUsd2copState(e.target.value);
+                                useCurrentUsd2Cop(Number(e.target.value));
+                            }}
+                            readOnly={true}
+                        />
+                        <IconButton
+                            flex={1}
+                            aria-label='Fetch TRM by Date'
+                            icon={loadingTRMByDate ? <Spinner size="sm" /> : <RepeatIcon/>}
+                            onClick={() => fetchTRMbyDate()}
+                            isDisabled={loadingTRMByDate}
+                        />
+                    </Flex>
+                )}
+                {tipoTRM === TIPO_TRM.ARBITRARIA && (
+                    <Flex flex={3}>
+                        <Input
+                            autoFocus
+                            value={usd2copState}
+                            onChange={(e) => {
+                                setUsd2copState(e.target.value);
+                                useCurrentUsd2Cop(Number(e.target.value));
+                            }}
+                        />
+                    </Flex>
+                )}
             </Flex>
 
         </Flex>
