@@ -11,11 +11,16 @@ import {
     CardBody,
     Heading,
     Text,
+    Box,
+    Divider,
+    Flex,
+    Tag,
+    useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import { useToast } from '@chakra-ui/react';
-import {ProductoWithInsumos} from "./types.tsx";
-import EndPointsURL from "../../api/EndPointsURL.tsx";
+import {ProductoWithInsumos} from "./types";
+import EndPointsURL from "../../api/EndPointsURL";
+import TerminadoSemiterminadoPicker from "./components/TerminadoSemiterminadoPicker";
 
 const endPoints = new EndPointsURL();
 
@@ -23,22 +28,17 @@ export default function CrearOrdenes() {
     const toast = useToast();
 
     const [selectedProducto, setSelectedProducto] = useState<ProductoWithInsumos | null>(null);
+    const [canProduce, setCanProduce] = useState(false);
+    const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [observaciones, setObservaciones] = useState('');
     const [responsableId, setResponsableId] = useState(1);
 
     const handleSeleccionarProducto = () => {
-        toast({
-            title: 'Seleccionar producto terminado',
-            description: 'La selección de productos estará disponible próximamente.',
-            status: 'info',
-            duration: 5000,
-            isClosable: true,
-        });
-        // TODO: Implementar lógica de selección de producto terminado.
+        setIsPickerOpen(true);
     };
 
     const handleCrearOrden = async () => {
-        if (selectedProducto) {
+        if (selectedProducto && canProduce) {
             try {
                 const ordenProduccion = {
                     productoId: selectedProducto.producto.productoId,
@@ -56,6 +56,7 @@ export default function CrearOrdenes() {
                 });
                 // Reset form
                 setSelectedProducto(null);
+                setCanProduce(false);
                 setObservaciones('');
             } catch (error) {
                 console.error('Error creating orden de producción:', error);
@@ -67,15 +68,17 @@ export default function CrearOrdenes() {
                     isClosable: true,
                 });
             }
-        } else {
-            toast({
-                title: 'Sin producto seleccionado',
-                description: 'Por favor, selecciona un producto antes de crear la orden.',
-                status: 'warning',
-                duration: 5000,
-                isClosable: true,
-            });
         }
+    };
+
+    const handlePickerConfirm = (producto: ProductoWithInsumos, canProduceFlag: boolean) => {
+        setSelectedProducto(producto);
+        setCanProduce(canProduceFlag);
+        setIsPickerOpen(false);
+    };
+
+    const handlePickerClose = () => {
+        setIsPickerOpen(false);
     };
 
     return (
@@ -86,11 +89,50 @@ export default function CrearOrdenes() {
                 </CardHeader>
                 <CardBody>
                     <VStack align="stretch" spacing={4}>
-                        <Text>
-                            {selectedProducto
-                                ? `Seleccionado: ${selectedProducto.producto.nombre}`
-                                : 'Ningún producto seleccionado.'}
-                        </Text>
+                        {selectedProducto ? (
+                            <VStack align='stretch' spacing={2}>
+                                <Heading size='sm'>{selectedProducto.producto.nombre}</Heading>
+                                <Text fontSize='sm' color='gray.600'>ID: {selectedProducto.producto.productoId}</Text>
+                                <Divider/>
+                                <VStack align='stretch' spacing={2}>
+                                    <Text fontWeight='medium'>Insumos requeridos</Text>
+                                    {selectedProducto.insumos.length === 0 ? (
+                                        <Text fontSize='sm' color='gray.500'>No se registran insumos para este producto.</Text>
+                                    ) : (
+                                        selectedProducto.insumos.map(insumo => {
+                                            const tieneStock = insumo.stockActual >= insumo.cantidadRequerida;
+                                            return (
+                                                <Flex
+                                                    key={insumo.insumoId}
+                                                    justify='space-between'
+                                                    align='center'
+                                                    p={2}
+                                                    borderWidth='1px'
+                                                    borderRadius='md'
+                                                    borderColor={tieneStock ? 'green.200' : 'red.200'}
+                                                    bg={tieneStock ? 'green.50' : 'red.50'}
+                                                >
+                                                    <Box>
+                                                        <Text fontSize='sm' fontWeight='medium'>{insumo.productoNombre}</Text>
+                                                        <Text fontSize='xs' color='gray.600'>Requerido: {insumo.cantidadRequerida}</Text>
+                                                    </Box>
+                                                    <Tag colorScheme={tieneStock ? 'green' : 'red'}>
+                                                        Stock: {insumo.stockActual}
+                                                    </Tag>
+                                                </Flex>
+                                            );
+                                        })
+                                    )}
+                                </VStack>
+                                <Text fontWeight='medium' color={canProduce ? 'green.600' : 'red.600'}>
+                                    {canProduce
+                                        ? 'Stock suficiente para producir este producto.'
+                                        : 'Stock insuficiente en al menos un insumo.'}
+                                </Text>
+                            </VStack>
+                        ) : (
+                            <Text>Ningún producto seleccionado.</Text>
+                        )}
                         <Button colorScheme="blue" onClick={handleSeleccionarProducto}>
                             Seleccionar producto terminado
                         </Button>
@@ -113,12 +155,17 @@ export default function CrearOrdenes() {
             </Select>
             <Button
                 onClick={handleCrearOrden}
-                isDisabled={!selectedProducto}
+                isDisabled={!selectedProducto || !canProduce}
                 mt="4"
                 colorScheme="blue"
             >
                 Crear Orden de Producción
             </Button>
+            <TerminadoSemiterminadoPicker
+                isOpen={isPickerOpen}
+                onClose={handlePickerClose}
+                onConfirm={handlePickerConfirm}
+            />
         </VStack>
     );
 }
