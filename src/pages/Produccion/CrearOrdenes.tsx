@@ -1,8 +1,17 @@
 // src/pages/ProduccionPage/CrearOrdenes.tsx
 
-import { useState, useRef } from 'react';
-import { Textarea, Select, Button, VStack } from '@chakra-ui/react';
-import { RecetaPicker, RecetaPickerRef } from './RecetaPicker';
+import { useState } from 'react';
+import {
+    Textarea,
+    Select,
+    Button,
+    VStack,
+    Card,
+    CardHeader,
+    CardBody,
+    Heading,
+    Text,
+} from '@chakra-ui/react';
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
 import {ProductoWithInsumos} from "./types.tsx";
@@ -13,13 +22,20 @@ const endPoints = new EndPointsURL();
 export default function CrearOrdenes() {
     const toast = useToast();
 
-    const [canProduce, setCanProduce] = useState(false);
     const [selectedProducto, setSelectedProducto] = useState<ProductoWithInsumos | null>(null);
     const [observaciones, setObservaciones] = useState('');
     const [responsableId, setResponsableId] = useState(1);
 
-    // Create a ref to RecetaPicker to access the refresh method
-    const recetaPickerRef = useRef<RecetaPickerRef>(null);
+    const handleSeleccionarProducto = () => {
+        toast({
+            title: 'Seleccionar producto terminado',
+            description: 'La selección de productos estará disponible próximamente.',
+            status: 'info',
+            duration: 5000,
+            isClosable: true,
+        });
+        // TODO: Implementar lógica de selección de producto terminado.
+    };
 
     const handleCrearOrden = async () => {
         if (selectedProducto) {
@@ -41,12 +57,6 @@ export default function CrearOrdenes() {
                 // Reset form
                 setSelectedProducto(null);
                 setObservaciones('');
-                setCanProduce(false);
-                // Trigger a refresh in RecetaPicker to update stocks
-                if (recetaPickerRef.current) {
-                    recetaPickerRef.current.refresh();
-//                     console.log("entered the if refresh")
-                }
             } catch (error) {
                 console.error('Error creating orden de producción:', error);
                 toast({
@@ -70,11 +80,23 @@ export default function CrearOrdenes() {
 
     return (
         <VStack align="stretch">
-            <RecetaPicker
-                setCanProduce={setCanProduce}
-                setSelectedProducto={setSelectedProducto}
-                ref={recetaPickerRef} // Pass the ref to RecetaPicker
-            />
+            <Card>
+                <CardHeader>
+                    <Heading size="md">Producto terminado</Heading>
+                </CardHeader>
+                <CardBody>
+                    <VStack align="stretch" spacing={4}>
+                        <Text>
+                            {selectedProducto
+                                ? `Seleccionado: ${selectedProducto.producto.nombre}`
+                                : 'Ningún producto seleccionado.'}
+                        </Text>
+                        <Button colorScheme="blue" onClick={handleSeleccionarProducto}>
+                            Seleccionar producto terminado
+                        </Button>
+                    </VStack>
+                </CardBody>
+            </Card>
             <Textarea
                 placeholder="Observaciones"
                 value={observaciones}
@@ -91,7 +113,7 @@ export default function CrearOrdenes() {
             </Select>
             <Button
                 onClick={handleCrearOrden}
-                isDisabled={!canProduce}
+                isDisabled={!selectedProducto}
                 mt="4"
                 colorScheme="blue"
             >
