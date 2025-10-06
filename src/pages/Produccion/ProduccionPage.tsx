@@ -24,7 +24,7 @@ export default function ProduccionPage(){
 
                 <TabList>
                     <Tab sx={my_style_tab}> Simulacion de Produccion </Tab>
-                    <Tab sx={my_style_tab}> Creacion Manual Orden Produccion </Tab>
+                    <Tab sx={my_style_tab}> Crear ODP Manualmente </Tab>
                     <Tab sx={my_style_tab}> Master Production Schedule (MPS) </Tab>
                     <Tab sx={my_style_tab}> Historial </Tab>
                 </TabList>
