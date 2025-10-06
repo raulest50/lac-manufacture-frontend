@@ -19,7 +19,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
-import {Producto, ProductoWithInsumos, InsumoWithStock} from '../types';
+import {Producto, ProductoWithInsumos, InsumoWithStock, ProductoStockDTO} from '../types';
 
 interface TerminadoSemiterminadoPickerProps {
     isOpen: boolean;
@@ -38,8 +38,8 @@ const endpoints = new EndPointsURL();
 export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm}: TerminadoSemiterminadoPickerProps) {
     const toast = useToast();
     const [searchText, setSearchText] = useState('');
-    const [results, setResults] = useState<Producto[]>([]);
-    const [selected, setSelected] = useState<Producto | null>(null);
+    const [results, setResults] = useState<ProductoStockDTO[]>([]);
+    const [selected, setSelected] = useState<ProductoStockDTO | null>(null);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
@@ -55,13 +55,20 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
         setIsConfirming(false);
     }, []);
 
+    const [tipoBusqueda, setTipoBusqueda] = useState<'NOMBRE' | 'ID'>('NOMBRE');
+
     const fetchProductos = useCallback(async (pageToFetch = 0) => {
         setIsLoading(true);
         try {
-            const response = await axios.get<SearchResponse<Producto> | Producto[]>(endpoints.search_semiytermi, {
-                params: {searchTerm: searchText ?? '', page: pageToFetch}
+            const response = await axios.get<SearchResponse<ProductoStockDTO> | ProductoStockDTO[]>(endpoints.search_semiytermi, {
+                params: {
+                    searchTerm: searchText ?? '', 
+                    tipoBusqueda: tipoBusqueda, 
+                    page: pageToFetch,
+                    size: 10
+                }
             });
-            const data = response.data as SearchResponse<Producto> | Producto[];
+            const data = response.data as SearchResponse<ProductoStockDTO> | ProductoStockDTO[];
             if (Array.isArray(data)) {
                 setResults(data);
                 setTotalPages(1);
@@ -84,7 +91,7 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
         } finally {
             setIsLoading(false);
         }
-    }, [searchText, toast]);
+    }, [searchText, tipoBusqueda, toast]);
 
     useEffect(() => {
         if (isOpen) {
@@ -104,15 +111,15 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
         }
     }, [handleSearch]);
 
-    const handleSelect = (producto: Producto) => {
-        setSelected(producto);
+    const handleSelect = (productoStock: ProductoStockDTO) => {
+        setSelected(productoStock);
     };
 
     const handleConfirm = async () => {
         if (!selected) return;
         setIsConfirming(true);
         try {
-            const url = endpoints.insumos_with_stock.replace('{id}', encodeURIComponent(String(selected.productoId)));
+            const url = endpoints.insumos_with_stock.replace('{id}', encodeURIComponent(String(selected.producto.productoId)));
             const response = await axios.get<InsumoWithStock[] | SearchResponse<InsumoWithStock>>(url);
             const data = response.data;
             let insumos: InsumoWithStock[];
@@ -122,7 +129,7 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
                 insumos = data.content ?? [];
             }
             const productoWithInsumos: ProductoWithInsumos = {
-                producto: selected,
+                producto: selected.producto,
                 insumos
             };
             const canProduce = insumos.every(insumo => insumo.stockActual >= insumo.cantidadRequerida);
@@ -158,16 +165,38 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
                 <ModalHeader>Seleccionar producto</ModalHeader>
                 <ModalCloseButton/>
                 <ModalBody>
-                    <Flex mb={4} gap={2}>
-                        <Input
-                            placeholder='Buscar por nombre o código'
-                            value={searchText}
-                            onChange={event => setSearchText(event.target.value)}
-                            onKeyDown={handleKeyDown}
-                        />
-                        <Button onClick={handleSearch} isLoading={isLoading} loadingText='Buscando'>
-                            Buscar
-                        </Button>
+                    <Flex direction="column" gap={3}>
+                        <Flex mb={2} gap={4} align="center">
+                            <Text fontWeight="medium">Buscar por:</Text>
+                            <Flex>
+                                <Button 
+                                    size="sm" 
+                                    colorScheme={tipoBusqueda === 'NOMBRE' ? 'blue' : 'gray'} 
+                                    mr={2}
+                                    onClick={() => setTipoBusqueda('NOMBRE')}
+                                >
+                                    Nombre
+                                </Button>
+                                <Button 
+                                    size="sm" 
+                                    colorScheme={tipoBusqueda === 'ID' ? 'blue' : 'gray'} 
+                                    onClick={() => setTipoBusqueda('ID')}
+                                >
+                                    ID
+                                </Button>
+                            </Flex>
+                        </Flex>
+                        <Flex gap={2}>
+                            <Input
+                                placeholder={tipoBusqueda === 'NOMBRE' ? 'Buscar por nombre' : 'Buscar por código'}
+                                value={searchText}
+                                onChange={event => setSearchText(event.target.value)}
+                                onKeyDown={handleKeyDown}
+                            />
+                            <Button onClick={handleSearch} isLoading={isLoading} loadingText='Buscando'>
+                                Buscar
+                            </Button>
+                        </Flex>
                     </Flex>
                     <VStack align='stretch' spacing={2} maxH='320px' overflowY='auto'>
                         {isLoading ? (
@@ -177,8 +206,9 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
                         ) : results.length === 0 ? (
                             <Text color='gray.500'>No se encontraron productos.</Text>
                         ) : (
-                            results.map(producto => {
-                                const isSelected = selected?.productoId === producto.productoId;
+                            results.map(productoStock => {
+                                const producto = productoStock.producto;
+                                const isSelected = selected?.producto.productoId === producto.productoId;
                                 return (
                                     <Box
                                         key={producto.productoId}
@@ -189,7 +219,7 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
                                         bg={isSelected ? 'blue.50' : 'white'}
                                         borderColor={isSelected ? 'blue.400' : 'gray.200'}
                                         _hover={{bg: 'gray.50'}}
-                                        onClick={() => handleSelect(producto)}
+                                        onClick={() => handleSelect(productoStock)}
                                     >
                                         <Flex justify='space-between' align='start'>
                                             <Box>

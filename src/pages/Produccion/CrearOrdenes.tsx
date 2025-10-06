@@ -80,9 +80,6 @@ export default function CrearOrdenes() {
                 canProduce={canProduce}
                 onSearchClick={handleSeleccionarProducto}
             />
-            <Button colorScheme="blue" onClick={handleSeleccionarProducto}>
-                Seleccionar producto terminado
-            </Button>
             <Textarea
                 placeholder="Observaciones"
                 value={observaciones}
