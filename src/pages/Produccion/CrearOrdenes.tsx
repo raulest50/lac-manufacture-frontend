@@ -1,21 +1,12 @@
 // src/pages/ProduccionPage/CrearOrdenes.tsx
 
 import { useState } from 'react';
-import {
-    Textarea,
-    Select,
-    Button,
-    VStack,
-    Card,
-    CardHeader,
-    CardBody,
-    Heading,
-    Text,
-} from '@chakra-ui/react';
+import { Textarea, Select, Button, VStack } from '@chakra-ui/react';
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
-import {ProductoWithInsumos} from "./types.tsx";
-import EndPointsURL from "../../api/EndPointsURL.tsx";
+import { ProductoWithInsumos } from './types.tsx';
+import EndPointsURL from '../../api/EndPointsURL.tsx';
+import ProductoTerminadoCard from './components/ProductoTerminadoCard';
 
 const endPoints = new EndPointsURL();
 
@@ -80,23 +71,10 @@ export default function CrearOrdenes() {
 
     return (
         <VStack align="stretch">
-            <Card>
-                <CardHeader>
-                    <Heading size="md">Producto terminado</Heading>
-                </CardHeader>
-                <CardBody>
-                    <VStack align="stretch" spacing={4}>
-                        <Text>
-                            {selectedProducto
-                                ? `Seleccionado: ${selectedProducto.producto.nombre}`
-                                : 'Ningún producto seleccionado.'}
-                        </Text>
-                        <Button colorScheme="blue" onClick={handleSeleccionarProducto}>
-                            Seleccionar producto terminado
-                        </Button>
-                    </VStack>
-                </CardBody>
-            </Card>
+            <ProductoTerminadoCard
+                selectedProducto={selectedProducto}
+                onPickClick={handleSeleccionarProducto}
+            />
             <Textarea
                 placeholder="Observaciones"
                 value={observaciones}
