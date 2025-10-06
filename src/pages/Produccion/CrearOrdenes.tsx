@@ -6,21 +6,13 @@ import {
     Select,
     Button,
     VStack,
-    Card,
-    CardHeader,
-    CardBody,
-    Heading,
-    Text,
-    Box,
-    Divider,
-    Flex,
-    Tag,
     useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import {ProductoWithInsumos} from "./types";
 import EndPointsURL from "../../api/EndPointsURL";
 import TerminadoSemiterminadoPicker from "./components/TerminadoSemiterminadoPicker";
+import TerSemiTerCard from "./components/TerSemiTerCard";
 
 const endPoints = new EndPointsURL();
 
@@ -83,62 +75,14 @@ export default function CrearOrdenes() {
 
     return (
         <VStack align="stretch">
-            <Card>
-                <CardHeader>
-                    <Heading size="md">Producto terminado</Heading>
-                </CardHeader>
-                <CardBody>
-                    <VStack align="stretch" spacing={4}>
-                        {selectedProducto ? (
-                            <VStack align='stretch' spacing={2}>
-                                <Heading size='sm'>{selectedProducto.producto.nombre}</Heading>
-                                <Text fontSize='sm' color='gray.600'>ID: {selectedProducto.producto.productoId}</Text>
-                                <Divider/>
-                                <VStack align='stretch' spacing={2}>
-                                    <Text fontWeight='medium'>Insumos requeridos</Text>
-                                    {selectedProducto.insumos.length === 0 ? (
-                                        <Text fontSize='sm' color='gray.500'>No se registran insumos para este producto.</Text>
-                                    ) : (
-                                        selectedProducto.insumos.map(insumo => {
-                                            const tieneStock = insumo.stockActual >= insumo.cantidadRequerida;
-                                            return (
-                                                <Flex
-                                                    key={insumo.insumoId}
-                                                    justify='space-between'
-                                                    align='center'
-                                                    p={2}
-                                                    borderWidth='1px'
-                                                    borderRadius='md'
-                                                    borderColor={tieneStock ? 'green.200' : 'red.200'}
-                                                    bg={tieneStock ? 'green.50' : 'red.50'}
-                                                >
-                                                    <Box>
-                                                        <Text fontSize='sm' fontWeight='medium'>{insumo.productoNombre}</Text>
-                                                        <Text fontSize='xs' color='gray.600'>Requerido: {insumo.cantidadRequerida}</Text>
-                                                    </Box>
-                                                    <Tag colorScheme={tieneStock ? 'green' : 'red'}>
-                                                        Stock: {insumo.stockActual}
-                                                    </Tag>
-                                                </Flex>
-                                            );
-                                        })
-                                    )}
-                                </VStack>
-                                <Text fontWeight='medium' color={canProduce ? 'green.600' : 'red.600'}>
-                                    {canProduce
-                                        ? 'Stock suficiente para producir este producto.'
-                                        : 'Stock insuficiente en al menos un insumo.'}
-                                </Text>
-                            </VStack>
-                        ) : (
-                            <Text>Ningún producto seleccionado.</Text>
-                        )}
-                        <Button colorScheme="blue" onClick={handleSeleccionarProducto}>
-                            Seleccionar producto terminado
-                        </Button>
-                    </VStack>
-                </CardBody>
-            </Card>
+            <TerSemiTerCard
+                productoSeleccionado={selectedProducto}
+                canProduce={canProduce}
+                onSearchClick={handleSeleccionarProducto}
+            />
+            <Button colorScheme="blue" onClick={handleSeleccionarProducto}>
+                Seleccionar producto terminado
+            </Button>
             <Textarea
                 placeholder="Observaciones"
                 value={observaciones}
