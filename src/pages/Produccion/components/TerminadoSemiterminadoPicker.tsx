@@ -59,7 +59,7 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
         setIsLoading(true);
         try {
             const response = await axios.get<SearchResponse<Producto> | Producto[]>(endpoints.search_semiytermi, {
-                params: {search: searchText, page: pageToFetch}
+                params: {searchTerm: searchText ?? '', page: pageToFetch}
             });
             const data = response.data as SearchResponse<Producto> | Producto[];
             if (Array.isArray(data)) {
