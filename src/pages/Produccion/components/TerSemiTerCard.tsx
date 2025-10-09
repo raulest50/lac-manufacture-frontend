@@ -32,6 +32,14 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
     const producto = productoSeleccionado?.producto;
     const insumos = productoSeleccionado?.insumos ?? [];
 
+    // Función para obtener la unidad de medida (UMB)
+    // En una implementación real, esto debería venir del backend
+    const obtenerUMB = (productoId: number): string => {
+        // Por defecto retornamos "KG", pero esto debería ser reemplazado
+        // con la lógica real para obtener la unidad de medida
+        return "KG";
+    };
+
     return (
         <Card variant="outline" borderColor="blue.200" w="full">
             <CardHeader bg="blue.50">
@@ -63,6 +71,12 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
                             <Text fontSize="sm" color="gray.600">
                                 Unidad: {producto.tipoUnidades}
                             </Text>
+                            {/* Añadir esta línea para mostrar la categoría */}
+                            {producto.categoriaNombre && (
+                                <Text fontSize="sm" color="gray.600">
+                                    Categoría: {producto.categoriaNombre}
+                                </Text>
+                            )}
                         </VStack>
                         <Divider />
                         <VStack align="stretch" spacing={2}>
@@ -76,7 +90,9 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
                                     <Table variant="simple" size="sm">
                                         <Thead>
                                             <Tr>
+                                                <Th>Código</Th>
                                                 <Th>Insumo</Th>
+                                                <Th>UMB</Th>
                                                 <Th isNumeric>Cantidad Requerida</Th>
                                                 <Th isNumeric>Stock Actual</Th>
                                                 <Th>Estado</Th>
@@ -87,7 +103,9 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
                                                 const tieneStock = insumo.stockActual >= insumo.cantidadRequerida;
                                                 return (
                                                     <Tr key={insumo.insumoId}>
+                                                        <Td>{insumo.productoId}</Td>
                                                         <Td fontWeight="medium">{insumo.productoNombre}</Td>
+                                                        <Td>{obtenerUMB(insumo.productoId)}</Td>
                                                         <Td isNumeric>{insumo.cantidadRequerida}</Td>
                                                         <Td isNumeric>{insumo.stockActual}</Td>
                                                         <Td>

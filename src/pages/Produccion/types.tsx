@@ -13,6 +13,8 @@ export interface Producto{
     cantidadUnidad: string;
     fechaCreacion?: string;
     ivaPercentual?: number;
+    categoriaId?: number;      // Añadir esta propiedad
+    categoriaNombre?: string;  // Añadir esta propiedad
 }
 
 export interface Insumo {
