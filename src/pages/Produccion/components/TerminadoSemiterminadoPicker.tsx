@@ -19,7 +19,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
-import {Producto, ProductoWithInsumos, InsumoWithStock, ProductoStockDTO} from '../types';
+import {Producto, ProductoWithInsumos, InsumoWithStock, ProductoStockDTO, Terminado} from '../types';
 
 interface TerminadoSemiterminadoPickerProps {
     isOpen: boolean;
@@ -60,27 +60,32 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
     const fetchProductos = useCallback(async (pageToFetch = 0) => {
         setIsLoading(true);
         try {
-            const response = await axios.get<SearchResponse<ProductoStockDTO> | ProductoStockDTO[]>(endpoints.search_semiytermi, {
-                params: {
-                    searchTerm: searchText ?? '', 
-                    tipoBusqueda: tipoBusqueda, 
+            // Use POST request to the new endpoint with parameters in the request body
+            const response = await axios.post<SearchResponse<Terminado>>(
+                endpoints.search_terminados_picker,
+                {
+                    searchTerm: searchText ?? '',
+                    tipoBusqueda: tipoBusqueda,
                     page: pageToFetch,
                     size: 10
                 }
-            });
-            const data = response.data as SearchResponse<ProductoStockDTO> | ProductoStockDTO[];
-            if (Array.isArray(data)) {
-                setResults(data);
-                setTotalPages(1);
-                setPage(0);
-            } else {
-                const items = data.content ?? [];
-                setResults(items);
-                setTotalPages(data.totalPages ?? 1);
-                setPage(data.number ?? pageToFetch);
-            }
+            );
+
+            // The response is always a paged object with the new endpoint
+            const data = response.data;
+            const terminados = data.content ?? [];
+
+            // Convert Terminado objects to ProductoStockDTO objects
+            const productoStockDTOs = terminados.map(terminado => ({
+                producto: terminado,
+                stock: 0 // The stock is not provided in the response, set to 0 or fetch separately if needed
+            }));
+
+            setResults(productoStockDTOs);
+            setTotalPages(data.totalPages ?? 1);
+            setPage(data.number ?? pageToFetch);
         } catch (error) {
-            console.error('Error fetching productos terminados y semiterminados', error);
+            console.error('Error fetching productos terminados', error);
             setResults([]);
             setTotalPages(1);
             toast({
@@ -162,7 +167,7 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
         <Modal isOpen={isOpen} onClose={handleCancel} size='xl'>
             <ModalOverlay/>
             <ModalContent>
-                <ModalHeader>Seleccionar producto</ModalHeader>
+                <ModalHeader>Seleccionar producto terminado</ModalHeader>
                 <ModalCloseButton/>
                 <ModalBody>
                     <Flex direction="column" gap={3}>
@@ -207,8 +212,16 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
                             <Text color='gray.500'>No se encontraron productos.</Text>
                         ) : (
                             results.map(productoStock => {
-                                const producto = productoStock.producto;
-                                const isSelected = selected?.producto.productoId === producto.productoId;
+                                const producto = productoStock?.producto;
+
+                                // Skip rendering if producto is undefined
+                                if (!producto) {
+                                    return null;
+                                }
+
+                                // Use optional chaining for selected.producto
+                                const isSelected = selected?.producto?.productoId === producto.productoId;
+
                                 return (
                                     <Box
                                         key={producto.productoId}

@@ -10,6 +10,7 @@ export default class EndPointsURL{
     public search_semiytermi:string;
 
     public search_terminado_byname:string;
+    public search_terminados_picker:string;
     public search_semi_byname_4pd:string;
 
     public save_mprima_v2: string;
@@ -174,6 +175,7 @@ export default class EndPointsURL{
         this.save_mprima_v2 = `${domain}/${productos_res}/save_mprima_v2`;
 
         this.search_terminado_byname = `${domain}/${productos_res}/search_terminados`;
+        this.search_terminados_picker = `${domain}/${productos_res}/search_terminados_picker`;
         this.search_semi_byname_4pd = `${domain}/${productos_res}/search_semi_4pd`;
 
         this.carga_masiva_mprims = `${domain}/${productos_res}/bulk_upload_excel`;

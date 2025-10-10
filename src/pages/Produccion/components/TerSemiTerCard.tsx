@@ -45,12 +45,12 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
             <CardHeader bg="blue.50">
                 <HStack>
                     <IconButton
-                        aria-label="Buscar terminado o semiterminado"
+                        aria-label="Buscar terminado"
                         icon={<FaSearch />}
                         onClick={onSearchClick}
                     />
                     <Heading size="sm">
-                        {producto ? producto.nombre : 'Selecciona un terminado/semiterminado'}
+                        {producto ? producto.nombre : 'Selecciona un terminado'}
                     </Heading>
                 </HStack>
             </CardHeader>
@@ -130,7 +130,7 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
                 ) : (
                     <VStack align="stretch" spacing={3}>
                         <Text fontSize="sm" color="gray.600">
-                            Aún no se ha seleccionado un producto terminado o semiterminado.
+                            Aún no se ha seleccionado un producto terminado.
                         </Text>
                         <Text fontSize="sm" color="gray.500">
                             Usa el botón de búsqueda para elegir un producto y ver sus detalles e insumos requeridos.
