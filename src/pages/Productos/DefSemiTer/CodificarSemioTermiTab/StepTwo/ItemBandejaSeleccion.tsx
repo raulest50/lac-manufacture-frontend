@@ -110,8 +110,7 @@ const ItemBandejaSeleccion: React.FC<ItemBandejaSeleccionProps> = ({
                         <NumberInput
                             size="sm"
                             min={0}
-                            step={0.1}
-                            precision={2}
+                            step={0.0001}
                             value={insumo.cantidadRequerida}
                             onChange={(_vStr, vNum) =>
                                 // Nota: el tipo de productoId en props es string, que coincide con la definición en Producto.
