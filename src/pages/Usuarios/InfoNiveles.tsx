@@ -154,6 +154,57 @@ useEffect(() => {
       { level: 3, description: 'Acceso completo a todas las funcionalidades del módulo.' }
     ]
   },
+  [Modulo.VENTAS]: {
+    title: 'Módulo de Ventas',
+    description: 'Gestión integral de operaciones y reportes de ventas',
+    implementationDetails: true,
+    implementationCode: `
+// Obtener el nivel de acceso para ventas
+useEffect(() => {
+    const fetchVentasAccessLevel = async () => {
+        try {
+            const response = await axios.get<WhoAmIResponse>(endPoints.whoami);
+            const authorities = response.data.authorities;
+
+            const ventasAuthority = authorities.find(
+                auth => auth.authority === "ACCESO_VENTAS"
+            );
+
+            if (ventasAuthority) {
+                setVentasAccessLevel(parseInt(ventasAuthority.nivel, 10));
+            }
+        } catch (error) {
+            console.error("Error al obtener el nivel de acceso para ventas:", error);
+        }
+    };
+
+    fetchVentasAccessLevel();
+}, []);
+
+// Renderizado condicional de pestañas
+<TabList>
+    <Tab sx={my_style_tab}>Crear Venta</Tab>
+    <Tab sx={my_style_tab}>Historial de Ventas</Tab>
+    <Tab sx={my_style_tab}>Reportes</Tab>
+    {(user === 'master' || ventasAccessLevel >= 3) && (
+        <Tab sx={my_style_tab}>Crear vendedor nuevo</Tab>
+    )}
+</TabList>
+
+<TabPanels>
+    {/* Contenido de las pestañas existentes */}
+    {(user === 'master' || ventasAccessLevel >= 3) && (
+        <TabPanel>
+            <p>Formulario para registrar nuevos vendedores próximamente.</p>
+        </TabPanel>
+    )}
+</TabPanels>`,
+    levels: [
+      { level: 1, description: 'Permite consultar la información de ventas existentes.' },
+      { level: 2, description: 'Permite gestionar ventas estándar: crear, editar y revisar reportes.' },
+      { level: 3, description: 'Incluye los permisos de niveles 1 y 2 y puede crear un nuevo vendedor.' }
+    ]
+  },
   [Modulo.USUARIOS]: {
     title: 'Módulo de Usuarios',
     description: 'Gestión de usuarios y asignación de accesos',
