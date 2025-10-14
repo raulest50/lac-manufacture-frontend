@@ -13,11 +13,76 @@ import DateRangePicker from "../../components/DateRangePicker";
 import MyPagination from "../../components/MyPagination";
 import OrdenProduccionCard from "./OrdenProduccionCard"; // Adjust the path as needed
 import axios from "axios";
-import { OrdenProduccionDTO } from "./types"; // Adjust the path as needed
+import { OrdenProduccionDTO, OrdenSeguimientoDTO } from "./types"; // Adjust the path as needed
 import { format } from "date-fns";
 import EndPointsURL from "../../api/EndPointsURL.tsx";
 
 const endPoints = new EndPointsURL();
+
+const toNullableString = (value: unknown): string | null => {
+    if (value === null || value === undefined) {
+        return null;
+    }
+
+    const stringValue = String(value);
+    return stringValue.trim().length > 0 ? stringValue : null;
+};
+
+const toNullableNumber = (value: unknown): number | null => {
+    if (value === null || value === undefined) {
+        return null;
+    }
+
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) ? numberValue : null;
+};
+
+const normalizeOrdenSeguimiento = (seguimiento: unknown): OrdenSeguimientoDTO | null => {
+    if (!seguimiento || typeof seguimiento !== "object") {
+        return null;
+    }
+
+    const seg = seguimiento as Partial<OrdenSeguimientoDTO> & {
+        seguimientoId?: unknown;
+        insumoNombre?: unknown;
+        cantidadRequerida?: unknown;
+        estado?: unknown;
+    };
+
+    if (typeof seg.seguimientoId !== "number") {
+        return null;
+    }
+
+    return {
+        seguimientoId: seg.seguimientoId,
+        insumoNombre: toNullableString(seg.insumoNombre) ?? "",
+        cantidadRequerida: Number(seg.cantidadRequerida ?? 0),
+        estado: Number(seg.estado ?? 0),
+    };
+};
+
+const normalizeOrdenProduccion = (orden: any): OrdenProduccionDTO => {
+    const ordenesSeguimiento = Array.isArray(orden?.ordenesSeguimiento)
+        ? (orden.ordenesSeguimiento as unknown[])
+              .map(normalizeOrdenSeguimiento)
+              .filter((item): item is OrdenSeguimientoDTO => item !== null)
+        : [];
+
+    return {
+        ordenId: Number(orden?.ordenId ?? 0),
+        productoNombre: toNullableString(orden?.productoNombre) ?? "",
+        fechaInicio: toNullableString(orden?.fechaInicio),
+        fechaLanzamiento: toNullableString(orden?.fechaLanzamiento),
+        fechaFinalPlanificada: toNullableString(orden?.fechaFinalPlanificada),
+        estadoOrden: Number(orden?.estadoOrden ?? 0),
+        numeroLotes: toNullableNumber(orden?.numeroLotes),
+        numeroPedidoComercial: toNullableString(orden?.numeroPedidoComercial),
+        areaOperativa: toNullableString(orden?.areaOperativa),
+        departamentoOperativo: toNullableString(orden?.departamentoOperativo),
+        observaciones: toNullableString(orden?.observaciones),
+        ordenesSeguimiento,
+    };
+};
 
 export default function HistorialOrdenes() {
     const [date1, setDate1] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -49,7 +114,11 @@ export default function HistorialOrdenes() {
                 },
             });
 
-            setOrdenes(response.data.content);
+            const normalizedContent: OrdenProduccionDTO[] = Array.isArray(response.data.content)
+                ? response.data.content.map(normalizeOrdenProduccion)
+                : [];
+
+            setOrdenes(normalizedContent);
             setTotalPages(response.data.totalPages);
         } catch (err) {
             setError("Error fetching Ordenes de Producción");
@@ -73,7 +142,11 @@ export default function HistorialOrdenes() {
                 },
             });
 
-            setOrdenes(response.data.content);
+            const normalizedContent: OrdenProduccionDTO[] = Array.isArray(response.data.content)
+                ? response.data.content.map(normalizeOrdenProduccion)
+                : [];
+
+            setOrdenes(normalizedContent);
             setTotalPages(response.data.totalPages);
             setPage(currentPage);
         } catch (err) {

@@ -23,6 +23,20 @@ interface OrdenProduccionCardProps {
 const OrdenProduccionCard: React.FC<OrdenProduccionCardProps> = ({ ordenProduccion }) => {
     const { isOpen, onToggle } = useDisclosure();
 
+    const formatDate = (value: string | null): string => {
+        if (!value) {
+            return "No disponible";
+        }
+
+        const parsedDate = new Date(value);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            return "No disponible";
+        }
+
+        return format(parsedDate, 'dd/MM/yyyy HH:mm');
+    };
+
     // Helper to map estadoOrden to label and color
     const getEstadoOrdenInfo = (estado: number): { label: string; colorScheme: string } => {
         switch (estado) {
@@ -53,15 +67,63 @@ const OrdenProduccionCard: React.FC<OrdenProduccionCardProps> = ({ ordenProducci
         <Box borderWidth="1px" borderRadius="lg" p={4} mb={4} boxShadow="sm">
             <Flex direction="column">
                 {/* Header Information */}
-                <HStack spacing={4}>
-                    <Text fontWeight="bold">Orden ID:</Text>
-                    <Text>{ordenProduccion.ordenId}</Text>
-                    <Text fontWeight="bold">Producto:</Text>
-                    <Text>{ordenProduccion.productoNombre}</Text>
-                    <Text fontWeight="bold">Fecha Creación:</Text>
-                    <Text>{format(new Date(ordenProduccion.fechaInicio), 'dd/MM/yyyy HH:mm')}</Text>
-                    <Badge colorScheme={estadoOrdenInfo.colorScheme}>{estadoOrdenInfo.label}</Badge>
-                </HStack>
+                <Flex justify="space-between" align={{ base: 'flex-start', md: 'center' }} direction={{ base: 'column', md: 'row' }} gap={2}>
+                    <VStack align="flex-start" spacing={1}>
+                        <HStack spacing={2}>
+                            <Text fontWeight="bold">Orden ID:</Text>
+                            <Text>{ordenProduccion.ordenId}</Text>
+                        </HStack>
+                        <HStack spacing={2}>
+                            <Text fontWeight="bold">Producto:</Text>
+                            <Text>{ordenProduccion.productoNombre}</Text>
+                        </HStack>
+                        <HStack spacing={2}>
+                            <Text fontWeight="bold">Fecha creación:</Text>
+                            <Text>{formatDate(ordenProduccion.fechaInicio)}</Text>
+                        </HStack>
+                        <HStack spacing={2}>
+                            <Text fontWeight="bold">Fecha lanzamiento:</Text>
+                            <Text>{formatDate(ordenProduccion.fechaLanzamiento)}</Text>
+                        </HStack>
+                        <HStack spacing={2}>
+                            <Text fontWeight="bold">Fecha final planificada:</Text>
+                            <Text>{formatDate(ordenProduccion.fechaFinalPlanificada)}</Text>
+                        </HStack>
+                    </VStack>
+                    <Badge alignSelf={{ base: 'flex-start', md: 'center' }} colorScheme={estadoOrdenInfo.colorScheme}>{estadoOrdenInfo.label}</Badge>
+                </Flex>
+
+                <Flex mt={4} direction={{ base: 'column', md: 'row' }} gap={6}>
+                    <VStack align="flex-start" spacing={1} flex={1}>
+                        <HStack spacing={2}>
+                            <Text fontWeight="bold">Número de lotes:</Text>
+                            <Text>{ordenProduccion.numeroLotes ?? 'No especificado'}</Text>
+                        </HStack>
+                        <HStack spacing={2}>
+                            <Text fontWeight="bold">Pedido comercial:</Text>
+                            <Text>{ordenProduccion.numeroPedidoComercial ?? 'No especificado'}</Text>
+                        </HStack>
+                    </VStack>
+                    <VStack align="flex-start" spacing={1} flex={1}>
+                        <HStack spacing={2}>
+                            <Text fontWeight="bold">Área operativa:</Text>
+                            <Text>{ordenProduccion.areaOperativa ?? 'No especificada'}</Text>
+                        </HStack>
+                        <HStack spacing={2}>
+                            <Text fontWeight="bold">Departamento operativo:</Text>
+                            <Text>{ordenProduccion.departamentoOperativo ?? 'No especificado'}</Text>
+                        </HStack>
+                    </VStack>
+                </Flex>
+
+                <Box mt={4}>
+                    <Text fontWeight="bold">Observaciones:</Text>
+                    <Text>
+                        {ordenProduccion.observaciones && ordenProduccion.observaciones.trim().length > 0
+                            ? ordenProduccion.observaciones
+                            : 'Sin observaciones'}
+                    </Text>
+                </Box>
 
                 {/* Toggle Button */}
                 <Flex justify="flex-end" mt={2}>
@@ -77,7 +139,7 @@ const OrdenProduccionCard: React.FC<OrdenProduccionCardProps> = ({ ordenProducci
                 {/* Collapsible List of Ordenes Seguimiento */}
                 <Collapse in={isOpen} animateOpacity>
                     <VStack align="start" mt={4} spacing={3}>
-                        {ordenProduccion.ordenesSeguimiento.map((seguimiento: OrdenSeguimientoDTO) => {
+                        {(ordenProduccion.ordenesSeguimiento ?? []).map((seguimiento: OrdenSeguimientoDTO) => {
                             const estadoSeguimientoInfo = getEstadoSeguimientoInfo(seguimiento.estado);
                             return (
                                 <Box key={seguimiento.seguimientoId} p={3} borderWidth="1px" borderRadius="md" width="100%">
