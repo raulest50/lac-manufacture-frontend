@@ -1,6 +1,6 @@
 // src/pages/ProduccionPage/CrearOrdenes.tsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Textarea,
     Select,
@@ -100,7 +100,11 @@ export default function CrearOrdenes() {
 
     const handlePickerConfirm = (producto: ProductoWithInsumos, canProduceFlag: boolean) => {
         setSelectedProducto(producto);
-        setCanProduce(canProduceFlag);
+        // Verificar si hay suficiente stock considerando numeroLotes
+        const canProduceWithQuantity = producto.insumos.every(
+            insumo => insumo.stockActual >= (insumo.cantidadRequerida * numeroLotes)
+        );
+        setCanProduce(canProduceWithQuantity);
         setIsPickerOpen(false);
     };
 
@@ -108,12 +112,23 @@ export default function CrearOrdenes() {
         setIsPickerOpen(false);
     };
 
+    // Efecto para actualizar canProduce cuando cambia numeroLotes
+    useEffect(() => {
+        if (selectedProducto) {
+            const canProduceWithQuantity = selectedProducto.insumos.every(
+                insumo => insumo.stockActual >= (insumo.cantidadRequerida * numeroLotes)
+            );
+            setCanProduce(canProduceWithQuantity);
+        }
+    }, [numeroLotes, selectedProducto]);
+
     return (
         <VStack align="stretch">
             <TerSemiTerCard
                 productoSeleccionado={selectedProducto}
                 canProduce={canProduce}
                 onSearchClick={handleSeleccionarProducto}
+                cantidadAProducir={numeroLotes}
             />
 
             <HStack spacing={4} mt="4">

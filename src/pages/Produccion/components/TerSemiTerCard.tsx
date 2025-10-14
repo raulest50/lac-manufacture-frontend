@@ -26,9 +26,10 @@ interface TerSemiTerCardProps {
     productoSeleccionado: ProductoWithInsumos | null;
     canProduce: boolean;
     onSearchClick: () => void;
+    cantidadAProducir?: number;
 }
 
-const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: TerSemiTerCardProps) => {
+const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick, cantidadAProducir = 1 }: TerSemiTerCardProps) => {
     const producto = productoSeleccionado?.producto;
     const insumos = productoSeleccionado?.insumos ?? [];
 
@@ -38,6 +39,17 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
         // Por defecto retornamos "KG", pero esto debería ser reemplazado
         // con la lógica real para obtener la unidad de medida
         return "KG";
+    };
+
+    // Función para calcular la cantidad ajustada según la cantidad a producir
+    const calcularCantidadAjustada = (cantidadBase: number): number => {
+        return cantidadBase * cantidadAProducir;
+    };
+
+    // Verificar si hay suficiente stock para la cantidad ajustada
+    const verificarStockSuficiente = (insumo: InsumoWithStock): boolean => {
+        const cantidadAjustada = calcularCantidadAjustada(insumo.cantidadRequerida);
+        return insumo.stockActual >= cantidadAjustada;
     };
 
     return (
@@ -80,7 +92,9 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
                         </VStack>
                         <Divider />
                         <VStack align="stretch" spacing={2}>
-                            <Text fontWeight="medium">Insumos requeridos</Text>
+                            <Text fontWeight="medium">
+                                Insumos requeridos (Cantidad a producir: {cantidadAProducir})
+                            </Text>
                             {insumos.length === 0 ? (
                                 <Text fontSize="sm" color="gray.500">
                                     No se registran insumos para este producto.
@@ -93,20 +107,23 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
                                                 <Th>Código</Th>
                                                 <Th>Insumo</Th>
                                                 <Th>UMB</Th>
-                                                <Th isNumeric>Cantidad Requerida</Th>
+                                                <Th isNumeric>Cantidad Base</Th>
+                                                <Th isNumeric>Cantidad Total</Th>
                                                 <Th isNumeric>Stock Actual</Th>
                                                 <Th>Estado</Th>
                                             </Tr>
                                         </Thead>
                                         <Tbody>
                                             {insumos.map((insumo) => {
-                                                const tieneStock = insumo.stockActual >= insumo.cantidadRequerida;
+                                                const cantidadAjustada = calcularCantidadAjustada(insumo.cantidadRequerida);
+                                                const tieneStock = verificarStockSuficiente(insumo);
                                                 return (
                                                     <Tr key={insumo.insumoId}>
                                                         <Td>{insumo.productoId}</Td>
                                                         <Td fontWeight="medium">{insumo.productoNombre}</Td>
                                                         <Td>{obtenerUMB(insumo.productoId)}</Td>
                                                         <Td isNumeric>{insumo.cantidadRequerida}</Td>
+                                                        <Td isNumeric fontWeight="bold">{cantidadAjustada}</Td>
                                                         <Td isNumeric>{insumo.stockActual}</Td>
                                                         <Td>
                                                             <Tag colorScheme={tieneStock ? 'green' : 'red'}>
@@ -123,8 +140,8 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick }: Ter
                         </VStack>
                         <Text fontWeight="medium" color={canProduce ? 'green.600' : 'red.600'}>
                             {canProduce
-                                ? 'Stock suficiente para producir este producto.'
-                                : 'Stock insuficiente en al menos un insumo.'}
+                                ? `Stock suficiente para producir ${cantidadAProducir} unidad(es) de este producto.`
+                                : `Stock insuficiente para producir ${cantidadAProducir} unidad(es) de este producto.`}
                         </Text>
                     </VStack>
                 ) : (

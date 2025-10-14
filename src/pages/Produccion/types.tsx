@@ -30,9 +30,16 @@ export interface ProcesoProduccion{
     targetNode: Node;
 }
 
+export interface Categoria {
+    categoriaId: number;
+    categoriaNombre: string;
+    categoriaDescripcion: string;
+}
+
 export interface Terminado extends Producto {
     insumos: Insumo[];
     procesoProduccion: ProcesoProduccion;
+    categoria?: Categoria;
 }
 
 export interface ProductoStockDTO {

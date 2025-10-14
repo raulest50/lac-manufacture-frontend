@@ -76,10 +76,23 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
             const terminados = data.content ?? [];
 
             // Convert Terminado objects to ProductoStockDTO objects
-            const productoStockDTOs = terminados.map(terminado => ({
-                producto: terminado,
-                stock: 0 // The stock is not provided in the response, set to 0 or fetch separately if needed
-            }));
+            const productoStockDTOs = terminados.map(terminado => {
+                // Extract category information if available
+                const categoriaId = terminado.categoria?.categoriaId;
+                const categoriaNombre = terminado.categoria?.categoriaNombre;
+
+                // Create a new producto object with category information as direct properties
+                const producto = {
+                    ...terminado,
+                    categoriaId,
+                    categoriaNombre
+                };
+
+                return {
+                    producto,
+                    stock: 0 // The stock is not provided in the response, set to 0 or fetch separately if needed
+                };
+            });
 
             setResults(productoStockDTOs);
             setTotalPages(data.totalPages ?? 1);
