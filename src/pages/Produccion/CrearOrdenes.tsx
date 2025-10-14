@@ -34,14 +34,14 @@ export default function CrearOrdenes() {
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [observaciones, setObservaciones] = useState('');
     const [responsableId, setResponsableId] = useState(1);
-    const [numeroPedido, setNumeroPedido] = useState('');
-    const [area, setArea] = useState('');
-    const [departamento, setDepartamento] = useState('');
+    const [numeroPedidoComercial, setNumeroPedidoComercial] = useState('');
+    const [areaOperativa, setAreaOperativa] = useState('');
+    const [departamentoOperativo, setDepartamentoOperativo] = useState('');
 
     // Nuevos estados para las fechas y el lote
-    const [fechaInicio, setFechaInicio] = useState('');
-    const [fechaFinalizacion, setFechaFinalizacion] = useState('');
-    const [lote, setLote] = useState('');
+    const [fechaLanzamiento, setFechaLanzamiento] = useState('');
+    const [fechaFinalPlanificada, setFechaFinalPlanificada] = useState('');
+    const [loteBatchNumber, setLoteBatchNumber] = useState('');
 
     // Estado para la cantidad a producir (número de lotes)
     const [numeroLotes, setNumeroLotes] = useState(1);
@@ -51,50 +51,77 @@ export default function CrearOrdenes() {
     };
 
     const handleCrearOrden = async () => {
-        if (selectedProducto && canProduce) {
-            try {
-                const ordenProduccion = {
-                    productoId: selectedProducto.producto.productoId,
-                    responsableId: responsableId,
-                    observaciones: observaciones,
-                    fechaInicio: fechaInicio,
-                    fechaFinalizacionTeorica: fechaFinalizacion,
-                    lote: lote,
-                    numeroLotes: numeroLotes, // Agregar el número de lotes a producir
-                    numeroPedido: numeroPedido, // Agregar el número de pedido
-                    area: area, // Agregar el área
-                    departamento: departamento, // Agregar el departamento
-                };
-                await axios.post(endPoints.save_produccion, ordenProduccion);
-                // Handle success
-                toast({
-                    title: 'Orden de Producción creada',
-                    description: 'La orden se ha creado correctamente.',
-                    status: 'success',
-                    duration: 5000,
-                    isClosable: true,
-                });
-                // Reset form
-                setSelectedProducto(null);
-                setCanProduce(false);
-                setObservaciones('');
-                setFechaInicio('');
-                setFechaFinalizacion('');
-                setLote('');
-                setNumeroLotes(1); // Resetear el número de lotes
-                setNumeroPedido(''); // Resetear el número de pedido
-                setArea(''); // Resetear el área
-                setDepartamento(''); // Resetear el departamento
-            } catch (error) {
-                console.error('Error creating orden de producción:', error);
-                toast({
-                    title: 'Error',
-                    description: 'No se pudo crear la orden de producción.',
-                    status: 'error',
-                    duration: 5000,
-                    isClosable: true,
-                });
-            }
+        if (!selectedProducto || numeroLotes < 1) {
+            toast({
+                title: 'Datos incompletos',
+                description: 'Selecciona un producto y especifica al menos un lote para crear la orden.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        if (!canProduce) {
+            toast({
+                title: 'Stock insuficiente',
+                description: 'La orden se creará aunque el stock actual no cubra los insumos requeridos.',
+                status: 'info',
+                duration: 5000,
+                isClosable: true,
+            });
+        }
+
+        const toNullableString = (value: string) => {
+            const trimmedValue = value.trim();
+            return trimmedValue === '' ? null : trimmedValue;
+        };
+
+        const toNullableDate = (value: string) => {
+            const trimmedValue = value.trim();
+            return trimmedValue === '' ? null : `${trimmedValue}T00:00:00`;
+        };
+
+        const payload = {
+            productoId: selectedProducto.producto.productoId,
+            numeroLotes,
+            observaciones: toNullableString(observaciones),
+            fechaLanzamiento: toNullableDate(fechaLanzamiento),
+            fechaFinalPlanificada: toNullableDate(fechaFinalPlanificada),
+            numeroPedidoComercial: toNullableString(numeroPedidoComercial),
+            areaOperativa: toNullableString(areaOperativa),
+            departamentoOperativo: toNullableString(departamentoOperativo),
+            loteBatchNumber: toNullableString(loteBatchNumber),
+        };
+
+        try {
+            await axios.post(endPoints.save_produccion, payload);
+            toast({
+                title: 'Orden de Producción creada',
+                description: 'La orden se ha creado correctamente.',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+            setSelectedProducto(null);
+            setCanProduce(false);
+            setObservaciones('');
+            setFechaLanzamiento('');
+            setFechaFinalPlanificada('');
+            setLoteBatchNumber('');
+            setNumeroLotes(1);
+            setNumeroPedidoComercial('');
+            setAreaOperativa('');
+            setDepartamentoOperativo('');
+        } catch (error) {
+            console.error('Error creating orden de producción:', error);
+            toast({
+                title: 'Error',
+                description: 'No se pudo crear la orden de producción.',
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
         }
     };
 
@@ -144,11 +171,11 @@ export default function CrearOrdenes() {
                 </FormControl>
 
                 <FormControl>
-                    <FormLabel>Numero de pedido</FormLabel>
+                    <FormLabel>Número de pedido comercial</FormLabel>
                     <Input
-                        placeholder="Ingrese el número de pedido"
-                        value={numeroPedido}
-                        onChange={(e) => setNumeroPedido(e.target.value)}
+                        placeholder="Ingrese el número de pedido comercial"
+                        value={numeroPedidoComercial}
+                        onChange={(e) => setNumeroPedidoComercial(e.target.value)}
                     />
                 </FormControl>
             </HStack>
@@ -156,20 +183,20 @@ export default function CrearOrdenes() {
             {/* Nuevos campos para fechas */}
             <HStack spacing={4} mt="4">
                 <FormControl>
-                    <FormLabel>Fecha de inicio</FormLabel>
+                    <FormLabel>Fecha de lanzamiento</FormLabel>
                     <Input
                         type="date"
-                        value={fechaInicio}
-                        onChange={(e) => setFechaInicio(e.target.value)}
+                        value={fechaLanzamiento}
+                        onChange={(e) => setFechaLanzamiento(e.target.value)}
                     />
                 </FormControl>
 
                 <FormControl>
-                    <FormLabel>Fecha teórica de finalización</FormLabel>
+                    <FormLabel>Fecha final planificada</FormLabel>
                     <Input
                         type="date"
-                        value={fechaFinalizacion}
-                        onChange={(e) => setFechaFinalizacion(e.target.value)}
+                        value={fechaFinalPlanificada}
+                        onChange={(e) => setFechaFinalPlanificada(e.target.value)}
                     />
                 </FormControl>
             </HStack>
@@ -180,8 +207,8 @@ export default function CrearOrdenes() {
                     <FormLabel>Lote</FormLabel>
                     <Input
                         placeholder="Ingrese el número de lote"
-                        value={lote}
-                        onChange={(e) => setLote(e.target.value)}
+                        value={loteBatchNumber}
+                        onChange={(e) => setLoteBatchNumber(e.target.value)}
                     />
                 </FormControl>
 
@@ -207,8 +234,8 @@ export default function CrearOrdenes() {
                     <FormLabel>Área</FormLabel>
                     <Input
                         placeholder="Ingrese el área"
-                        value={area}
-                        onChange={(e) => setArea(e.target.value)}
+                        value={areaOperativa}
+                        onChange={(e) => setAreaOperativa(e.target.value)}
                     />
                 </FormControl>
 
@@ -216,8 +243,8 @@ export default function CrearOrdenes() {
                     <FormLabel>Departamento</FormLabel>
                     <Input
                         placeholder="Ingrese el departamento"
-                        value={departamento}
-                        onChange={(e) => setDepartamento(e.target.value)}
+                        value={departamentoOperativo}
+                        onChange={(e) => setDepartamentoOperativo(e.target.value)}
                     />
                 </FormControl>
             </HStack>
@@ -230,7 +257,7 @@ export default function CrearOrdenes() {
             />
             <Button
                 onClick={handleCrearOrden}
-                isDisabled={!selectedProducto || !canProduce || !fechaInicio || !fechaFinalizacion || !lote || numeroLotes < 1}
+                isDisabled={!selectedProducto || numeroLotes < 1}
                 mt="4"
                 colorScheme="blue"
             >
