@@ -70,9 +70,14 @@ export interface OrdenSeguimientoDTO {
 export interface OrdenProduccionDTO {
     ordenId: number;
     productoNombre: string;
-    fechaInicio: string; // ISO date string
+    fechaInicio: string | null; // ISO date string or null when unavailable
+    fechaLanzamiento: string | null;
+    fechaFinalPlanificada: string | null;
     estadoOrden: number; // 0: en produccion, 1: terminada
-    responsableId: number;
-    observaciones: string;
+    numeroLotes: number | null;
+    numeroPedidoComercial: string | null;
+    areaOperativa: string | null;
+    departamentoOperativo: string | null;
+    observaciones: string | null;
     ordenesSeguimiento: OrdenSeguimientoDTO[];
 }
