@@ -53,6 +53,7 @@ export interface InsumoWithStock {
     productoNombre: string;
     cantidadRequerida: number;
     stockActual: number;
+    tipo_producto: string;
 }
 
 export interface ProductoWithInsumos {
