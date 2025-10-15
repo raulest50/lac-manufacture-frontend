@@ -68,6 +68,9 @@ export default class EndPointsURL{
     public update_orden_compra: string;
 
 
+    // ventas resource
+    public sales: { vendedores: string; };
+
     // movimientos resource
     public search_products_with_stock:string;
     public get_movimientos_by_producto:string;
@@ -157,6 +160,7 @@ export default class EndPointsURL{
         const compras_res = 'compras';
         const produccion_res = 'produccion';
         const movimientos_res = 'movimientos';
+        const ventas_res = 'ventas';
         const contabilidad_res = 'api/contabilidad';
         const auth_res = 'api/auth';
         const personal_res = 'integrantes-personal';
@@ -223,6 +227,11 @@ export default class EndPointsURL{
         this.save_proceso_produccion = `${domain}/${procesos_produccion_res}`;
         this.get_procesos_produccion_pag = `${domain}/${procesos_produccion_res}/paginados`;
         this.update_proceso_produccion = `${domain}/${procesos_produccion_res}/{id}`;
+
+        // ventas endpoints
+        this.sales = {
+            vendedores: `${domain}/${ventas_res}/vendedores`,
+        };
 
         // movimientos endpoints
         this.search_products_with_stock = `${domain}/${movimientos_res}/search_products_with_stock`;
