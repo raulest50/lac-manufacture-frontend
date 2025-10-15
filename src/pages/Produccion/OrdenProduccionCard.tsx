@@ -15,7 +15,6 @@ import {
     MenuButton,
     MenuList,
     MenuItem,
-    MenuIcon,
     useToast,
 } from "@chakra-ui/react";
 import { FaChevronDown, FaChevronUp, FaFilePdf } from "react-icons/fa";
@@ -129,8 +128,10 @@ const OrdenProduccionCard: React.FC<OrdenProduccionCardProps> = ({ ordenProducci
                                 size="sm"
                             />
                             <MenuList>
-                                <MenuItem onClick={() => { void handleDownloadPdf(); }}>
-                                    <MenuIcon as={FaFilePdf} />
+                                <MenuItem
+                                    icon={<FaFilePdf />}
+                                    onClick={() => { void handleDownloadPdf(); }}
+                                >
                                     Generar PDF
                                 </MenuItem>
                             </MenuList>
