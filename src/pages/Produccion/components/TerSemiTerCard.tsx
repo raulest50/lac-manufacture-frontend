@@ -35,13 +35,18 @@ interface TerSemiTerCardProps {
     cantidadAProducir?: number;
 }
 
+type InsumoWithStockResponse = Omit<InsumoWithStock, 'tipo_producto'> & {
+    tipo_producto?: string;
+    tipoProducto?: string;
+};
+
 const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick, cantidadAProducir = 1 }: TerSemiTerCardProps) => {
     const producto = productoSeleccionado?.producto;
     const insumos = productoSeleccionado?.insumos ?? [];
     const endPoints = new EndPointsURL();
 
     // Estado para almacenar los materiales de los semiterminados
-    const [semiterminadosMateriales, setSemiterminadosMateriales] = useState<Record<number, any[]>>({});
+    const [semiterminadosMateriales, setSemiterminadosMateriales] = useState<Record<number, InsumoWithStock[]>>({});
     const [loadingSemiterminados, setLoadingSemiterminados] = useState<Record<number, boolean>>({});
 
     // Estado para controlar qué semiterminados están expandidos
@@ -73,14 +78,15 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick, canti
 
         try {
             const url = endPoints.insumos_with_stock.replace('{id}', encodeURIComponent(String(productoId)));
-            const response = await axios.get(url);
-            let materiales = [];
-
-            if (Array.isArray(response.data)) {
-                materiales = response.data;
-            } else if (response.data.content) {
-                materiales = response.data.content;
-            }
+            const response = await axios.get<
+                InsumoWithStockResponse[] | { content?: InsumoWithStockResponse[] }
+            >(url);
+            const data = response.data;
+            const materialesSinNormalizar = Array.isArray(data) ? data : data.content ?? [];
+            const materiales = materialesSinNormalizar.map(material => ({
+                ...material,
+                tipo_producto: material.tipo_producto ?? material.tipoProducto ?? '',
+            }));
 
             // Guardar los materiales en el estado
             setSemiterminadosMateriales(prev => ({ ...prev, [insumoId]: materiales }));
@@ -96,14 +102,12 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick, canti
 
     // Función para determinar si un insumo es un semiterminado
     const esSemiterminado = (insumo: InsumoWithStock): boolean => {
-        // Verificar si el nombre del producto contiene "SEMI"
-        // Esta lógica puede ajustarse según cómo se identifiquen los semiterminados en tu aplicación
-        return insumo.productoNombre.includes("SEMI");
+        if (insumo.tipo_producto === 'S') {
+            return true;
+        }
 
-        // Nota: La interfaz InsumoWithStock no tiene la propiedad tipo_producto
-        // Si en el futuro se añade esta propiedad, se podría usar también para identificar semiterminados:
-        // return insumo.productoNombre.includes("SEMI") || 
-        //       (insumo.tipo_producto && insumo.tipo_producto === "S");
+        // Respaldo para datos antiguos que aún no tengan la clasificación explícita
+        return insumo.productoNombre.toUpperCase().includes('SEMI');
     };
 
     // Función para manejar el clic en el botón de expandir/colapsar

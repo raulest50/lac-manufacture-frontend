@@ -35,6 +35,11 @@ interface SearchResponse<T> {
 
 const endpoints = new EndPointsURL();
 
+type InsumoWithStockResponse = Omit<InsumoWithStock, 'tipo_producto'> & {
+    tipo_producto?: string;
+    tipoProducto?: string;
+};
+
 export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm}: TerminadoSemiterminadoPickerProps) {
     const toast = useToast();
     const [searchText, setSearchText] = useState('');
@@ -138,14 +143,15 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
         setIsConfirming(true);
         try {
             const url = endpoints.insumos_with_stock.replace('{id}', encodeURIComponent(String(selected.producto.productoId)));
-            const response = await axios.get<InsumoWithStock[] | SearchResponse<InsumoWithStock>>(url);
+            const response = await axios.get<
+                InsumoWithStockResponse[] | SearchResponse<InsumoWithStockResponse>
+            >(url);
             const data = response.data;
-            let insumos: InsumoWithStock[];
-            if (Array.isArray(data)) {
-                insumos = data;
-            } else {
-                insumos = data.content ?? [];
-            }
+            const rawInsumos = Array.isArray(data) ? data : data.content ?? [];
+            const insumos: InsumoWithStock[] = rawInsumos.map(raw => ({
+                ...raw,
+                tipo_producto: raw.tipo_producto ?? raw.tipoProducto ?? '',
+            }));
             const productoWithInsumos: ProductoWithInsumos = {
                 producto: selected.producto,
                 insumos
