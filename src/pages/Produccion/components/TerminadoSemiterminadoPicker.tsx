@@ -35,9 +35,10 @@ interface SearchResponse<T> {
 
 const endpoints = new EndPointsURL();
 
-type InsumoWithStockResponse = Omit<InsumoWithStock, 'tipo_producto'> & {
+type InsumoWithStockResponse = Omit<InsumoWithStock, 'tipo_producto' | 'subInsumos'> & {
     tipo_producto?: string;
     tipoProducto?: string;
+    subInsumos?: InsumoWithStockResponse[];
 };
 
 export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm}: TerminadoSemiterminadoPickerProps) {
@@ -148,10 +149,16 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
             >(url);
             const data = response.data;
             const rawInsumos = Array.isArray(data) ? data : data.content ?? [];
-            const insumos: InsumoWithStock[] = rawInsumos.map(raw => ({
-                ...raw,
-                tipo_producto: raw.tipo_producto ?? raw.tipoProducto ?? '',
-            }));
+
+            // Función recursiva para normalizar los insumos y sus subinsumos
+            const normalizeInsumo = (insumo: InsumoWithStockResponse): InsumoWithStock => ({
+                ...insumo,
+                tipo_producto: insumo.tipo_producto ?? insumo.tipoProducto ?? '',
+                subInsumos: (insumo.subInsumos ?? []).map(normalizeInsumo)
+            });
+
+            const insumos: InsumoWithStock[] = rawInsumos.map(normalizeInsumo);
+
             const productoWithInsumos: ProductoWithInsumos = {
                 producto: selected.producto,
                 insumos
