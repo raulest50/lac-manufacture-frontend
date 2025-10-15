@@ -38,6 +38,7 @@ const endpoints = new EndPointsURL();
 type InsumoWithStockResponse = Omit<InsumoWithStock, 'tipo_producto' | 'subInsumos'> & {
     tipo_producto?: string;
     tipoProducto?: string;
+    tipoUnidades?: string;
     subInsumos?: InsumoWithStockResponse[];
 };
 
@@ -154,6 +155,7 @@ export default function TerminadoSemiterminadoPicker({isOpen, onClose, onConfirm
             const normalizeInsumo = (insumo: InsumoWithStockResponse): InsumoWithStock => ({
                 ...insumo,
                 tipo_producto: insumo.tipo_producto ?? insumo.tipoProducto ?? '',
+                tipoUnidades: insumo.tipoUnidades ?? 'KG', // Usar 'KG' como valor predeterminado si no está definido
                 subInsumos: (insumo.subInsumos ?? []).map(normalizeInsumo)
             });
 
