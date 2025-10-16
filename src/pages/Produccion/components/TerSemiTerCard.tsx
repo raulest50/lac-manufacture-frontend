@@ -50,6 +50,9 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick, canti
     // Estado para controlar qué semiterminados están expandidos
     const [expandedSemiterminados, setExpandedSemiterminados] = useState<Record<number, boolean>>({});
 
+    // Función para formatear cantidades numéricas
+    const formatCantidad = (valor: number) => valor.toFixed(3);
+
     // Función para obtener la unidad de medida (UMB)
     const obtenerUMB = (insumo: InsumoWithStock): string => {
         // Usar el campo tipoUnidades del insumo en lugar de hardcodear "KG"
@@ -194,9 +197,9 @@ const TerSemiTerCard = ({ productoSeleccionado, canProduce, onSearchClick, canti
                     )}
                 </Td>
                 <Td>{obtenerUMB(insumo)}</Td>
-                <Td isNumeric>{insumo.cantidadRequerida}</Td>
-                <Td isNumeric fontWeight="bold">{cantidadAjustada}</Td>
-                <Td isNumeric>{insumo.stockActual}</Td>
+                <Td isNumeric>{formatCantidad(insumo.cantidadRequerida)}</Td>
+                <Td isNumeric fontWeight="bold">{formatCantidad(cantidadAjustada)}</Td>
+                <Td isNumeric>{formatCantidad(insumo.stockActual)}</Td>
                 <Td>
                     <Tag colorScheme={tieneStock ? 'green' : 'red'}>
                         {tieneStock ? 'Suficiente' : 'Insuficiente'}
