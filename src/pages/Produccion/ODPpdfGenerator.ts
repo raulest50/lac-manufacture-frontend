@@ -96,7 +96,7 @@ class ODPpdfGenerator {
         doc.setFontSize(9);
         const productoInfo = [
             `Producto: ${orden.productoNombre}`,
-            `Número de lotes: ${this.formatNullableNumber(orden.numeroLotes)}`,
+            `Cantidad a producir: ${this.formatNullableNumber(orden.cantidadAProducir)}`,
             `Pedido comercial: ${orden.numeroPedidoComercial ?? "No especificado"}`,
             `Área operativa: ${orden.areaOperativa ?? "No especificada"}`,
             `Departamento operativo: ${orden.departamentoOperativo ?? "No especificado"}`,

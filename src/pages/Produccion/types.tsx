@@ -77,7 +77,7 @@ export interface OrdenProduccionDTO {
     fechaLanzamiento: string | null;
     fechaFinalPlanificada: string | null;
     estadoOrden: number; // 0: en produccion, 1: terminada
-    numeroLotes: number | null;
+    cantidadAProducir: number | null;
     numeroPedidoComercial: string | null;
     areaOperativa: string | null;
     departamentoOperativo: string | null;

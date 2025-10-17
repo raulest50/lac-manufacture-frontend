@@ -142,8 +142,8 @@ const OrdenProduccionCard: React.FC<OrdenProduccionCardProps> = ({ ordenProducci
                 <Flex mt={4} direction={{ base: 'column', md: 'row' }} gap={6}>
                     <VStack align="flex-start" spacing={1} flex={1}>
                         <HStack spacing={2}>
-                            <Text fontWeight="bold">Número de lotes:</Text>
-                            <Text>{ordenProduccion.numeroLotes ?? 'No especificado'}</Text>
+                            <Text fontWeight="bold">Cantidad a producir:</Text>
+                            <Text>{ordenProduccion.cantidadAProducir ?? 'No especificado'}</Text>
                         </HStack>
                         <HStack spacing={2}>
                             <Text fontWeight="bold">Pedido comercial:</Text>
