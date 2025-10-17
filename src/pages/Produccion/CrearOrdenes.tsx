@@ -43,18 +43,18 @@ export default function CrearOrdenes() {
     const [fechaFinalPlanificada, setFechaFinalPlanificada] = useState('');
     const [loteBatchNumber, setLoteBatchNumber] = useState('');
 
-    // Estado para la cantidad a producir (número de lotes)
-    const [numeroLotes, setNumeroLotes] = useState(1);
+    // Estado para la cantidad a producir
+    const [cantidadAProducir, setCantidadAProducir] = useState(1);
 
     const handleSeleccionarProducto = () => {
         setIsPickerOpen(true);
     };
 
     const handleCrearOrden = async () => {
-        if (!selectedProducto || numeroLotes < 1) {
+        if (!selectedProducto || cantidadAProducir < 1) {
             toast({
                 title: 'Datos incompletos',
-                description: 'Selecciona un producto y especifica al menos un lote para crear la orden.',
+                description: 'Selecciona un producto y especifica al menos una cantidad a producir para crear la orden.',
                 status: 'warning',
                 duration: 5000,
                 isClosable: true,
@@ -84,7 +84,7 @@ export default function CrearOrdenes() {
 
         const payload = {
             productoId: selectedProducto.producto.productoId,
-            numeroLotes,
+            cantidadAProducir,
             observaciones: toNullableString(observaciones),
             fechaLanzamiento: toNullableDate(fechaLanzamiento),
             fechaFinalPlanificada: toNullableDate(fechaFinalPlanificada),
@@ -109,7 +109,7 @@ export default function CrearOrdenes() {
             setFechaLanzamiento('');
             setFechaFinalPlanificada('');
             setLoteBatchNumber('');
-            setNumeroLotes(1);
+            setCantidadAProducir(1);
             setNumeroPedidoComercial('');
             setAreaOperativa('');
             setDepartamentoOperativo('');
@@ -127,9 +127,9 @@ export default function CrearOrdenes() {
 
     const handlePickerConfirm = (producto: ProductoWithInsumos, canProduceFlag: boolean) => {
         setSelectedProducto(producto);
-        // Verificar si hay suficiente stock considerando numeroLotes
+        // Verificar si hay suficiente stock considerando la cantidad a producir
         const canProduceWithQuantity = producto.insumos.every(
-            insumo => insumo.stockActual >= (insumo.cantidadRequerida * numeroLotes)
+            insumo => insumo.stockActual >= (insumo.cantidadRequerida * cantidadAProducir)
         );
         setCanProduce(canProduceWithQuantity);
         setIsPickerOpen(false);
@@ -139,15 +139,15 @@ export default function CrearOrdenes() {
         setIsPickerOpen(false);
     };
 
-    // Efecto para actualizar canProduce cuando cambia numeroLotes
+    // Efecto para actualizar canProduce cuando cambia la cantidad a producir
     useEffect(() => {
         if (selectedProducto) {
             const canProduceWithQuantity = selectedProducto.insumos.every(
-                insumo => insumo.stockActual >= (insumo.cantidadRequerida * numeroLotes)
+                insumo => insumo.stockActual >= (insumo.cantidadRequerida * cantidadAProducir)
             );
             setCanProduce(canProduceWithQuantity);
         }
-    }, [numeroLotes, selectedProducto]);
+    }, [cantidadAProducir, selectedProducto]);
 
     return (
         <VStack align="stretch">
@@ -155,7 +155,7 @@ export default function CrearOrdenes() {
                 productoSeleccionado={selectedProducto}
                 canProduce={canProduce}
                 onSearchClick={handleSeleccionarProducto}
-                cantidadAProducir={numeroLotes}
+                cantidadAProducir={cantidadAProducir}
             />
 
             <HStack spacing={4} mt="4">
@@ -214,10 +214,10 @@ export default function CrearOrdenes() {
 
                 <FormControl>
                     <FormLabel>Cantidad a producir</FormLabel>
-                    <NumberInput 
-                        min={1} 
-                        value={numeroLotes} 
-                        onChange={(valueString) => setNumeroLotes(Number(valueString))}
+                    <NumberInput
+                        min={1}
+                        value={cantidadAProducir}
+                        onChange={(valueString) => setCantidadAProducir(Number(valueString))}
                     >
                         <NumberInputField />
                         <NumberInputStepper>
@@ -257,7 +257,7 @@ export default function CrearOrdenes() {
             />
             <Button
                 onClick={handleCrearOrden}
-                isDisabled={!selectedProducto || numeroLotes < 1}
+                isDisabled={!selectedProducto || cantidadAProducir < 1}
                 mt="4"
                 colorScheme="blue"
             >
