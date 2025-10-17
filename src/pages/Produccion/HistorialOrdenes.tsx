@@ -25,12 +25,27 @@ const toNullableString = (value: unknown): string | null => {
     }
 
     const stringValue = String(value);
-    return stringValue.trim().length > 0 ? stringValue : null;
+    const trimmed = stringValue.trim();
+    return trimmed.length > 0 ? trimmed : null;
 };
 
 const toNullableNumber = (value: unknown): number | null => {
     if (value === null || value === undefined) {
         return null;
+    }
+
+    if (typeof value === "number") {
+        return Number.isFinite(value) ? value : null;
+    }
+
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (trimmed.length === 0) {
+            return null;
+        }
+
+        const parsed = Number(trimmed);
+        return Number.isFinite(parsed) ? parsed : null;
     }
 
     const numberValue = Number(value);
@@ -68,13 +83,25 @@ const normalizeOrdenProduccion = (orden: any): OrdenProduccionDTO => {
               .filter((item): item is OrdenSeguimientoDTO => item !== null)
         : [];
 
+    const productoIdRaw = orden?.productoId ?? orden?.producto?.productoId ?? orden?.producto?.codigo ?? orden?.producto?.codigoProducto;
+    const productoNombreRaw = orden?.productoNombre ?? orden?.producto?.nombre;
+    const productoTipoRaw = orden?.productoTipo ?? orden?.producto_tipo ?? orden?.producto?.tipo_producto ?? orden?.producto?.tipoProducto;
+    const productoUnidadRaw = orden?.productoUnidad ?? orden?.producto?.tipoUnidades ?? orden?.producto?.unidad ?? orden?.tipoUnidades;
+    const categoriaIdRaw = orden?.productoCategoriaId ?? orden?.categoriaId ?? orden?.producto?.categoriaId;
+    const categoriaNombreRaw = orden?.productoCategoriaNombre ?? orden?.categoriaNombre ?? orden?.producto?.categoriaNombre;
+
     return {
-        ordenId: Number(orden?.ordenId ?? 0),
-        productoNombre: toNullableString(orden?.productoNombre) ?? "",
+        ordenId: toNullableNumber(orden?.ordenId) ?? 0,
+        productoId: toNullableString(productoIdRaw),
+        productoNombre: toNullableString(productoNombreRaw) ?? "",
+        productoTipo: toNullableString(productoTipoRaw),
+        productoCategoriaId: toNullableNumber(categoriaIdRaw),
+        productoCategoriaNombre: toNullableString(categoriaNombreRaw),
+        productoUnidad: toNullableString(productoUnidadRaw),
         fechaInicio: toNullableString(orden?.fechaInicio),
         fechaLanzamiento: toNullableString(orden?.fechaLanzamiento),
         fechaFinalPlanificada: toNullableString(orden?.fechaFinalPlanificada),
-        estadoOrden: Number(orden?.estadoOrden ?? 0),
+        estadoOrden: toNullableNumber(orden?.estadoOrden) ?? 0,
         cantidadAProducir: toNullableNumber(orden?.cantidadAProducir ?? orden?.numeroLotes),
         numeroPedidoComercial: toNullableString(orden?.numeroPedidoComercial),
         areaOperativa: toNullableString(orden?.areaOperativa),
