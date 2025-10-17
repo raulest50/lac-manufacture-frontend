@@ -49,7 +49,7 @@ export interface ProductoStockDTO {
 
 export interface InsumoWithStock {
     insumoId: number;
-    productoId: number;
+    productoId: number | string;
     productoNombre: string;
     cantidadRequerida: number;
     stockActual: number;
@@ -72,7 +72,12 @@ export interface OrdenSeguimientoDTO {
 
 export interface OrdenProduccionDTO {
     ordenId: number;
+    productoId: string | null;
     productoNombre: string;
+    productoTipo: string | null;
+    productoCategoriaId?: number | null;
+    productoCategoriaNombre?: string | null;
+    productoUnidad?: string | null;
     fechaInicio: string | null; // ISO date string or null when unavailable
     fechaLanzamiento: string | null;
     fechaFinalPlanificada: string | null;
