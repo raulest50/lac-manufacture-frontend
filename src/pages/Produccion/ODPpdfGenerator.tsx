@@ -387,55 +387,66 @@ class ODPpdfGenerator {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
 
+        const flattened = !insumosError && insumosTree.length ? this.flattenInsumos(insumosTree) : [];
+        const multiplicador = orden.cantidadProducir ?? 0;
+        const tableBody = flattened.map(({ item, level }) => {
+            const codigo = this.toNullableString(item.productoId) ?? String(item.productoId ?? "");
+            const indent = `${"  ".repeat(level)}${level > 0 ? "↳ " : ""}`;
+            const unidad = this.toNullableString(item.tipoUnidades) ?? this.defaultUnidad;
+            const cantidadBase = item.cantidadRequerida ?? 0;
+            const cantidadADispensar = cantidadBase * multiplicador;
+            const nombreMaterial = level > 0 ? `${indent}${item.productoNombre}` : item.productoNombre;
+
+            return [
+                codigo,
+                nombreMaterial,
+                unidad,
+                "",
+                this.formatNumber(cantidadADispensar),
+                "",
+                "",
+            ];
+        });
+
         if (insumosError) {
             doc.text(`Información no disponible (${insumosError})`, margin, currentY);
             currentY += 6;
         } else if (!insumosTree.length) {
             doc.text("No se registran insumos para este producto.", margin, currentY);
             currentY += 6;
-        } else {
-            const flattened = this.flattenInsumos(insumosTree);
-            const multiplicador = orden.cantidadProducir;
-            const tableBody = flattened.map(({ item, level }) => {
-                const codigo = this.toNullableString(item.productoId) ?? String(item.productoId ?? "");
-                const indent = `${"  ".repeat(level)}${level > 0 ? "↳ " : ""}`;
-                const unidad = this.toNullableString(item.tipoUnidades) ?? this.defaultUnidad;
-                const cantidadBase = item.cantidadRequerida ?? 0;
-                const cantidadAjustadaValor =
-                    multiplicador !== null && multiplicador !== undefined
-                        ? cantidadBase * multiplicador
-                        : null;
-
-                return [
-                    codigo,
-                    `${indent}${item.productoNombre}`.trim(),
-                    unidad,
-                    this.formatNumber(cantidadBase),
-                    cantidadAjustadaValor !== null ? this.formatNumber(cantidadAjustadaValor) : "—",
-                ];
-            });
-
-            autoTable(doc, {
-                head: [["Código", "Nombre", "Unidad", "Cantidad base", "Cantidad ajustada"]],
-                body: tableBody,
-                startY: currentY,
-                styles: {
-                    fontSize: 8,
-                    halign: "center",
-                    valign: "middle",
-                },
-                headStyles: {
-                    fillColor: [217, 234, 249],
-                    textColor: 40,
-                },
-                columnStyles: {
-                    1: { halign: "left" },
-                },
-                theme: "grid",
-            });
-
-            currentY = (doc.lastAutoTable?.finalY ?? currentY) + 6;
         }
+
+        autoTable(doc, {
+            head: [[
+                "Código",
+                "Nombre material",
+                "Unidad de medida",
+                "Lote",
+                "Cantidad a dispensar",
+                "Responsable dispensación",
+                "Área dispensación",
+            ]],
+            body: tableBody,
+            startY: currentY,
+            styles: {
+                fontSize: 8,
+                halign: "center",
+                valign: "middle",
+            },
+            headStyles: {
+                fillColor: [217, 234, 249],
+                textColor: 40,
+            },
+            columnStyles: {
+                0: { cellWidth: 22 },
+                1: { halign: "left", cellWidth: 60 },
+                2: { cellWidth: 26 },
+                4: { halign: "right", cellWidth: 32 },
+            },
+            theme: "grid",
+        });
+
+        currentY = (doc.lastAutoTable?.finalY ?? currentY) + 6;
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
