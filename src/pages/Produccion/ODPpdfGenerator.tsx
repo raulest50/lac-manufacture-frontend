@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import axios from "axios";
 import EndPointsURL from "../../api/EndPointsURL";
-import { InsumoWithStock, OrdenProduccionDTO, OrdenSeguimientoDTO } from "./types";
+import { InsumoWithStock, OrdenProduccionDTO } from "./types";
 
 interface AutoTableProperties {
     finalY: number;
@@ -19,11 +19,6 @@ type EstadoInfo = {
 const estadoOrdenMap: Record<number, EstadoInfo> = {
     0: { label: "En Producción" },
     1: { label: "Terminada" },
-};
-
-const estadoSeguimientoMap: Record<number, EstadoInfo> = {
-    0: { label: "Pendiente" },
-    1: { label: "Finalizada" },
 };
 
 type SearchResponse<T> = {
@@ -503,46 +498,6 @@ class ODPpdfGenerator {
         const obsLines = doc.splitTextToSize(obsText, pageWidth - margin * 2);
         doc.text(obsLines, margin, currentY);
         currentY += obsLines.length * 4 + 4;
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
-        doc.text("Seguimiento", margin, currentY);
-        currentY += 4;
-
-        if (orden.ordenesSeguimiento && orden.ordenesSeguimiento.length > 0) {
-            const tableBody = orden.ordenesSeguimiento.map((seguimiento: OrdenSeguimientoDTO, index: number) => [
-                `${index + 1}`,
-                seguimiento.insumoNombre,
-                seguimiento.cantidadRequerida.toString(),
-                estadoSeguimientoMap[seguimiento.estado]?.label ?? "Desconocido",
-            ]);
-
-            autoTable(doc, {
-                head: [["Seguimiento", "Insumo", "Cantidad requerida", "Estado"]],
-                body: tableBody,
-                startY: currentY,
-                styles: {
-                    fontSize: 8,
-                    halign: "center",
-                    valign: "middle",
-                },
-                headStyles: {
-                    fillColor: [255, 192, 203],
-                    textColor: 40,
-                },
-                columnStyles: {
-                    1: { halign: "left" },
-                },
-                theme: "grid",
-            });
-
-            currentY = (doc.lastAutoTable?.finalY ?? currentY) + 6;
-        } else {
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.text("No se registran seguimientos para esta orden.", margin, currentY + 4);
-            currentY += 10;
-        }
 
         return doc;
     }
