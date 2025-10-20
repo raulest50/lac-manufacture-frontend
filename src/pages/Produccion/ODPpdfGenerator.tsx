@@ -196,19 +196,31 @@ class ODPpdfGenerator {
     }
 
     private async fetchInsumosWithStock(productoId: string | null): Promise<{ data: InsumoWithStock[]; error?: string }> {
+        // Log del productoId recibido
+        console.log("fetchInsumosWithStock - productoId recibido:", productoId, "Tipo:", typeof productoId);
+
         if (!productoId) {
+            console.log("fetchInsumosWithStock - productoId es nulo o vacío");
             return { data: [], error: "Identificador de producto no disponible." };
         }
 
         try {
             const url = this.endPoints.insumos_with_stock.replace("{id}", encodeURIComponent(productoId));
+            console.log("URL para obtener insumos:", url);
+
             const response = await axios.get<InsumoWithStockResponse[] | SearchResponse<InsumoWithStockResponse>>(url);
+            console.log("Respuesta del servidor (insumos):", response.data);
+
             const payload = response.data;
             const rawInsumos = Array.isArray(payload) ? payload : payload?.content ?? [];
+            console.log("Insumos sin procesar:", rawInsumos);
 
             const data = rawInsumos.map((insumo) => this.normalizeInsumoResponse(insumo));
+            console.log("Insumos normalizados:", data);
+
             return { data };
         } catch (error) {
+            console.error("Error en fetchInsumosWithStock:", error);
             const message = this.getErrorMessage(error);
             return { data: [], error: message };
         }
@@ -230,6 +242,7 @@ class ODPpdfGenerator {
         try {
             const url = this.endPoints.update_producto.replace("{productoId}", encodeURIComponent(String(insumo.productoId)));
             const response = await axios.get(url);
+            console.log(response.data);
             const data = response.data as Record<string, unknown> | undefined;
             const procesos:
                 | Array<Record<string, unknown>>
@@ -287,6 +300,9 @@ class ODPpdfGenerator {
     }
 
     private async generatePDF(orden: OrdenProduccionDTO): Promise<jsPDFWithAutoTable> {
+        // Log de la orden completa para ver todos los datos
+        console.log("Orden completa:", orden);
+
         const doc = new jsPDF({ unit: "mm", format: "a4" }) as jsPDFWithAutoTable;
         const margin = 15;
         const pageWidth = doc.internal.pageSize.getWidth();
@@ -345,6 +361,8 @@ class ODPpdfGenerator {
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
+        // Antes de formatear la cantidad a producir
+        console.log("Cantidad a producir:", orden.cantidadProducir, "Tipo:", typeof orden.cantidadProducir);
         const productoInfo = [
             `Producto: ${orden.productoNombre}`,
             `Cantidad a producir: ${this.formatNullableNumber(orden.cantidadProducir)}`,
@@ -363,6 +381,8 @@ class ODPpdfGenerator {
         doc.text("Árbol de insumos", margin, currentY);
         currentY += 6;
 
+        // Antes de llamar a fetchInsumosWithStock
+        console.log("ProductoId antes de fetchInsumosWithStock:", orden.productoId, "Tipo:", typeof orden.productoId);
         const { data: insumosTree, error: insumosError } = await this.fetchInsumosWithStock(orden.productoId);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
@@ -514,6 +534,7 @@ class ODPpdfGenerator {
     }
 
     private formatNullableNumber(value: number | null): string {
+        console.log("formatNullableNumber - valor recibido:", value, "Tipo:", typeof value);
         return value !== null && value !== undefined ? value.toString() : "No especificado";
     }
 
