@@ -11,7 +11,6 @@ import {
     FormLabel,
     Input,
     HStack,
-    Box,
     NumberInput,
     NumberInputField,
     NumberInputStepper,
@@ -44,14 +43,14 @@ export default function CrearOrdenes() {
     const [loteBatchNumber, setLoteBatchNumber] = useState('');
 
     // Estado para la cantidad a producir
-    const [cantidadAProducir, setCantidadAProducir] = useState(1);
+    const [cantidadProducir, setCantidadProducir] = useState(1);
 
     const handleSeleccionarProducto = () => {
         setIsPickerOpen(true);
     };
 
     const handleCrearOrden = async () => {
-        if (!selectedProducto || cantidadAProducir < 1) {
+        if (!selectedProducto || cantidadProducir < 1) {
             toast({
                 title: 'Datos incompletos',
                 description: 'Selecciona un producto y especifica al menos una cantidad a producir para crear la orden.',
@@ -84,7 +83,7 @@ export default function CrearOrdenes() {
 
         const payload = {
             productoId: selectedProducto.producto.productoId,
-            cantidadAProducir,
+            cantidadProducir: cantidadProducir,
             observaciones: toNullableString(observaciones),
             fechaLanzamiento: toNullableDate(fechaLanzamiento),
             fechaFinalPlanificada: toNullableDate(fechaFinalPlanificada),
@@ -109,7 +108,7 @@ export default function CrearOrdenes() {
             setFechaLanzamiento('');
             setFechaFinalPlanificada('');
             setLoteBatchNumber('');
-            setCantidadAProducir(1);
+            setCantidadProducir(1);
             setNumeroPedidoComercial('');
             setAreaOperativa('');
             setDepartamentoOperativo('');
@@ -129,7 +128,7 @@ export default function CrearOrdenes() {
         setSelectedProducto(producto);
         // Verificar si hay suficiente stock considerando la cantidad a producir
         const canProduceWithQuantity = producto.insumos.every(
-            insumo => insumo.stockActual >= (insumo.cantidadRequerida * cantidadAProducir)
+            insumo => insumo.stockActual >= (insumo.cantidadRequerida * cantidadProducir)
         );
         setCanProduce(canProduceWithQuantity);
         setIsPickerOpen(false);
@@ -143,11 +142,11 @@ export default function CrearOrdenes() {
     useEffect(() => {
         if (selectedProducto) {
             const canProduceWithQuantity = selectedProducto.insumos.every(
-                insumo => insumo.stockActual >= (insumo.cantidadRequerida * cantidadAProducir)
+                insumo => insumo.stockActual >= (insumo.cantidadRequerida * cantidadProducir)
             );
             setCanProduce(canProduceWithQuantity);
         }
-    }, [cantidadAProducir, selectedProducto]);
+    }, [cantidadProducir, selectedProducto]);
 
     return (
         <VStack align="stretch">
@@ -155,7 +154,7 @@ export default function CrearOrdenes() {
                 productoSeleccionado={selectedProducto}
                 canProduce={canProduce}
                 onSearchClick={handleSeleccionarProducto}
-                cantidadAProducir={cantidadAProducir}
+                cantidadAProducir={cantidadProducir}
             />
 
             <HStack spacing={4} mt="4">
@@ -216,8 +215,8 @@ export default function CrearOrdenes() {
                     <FormLabel>Cantidad a producir</FormLabel>
                     <NumberInput
                         min={1}
-                        value={cantidadAProducir}
-                        onChange={(valueString) => setCantidadAProducir(Number(valueString))}
+                        value={cantidadProducir}
+                        onChange={(valueString) => setCantidadProducir(Number(valueString))}
                     >
                         <NumberInputField />
                         <NumberInputStepper>
@@ -257,7 +256,7 @@ export default function CrearOrdenes() {
             />
             <Button
                 onClick={handleCrearOrden}
-                isDisabled={!selectedProducto || cantidadAProducir < 1}
+                isDisabled={!selectedProducto || cantidadProducir < 1}
                 mt="4"
                 colorScheme="blue"
             >

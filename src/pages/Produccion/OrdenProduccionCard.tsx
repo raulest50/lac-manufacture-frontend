@@ -21,7 +21,7 @@ import { FaChevronDown, FaChevronUp, FaFilePdf } from "react-icons/fa";
 import { FiMoreVertical } from "react-icons/fi";
 import { OrdenProduccionDTO, OrdenSeguimientoDTO } from "./types.tsx"; // Adjust the import path as needed
 import { format } from 'date-fns';
-import ODPpdfGenerator from "./ODPpdfGenerator";
+import ODPpdfGenerator from "./ODPpdfGenerator.tsx";
 
 interface OrdenProduccionCardProps {
     ordenProduccion: OrdenProduccionDTO;
