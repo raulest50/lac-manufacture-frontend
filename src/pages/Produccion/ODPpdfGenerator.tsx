@@ -352,7 +352,7 @@ class ODPpdfGenerator {
         doc.setFontSize(9);
         const productoInfo = [
             `Producto: ${orden.productoNombre}`,
-            `Cantidad a producir: ${this.formatNullableNumber(orden.cantidadAProducir)}`,
+            `Cantidad a producir: ${this.formatNullableNumber(orden.cantidadProducir)}`,
             `Pedido comercial: ${orden.numeroPedidoComercial ?? "No especificado"}`,
             `Área operativa: ${orden.areaOperativa ?? "No especificada"}`,
             `Departamento operativo: ${orden.departamentoOperativo ?? "No especificado"}`,
@@ -380,7 +380,7 @@ class ODPpdfGenerator {
             currentY += 6;
         } else {
             const flattened = this.flattenInsumos(insumosTree);
-            const multiplicador = orden.cantidadAProducir;
+            const multiplicador = orden.cantidadProducir;
             const tableBody = flattened.map(({ item, level }) => {
                 const codigo = this.toNullableString(item.productoId) ?? String(item.productoId ?? "");
                 const indent = `${"  ".repeat(level)}${level > 0 ? "↳ " : ""}`;
