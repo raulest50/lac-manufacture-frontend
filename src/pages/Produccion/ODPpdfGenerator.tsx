@@ -45,10 +45,23 @@ type Data4PDFInsumoResponse = {
     insumos?: Data4PDFInsumoResponse[];
 };
 
+type Data4PDFProcesoResponse = Record<string, unknown> & {
+    data?: Record<string, unknown>;
+};
+
+type Data4PDFSemiterminadoResponse = {
+    productoId?: unknown;
+    nombre?: unknown;
+    procesoProduccionCompleto?: {
+        procesosProduccion?: Data4PDFProcesoResponse[];
+    };
+};
+
 type Data4PDFResponse = {
     terminado?: {
         insumos?: Data4PDFInsumoResponse[];
     };
+    semiterminados?: Data4PDFSemiterminadoResponse[];
 };
 
 type ProcesoPaso = {
@@ -121,15 +134,6 @@ export default class ODPpdfGenerator {
         });
     }
 
-    private isSemiterminado(insumo: InsumoWithStock): boolean {
-        if (this.toNullableString(insumo.tipo_producto)?.toUpperCase() === "S") {
-            return true;
-        }
-
-        const nombre = this.toNullableString(insumo.productoNombre)?.toUpperCase();
-        return nombre ? nombre.includes("SEMI") : false;
-    }
-
     private flattenInsumos(insumos: InsumoWithStock[], level = 0): Array<{ item: InsumoWithStock; level: number }> {
         return insumos.flatMap((insumo) => {
             const current = [{ item: insumo, level }];
@@ -138,24 +142,6 @@ export default class ODPpdfGenerator {
                 : [];
             return current.concat(children);
         });
-    }
-
-    private collectSemiterminados(insumos: InsumoWithStock[]): InsumoWithStock[] {
-        const map = new Map<string, InsumoWithStock>();
-
-        const visit = (insumo: InsumoWithStock) => {
-            if (this.isSemiterminado(insumo)) {
-                const key = this.toNullableString(insumo.productoId) ?? String(insumo.insumoId);
-                if (!map.has(key)) {
-                    map.set(key, insumo);
-                }
-            }
-
-            (insumo.subInsumos ?? []).forEach(visit);
-        };
-
-        insumos.forEach(visit);
-        return Array.from(map.values());
     }
 
     private buildDurationLabel(data: Record<string, unknown> | undefined): string | null {
@@ -248,7 +234,9 @@ export default class ODPpdfGenerator {
         };
     }
 
-    private async fetchData4PDF(productoId: string | null): Promise<{ data: InsumoWithStock[]; error?: string }> {
+    private async fetchData4PDF(
+        productoId: string | null,
+    ): Promise<{ data: InsumoWithStock[]; semiterminadoProcesos: SemiterminadoProcesoResult[]; error?: string }> {
         console.log("fetchData4PDF - productoId recibido:", productoId, "Tipo:", typeof productoId);
 
         if (!productoId) {
@@ -267,84 +255,63 @@ export default class ODPpdfGenerator {
             const data = this.normalizeData4PDFInsumos(rawInsumos);
             console.log("Insumos normalizados desde data4pdf:", data);
 
-            return { data };
-        } catch (error) {
-            console.error("Error en fetchData4PDF:", error);
-            const message = this.getErrorMessage(error);
-            return { data: [], error: message };
-        }
-    }
+            const rawSemiterminados = Array.isArray(response.data?.semiterminados)
+                ? response.data?.semiterminados
+                : [];
 
-    private async fetchSemiterminadoProcesos(insumo: InsumoWithStock): Promise<SemiterminadoProcesoResult> {
-        const semiterminadoId = this.toNullableString(insumo.productoId) ?? String(insumo.insumoId);
-        const semiterminadoNombre = this.toNullableString(insumo.productoNombre) ?? `Semiterminado ${semiterminadoId}`;
+            const semiterminadoProcesos = rawSemiterminados.map((semi, index) => {
+                const semiterminadoId =
+                    this.toNullableString((semi as { productoId?: unknown }).productoId) ?? `semi-${index + 1}`;
+                const semiterminadoNombre =
+                    this.toNullableString((semi as { nombre?: unknown }).nombre) ??
+                    `Semiterminado ${semiterminadoId}`;
 
-        if (!this.toNullableString(insumo.productoId)) {
-            return {
-                semiterminadoId,
-                semiterminadoNombre,
-                pasos: [],
-                error: "Identificador de producto no disponible.",
-            };
-        }
+                const procesosRaw = (semi as Data4PDFSemiterminadoResponse)?.procesoProduccionCompleto?.procesosProduccion;
+                const procesosArray = Array.isArray(procesosRaw) ? procesosRaw : [];
 
-        try {
-            const url = this.endPoints.update_producto.replace("{productoId}", encodeURIComponent(String(insumo.productoId)));
-            const response = await axios.get(url);
-            console.log(response.data);
-            const data = response.data as Record<string, unknown> | undefined;
-            const procesos:
-                | Array<Record<string, unknown>>
-                | undefined = Array.isArray((data as { procesoProduccionCompleto?: { procesosProduccion?: unknown[] } })
-                ?.procesoProduccionCompleto?.procesosProduccion)
-                ? ((data as { procesoProduccionCompleto?: { procesosProduccion?: unknown[] } })
-                      ?.procesoProduccionCompleto?.procesosProduccion as Record<string, unknown>[])
-                : Array.isArray((data as { procesoProduccion?: { procesoNodes?: unknown[] } })?.procesoProduccion?.procesoNodes)
-                ? ((data as { procesoProduccion?: { procesoNodes?: unknown[] } })?.procesoProduccion?.procesoNodes as Record<string, unknown>[])
-                : undefined;
+                const pasos: ProcesoPaso[] = procesosArray.map((proceso, pasoIndex) => {
+                    const procesoData =
+                        (proceso as { data?: Record<string, unknown> }).data ?? (proceso as Record<string, unknown>);
+                    const nombre =
+                        this.toNullableString(
+                            (procesoData as { nombre?: unknown }).nombre ??
+                                (procesoData as { nombreProceso?: unknown }).nombreProceso ??
+                                (procesoData as { label?: unknown }).label ??
+                                (proceso as { nombre?: unknown }).nombre,
+                        ) ?? `Paso ${pasoIndex + 1}`;
 
-            const pasos: ProcesoPaso[] = (procesos ?? []).map((proceso, index) => {
-                const procesoData = (proceso as { data?: Record<string, unknown> }).data ?? proceso;
-                const nombre =
-                    this.toNullableString(
-                        (procesoData as { nombre?: unknown }).nombre ??
-                            (procesoData as { nombreProceso?: unknown }).nombreProceso ??
-                            (procesoData as { label?: unknown }).label ??
-                            (proceso as { nombre?: unknown }).nombre,
-                    ) ?? `Paso ${index + 1}`;
+                    const id =
+                        this.toNullableString((proceso as { id?: unknown }).id ?? (procesoData as { id?: unknown }).id) ??
+                        `paso-${pasoIndex + 1}`;
 
-                const id =
-                    this.toNullableString((proceso as { id?: unknown }).id ?? (procesoData as { id?: unknown }).id) ??
-                    `paso-${index + 1}`;
+                    const responsable = this.toNullableString(
+                        (procesoData as { responsable?: unknown }).responsable ??
+                            (procesoData as { responsableNombre?: unknown }).responsableNombre ??
+                            (procesoData as { encargado?: unknown }).encargado,
+                    );
 
-                const responsable = this.toNullableString(
-                    (procesoData as { responsable?: unknown }).responsable ??
-                        (procesoData as { responsableNombre?: unknown }).responsableNombre ??
-                        (procesoData as { encargado?: unknown }).encargado,
-                );
+                    const duracion = this.buildDurationLabel(procesoData);
 
-                const duracion = this.buildDurationLabel(procesoData);
+                    return {
+                        id,
+                        nombre,
+                        duracion,
+                        responsable,
+                    };
+                });
 
                 return {
-                    id,
-                    nombre,
-                    duracion,
-                    responsable,
+                    semiterminadoId,
+                    semiterminadoNombre,
+                    pasos,
                 };
             });
 
-            return {
-                semiterminadoId,
-                semiterminadoNombre,
-                pasos,
-            };
+            return { data, semiterminadoProcesos };
         } catch (error) {
-            return {
-                semiterminadoId,
-                semiterminadoNombre,
-                pasos: [],
-                error: this.getErrorMessage(error),
-            };
+            console.error("Error en fetchData4PDF:", error);
+            const message = this.getErrorMessage(error);
+            return { data: [], semiterminadoProcesos: [], error: message };
         }
     }
 
@@ -432,7 +399,11 @@ export default class ODPpdfGenerator {
 
         // Antes de llamar a fetchData4PDF
         console.log("ProductoId antes de fetchData4PDF:", orden.productoId, "Tipo:", typeof orden.productoId);
-        const { data: insumosTree, error: insumosError } = await this.fetchData4PDF(orden.productoId);
+        const {
+            data: insumosTree,
+            semiterminadoProcesos,
+            error: insumosError,
+        } = await this.fetchData4PDF(orden.productoId);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
 
@@ -507,74 +478,67 @@ export default class ODPpdfGenerator {
         if (insumosError) {
             doc.text("Información no disponible por error al obtener insumos.", margin, currentY);
             currentY += 6;
+        } else if (!semiterminadoProcesos.length) {
+            doc.text("No se identificaron semiterminados asociados a la orden.", margin, currentY);
+            currentY += 6;
         } else {
-            const semiterminados = this.collectSemiterminados(insumosTree);
-            if (!semiterminados.length) {
-                doc.text("No se identificaron semiterminados asociados a la orden.", margin, currentY);
+            const procesosBody = semiterminadoProcesos.flatMap((resultado) => {
+                const encabezado = `${resultado.semiterminadoNombre} (${resultado.semiterminadoId})`;
+
+                if (resultado.error) {
+                    return [[`${encabezado} – Información no disponible (${resultado.error})`, "", "—", "—"]];
+                }
+
+                if (!resultado.pasos.length) {
+                    return [[`${encabezado} – Sin procesos registrados`, "", "—", "—"]];
+                }
+
+                return resultado.pasos.map((paso) => [
+                    `${encabezado} – ${paso.nombre}`,
+                    "",
+                    paso.duracion && paso.duracion.trim().length > 0 ? paso.duracion : "—",
+                    paso.responsable && paso.responsable.trim().length > 0 ? paso.responsable : "—",
+                ]);
+            });
+
+            if (!procesosBody.length) {
+                doc.text("Información no disponible.", margin, currentY);
                 currentY += 6;
             } else {
-                const procesosResults = await Promise.all(
-                    semiterminados.map(async (semi) => this.fetchSemiterminadoProcesos(semi)),
-                );
-
-                const procesosBody = procesosResults.flatMap((resultado) => {
-                    const encabezado = `${resultado.semiterminadoNombre} (${resultado.semiterminadoId})`;
-
-                    if (resultado.error) {
-                        return [[`${encabezado} – Información no disponible (${resultado.error})`, "", "—", "—"]];
-                    }
-
-                    if (!resultado.pasos.length) {
-                        return [[`${encabezado} – Sin procesos registrados`, "", "—", "—"]];
-                    }
-
-                    return resultado.pasos.map((paso) => [
-                        `${encabezado} – ${paso.nombre}`,
-                        "",
-                        paso.duracion ?? "—",
-                        paso.responsable ?? "—",
-                    ]);
+                autoTable(doc, {
+                    head: [["Proceso / Paso", "Checklist", "Duración", "Responsable"]],
+                    body: procesosBody,
+                    startY: currentY,
+                    styles: {
+                        fontSize: 8,
+                        halign: "center",
+                        valign: "middle",
+                    },
+                    headStyles: {
+                        fillColor: [234, 223, 255],
+                        textColor: 40,
+                    },
+                    columnStyles: {
+                        0: { halign: "left" },
+                        1: { halign: "center" },
+                        2: { halign: "center" },
+                        3: { halign: "center" },
+                    },
+                    theme: "grid",
+                    // Dibujar manualmente los checkboxes
+                    didDrawCell: (data) => {
+                        if (data.section === "body" && data.column.index === 1) {
+                            const { x, y, width, height } = data.cell;
+                            const size = Math.min(5, height - 2);        // tamaño del checkbox
+                            const cx = x + (width - size) / 2;           // centrado horizontal
+                            const cy = y + (height - size) / 2;          // centrado vertical
+                            data.doc.setLineWidth(0.3);
+                            data.doc.rect(cx, cy, size, size);           // dibuja el cuadro
+                        }
+                    },
                 });
 
-                if (!procesosBody.length) {
-                    doc.text("Información no disponible.", margin, currentY);
-                    currentY += 6;
-                } else {
-                    autoTable(doc, {
-                        head: [["Proceso / Paso", "Checklist", "Duración", "Responsable"]],
-                        body: procesosBody,
-                        startY: currentY,
-                        styles: {
-                            fontSize: 8,
-                            halign: "center",
-                            valign: "middle",
-                        },
-                        headStyles: {
-                            fillColor: [234, 223, 255],
-                            textColor: 40,
-                        },
-                        columnStyles: {
-                            0: { halign: "left" },
-                            1: { halign: "center" },
-                            2: { halign: "center" },
-                            3: { halign: "center" },
-                        },
-                        theme: "grid",
-                        // Dibujar manualmente los checkboxes
-                        didDrawCell: (data) => {
-                            if (data.section === "body" && data.column.index === 1) {
-                                const { x, y, width, height } = data.cell;
-                                const size = Math.min(5, height - 2);        // tamaño del checkbox
-                                const cx = x + (width - size) / 2;           // centrado horizontal
-                                const cy = y + (height - size) / 2;          // centrado vertical
-                                data.doc.setLineWidth(0.3);
-                                data.doc.rect(cx, cy, size, size);           // dibuja el cuadro
-                            }
-                        },
-                    });
-
-                    currentY = (doc.lastAutoTable?.finalY ?? currentY) + 6;
-                }
+                currentY = (doc.lastAutoTable?.finalY ?? currentY) + 6;
             }
         }
 
