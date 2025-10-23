@@ -47,7 +47,7 @@ type SemiterminadoProcesoResult = {
     error?: string;
 };
 
-class ODPpdfGenerator {
+export default class ODPpdfGenerator {
     private readonly endPoints = new EndPointsURL();
     private readonly defaultUnidad = "KG";
 
@@ -303,7 +303,7 @@ class ODPpdfGenerator {
         // Log de la orden completa para ver todos los datos
         console.log("Orden completa:", orden);
 
-        const doc = new jsPDF({ unit: "mm", format: "a4" }) as jsPDFWithAutoTable;
+        const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" }) as jsPDFWithAutoTable;
         const margin = 15;
         const pageWidth = doc.internal.pageSize.getWidth();
         let currentY = margin;
@@ -418,13 +418,13 @@ class ODPpdfGenerator {
 
         autoTable(doc, {
             head: [[
-                "Código",
-                "Nombre material",
+                "Código Insumo",
+                "Nombre Insumo",
                 "Unidad de medida",
                 "Lote",
                 "Cantidad a dispensar",
-                "Responsable dispensación",
-                "Área dispensación",
+                "Responsable Dispensación",
+                "Área de Ejecucion",
             ]],
             body: tableBody,
             startY: currentY,
@@ -472,16 +472,16 @@ class ODPpdfGenerator {
                     const encabezado = `${resultado.semiterminadoNombre} (${resultado.semiterminadoId})`;
 
                     if (resultado.error) {
-                        return [[`${encabezado} – Información no disponible (${resultado.error})`, "☐", "—", "—"]];
+                        return [[`${encabezado} – Información no disponible (${resultado.error})`, "", "—", "—"]];
                     }
 
                     if (!resultado.pasos.length) {
-                        return [[`${encabezado} – Sin procesos registrados`, "☐", "—", "—"]];
+                        return [[`${encabezado} – Sin procesos registrados`, "", "—", "—"]];
                     }
 
                     return resultado.pasos.map((paso) => [
                         `${encabezado} – ${paso.nombre}`,
-                        "☐",
+                        "",
                         paso.duracion ?? "—",
                         paso.responsable ?? "—",
                     ]);
@@ -511,6 +511,17 @@ class ODPpdfGenerator {
                             3: { halign: "center" },
                         },
                         theme: "grid",
+                        // Dibujar manualmente los checkboxes
+                        didDrawCell: (data) => {
+                            if (data.section === "body" && data.column.index === 1) {
+                                const { x, y, width, height } = data.cell;
+                                const size = Math.min(5, height - 2);        // tamaño del checkbox
+                                const cx = x + (width - size) / 2;           // centrado horizontal
+                                const cy = y + (height - size) / 2;          // centrado vertical
+                                data.doc.setLineWidth(0.3);
+                                data.doc.rect(cx, cy, size, size);           // dibuja el cuadro
+                            }
+                        },
                     });
 
                     currentY = (doc.lastAutoTable?.finalY ?? currentY) + 6;
@@ -566,5 +577,3 @@ class ODPpdfGenerator {
         });
     }
 }
-
-export default ODPpdfGenerator;
