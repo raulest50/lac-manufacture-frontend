@@ -411,7 +411,7 @@ export default class ODPpdfGenerator {
         const multiplicador = orden.cantidadProducir ?? 0;
         const tableBody = flattened.map(({ item, level }) => {
             const codigo = this.toNullableString(item.productoId) ?? String(item.productoId ?? "");
-            const indent = `${"  ".repeat(level)}${level > 0 ? "↳ " : ""}`;
+            const indent = `${"    ".repeat(level)}`;
             const unidad = this.toNullableString(item.tipoUnidades) ?? this.defaultUnidad;
             const cantidadBase = item.cantidadRequerida ?? 0;
             const cantidadADispensar = cantidadBase * multiplicador;
@@ -478,35 +478,43 @@ export default class ODPpdfGenerator {
         if (insumosError) {
             doc.text("Información no disponible por error al obtener insumos.", margin, currentY);
             currentY += 6;
-        } else if (!semiterminadoProcesos.length) {
-            doc.text("No se identificaron semiterminados asociados a la orden.", margin, currentY);
-            currentY += 6;
         } else {
-            const procesosBody = semiterminadoProcesos.flatMap((resultado) => {
+            // Create a row for the terminado (finished product)
+            const terminadoRow = [
+                `area responsable fabricacion terminado: ${orden.productoNombre}`,
+                "",
+                ""
+            ];
+
+            // Create rows for semiterminados
+            const semiterminadosRows = semiterminadoProcesos.flatMap((resultado) => {
                 const encabezado = `${resultado.semiterminadoNombre} (${resultado.semiterminadoId})`;
 
                 if (resultado.error) {
-                    return [[`${encabezado} – Información no disponible (${resultado.error})`, "", "—", "—"]];
+                    return [[`${encabezado} – Información no disponible (${resultado.error})`, "", ""]];
                 }
 
                 if (!resultado.pasos.length) {
-                    return [[`${encabezado} – Sin procesos registrados`, "", "—", "—"]];
+                    return [[`${encabezado} – Sin procesos registrados`, "", ""]];
                 }
 
-                return resultado.pasos.map((paso) => [
-                    `${encabezado} – ${paso.nombre}`,
+                // Temporary fix: Create a single row for each semiterminado
+                return [[
+                    `area responsable fabricacion semiterminado: ${resultado.semiterminadoNombre}`,
                     "",
-                    paso.duracion && paso.duracion.trim().length > 0 ? paso.duracion : "—",
-                    paso.responsable && paso.responsable.trim().length > 0 ? paso.responsable : "—",
-                ]);
+                    ""
+                ]];
             });
+
+            // Combine terminado row with semiterminados rows
+            const procesosBody = [terminadoRow, ...semiterminadosRows];
 
             if (!procesosBody.length) {
                 doc.text("Información no disponible.", margin, currentY);
                 currentY += 6;
             } else {
                 autoTable(doc, {
-                    head: [["Proceso / Paso", "Checklist", "Duración", "Responsable"]],
+                    head: [["Proceso / Paso", "Estado", "Responsable"]],
                     body: procesosBody,
                     startY: currentY,
                     styles: {
@@ -522,7 +530,6 @@ export default class ODPpdfGenerator {
                         0: { halign: "left" },
                         1: { halign: "center" },
                         2: { halign: "center" },
-                        3: { halign: "center" },
                     },
                     theme: "grid",
                     // Dibujar manualmente los checkboxes
