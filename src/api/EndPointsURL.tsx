@@ -46,6 +46,7 @@ export default class EndPointsURL{
     public orden_seguimiento_update_estado:string;
     public orden_produccion_update_estado:string;
     public search_ordenes_by_responsable:string;
+    public produccion_terminado_data4pdf: string;
 
     // recursos de produccion
     public save_recurso_produccion:string;
@@ -216,6 +217,7 @@ export default class EndPointsURL{
         this.orden_seguimiento_update_estado = `${domain}/${produccion_res}/orden_seguimiento/{id}/update_estado`;
         this.orden_produccion_update_estado = `${domain}/${produccion_res}/orden_produccion/{id}/update_estado`;
         this.search_ordenes_by_responsable = `${domain}/${produccion_res}/ordenes_produccion/responsable/{responsableId}`;
+        this.produccion_terminado_data4pdf = `${domain}/${produccion_res}/terminado/{id}/data4pdf`;
 
         // recursos de produccion endpoints
         this.save_recurso_produccion = `${domain}/${recursos_produccion_res}`;

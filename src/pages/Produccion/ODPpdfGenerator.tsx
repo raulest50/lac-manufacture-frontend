@@ -21,16 +21,34 @@ const estadoOrdenMap: Record<number, EstadoInfo> = {
     1: { label: "Terminada" },
 };
 
-type SearchResponse<T> = {
-    content?: T[];
+type Data4PDFProductoResponse = {
+    productoId?: unknown;
+    nombre?: unknown;
+    tipo_producto?: unknown;
+    tipoProducto?: unknown;
+    tipoUnidades?: unknown;
+    unidad?: unknown;
+    insumos?: Data4PDFInsumoResponse[];
 };
 
-type InsumoWithStockResponse = Omit<InsumoWithStock, "tipo_producto" | "subInsumos"> & {
-    tipo_producto?: string;
-    tipoProducto?: string;
-    tipoUnidades?: string;
-    unidad?: string;
-    subInsumos?: InsumoWithStockResponse[];
+type Data4PDFInsumoResponse = {
+    insumoId?: unknown;
+    cantidadRequerida?: unknown;
+    stockActual?: unknown;
+    producto?: Data4PDFProductoResponse;
+    productoNombre?: unknown;
+    tipo_producto?: unknown;
+    tipoProducto?: unknown;
+    tipoUnidades?: unknown;
+    unidad?: unknown;
+    subInsumos?: Data4PDFInsumoResponse[];
+    insumos?: Data4PDFInsumoResponse[];
+};
+
+type Data4PDFResponse = {
+    terminado?: {
+        insumos?: Data4PDFInsumoResponse[];
+    };
 };
 
 type ProcesoPaso = {
@@ -171,56 +189,87 @@ export default class ODPpdfGenerator {
         return typeof error === "string" ? error : "Error desconocido";
     }
 
-    private normalizeInsumoResponse(insumo: InsumoWithStockResponse): InsumoWithStock {
-        const subInsumos = Array.isArray(insumo.subInsumos)
-            ? insumo.subInsumos.map((child) => this.normalizeInsumoResponse(child))
+    private normalizeData4PDFInsumos(insumos: Data4PDFInsumoResponse[] | undefined): InsumoWithStock[] {
+        if (!Array.isArray(insumos)) {
+            return [];
+        }
+
+        return insumos.map((insumo, index) => this.normalizeData4PDFInsumo(insumo, index));
+    }
+
+    private normalizeData4PDFInsumo(insumo: Data4PDFInsumoResponse, fallbackIndex: number): InsumoWithStock {
+        const producto = insumo.producto ?? {};
+
+        const rawProductoId =
+            (producto as { productoId?: unknown }).productoId ?? (insumo as { productoId?: unknown }).productoId;
+        const productoId =
+            this.toNullableNumber(rawProductoId) ?? this.toNullableString(rawProductoId) ?? fallbackIndex;
+
+        const rawInsumoId = (insumo as { insumoId?: unknown }).insumoId;
+        const insumoId = this.toNullableNumber(rawInsumoId) ?? (typeof productoId === "number" ? productoId : fallbackIndex);
+
+        const productoNombre =
+            this.toNullableString((producto as { nombre?: unknown }).nombre ?? insumo.productoNombre) ??
+            this.toNullableString((insumo as { nombre?: unknown }).nombre) ??
+            "";
+
+        const cantidadRequerida = this.toNullableNumber(insumo.cantidadRequerida) ?? 0;
+        const stockActual = this.toNullableNumber(insumo.stockActual) ?? 0;
+
+        const tipoProducto =
+            this.toNullableString((producto as { tipo_producto?: unknown }).tipo_producto) ??
+            this.toNullableString((producto as { tipoProducto?: unknown }).tipoProducto) ??
+            this.toNullableString(insumo.tipo_producto ?? insumo.tipoProducto) ??
+            "";
+
+        const unidad =
+            this.toNullableString((producto as { tipoUnidades?: unknown }).tipoUnidades) ??
+            this.toNullableString((producto as { unidad?: unknown }).unidad) ??
+            this.toNullableString(insumo.tipoUnidades ?? insumo.unidad) ??
+            this.defaultUnidad;
+
+        const rawChildren = Array.isArray(insumo.subInsumos)
+            ? insumo.subInsumos
+            : Array.isArray(insumo.insumos)
+            ? insumo.insumos
+            : Array.isArray((producto as { insumos?: Data4PDFInsumoResponse[] }).insumos)
+            ? (producto as { insumos?: Data4PDFInsumoResponse[] }).insumos
             : [];
 
-        const productoNombre = this.toNullableString(insumo.productoNombre ?? (insumo as { nombre?: unknown }).nombre) ?? "";
-
-        const rawProductoId = insumo.productoId ?? (insumo as { productoId?: unknown }).productoId;
-        const productoId = this.toNullableNumber(rawProductoId) ?? this.toNullableString(rawProductoId) ?? 0;
-
         return {
-            insumoId: this.toNullableNumber(insumo.insumoId) ?? 0,
+            insumoId,
             productoId,
             productoNombre,
-            cantidadRequerida: this.toNullableNumber(insumo.cantidadRequerida) ?? 0,
-            stockActual: this.toNullableNumber(insumo.stockActual) ?? 0,
-            tipo_producto: this.toNullableString(insumo.tipo_producto ?? insumo.tipoProducto) ?? "",
-            tipoUnidades: this.toNullableString(
-                insumo.tipoUnidades ?? insumo.unidad ?? (insumo as { tipoUnidades?: unknown }).tipoUnidades,
-            ) ?? this.defaultUnidad,
-            subInsumos,
+            cantidadRequerida,
+            stockActual,
+            tipo_producto: tipoProducto,
+            tipoUnidades: unidad,
+            subInsumos: this.normalizeData4PDFInsumos(rawChildren),
         };
     }
 
-    private async fetchInsumosWithStock(productoId: string | null): Promise<{ data: InsumoWithStock[]; error?: string }> {
-        // Log del productoId recibido
-        console.log("fetchInsumosWithStock - productoId recibido:", productoId, "Tipo:", typeof productoId);
+    private async fetchData4PDF(productoId: string | null): Promise<{ data: InsumoWithStock[]; error?: string }> {
+        console.log("fetchData4PDF - productoId recibido:", productoId, "Tipo:", typeof productoId);
 
         if (!productoId) {
-            console.log("fetchInsumosWithStock - productoId es nulo o vacío");
+            console.log("fetchData4PDF - productoId es nulo o vacío");
             return { data: [], error: "Identificador de producto no disponible." };
         }
 
         try {
-            const url = this.endPoints.insumos_with_stock.replace("{id}", encodeURIComponent(productoId));
-            console.log("URL para obtener insumos:", url);
+            const url = this.endPoints.produccion_terminado_data4pdf.replace("{id}", encodeURIComponent(productoId));
+            console.log("URL para obtener data4pdf:", url);
 
-            const response = await axios.get<InsumoWithStockResponse[] | SearchResponse<InsumoWithStockResponse>>(url);
-            console.log("Respuesta del servidor (insumos):", response.data);
+            const response = await axios.get<Data4PDFResponse>(url);
+            console.log("Respuesta del servidor (data4pdf):", response.data);
 
-            const payload = response.data;
-            const rawInsumos = Array.isArray(payload) ? payload : payload?.content ?? [];
-            console.log("Insumos sin procesar:", rawInsumos);
-
-            const data = rawInsumos.map((insumo) => this.normalizeInsumoResponse(insumo));
-            console.log("Insumos normalizados:", data);
+            const rawInsumos = response.data?.terminado?.insumos;
+            const data = this.normalizeData4PDFInsumos(rawInsumos);
+            console.log("Insumos normalizados desde data4pdf:", data);
 
             return { data };
         } catch (error) {
-            console.error("Error en fetchInsumosWithStock:", error);
+            console.error("Error en fetchData4PDF:", error);
             const message = this.getErrorMessage(error);
             return { data: [], error: message };
         }
@@ -381,9 +430,9 @@ export default class ODPpdfGenerator {
         doc.text("Árbol de insumos", margin, currentY);
         currentY += 6;
 
-        // Antes de llamar a fetchInsumosWithStock
-        console.log("ProductoId antes de fetchInsumosWithStock:", orden.productoId, "Tipo:", typeof orden.productoId);
-        const { data: insumosTree, error: insumosError } = await this.fetchInsumosWithStock(orden.productoId);
+        // Antes de llamar a fetchData4PDF
+        console.log("ProductoId antes de fetchData4PDF:", orden.productoId, "Tipo:", typeof orden.productoId);
+        const { data: insumosTree, error: insumosError } = await this.fetchData4PDF(orden.productoId);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
 
