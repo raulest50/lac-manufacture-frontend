@@ -49,19 +49,32 @@ type Data4PDFProcesoResponse = Record<string, unknown> & {
     data?: Record<string, unknown>;
 };
 
+// Interface for AreaProduccion based on the backend model
+interface AreaProduccion {
+    areaId: number;
+    nombre: string;
+    descripcion: string;
+    responsableArea?: any;
+}
+
 type Data4PDFSemiterminadoResponse = {
     productoId?: unknown;
     nombre?: unknown;
     procesoProduccionCompleto?: {
         procesosProduccion?: Data4PDFProcesoResponse[];
+        areaProduccion?: AreaProduccion; // New field added
     };
 };
 
 type Data4PDFResponse = {
     terminado?: {
         insumos?: Data4PDFInsumoResponse[];
+        procesoProduccionCompleto?: {
+            areaProduccion?: AreaProduccion; // New field added
+        };
     };
     semiterminados?: Data4PDFSemiterminadoResponse[];
+    areasProduccion?: AreaProduccion[]; // New list of production areas
 };
 
 type ProcesoPaso = {
@@ -134,13 +147,21 @@ export default class ODPpdfGenerator {
         });
     }
 
-    private flattenInsumos(insumos: InsumoWithStock[], level = 0): Array<{ item: InsumoWithStock; level: number }> {
+    private flattenInsumos(insumos: InsumoWithStock[], level = 0, onlyFirstLevelSemiterminados = false): Array<{ item: InsumoWithStock; level: number }> {
         return insumos.flatMap((insumo) => {
             const current = [{ item: insumo, level }];
-            const children = Array.isArray(insumo.subInsumos)
-                ? this.flattenInsumos(insumo.subInsumos, level + 1)
-                : [];
-            return current.concat(children);
+
+            // If it's a material (not a semiterminado) or we're at the first level, process its subinsumos
+            const isMaterial = insumo.tipo_producto.toLowerCase() !== 'semiterminado';
+
+            if (isMaterial || level === 0 || !onlyFirstLevelSemiterminados) {
+                const children = Array.isArray(insumo.subInsumos)
+                    ? this.flattenInsumos(insumo.subInsumos, level + 1, onlyFirstLevelSemiterminados)
+                    : [];
+                return current.concat(children);
+            }
+
+            return current;
         });
     }
 
@@ -236,12 +257,12 @@ export default class ODPpdfGenerator {
 
     private async fetchData4PDF(
         productoId: string | null,
-    ): Promise<{ data: InsumoWithStock[]; semiterminadoProcesos: SemiterminadoProcesoResult[]; error?: string }> {
+    ): Promise<{ data: InsumoWithStock[]; semiterminadoProcesos: SemiterminadoProcesoResult[]; areasProduccion: AreaProduccion[]; error?: string }> {
         console.log("fetchData4PDF - productoId recibido:", productoId, "Tipo:", typeof productoId);
 
         if (!productoId) {
             console.log("fetchData4PDF - productoId es nulo o vacío");
-            return { data: [], error: "Identificador de producto no disponible." };
+            return { data: [], semiterminadoProcesos: [], areasProduccion: [], error: "Identificador de producto no disponible." };
         }
 
         try {
@@ -255,9 +276,29 @@ export default class ODPpdfGenerator {
             const data = this.normalizeData4PDFInsumos(rawInsumos);
             console.log("Insumos normalizados desde data4pdf:", data);
 
+            // Extract areas of production
+            const areasProduccion: AreaProduccion[] = [];
+
+            // Extract area from terminado if it exists
+            const terminadoArea = response.data?.terminado?.procesoProduccionCompleto?.areaProduccion;
+            if (terminadoArea && typeof terminadoArea === 'object' && 'areaId' in terminadoArea) {
+                areasProduccion.push(terminadoArea as AreaProduccion);
+            }
+
             const rawSemiterminados = Array.isArray(response.data?.semiterminados)
                 ? response.data?.semiterminados
                 : [];
+
+            // Extract areas from semiterminados
+            rawSemiterminados.forEach(semi => {
+                const areaProduccion = semi?.procesoProduccionCompleto?.areaProduccion;
+                if (areaProduccion && typeof areaProduccion === 'object' && 'areaId' in areaProduccion) {
+                    // Check if the area already exists in the array to avoid duplicates
+                    if (!areasProduccion.some(area => area.areaId === areaProduccion.areaId)) {
+                        areasProduccion.push(areaProduccion as AreaProduccion);
+                    }
+                }
+            });
 
             const semiterminadoProcesos = rawSemiterminados.map((semi, index) => {
                 const semiterminadoId =
@@ -307,11 +348,11 @@ export default class ODPpdfGenerator {
                 };
             });
 
-            return { data, semiterminadoProcesos };
+            return { data, semiterminadoProcesos, areasProduccion };
         } catch (error) {
             console.error("Error en fetchData4PDF:", error);
             const message = this.getErrorMessage(error);
-            return { data: [], semiterminadoProcesos: [], error: message };
+            return { data: [], semiterminadoProcesos: [], areasProduccion: [], error: message };
         }
     }
 
@@ -381,6 +422,7 @@ export default class ODPpdfGenerator {
         console.log("Cantidad a producir:", orden.cantidadProducir, "Tipo:", typeof orden.cantidadProducir);
         const productoInfo = [
             `Producto: ${orden.productoNombre}`,
+            `Lote: ______________________`,
             `Cantidad a producir: ${this.formatNullableNumber(orden.cantidadProducir)}`,
             `Pedido comercial: ${orden.numeroPedidoComercial ?? "No especificado"}`,
             `Área operativa: ${orden.areaOperativa ?? "No especificada"}`,
@@ -402,12 +444,13 @@ export default class ODPpdfGenerator {
         const {
             data: insumosTree,
             semiterminadoProcesos,
+            areasProduccion,
             error: insumosError,
         } = await this.fetchData4PDF(orden.productoId);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
 
-        const flattened = !insumosError && insumosTree.length ? this.flattenInsumos(insumosTree) : [];
+        const flattened = !insumosError && insumosTree.length ? this.flattenInsumos(insumosTree, 0, true) : [];
         const multiplicador = orden.cantidadProducir ?? 0;
         const tableBody = flattened.map(({ item, level }) => {
             const codigo = this.toNullableString(item.productoId) ?? String(item.productoId ?? "");
@@ -470,7 +513,7 @@ export default class ODPpdfGenerator {
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
-        doc.text("Procesos de semiterminados", margin, currentY);
+        doc.text("Áreas de Producción", margin, currentY);
         currentY += 6;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
@@ -479,42 +522,24 @@ export default class ODPpdfGenerator {
             doc.text("Información no disponible por error al obtener insumos.", margin, currentY);
             currentY += 6;
         } else {
-            // Create a row for the terminado (finished product)
-            const terminadoRow = [
-                `area responsable fabricacion terminado: ${orden.productoNombre}`,
-                "",
-                ""
-            ];
-
-            // Create rows for semiterminados
-            const semiterminadosRows = semiterminadoProcesos.flatMap((resultado) => {
-                const encabezado = `${resultado.semiterminadoNombre} (${resultado.semiterminadoId})`;
-
-                if (resultado.error) {
-                    return [[`${encabezado} – Información no disponible (${resultado.error})`, "", ""]];
-                }
-
-                if (!resultado.pasos.length) {
-                    return [[`${encabezado} – Sin procesos registrados`, "", ""]];
-                }
-
-                // Temporary fix: Create a single row for each semiterminado
-                return [[
-                    `area responsable fabricacion semiterminado: ${resultado.semiterminadoNombre}`,
+            // Create rows for areas of production
+            const areasProduccionRows = areasProduccion.map(area => {
+                return [
+                    area.nombre,
                     "",
-                    ""
-                ]];
+                    "" // Leaving Responsable column empty for physical signature
+                ];
             });
 
-            // Combine terminado row with semiterminados rows
-            const procesosBody = [terminadoRow, ...semiterminadosRows];
+            // If no areas are available, create a default row
+            const procesosBody = areasProduccionRows.length > 0 ? areasProduccionRows : [["No hay áreas de producción registradas", "", ""]];
 
             if (!procesosBody.length) {
                 doc.text("Información no disponible.", margin, currentY);
                 currentY += 6;
             } else {
                 autoTable(doc, {
-                    head: [["Proceso / Paso", "Estado", "Responsable"]],
+                    head: [["Area Proceso", "Estado", "Responsable"]],
                     body: procesosBody,
                     startY: currentY,
                     styles: {
