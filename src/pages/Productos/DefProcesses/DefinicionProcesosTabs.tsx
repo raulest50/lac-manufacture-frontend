@@ -3,6 +3,7 @@ import {FaArrowLeft} from 'react-icons/fa';
 import DefinicionProcesosTab from './DefinicionProcesosTab.tsx';
 import CrearRecursoProduccion from './CrearRecursoProduccion.tsx';
 import ConsultaRecursosProduccion from './ConsultaRecursosProduccion.tsx';
+import CrearAreaProduccionTab from './CreadorProcesos/CrearAreaProduccionTab.tsx';
 import {my_style_tab} from '../../../styles/styles_general.tsx';
 
 interface Props {
@@ -20,6 +21,7 @@ export function DefinicionProcesosTabs({onBack}: Props) {
                     <Tab sx={my_style_tab}>Definición de Procesos</Tab>
                     <Tab sx={my_style_tab}>Crear Recurso Producción</Tab>
                     <Tab sx={my_style_tab}>Consulta Recursos Producción</Tab>
+                    <Tab sx={my_style_tab}>Crear Área Producción</Tab>
                 </TabList>
                 <TabPanels>
                     <TabPanel>
@@ -30,6 +32,9 @@ export function DefinicionProcesosTabs({onBack}: Props) {
                     </TabPanel>
                     <TabPanel>
                         <ConsultaRecursosProduccion />
+                    </TabPanel>
+                    <TabPanel>
+                        <CrearAreaProduccionTab />
                     </TabPanel>
                 </TabPanels>
             </Tabs>

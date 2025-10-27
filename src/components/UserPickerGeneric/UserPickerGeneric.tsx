@@ -28,8 +28,8 @@ import {
     Select,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import EndPointsURL from "../api/EndPointsURL.tsx";
-import { User } from "../pages/Usuarios/GestionUsuarios/types.tsx";
+import EndPointsURL from "../../api/EndPointsURL.tsx";
+import { User } from "../../pages/Usuarios/GestionUsuarios/types.tsx";
 
 const endPoints = new EndPointsURL();
 

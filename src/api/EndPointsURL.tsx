@@ -143,6 +143,13 @@ export default class EndPointsURL{
     // public get_estado_resultados: string;
     public search_transacciones_almacen: string;
 
+
+    //enpoints para management de Areas de Produccion (AreaProduccion)
+    public crear_area_produccion: string;
+    public area_prod_search_by_name: string;
+
+
+
     // master directives endpoints
     public get_master_directives: string;
     public update_master_directive: string;
@@ -170,6 +177,7 @@ export default class EndPointsURL{
         const recursos_produccion_res = 'api/recursos-produccion';
         const procesos_produccion_res = 'api/procesos-produccion';
         const user_management_res = 'usuarios';
+        const area_produccion_res = 'api/areas-produccion';
 
         // productos endpoints
         this.search_mprima = `${domain}/${productos_res}/search_mprima`;
@@ -295,6 +303,11 @@ export default class EndPointsURL{
 
         // notifications endpoint
         this.module_notifications = `${domain}/notificaciones/notifications4user`;
+
+        // AreaProduccion endpoints
+        this.crear_area_produccion = `${domain}/${area_produccion_res}/crear`;
+        this.area_prod_search_by_name = `${domain}/${area_produccion_res}/search_by_name`;
+
     }
 
 

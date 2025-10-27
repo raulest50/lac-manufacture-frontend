@@ -21,7 +21,7 @@ import {
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
 import { SearchIcon } from '@chakra-ui/icons';
-import UserGenericPicker from '../../../components/UserPickerGeneric';
+import UserGenericPicker from '../../../components/UserPickerGeneric/UserPickerGeneric.tsx';
 import { User } from '../../../pages/Usuarios/GestionUsuarios/types';
 
 interface VendorFormData {
