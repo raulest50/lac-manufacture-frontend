@@ -64,23 +64,12 @@ const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
     const toast = useToast();
 
     const handleSearch = async () => {
-        if (!searchText.trim()) {
-            toast({
-                title: 'Error',
-                description: 'Por favor ingrese un texto de búsqueda.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
-            return;
-        }
-
         setIsLoading(true);
         try {
             const searchDTO: SearchAreaProduccionDTO = {
                 nombre: searchText
             };
-            
+
             const response = await axios.post(endPoints.area_prod_search_by_name, searchDTO, {
                 params: {
                     page: 0,

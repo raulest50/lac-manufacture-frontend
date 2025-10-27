@@ -61,17 +61,6 @@ const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
     const toast = useToast();
 
     const handleSearch = async () => {
-        if (!searchText.trim()) {
-            toast({
-                title: 'Error',
-                description: 'Por favor ingrese un texto de búsqueda.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            });
-            return;
-        }
-
         setIsLoading(true);
         try {
             const response = await axios.post(endPoints.search_user_by_dto, {
