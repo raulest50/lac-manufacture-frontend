@@ -97,6 +97,8 @@ export default class EndPointsURL{
     public deactivate_user: string;
     public activate_user: string;
 
+    public search_user_by_dto: string;
+
 
     // integrantes de personal
     public save_integrante_personal: string;
@@ -167,6 +169,7 @@ export default class EndPointsURL{
         const personal_res = 'integrantes-personal';
         const recursos_produccion_res = 'api/recursos-produccion';
         const procesos_produccion_res = 'api/procesos-produccion';
+        const user_management_res = 'usuarios';
 
         // productos endpoints
         this.search_mprima = `${domain}/${productos_res}/search_mprima`;
@@ -251,9 +254,11 @@ export default class EndPointsURL{
         this.login = `${domain}/${auth_res}/login`;
         this.request_reset_passw = `${domain}/${auth_res}/request_reset_passw`;
         this.set_new_passw = `${domain}/${auth_res}/set_new_passw`;
-        this.get_all_users = `${domain}/usuarios`;
-        this.deactivate_user = `${domain}/usuarios/{userId}/deactivate`;
-        this.activate_user = `${domain}/usuarios/{userId}/activate`;
+        this.get_all_users = `${domain}/${user_management_res}`;
+        this.deactivate_user = `${domain}/${user_management_res}/{userId}/deactivate`;
+        this.activate_user = `${domain}/${user_management_res}/{userId}/activate`;
+
+        this.search_user_by_dto = `${domain}/${user_management_res}/search_by_dto`;
 
         // integrantes de personal endpoints
         this.save_integrante_personal = `${domain}/${personal_res}/save`;
