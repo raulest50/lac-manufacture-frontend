@@ -147,17 +147,39 @@ export default class ODPpdfGenerator {
         });
     }
 
+    /**
+     * Flattens the insumos tree into a flat array, with special handling for semiterminados.
+     * 
+     * When onlyFirstLevelSemiterminados is true:
+     * - First-level semiterminados (directly within the finished product) are included
+     * - Semiterminados nested inside other semiterminados are NOT included
+     * - All materials are included, regardless of their nesting level
+     * 
+     * @param insumos Array of insumos to flatten
+     * @param level Current nesting level (0 for top level)
+     * @param onlyFirstLevelSemiterminados Whether to only include first-level semiterminados
+     * @returns Flattened array of insumos with their nesting level
+     */
     private flattenInsumos(insumos: InsumoWithStock[], level = 0, onlyFirstLevelSemiterminados = false): Array<{ item: InsumoWithStock; level: number }> {
         return insumos.flatMap((insumo) => {
+            const isMaterial = insumo.tipo_producto.toLowerCase() !== 'semiterminado';
+            const isSemiterminado = !isMaterial;
+
+            // If this is a nested semiterminado (not first level) and we're filtering nested semiterminados
+            if (isSemiterminado && level > 0 && onlyFirstLevelSemiterminados) {
+                // Don't include the nested semiterminado in the result, but process its materials
+                if (Array.isArray(insumo.subInsumos)) {
+                    return this.flattenInsumos(insumo.subInsumos, level + 1, onlyFirstLevelSemiterminados);
+                }
+                return [];
+            }
+
+            // For materials or first-level semiterminados, include them in the result
             const current = [{ item: insumo, level }];
 
-            // If it's a material (not a semiterminado) or we're at the first level, process its subinsumos
-            const isMaterial = insumo.tipo_producto.toLowerCase() !== 'semiterminado';
-
-            if (isMaterial || level === 0 || !onlyFirstLevelSemiterminados) {
-                const children = Array.isArray(insumo.subInsumos)
-                    ? this.flattenInsumos(insumo.subInsumos, level + 1, onlyFirstLevelSemiterminados)
-                    : [];
+            // And process their subinsumos
+            if (Array.isArray(insumo.subInsumos)) {
+                const children = this.flattenInsumos(insumo.subInsumos, level + 1, onlyFirstLevelSemiterminados);
                 return current.concat(children);
             }
 

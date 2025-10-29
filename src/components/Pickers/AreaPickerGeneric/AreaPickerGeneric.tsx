@@ -1,4 +1,4 @@
-// src/components/UserPickerGeneric.tsx
+// src/components/AreaPickerGeneric/AreaPickerGeneric.tsx
 
 import React, { useState } from 'react';
 import {
@@ -25,36 +25,39 @@ import {
     Th,
     Td,
     Flex,
-    Select,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import EndPointsURL from "../../api/EndPointsURL.tsx";
-import { User } from "../../pages/Usuarios/GestionUsuarios/types.tsx";
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
 
 const endPoints = new EndPointsURL();
 
-// Define SearchType enum based on backend requirements
-enum SearchType {
-    ID = 'ID',
-    NAME = 'NAME',
-    EMAIL = 'EMAIL'
+// Interface for AreaProduccion based on the backend model
+interface AreaProduccion {
+    areaId: number;
+    nombre: string;
+    descripcion: string;
+    responsableArea?: any; // We don't need the full User type here
 }
 
-interface UserGenericPickerProps {
+// DTO for searching AreaProduccion
+interface SearchAreaProduccionDTO {
+    nombre: string;
+}
+
+interface AreaPickerGenericProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelectUser: (user: User) => void;
+    onSelectArea: (area: AreaProduccion) => void;
 }
 
-const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
+const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
     isOpen,
     onClose,
-    onSelectUser,
+    onSelectArea,
 }) => {
     const [searchText, setSearchText] = useState('');
-    const [searchType, setSearchType] = useState<SearchType>(SearchType.NAME);
-    const [users, setUsers] = useState<User[]>([]);
-    const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+    const [areas, setAreas] = useState<AreaProduccion[]>([]);
+    const [selectedAreaId, setSelectedAreaId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const resultsPerPage = 10;
@@ -63,23 +66,24 @@ const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
     const handleSearch = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.post(endPoints.search_user_by_dto, {
-                search: searchText,
-                searchType: searchType
-            }, {
+            const searchDTO: SearchAreaProduccionDTO = {
+                nombre: searchText
+            };
+
+            const response = await axios.post(endPoints.area_prod_search_by_name, searchDTO, {
                 params: {
                     page: 0,
                     size: 100
                 }
             });
-            setUsers(response.data);
-            setSelectedUserId(null); // Reset selection on new search
+            setAreas(response.data);
+            setSelectedAreaId(null); // Reset selection on new search
             setCurrentPage(1); // Reset to first page on new search
         } catch (error) {
-            console.error('Error searching Users:', error);
+            console.error('Error searching Areas:', error);
             toast({
                 title: 'Error',
-                description: 'Failed to search Users.',
+                description: 'Error al buscar áreas de producción.',
                 status: 'error',
                 duration: 5000,
                 isClosable: true,
@@ -90,10 +94,10 @@ const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
     };
 
     const handleConfirm = () => {
-        if (selectedUserId !== null) {
-            const user = users.find((u) => u.id === selectedUserId);
-            if (user) {
-                onSelectUser(user);
+        if (selectedAreaId !== null) {
+            const area = areas.find((a) => a.areaId === selectedAreaId);
+            if (area) {
+                onSelectArea(area);
             }
         }
         onClose();
@@ -110,10 +114,10 @@ const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
     };
 
     // Calculate pagination
-    const totalPages = Math.ceil(users.length / resultsPerPage);
+    const totalPages = Math.ceil(areas.length / resultsPerPage);
     const startIndex = (currentPage - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
-    const currentUsers = users.slice(startIndex, endIndex);
+    const currentAreas = areas.slice(startIndex, endIndex);
 
     // Handle pagination
     const goToPage = (page: number) => {
@@ -126,30 +130,20 @@ const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
         <Modal isOpen={isOpen} onClose={onClose} size="lg">
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Seleccionar Usuario</ModalHeader>
+                <ModalHeader>Seleccionar Área de Producción</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
                     <VStack spacing={4}>
                         <FormControl>
-                            <FormLabel>Buscar Usuario</FormLabel>
+                            <FormLabel>Buscar Área</FormLabel>
                             <HStack>
                                 <Input
                                     value={searchText}
                                     onChange={(e) => setSearchText(e.target.value)}
                                     onKeyDown={onKeyPress_InputBuscar}
-                                    placeholder="Ingrese texto de búsqueda"
+                                    placeholder="Ingrese nombre del área"
                                     isDisabled={isLoading}
                                 />
-                                <Select 
-                                    value={searchType}
-                                    onChange={(e) => setSearchType(e.target.value as SearchType)}
-                                    isDisabled={isLoading}
-                                    width="150px"
-                                >
-                                    <option value={SearchType.ID}>ID</option>
-                                    <option value={SearchType.NAME}>Nombre</option>
-                                    <option value={SearchType.EMAIL}>Email</option>
-                                </Select>
                                 <Button 
                                     colorScheme="blue" 
                                     onClick={handleSearch} 
@@ -161,29 +155,27 @@ const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
                             </HStack>
                         </FormControl>
                         <Box w="full" overflowX="auto">
-                            {users.length > 0 ? (
+                            {areas.length > 0 ? (
                                 <>
                                     <Table variant="simple" size="sm">
                                         <Thead>
                                             <Tr>
                                                 <Th>ID</Th>
-                                                <Th>Cédula</Th>
                                                 <Th>Nombre</Th>
-                                                <Th>Correo</Th>
+                                                <Th>Descripción</Th>
                                             </Tr>
                                         </Thead>
                                         <Tbody>
-                                            {currentUsers.map((user) => (
+                                            {currentAreas.map((area) => (
                                                 <Tr 
-                                                    key={user.id} 
-                                                    onClick={() => setSelectedUserId(user.id)}
-                                                    bg={selectedUserId === user.id ? "teal.100" : "transparent"}
+                                                    key={area.areaId} 
+                                                    onClick={() => setSelectedAreaId(area.areaId)}
+                                                    bg={selectedAreaId === area.areaId ? "teal.100" : "transparent"}
                                                     _hover={{ bg: "gray.100", cursor: "pointer" }}
                                                 >
-                                                    <Td>{user.id}</Td>
-                                                    <Td>{user.cedula}</Td>
-                                                    <Td>{user.nombreCompleto || user.username}</Td>
-                                                    <Td>{user.username}</Td>
+                                                    <Td>{area.areaId}</Td>
+                                                    <Td>{area.nombre}</Td>
+                                                    <Td>{area.descripcion}</Td>
                                                 </Tr>
                                             ))}
                                         </Tbody>
@@ -215,7 +207,7 @@ const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
                                     )}
                                 </>
                             ) : (
-                                <Text textAlign="center">No hay usuarios para mostrar</Text>
+                                <Text textAlign="center">No hay áreas para mostrar</Text>
                             )}
                         </Box>
                     </VStack>
@@ -225,7 +217,7 @@ const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
                         colorScheme="teal" 
                         mr={3} 
                         onClick={handleConfirm}
-                        isDisabled={selectedUserId === null}
+                        isDisabled={selectedAreaId === null}
                     >
                         Aceptar
                     </Button>
@@ -238,4 +230,4 @@ const UserGenericPicker: React.FC<UserGenericPickerProps> = ({
     );
 };
 
-export default UserGenericPicker;
+export default AreaPickerGeneric;

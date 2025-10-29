@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { SearchIcon } from '@chakra-ui/icons';
 import { useState } from "react";
-import AreaPickerGeneric from "../../../../../components/AreaPickerGeneric/AreaPickerGeneric.tsx";
+import AreaPickerGeneric from "../../../../../components/Pickers/AreaPickerGeneric/AreaPickerGeneric.tsx";
 
 // Interface for AreaProduccion based on the backend model
 interface AreaProduccion {

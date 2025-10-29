@@ -18,7 +18,7 @@ import axios from 'axios';
 import { SearchIcon } from '@chakra-ui/icons';
 import EndPointsURL from '../../../../api/EndPointsURL.tsx';
 import { input_style } from '../../../../styles/styles_general.tsx';
-import UserGenericPicker from '../../../../components/UserPickerGeneric/UserPickerGeneric.tsx';
+import UserGenericPicker from '../../../../components/Pickers/UserPickerGeneric/UserPickerGeneric.tsx';
 import { User } from '../../../../pages/Usuarios/GestionUsuarios/types';
 
 // Interface for AreaProduccion based on the backend model

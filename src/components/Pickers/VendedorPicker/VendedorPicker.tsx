@@ -1,4 +1,4 @@
-// src/components/AreaPickerGeneric/AreaPickerGeneric.tsx
+// src/components/Pickers/VendedorPicker/VendedorPicker.tsx
 
 import React, { useState } from 'react';
 import {
@@ -25,39 +25,49 @@ import {
     Th,
     Td,
     Flex,
+    Select,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import EndPointsURL from "../../api/EndPointsURL.tsx";
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
 
 const endPoints = new EndPointsURL();
 
-// Interface for AreaProduccion based on the backend model
-interface AreaProduccion {
-    areaId: number;
-    nombre: string;
-    descripcion: string;
-    responsableArea?: any; // We don't need the full User type here
+// Interface for Vendedor based on the backend model
+interface Vendedor {
+    cedula: number;
+    nombres: string;
+    apellidos: string;
+    email: string;
+    username?: string;
 }
 
-// DTO for searching AreaProduccion
-interface SearchAreaProduccionDTO {
-    nombre: string;
+// Enum for search types
+enum SearchType {
+    ID = 'ID',
+    NAME = 'NAME'
 }
 
-interface AreaPickerGenericProps {
+// DTO for searching Vendedor
+interface SearchVendedorDTO {
+    search: string;
+    searchType: SearchType;
+}
+
+interface VendedorPickerProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelectArea: (area: AreaProduccion) => void;
+    onSelectVendedor: (vendedor: Vendedor) => void;
 }
 
-const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
+const VendedorPicker: React.FC<VendedorPickerProps> = ({
     isOpen,
     onClose,
-    onSelectArea,
+    onSelectVendedor,
 }) => {
     const [searchText, setSearchText] = useState('');
-    const [areas, setAreas] = useState<AreaProduccion[]>([]);
-    const [selectedAreaId, setSelectedAreaId] = useState<number | null>(null);
+    const [searchType, setSearchType] = useState<SearchType>(SearchType.NAME);
+    const [vendedores, setVendedores] = useState<Vendedor[]>([]);
+    const [selectedVendedorId, setSelectedVendedorId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const resultsPerPage = 10;
@@ -66,24 +76,48 @@ const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
     const handleSearch = async () => {
         setIsLoading(true);
         try {
-            const searchDTO: SearchAreaProduccionDTO = {
-                nombre: searchText
+            const searchDTO: SearchVendedorDTO = {
+                search: searchText,
+                searchType: searchType
             };
 
-            const response = await axios.post(endPoints.area_prod_search_by_name, searchDTO, {
+            const response = await axios.post(endPoints.search_vendedor, searchDTO, {
                 params: {
                     page: 0,
                     size: 100
                 }
             });
-            setAreas(response.data);
-            setSelectedAreaId(null); // Reset selection on new search
+
+            console.log('Respuesta de búsqueda de vendedores:', response.data);
+
+            // Manejar correctamente la estructura de Page de Spring
+            if (response.data) {
+                // Si la respuesta es directamente un array
+                if (Array.isArray(response.data)) {
+                    setVendedores(response.data);
+                } 
+                // Si la respuesta es un objeto Page con propiedad content
+                else if (response.data.content && Array.isArray(response.data.content)) {
+                    setVendedores(response.data.content);
+                }
+                // Si la respuesta es el objeto directamente en data
+                else if (typeof response.data === 'object') {
+                    setVendedores([response.data]);
+                }
+                else {
+                    setVendedores([]);
+                }
+            } else {
+                setVendedores([]);
+            }
+
+            setSelectedVendedorId(null); // Reset selection on new search
             setCurrentPage(1); // Reset to first page on new search
         } catch (error) {
-            console.error('Error searching Areas:', error);
+            console.error('Error searching Vendedores:', error);
             toast({
                 title: 'Error',
-                description: 'Error al buscar áreas de producción.',
+                description: 'Error al buscar vendedores.',
                 status: 'error',
                 duration: 5000,
                 isClosable: true,
@@ -94,10 +128,10 @@ const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
     };
 
     const handleConfirm = () => {
-        if (selectedAreaId !== null) {
-            const area = areas.find((a) => a.areaId === selectedAreaId);
-            if (area) {
-                onSelectArea(area);
+        if (selectedVendedorId !== null) {
+            const vendedor = vendedores.find((v) => v.cedula === selectedVendedorId);
+            if (vendedor) {
+                onSelectVendedor(vendedor);
             }
         }
         onClose();
@@ -114,10 +148,10 @@ const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
     };
 
     // Calculate pagination
-    const totalPages = Math.ceil(areas.length / resultsPerPage);
+    const totalPages = Math.ceil(vendedores.length / resultsPerPage);
     const startIndex = (currentPage - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
-    const currentAreas = areas.slice(startIndex, endIndex);
+    const currentVendedores = vendedores.slice(startIndex, endIndex);
 
     // Handle pagination
     const goToPage = (page: number) => {
@@ -130,20 +164,29 @@ const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
         <Modal isOpen={isOpen} onClose={onClose} size="lg">
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Seleccionar Área de Producción</ModalHeader>
+                <ModalHeader>Seleccionar Vendedor</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
                     <VStack spacing={4}>
                         <FormControl>
-                            <FormLabel>Buscar Área</FormLabel>
+                            <FormLabel>Buscar Vendedor</FormLabel>
                             <HStack>
                                 <Input
                                     value={searchText}
                                     onChange={(e) => setSearchText(e.target.value)}
                                     onKeyDown={onKeyPress_InputBuscar}
-                                    placeholder="Ingrese nombre del área"
+                                    placeholder="Ingrese texto de búsqueda"
                                     isDisabled={isLoading}
                                 />
+                                <Select 
+                                    value={searchType}
+                                    onChange={(e) => setSearchType(e.target.value as SearchType)}
+                                    width="150px"
+                                    isDisabled={isLoading}
+                                >
+                                    <option value={SearchType.ID}>Por ID</option>
+                                    <option value={SearchType.NAME}>Por Nombre</option>
+                                </Select>
                                 <Button 
                                     colorScheme="blue" 
                                     onClick={handleSearch} 
@@ -155,27 +198,29 @@ const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
                             </HStack>
                         </FormControl>
                         <Box w="full" overflowX="auto">
-                            {areas.length > 0 ? (
+                            {vendedores.length > 0 ? (
                                 <>
                                     <Table variant="simple" size="sm">
                                         <Thead>
                                             <Tr>
                                                 <Th>ID</Th>
                                                 <Th>Nombre</Th>
-                                                <Th>Descripción</Th>
+                                                <Th>Email</Th>
+                                                <Th>Usuario</Th>
                                             </Tr>
                                         </Thead>
                                         <Tbody>
-                                            {currentAreas.map((area) => (
+                                            {currentVendedores.map((vendedor) => (
                                                 <Tr 
-                                                    key={area.areaId} 
-                                                    onClick={() => setSelectedAreaId(area.areaId)}
-                                                    bg={selectedAreaId === area.areaId ? "teal.100" : "transparent"}
+                                                    key={vendedor.cedula} 
+                                                    onClick={() => setSelectedVendedorId(vendedor.cedula)}
+                                                    bg={selectedVendedorId === vendedor.cedula ? "teal.100" : "transparent"}
                                                     _hover={{ bg: "gray.100", cursor: "pointer" }}
                                                 >
-                                                    <Td>{area.areaId}</Td>
-                                                    <Td>{area.nombre}</Td>
-                                                    <Td>{area.descripcion}</Td>
+                                                    <Td>{vendedor.cedula}</Td>
+                                                    <Td>{`${vendedor.nombres} ${vendedor.apellidos}`}</Td>
+                                                    <Td>{vendedor.email}</Td>
+                                                    <Td>{vendedor.username || '-'}</Td>
                                                 </Tr>
                                             ))}
                                         </Tbody>
@@ -207,7 +252,7 @@ const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
                                     )}
                                 </>
                             ) : (
-                                <Text textAlign="center">No hay áreas para mostrar</Text>
+                                <Text textAlign="center">No hay vendedores para mostrar</Text>
                             )}
                         </Box>
                     </VStack>
@@ -217,7 +262,7 @@ const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
                         colorScheme="teal" 
                         mr={3} 
                         onClick={handleConfirm}
-                        isDisabled={selectedAreaId === null}
+                        isDisabled={selectedVendedorId === null}
                     >
                         Aceptar
                     </Button>
@@ -230,4 +275,4 @@ const AreaPickerGeneric: React.FC<AreaPickerGenericProps> = ({
     );
 };
 
-export default AreaPickerGeneric;
+export default VendedorPicker;

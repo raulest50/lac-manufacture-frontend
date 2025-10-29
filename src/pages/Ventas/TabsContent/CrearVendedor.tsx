@@ -21,7 +21,7 @@ import {
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
 import { SearchIcon } from '@chakra-ui/icons';
-import UserGenericPicker from '../../../components/UserPickerGeneric/UserPickerGeneric.tsx';
+import UserGenericPicker from '../../../components/Pickers/UserPickerGeneric/UserPickerGeneric.tsx';
 import { User } from '../../../pages/Usuarios/GestionUsuarios/types';
 
 interface VendorFormData {
@@ -238,7 +238,7 @@ const CrearVendedor: React.FC<CrearVendedorProps> = ({ onVendorCreated }) => {
         };
 
         try {
-            const response = await axios.post(endPoints.sales.vendedores, payload);
+            const response = await axios.post(endPoints.create_vendedor, payload);
 
             if (response.status === 201) {
                 toast({
@@ -260,7 +260,7 @@ const CrearVendedor: React.FC<CrearVendedorProps> = ({ onVendorCreated }) => {
                     userId: false,
                 });
                 setSelectedUser(null);
-                
+
                 if (onVendorCreated) {
                     onVendorCreated();
                 }

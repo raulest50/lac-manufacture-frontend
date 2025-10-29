@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import UserGenericPicker from './UserPickerGeneric.tsx';
-import { User } from '../../pages/Usuarios/GestionUsuarios/types.tsx';
+import { User } from '../../../pages/Usuarios/GestionUsuarios/types.tsx';
 import { Button, Box, Text, VStack } from '@chakra-ui/react';
 
 export const Default = () => {

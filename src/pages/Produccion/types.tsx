@@ -70,6 +70,17 @@ export interface OrdenSeguimientoDTO {
     estado: number; // 0: pendiente, 1: finalizada
 }
 
+export interface Vendedor {
+    cedula: number;
+    nombres: string;
+    apellidos: string;
+    fechaNacimiento?: string;
+    email: string;
+    telefono?: string;
+    direccion?: string;
+    user?: any;
+}
+
 export interface OrdenProduccionDTO {
     ordenId: number;
     productoId: string | null;

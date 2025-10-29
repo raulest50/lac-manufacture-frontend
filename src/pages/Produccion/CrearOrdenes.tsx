@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import {
     Textarea,
-    Select,
     Button,
     VStack,
     useToast,
@@ -16,12 +15,17 @@ import {
     NumberInputStepper,
     NumberIncrementStepper,
     NumberDecrementStepper,
+    InputGroup,
+    InputRightElement,
+    IconButton,
 } from '@chakra-ui/react';
+import { SearchIcon } from '@chakra-ui/icons';
 import axios from 'axios';
-import {ProductoWithInsumos} from "./types";
+import {ProductoWithInsumos, Vendedor} from "./types";
 import EndPointsURL from "../../api/EndPointsURL";
 import TerminadoSemiterminadoPicker from "./components/TerminadoSemiterminadoPicker";
 import TerSemiTerCard from "./components/TerSemiTerCard";
+import VendedorPicker from "../../components/Pickers/VendedorPicker/VendedorPicker";
 
 const endPoints = new EndPointsURL();
 
@@ -33,6 +37,8 @@ export default function CrearOrdenes() {
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [observaciones, setObservaciones] = useState('');
     const [responsableId, setResponsableId] = useState(1);
+    const [selectedVendedor, setSelectedVendedor] = useState<Vendedor | null>(null);
+    const [isVendedorPickerOpen, setIsVendedorPickerOpen] = useState(false);
     const [numeroPedidoComercial, setNumeroPedidoComercial] = useState('');
     const [areaOperativa, setAreaOperativa] = useState('');
     const [departamentoOperativo, setDepartamentoOperativo] = useState('');
@@ -91,6 +97,7 @@ export default function CrearOrdenes() {
             areaOperativa: toNullableString(areaOperativa),
             departamentoOperativo: toNullableString(departamentoOperativo),
             loteBatchNumber: toNullableString(loteBatchNumber),
+            responsableId: responsableId,
         };
 
         try {
@@ -112,6 +119,8 @@ export default function CrearOrdenes() {
             setNumeroPedidoComercial('');
             setAreaOperativa('');
             setDepartamentoOperativo('');
+            setSelectedVendedor(null);
+            setResponsableId(1); // Reset to default value
         } catch (error) {
             console.error('Error creating orden de producción:', error);
             toast({
@@ -138,6 +147,20 @@ export default function CrearOrdenes() {
         setIsPickerOpen(false);
     };
 
+    // Handlers for VendedorPicker
+    const handleOpenVendedorPicker = () => {
+        setIsVendedorPickerOpen(true);
+    };
+
+    const handleVendedorPickerClose = () => {
+        setIsVendedorPickerOpen(false);
+    };
+
+    const handleSelectVendedor = (vendedor: Vendedor) => {
+        setSelectedVendedor(vendedor);
+        setResponsableId(vendedor.cedula);
+    };
+
     // Efecto para actualizar canProduce cuando cambia la cantidad a producir
     useEffect(() => {
         if (selectedProducto) {
@@ -160,13 +183,21 @@ export default function CrearOrdenes() {
             <HStack spacing={4} mt="4">
                 <FormControl>
                     <FormLabel>Asesor</FormLabel>
-                    <Select
-                        value={responsableId}
-                        onChange={(e) => setResponsableId(Number(e.target.value))}
-                    >
-                        <option value={1}>Vendedor 1</option>
-                        <option value={2}>Vendedor 2</option>
-                    </Select>
+                    <InputGroup>
+                        <Input
+                            value={selectedVendedor ? `${selectedVendedor.cedula} - ${selectedVendedor.nombres} ${selectedVendedor.apellidos}` : ''}
+                            placeholder="Seleccione un vendedor"
+                            isReadOnly
+                        />
+                        <InputRightElement>
+                            <IconButton
+                                aria-label="Buscar vendedor"
+                                icon={<SearchIcon />}
+                                size="sm"
+                                onClick={handleOpenVendedorPicker}
+                            />
+                        </InputRightElement>
+                    </InputGroup>
                 </FormControl>
 
                 <FormControl>
@@ -266,6 +297,11 @@ export default function CrearOrdenes() {
                 isOpen={isPickerOpen}
                 onClose={handlePickerClose}
                 onConfirm={handlePickerConfirm}
+            />
+            <VendedorPicker
+                isOpen={isVendedorPickerOpen}
+                onClose={handleVendedorPickerClose}
+                onSelectVendedor={handleSelectVendedor}
             />
         </VStack>
     );
