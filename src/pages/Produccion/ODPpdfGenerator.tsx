@@ -153,7 +153,8 @@ export default class ODPpdfGenerator {
      * When onlyFirstLevelSemiterminados is true:
      * - First-level semiterminados (directly within the finished product) are included
      * - Semiterminados nested inside other semiterminados are NOT included
-     * - All materials are included, regardless of their nesting level
+     * - All materials from nested semiterminados are extracted and presented as direct inputs
+     *   of the first-level semiterminado, maintaining the appropriate indentation level
      * 
      * @param insumos Array of insumos to flatten
      * @param level Current nesting level (0 for top level)
@@ -165,25 +166,54 @@ export default class ODPpdfGenerator {
             const isMaterial = insumo.tipo_producto.toLowerCase() !== 'semiterminado';
             const isSemiterminado = !isMaterial;
 
-            // If this is a nested semiterminado (not first level) and we're filtering nested semiterminados
+            // Si este es un semiterminado anidado (no de primer nivel) y estamos filtrando semiterminados anidados
             if (isSemiterminado && level > 0 && onlyFirstLevelSemiterminados) {
-                // Don't include the nested semiterminado in the result, but process its materials
+                // No incluir el semiterminado anidado en el resultado, solo extraer sus materiales
                 if (Array.isArray(insumo.subInsumos)) {
-                    return this.flattenInsumos(insumo.subInsumos, level + 1, onlyFirstLevelSemiterminados);
+                    // Extraer recursivamente todos los materiales de este semiterminado anidado
+                    return this.extractAllMaterials(insumo.subInsumos, level);
                 }
                 return [];
             }
 
-            // For materials or first-level semiterminados, include them in the result
+            // Para materiales o semiterminados de primer nivel, incluirlos en el resultado
             const current = [{ item: insumo, level }];
 
-            // And process their subinsumos
+            // Y procesar sus subinsumos
             if (Array.isArray(insumo.subInsumos)) {
                 const children = this.flattenInsumos(insumo.subInsumos, level + 1, onlyFirstLevelSemiterminados);
                 return current.concat(children);
             }
 
             return current;
+        });
+    }
+
+    /**
+     * Helper method to extract all materials from a nested semiterminado.
+     * 
+     * This method recursively processes all insumos:
+     * - If an insumo is a material, it's included in the result with the appropriate level
+     * - If an insumo is a semiterminado, it's excluded but its materials are extracted recursively
+     * 
+     * @param insumos Array of insumos to process
+     * @param parentLevel The nesting level of the parent semiterminado
+     * @returns Flattened array of materials with their nesting level
+     */
+    private extractAllMaterials(insumos: InsumoWithStock[], parentLevel: number): Array<{ item: InsumoWithStock; level: number }> {
+        return insumos.flatMap((insumo) => {
+            const isMaterial = insumo.tipo_producto.toLowerCase() !== 'semiterminado';
+
+            if (isMaterial) {
+                // Si es un material, incluirlo con el nivel del padre + 1
+                return [{ item: insumo, level: parentLevel + 1 }];
+            } else {
+                // Si es un semiterminado, no incluirlo pero extraer sus materiales
+                if (Array.isArray(insumo.subInsumos)) {
+                    return this.extractAllMaterials(insumo.subInsumos, parentLevel + 1);
+                }
+                return [];
+            }
         });
     }
 
