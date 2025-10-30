@@ -502,6 +502,7 @@ export default class ODPpdfGenerator {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
 
+        console.log(insumosTree);
         const flattened = !insumosError && insumosTree.length ? this.flattenInsumos(insumosTree, 0, true) : [];
         const multiplicador = orden.cantidadProducir ?? 0;
         const tableBody = flattened.map(({ item, level }) => {

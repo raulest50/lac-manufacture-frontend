@@ -36,7 +36,7 @@ export default function CrearOrdenes() {
     const [canProduce, setCanProduce] = useState(false);
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [observaciones, setObservaciones] = useState('');
-    const [responsableId, setResponsableId] = useState(1);
+    const [vendedorResponsableId, setVendedorResponsableId] = useState(1);
     const [selectedVendedor, setSelectedVendedor] = useState<Vendedor | null>(null);
     const [isVendedorPickerOpen, setIsVendedorPickerOpen] = useState(false);
     const [numeroPedidoComercial, setNumeroPedidoComercial] = useState('');
@@ -97,7 +97,7 @@ export default function CrearOrdenes() {
             areaOperativa: toNullableString(areaOperativa),
             departamentoOperativo: toNullableString(departamentoOperativo),
             loteBatchNumber: toNullableString(loteBatchNumber),
-            responsableId: responsableId,
+            vendedorResponsableId: vendedorResponsableId,
         };
 
         try {
@@ -120,7 +120,7 @@ export default function CrearOrdenes() {
             setAreaOperativa('');
             setDepartamentoOperativo('');
             setSelectedVendedor(null);
-            setResponsableId(1); // Reset to default value
+            setVendedorResponsableId(1); // Reset to default value
         } catch (error) {
             console.error('Error creating orden de producción:', error);
             toast({
@@ -158,7 +158,7 @@ export default function CrearOrdenes() {
 
     const handleSelectVendedor = (vendedor: Vendedor) => {
         setSelectedVendedor(vendedor);
-        setResponsableId(vendedor.cedula);
+        setVendedorResponsableId(vendedor.cedula);
     };
 
     // Efecto para actualizar canProduce cuando cambia la cantidad a producir
