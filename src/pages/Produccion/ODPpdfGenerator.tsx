@@ -12,15 +12,14 @@ interface jsPDFWithAutoTable extends jsPDF {
     lastAutoTable?: AutoTableProperties;
 }
 
-type EstadoInfo = {
-    label: string;
-};
+type EstadoInfo = { label: string };
 
 const estadoOrdenMap: Record<number, EstadoInfo> = {
     0: { label: "En Producción" },
     1: { label: "Terminada" },
 };
 
+// --- Payload types (flexibles) ---
 type Data4PDFProductoResponse = {
     productoId?: unknown;
     nombre?: unknown;
@@ -45,11 +44,6 @@ type Data4PDFInsumoResponse = {
     insumos?: Data4PDFInsumoResponse[];
 };
 
-type Data4PDFProcesoResponse = Record<string, unknown> & {
-    data?: Record<string, unknown>;
-};
-
-// Interface for AreaProduccion based on the backend model
 interface AreaProduccion {
     areaId: number;
     nombre: string;
@@ -57,38 +51,17 @@ interface AreaProduccion {
     responsableArea?: any;
 }
 
-type Data4PDFSemiterminadoResponse = {
-    productoId?: unknown;
-    nombre?: unknown;
-    procesoProduccionCompleto?: {
-        procesosProduccion?: Data4PDFProcesoResponse[];
-        areaProduccion?: AreaProduccion; // New field added
-    };
-};
-
 type Data4PDFResponse = {
     terminado?: {
-        insumos?: Data4PDFInsumoResponse[];
+        insumos?: Data4PDFInsumoResponse[]; // (se deja, pero NO lo usamos para la tabla 1)
         procesoProduccionCompleto?: {
-            areaProduccion?: AreaProduccion; // New field added
+            areaProduccion?: AreaProduccion;
         };
     };
-    semiterminados?: Data4PDFSemiterminadoResponse[];
-    areasProduccion?: AreaProduccion[]; // New list of production areas
-};
-
-type ProcesoPaso = {
-    id: string;
-    nombre: string;
-    duracion?: string | null;
-    responsable?: string | null;
-};
-
-type SemiterminadoProcesoResult = {
-    semiterminadoId: string;
-    semiterminadoNombre: string;
-    pasos: ProcesoPaso[];
-    error?: string;
+    // NUEVO: el backend ya separa
+    materials?: Data4PDFInsumoResponse[];
+    semiterminados?: Data4PDFInsumoResponse[];
+    areasProduccion?: AreaProduccion[];
 };
 
 export default class ODPpdfGenerator {
@@ -105,134 +78,32 @@ export default class ODPpdfGenerator {
         return doc.output("blob");
     }
 
+    // ---------------------- Utils ----------------------
     private toNullableString(value: unknown): string | null {
-        if (value === null || value === undefined) {
-            return null;
-        }
-
+        if (value === null || value === undefined) return null;
         const str = String(value).trim();
         return str.length > 0 ? str : null;
     }
 
     private toNullableNumber(value: unknown): number | null {
-        if (value === null || value === undefined) {
-            return null;
-        }
-
-        if (typeof value === "number") {
-            return Number.isFinite(value) ? value : null;
-        }
-
+        if (value === null || value === undefined) return null;
+        if (typeof value === "number") return Number.isFinite(value) ? value : null;
         if (typeof value === "string") {
             const trimmed = value.trim();
-            if (!trimmed) {
-                return null;
-            }
+            if (!trimmed) return null;
             const parsed = Number(trimmed);
             return Number.isFinite(parsed) ? parsed : null;
         }
-
         const parsed = Number(value);
         return Number.isFinite(parsed) ? parsed : null;
     }
 
     private formatNumber(value: number | null | undefined, decimals = 3): string {
-        if (value === null || value === undefined || Number.isNaN(value)) {
-            return "—";
-        }
-
+        if (value === null || value === undefined || Number.isNaN(value)) return "—";
         return value.toLocaleString(undefined, {
             minimumFractionDigits: decimals,
             maximumFractionDigits: decimals,
         });
-    }
-
-    /**
-     * Flattens the insumos tree into a flat array, with special handling for semiterminados.
-     * 
-     * When onlyFirstLevelSemiterminados is true:
-     * - First-level semiterminados (directly within the finished product) are included
-     * - Semiterminados nested inside other semiterminados are NOT included
-     * - All materials from nested semiterminados are extracted and presented as direct inputs
-     *   of the first-level semiterminado, maintaining the appropriate indentation level
-     * 
-     * @param insumos Array of insumos to flatten
-     * @param level Current nesting level (0 for top level)
-     * @param onlyFirstLevelSemiterminados Whether to only include first-level semiterminados
-     * @returns Flattened array of insumos with their nesting level
-     */
-    private flattenInsumos(insumos: InsumoWithStock[], level = 0, onlyFirstLevelSemiterminados = false): Array<{ item: InsumoWithStock; level: number }> {
-        return insumos.flatMap((insumo) => {
-            const isMaterial = insumo.tipo_producto.toLowerCase() !== 'semiterminado';
-            const isSemiterminado = !isMaterial;
-
-            // Si este es un semiterminado anidado (no de primer nivel) y estamos filtrando semiterminados anidados
-            if (isSemiterminado && level > 0 && onlyFirstLevelSemiterminados) {
-                // No incluir el semiterminado anidado en el resultado, solo extraer sus materiales
-                if (Array.isArray(insumo.subInsumos)) {
-                    // Extraer recursivamente todos los materiales de este semiterminado anidado
-                    return this.extractAllMaterials(insumo.subInsumos, level);
-                }
-                return [];
-            }
-
-            // Para materiales o semiterminados de primer nivel, incluirlos en el resultado
-            const current = [{ item: insumo, level }];
-
-            // Y procesar sus subinsumos
-            if (Array.isArray(insumo.subInsumos)) {
-                const children = this.flattenInsumos(insumo.subInsumos, level + 1, onlyFirstLevelSemiterminados);
-                return current.concat(children);
-            }
-
-            return current;
-        });
-    }
-
-    /**
-     * Helper method to extract all materials from a nested semiterminado.
-     * 
-     * This method recursively processes all insumos:
-     * - If an insumo is a material, it's included in the result with the appropriate level
-     * - If an insumo is a semiterminado, it's excluded but its materials are extracted recursively
-     * 
-     * @param insumos Array of insumos to process
-     * @param parentLevel The nesting level of the parent semiterminado
-     * @returns Flattened array of materials with their nesting level
-     */
-    private extractAllMaterials(insumos: InsumoWithStock[], parentLevel: number): Array<{ item: InsumoWithStock; level: number }> {
-        return insumos.flatMap((insumo) => {
-            const isMaterial = insumo.tipo_producto.toLowerCase() !== 'semiterminado';
-
-            if (isMaterial) {
-                // Si es un material, incluirlo con el nivel del padre + 1
-                return [{ item: insumo, level: parentLevel + 1 }];
-            } else {
-                // Si es un semiterminado, no incluirlo pero extraer sus materiales
-                if (Array.isArray(insumo.subInsumos)) {
-                    return this.extractAllMaterials(insumo.subInsumos, parentLevel + 1);
-                }
-                return [];
-            }
-        });
-    }
-
-    private buildDurationLabel(data: Record<string, unknown> | undefined): string | null {
-        if (!data) {
-            return null;
-        }
-
-        const tiempo = this.toNullableString((data as { tiempo?: unknown }).tiempo);
-        const unidadesTiempo = this.toNullableString((data as { unidadesTiempo?: unknown }).unidadesTiempo);
-        if (tiempo && unidadesTiempo) {
-            return `${tiempo} ${unidadesTiempo}`;
-        }
-
-        if (tiempo) {
-            return tiempo;
-        }
-
-        return this.toNullableString((data as { tiempoPlanificado?: unknown }).tiempoPlanificado) ?? unidadesTiempo ?? null;
     }
 
     private getErrorMessage(error: unknown): string {
@@ -240,81 +111,230 @@ export default class ODPpdfGenerator {
             const responseMessage = (error.response?.data as { message?: string } | undefined)?.message;
             return responseMessage ?? error.message;
         }
-
-        if (error instanceof Error) {
-            return error.message;
-        }
-
+        if (error instanceof Error) return error.message;
         return typeof error === "string" ? error : "Error desconocido";
     }
 
-    private normalizeData4PDFInsumos(insumos: Data4PDFInsumoResponse[] | undefined): InsumoWithStock[] {
-        if (!Array.isArray(insumos)) {
-            return [];
-        }
-
-        return insumos.map((insumo, index) => this.normalizeData4PDFInsumo(insumo, index));
+    private formatDate(date: string | null): string {
+        if (!date) return "No disponible";
+        const parsed = new Date(date);
+        if (Number.isNaN(parsed.getTime())) return "No disponible";
+        return parsed.toLocaleDateString();
     }
 
-    private normalizeData4PDFInsumo(insumo: Data4PDFInsumoResponse, fallbackIndex: number): InsumoWithStock {
-        const producto = insumo.producto ?? {};
+    private formatNullableNumber(value: number | null): string {
+        return value !== null && value !== undefined ? value.toString() : "No especificado";
+    }
 
-        const rawProductoId =
-            (producto as { productoId?: unknown }).productoId ?? (insumo as { productoId?: unknown }).productoId;
-        const productoId =
-            this.toNullableNumber(rawProductoId) ?? this.toNullableString(rawProductoId) ?? fallbackIndex;
+    private async getImageBase64(url: string): Promise<string> {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (typeof reader.result === "string") resolve(reader.result);
+                else reject("Error converting image to base64.");
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
 
-        const rawInsumoId = (insumo as { insumoId?: unknown }).insumoId;
-        const insumoId = this.toNullableNumber(rawInsumoId) ?? (typeof productoId === "number" ? productoId : fallbackIndex);
+    // ---------------------- Nueva lógica: construir árbol limpio ----------------------
+    /**
+     * Extrae SOLO materiales de un arreglo mixto (materiales y/o semiterminados),
+     * "aplastando" los semiterminados anidados para subir sus materiales.
+     */
+    private extractMaterialsRecursively(items: Data4PDFInsumoResponse[] | undefined): Data4PDFInsumoResponse[] {
+        if (!Array.isArray(items)) return [];
 
-        const productoNombre =
-            this.toNullableString((producto as { nombre?: unknown }).nombre ?? insumo.productoNombre) ??
-            this.toNullableString((insumo as { nombre?: unknown }).nombre) ??
-            "";
+        const getChildren = (x: Data4PDFInsumoResponse): Data4PDFInsumoResponse[] => {
+            if (Array.isArray(x.subInsumos)) return x.subInsumos;
+            if (Array.isArray(x.insumos)) return x.insumos;
+            if (Array.isArray(x.producto?.insumos)) return x.producto!.insumos!;
+            return [];
+        };
 
-        const cantidadRequerida = this.toNullableNumber(insumo.cantidadRequerida) ?? 0;
-        const stockActual = this.toNullableNumber(insumo.stockActual) ?? 0;
+        const looksSemi = (x: Data4PDFInsumoResponse): boolean => {
+            const kids = getChildren(x);
+            if (kids.length > 0) return true;
+            const rawTipo =
+                this.toNullableString(x.tipo_producto) ??
+                this.toNullableString(x.tipoProducto) ??
+                "";
+            const t = (rawTipo ?? "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/\p{Diacritic}/gu, "")
+                .replace(/[^a-z]/g, "");
+            return t.includes("semi") && t.includes("termin");
+        };
 
-        const tipoProducto =
-            this.toNullableString((producto as { tipo_producto?: unknown }).tipo_producto) ??
-            this.toNullableString((producto as { tipoProducto?: unknown }).tipoProducto) ??
-            this.toNullableString(insumo.tipo_producto ?? insumo.tipoProducto) ??
-            "";
+        const out: Data4PDFInsumoResponse[] = [];
+        for (const it of items) {
+            if (looksSemi(it)) {
+                out.push(...this.extractMaterialsRecursively(getChildren(it)));
+            } else {
+                out.push(it);
+            }
+        }
+        return out;
+    }
+
+    /**
+     * Normaliza cualquier item (material) a InsumoWithStock.
+     * Lee PRIMERO de producto.*, luego de campos planos, para evitar IDs/nombres 0/idx.
+     */
+    private normalizeMaterial(m: Data4PDFInsumoResponse, idx: number): InsumoWithStock {
+        const p = (m as any).producto ?? {};
+
+        const nombre =
+            this.toNullableString((m as any).productoNombre) ??
+            this.toNullableString((m as any).nombre) ??
+            this.toNullableString((p as any).productoNombre) ??
+            this.toNullableString((p as any).nombre) ??
+            `Material ${idx + 1}`;
+
+        const productoIdRaw =
+            this.toNullableString((m as any).productoId) ??
+            this.toNullableString((p as any).productoId) ??
+            this.toNullableNumber((m as any).productoId) ??
+            this.toNullableNumber((p as any).productoId) ??
+            idx;
 
         const unidad =
-            this.toNullableString((producto as { tipoUnidades?: unknown }).tipoUnidades) ??
-            this.toNullableString((producto as { unidad?: unknown }).unidad) ??
-            this.toNullableString(insumo.tipoUnidades ?? insumo.unidad) ??
+            this.toNullableString((m as any).tipoUnidades) ??
+            this.toNullableString((m as any).unidad) ??
+            this.toNullableString((p as any).tipoUnidades) ??
+            this.toNullableString((p as any).unidad) ??
             this.defaultUnidad;
 
-        const rawChildren = Array.isArray(insumo.subInsumos)
-            ? insumo.subInsumos
-            : Array.isArray(insumo.insumos)
-            ? insumo.insumos
-            : Array.isArray((producto as { insumos?: Data4PDFInsumoResponse[] }).insumos)
-            ? (producto as { insumos?: Data4PDFInsumoResponse[] }).insumos
-            : [];
+        const cantidadRequerida =
+            this.toNullableNumber((m as any).cantidadRequerida) ??
+            this.toNullableNumber((p as any).cantidadRequerida) ??
+            1;
+
+        const stockActual =
+            this.toNullableNumber((m as any).stockActual) ??
+            this.toNullableNumber((p as any).stockActual) ??
+            0;
 
         return {
-            insumoId,
-            productoId,
-            productoNombre,
+            insumoId:
+                this.toNullableNumber((m as any).insumoId) ??
+                this.toNullableNumber((p as any).insumoId) ??
+                idx,
+            productoId: productoIdRaw,
+            productoNombre: nombre,
             cantidadRequerida,
             stockActual,
-            tipo_producto: tipoProducto,
+            tipo_producto: "material",
             tipoUnidades: unidad,
-            subInsumos: this.normalizeData4PDFInsumos(rawChildren),
+            subInsumos: [],
         };
     }
 
+    /**
+     * Normaliza un semiterminado de primer nivel a InsumoWithStock,
+     * pero purgando semiterminados anidados (sube sus materiales).
+     */
+    private normalizeSemiTopLevel(s: Data4PDFInsumoResponse, idx: number): InsumoWithStock {
+        const p = (s as any).producto ?? {};
+
+        const rawChildren: Data4PDFInsumoResponse[] =
+            Array.isArray(s.subInsumos) ? s.subInsumos :
+                Array.isArray(s.insumos) ? s.insumos :
+                    Array.isArray(p?.insumos) ? p.insumos : [];
+
+        const onlyMaterials = this.extractMaterialsRecursively(rawChildren);
+
+        const nombre =
+            this.toNullableString((s as any).productoNombre) ??
+            this.toNullableString((s as any).nombre) ??
+            this.toNullableString((p as any).productoNombre) ??
+            this.toNullableString((p as any).nombre) ??
+            `Semiterminado ${idx + 1}`;
+
+        const productoIdRaw =
+            this.toNullableString((s as any).productoId) ??
+            this.toNullableString((p as any).productoId) ??
+            this.toNullableNumber((s as any).productoId) ??
+            this.toNullableNumber((p as any).productoId) ??
+            `semi-${idx}`;
+
+        const unidad =
+            this.toNullableString((s as any).tipoUnidades) ??
+            this.toNullableString((s as any).unidad) ??
+            this.toNullableString((p as any).tipoUnidades) ??
+            this.toNullableString((p as any).unidad) ??
+            this.defaultUnidad;
+
+        const cantidadRequerida =
+            this.toNullableNumber((s as any).cantidadRequerida) ??
+            this.toNullableNumber((p as any).cantidadRequerida) ??
+            1;
+
+        const stockActual =
+            this.toNullableNumber((s as any).stockActual) ??
+            this.toNullableNumber((p as any).stockActual) ??
+            0;
+
+        return {
+            insumoId:
+                this.toNullableNumber((s as any).insumoId) ??
+                this.toNullableNumber((p as any).insumoId) ??
+                idx,
+            productoId: productoIdRaw,
+            productoNombre: nombre,
+            cantidadRequerida,
+            stockActual,
+            tipo_producto: "semiterminado",
+            tipoUnidades: unidad,
+            subInsumos: onlyMaterials.map((m, i) => this.normalizeMaterial(m, i)),
+        };
+    }
+
+    /**
+     * Crea el árbol raíz a partir del payload nuevo (materials + semiterminados).
+     * - Materiales van directo a la raíz
+     * - Semiterminados de primer nivel van a la raíz con SOLO materiales como hijos
+     */
+    private buildTreeFromPayload(resp: Data4PDFResponse): InsumoWithStock[] {
+        const materials = Array.isArray((resp as any).materials) ? (resp as any).materials : [];
+        const semis = Array.isArray((resp as any).semiterminados) ? (resp as any).semiterminados : [];
+
+        const rootMaterials = materials.map((m, i) => this.normalizeMaterial(m, i));
+        const rootSemis = semis.map((s, i) => this.normalizeSemiTopLevel(s, i));
+
+        const tree = [...rootMaterials, ...rootSemis];
+        console.log("Árbol construido (materials + semis top-level purgados):", tree);
+        return tree;
+    }
+
+    /**
+     * Flatten simple (sin reglas especiales): solo calcula niveles para indentación en la tabla.
+     */
+    private flattenInsumos(
+        insumos: InsumoWithStock[],
+        level = 0
+    ): Array<{ item: InsumoWithStock; level: number }> {
+        return insumos.flatMap((insumo) => {
+            const current = [{ item: insumo, level }];
+            const kids = Array.isArray(insumo.subInsumos) ? insumo.subInsumos : [];
+            if (kids.length === 0) return current;
+            return current.concat(this.flattenInsumos(kids, level + 1));
+        });
+    }
+
+    // ---------------------- Data fetch (usa payload nuevo) ----------------------
     private async fetchData4PDF(
         productoId: string | null,
-    ): Promise<{ data: InsumoWithStock[]; semiterminadoProcesos: SemiterminadoProcesoResult[]; areasProduccion: AreaProduccion[]; error?: string }> {
+    ): Promise<{ data: InsumoWithStock[]; areasProduccion: AreaProduccion[]; error?: string }> {
         console.log("fetchData4PDF - productoId recibido:", productoId, "Tipo:", typeof productoId);
 
         if (!productoId) {
             console.log("fetchData4PDF - productoId es nulo o vacío");
-            return { data: [], semiterminadoProcesos: [], areasProduccion: [], error: "Identificador de producto no disponible." };
+            return { data: [], areasProduccion: [], error: "Identificador de producto no disponible." };
         }
 
         try {
@@ -324,92 +344,32 @@ export default class ODPpdfGenerator {
             const response = await axios.get<Data4PDFResponse>(url);
             console.log("Respuesta del servidor (data4pdf):", response.data);
 
-            const rawInsumos = response.data?.terminado?.insumos;
-            const data = this.normalizeData4PDFInsumos(rawInsumos);
-            console.log("Insumos normalizados desde data4pdf:", data);
+            // NUEVO: construir el árbol desde materials + semiterminados
+            const data = this.buildTreeFromPayload(response.data);
 
-            // Extract areas of production
+            // Áreas de producción (igual que antes)
             const areasProduccion: AreaProduccion[] = [];
-
-            // Extract area from terminado if it exists
             const terminadoArea = response.data?.terminado?.procesoProduccionCompleto?.areaProduccion;
-            if (terminadoArea && typeof terminadoArea === 'object' && 'areaId' in terminadoArea) {
+            if (terminadoArea && typeof terminadoArea === "object" && "areaId" in terminadoArea) {
                 areasProduccion.push(terminadoArea as AreaProduccion);
             }
-
-            const rawSemiterminados = Array.isArray(response.data?.semiterminados)
-                ? response.data?.semiterminados
-                : [];
-
-            // Extract areas from semiterminados
-            rawSemiterminados.forEach(semi => {
-                const areaProduccion = semi?.procesoProduccionCompleto?.areaProduccion;
-                if (areaProduccion && typeof areaProduccion === 'object' && 'areaId' in areaProduccion) {
-                    // Check if the area already exists in the array to avoid duplicates
-                    if (!areasProduccion.some(area => area.areaId === areaProduccion.areaId)) {
-                        areasProduccion.push(areaProduccion as AreaProduccion);
-                    }
+            const areasFromRoot = Array.isArray(response.data?.areasProduccion) ? response.data!.areasProduccion! : [];
+            for (const a of areasFromRoot) {
+                if (!areasProduccion.some((x) => x.areaId === a.areaId)) {
+                    areasProduccion.push(a);
                 }
-            });
+            }
 
-            const semiterminadoProcesos = rawSemiterminados.map((semi, index) => {
-                const semiterminadoId =
-                    this.toNullableString((semi as { productoId?: unknown }).productoId) ?? `semi-${index + 1}`;
-                const semiterminadoNombre =
-                    this.toNullableString((semi as { nombre?: unknown }).nombre) ??
-                    `Semiterminado ${semiterminadoId}`;
-
-                const procesosRaw = (semi as Data4PDFSemiterminadoResponse)?.procesoProduccionCompleto?.procesosProduccion;
-                const procesosArray = Array.isArray(procesosRaw) ? procesosRaw : [];
-
-                const pasos: ProcesoPaso[] = procesosArray.map((proceso, pasoIndex) => {
-                    const procesoData =
-                        (proceso as { data?: Record<string, unknown> }).data ?? (proceso as Record<string, unknown>);
-                    const nombre =
-                        this.toNullableString(
-                            (procesoData as { nombre?: unknown }).nombre ??
-                                (procesoData as { nombreProceso?: unknown }).nombreProceso ??
-                                (procesoData as { label?: unknown }).label ??
-                                (proceso as { nombre?: unknown }).nombre,
-                        ) ?? `Paso ${pasoIndex + 1}`;
-
-                    const id =
-                        this.toNullableString((proceso as { id?: unknown }).id ?? (procesoData as { id?: unknown }).id) ??
-                        `paso-${pasoIndex + 1}`;
-
-                    const responsable = this.toNullableString(
-                        (procesoData as { responsable?: unknown }).responsable ??
-                            (procesoData as { responsableNombre?: unknown }).responsableNombre ??
-                            (procesoData as { encargado?: unknown }).encargado,
-                    );
-
-                    const duracion = this.buildDurationLabel(procesoData);
-
-                    return {
-                        id,
-                        nombre,
-                        duracion,
-                        responsable,
-                    };
-                });
-
-                return {
-                    semiterminadoId,
-                    semiterminadoNombre,
-                    pasos,
-                };
-            });
-
-            return { data, semiterminadoProcesos, areasProduccion };
+            return { data, areasProduccion };
         } catch (error) {
             console.error("Error en fetchData4PDF:", error);
             const message = this.getErrorMessage(error);
-            return { data: [], semiterminadoProcesos: [], areasProduccion: [], error: message };
+            return { data: [], areasProduccion: [], error: message };
         }
     }
 
+    // ---------------------- PDF generation (cabezote y tabla 2 intactos) ----------------------
     private async generatePDF(orden: OrdenProduccionDTO): Promise<jsPDFWithAutoTable> {
-        // Log de la orden completa para ver todos los datos
         console.log("Orden completa:", orden);
 
         const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" }) as jsPDFWithAutoTable;
@@ -417,17 +377,18 @@ export default class ODPpdfGenerator {
         const pageWidth = doc.internal.pageSize.getWidth();
         let currentY = margin;
 
+        // Logo
         let logoBase64: string | null = null;
         try {
             logoBase64 = await this.getImageBase64("/logo_exotic.png");
         } catch (error) {
             console.error("Error fetching logo image", error);
         }
-
         if (logoBase64) {
             doc.addImage(logoBase64, "PNG", margin, currentY, 30, 24);
         }
 
+        // Título y estado (IDENTICO)
         doc.setFont("helvetica", "bold");
         doc.setFontSize(16);
         doc.text("ORDEN DE PRODUCCIÓN", pageWidth / 2, currentY + 10, { align: "center" });
@@ -439,6 +400,7 @@ export default class ODPpdfGenerator {
 
         currentY += 32;
 
+        // Datos empresa (IDENTICO)
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.text("Napolitana J.P S.A.S.", margin, currentY);
@@ -449,6 +411,7 @@ export default class ODPpdfGenerator {
         currentY += 4;
         doc.text("produccion.exotic@gmail.com", margin, currentY);
 
+        // Fechas (IDENTICO)
         let detailY = margin + 20;
         const detailX = pageWidth - margin - 60;
         doc.setFontSize(8);
@@ -463,6 +426,7 @@ export default class ODPpdfGenerator {
 
         currentY += 12;
 
+        // Resumen del producto (IDENTICO)
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.text("Resumen del producto", margin, currentY);
@@ -470,8 +434,6 @@ export default class ODPpdfGenerator {
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
-        // Antes de formatear la cantidad a producir
-        console.log("Cantidad a producir:", orden.cantidadProducir, "Tipo:", typeof orden.cantidadProducir);
         const productoInfo = [
             `Producto: ${orden.productoNombre}`,
             `Lote: ______________________`,
@@ -485,26 +447,20 @@ export default class ODPpdfGenerator {
             currentY += 5;
         });
 
+        // ---------------------- TABLA 1 (Árbol de insumos) ----------------------
         currentY += 2;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.text("Árbol de insumos", margin, currentY);
         currentY += 6;
 
-        // Antes de llamar a fetchData4PDF
-        console.log("ProductoId antes de fetchData4PDF:", orden.productoId, "Tipo:", typeof orden.productoId);
-        const {
-            data: insumosTree,
-            semiterminadoProcesos,
-            areasProduccion,
-            error: insumosError,
-        } = await this.fetchData4PDF(orden.productoId);
+        const { data: insumosTree, areasProduccion, error: insumosError } = await this.fetchData4PDF(orden.productoId);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
 
-        console.log(insumosTree);
-        const flattened = !insumosError && insumosTree.length ? this.flattenInsumos(insumosTree, 0, true) : [];
+        const flattened = !insumosError && insumosTree.length ? this.flattenInsumos(insumosTree, 0) : [];
         const multiplicador = orden.cantidadProducir ?? 0;
+
         const tableBody = flattened.map(({ item, level }) => {
             const codigo = this.toNullableString(item.productoId) ?? String(item.productoId ?? "");
             const indent = `${"    ".repeat(level)}`;
@@ -544,15 +500,8 @@ export default class ODPpdfGenerator {
             ]],
             body: tableBody,
             startY: currentY,
-            styles: {
-                fontSize: 8,
-                halign: "center",
-                valign: "middle",
-            },
-            headStyles: {
-                fillColor: [217, 234, 249],
-                textColor: 40,
-            },
+            styles: { fontSize: 8, halign: "center", valign: "middle" },
+            headStyles: { fillColor: [217, 234, 249], textColor: 40 },
             columnStyles: {
                 0: { cellWidth: 22 },
                 1: { halign: "left", cellWidth: 60 },
@@ -564,6 +513,7 @@ export default class ODPpdfGenerator {
 
         currentY = (doc.lastAutoTable?.finalY ?? currentY) + 6;
 
+        // ---------------------- TABLA 2 (Áreas de Producción) IDENTICA ----------------------
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.text("Áreas de Producción", margin, currentY);
@@ -575,16 +525,7 @@ export default class ODPpdfGenerator {
             doc.text("Información no disponible por error al obtener insumos.", margin, currentY);
             currentY += 6;
         } else {
-            // Create rows for areas of production
-            const areasProduccionRows = areasProduccion.map(area => {
-                return [
-                    area.nombre,
-                    "",
-                    "" // Leaving Responsable column empty for physical signature
-                ];
-            });
-
-            // If no areas are available, create a default row
+            const areasProduccionRows = (areasProduccion ?? []).map(area => [area.nombre, "", ""]);
             const procesosBody = areasProduccionRows.length > 0 ? areasProduccionRows : [["No hay áreas de producción registradas", "", ""]];
 
             if (!procesosBody.length) {
@@ -595,30 +536,18 @@ export default class ODPpdfGenerator {
                     head: [["Area Proceso", "Estado", "Responsable"]],
                     body: procesosBody,
                     startY: currentY,
-                    styles: {
-                        fontSize: 8,
-                        halign: "center",
-                        valign: "middle",
-                    },
-                    headStyles: {
-                        fillColor: [234, 223, 255],
-                        textColor: 40,
-                    },
-                    columnStyles: {
-                        0: { halign: "left" },
-                        1: { halign: "center" },
-                        2: { halign: "center" },
-                    },
+                    styles: { fontSize: 8, halign: "center", valign: "middle" },
+                    headStyles: { fillColor: [234, 223, 255], textColor: 40 },
+                    columnStyles: { 0: { halign: "left" }, 1: { halign: "center" }, 2: { halign: "center" } },
                     theme: "grid",
-                    // Dibujar manualmente los checkboxes
                     didDrawCell: (data) => {
                         if (data.section === "body" && data.column.index === 1) {
                             const { x, y, width, height } = data.cell;
-                            const size = Math.min(5, height - 2);        // tamaño del checkbox
-                            const cx = x + (width - size) / 2;           // centrado horizontal
-                            const cy = y + (height - size) / 2;          // centrado vertical
+                            const size = Math.min(5, height - 2);
+                            const cx = x + (width - size) / 2;
+                            const cy = y + (height - size) / 2;
                             data.doc.setLineWidth(0.3);
-                            data.doc.rect(cx, cy, size, size);           // dibuja el cuadro
+                            data.doc.rect(cx, cy, size, size);
                         }
                     },
                 });
@@ -627,6 +556,7 @@ export default class ODPpdfGenerator {
             }
         }
 
+        // Observaciones (IDENTICO)
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.text("Observaciones", margin, currentY);
@@ -637,41 +567,7 @@ export default class ODPpdfGenerator {
         const obsText = observaciones && observaciones.length > 0 ? observaciones : "Sin observaciones";
         const obsLines = doc.splitTextToSize(obsText, pageWidth - margin * 2);
         doc.text(obsLines, margin, currentY);
-        currentY += obsLines.length * 4 + 4;
 
         return doc;
-    }
-
-    private formatDate(date: string | null): string {
-        if (!date) {
-            return "No disponible";
-        }
-        const parsed = new Date(date);
-        if (Number.isNaN(parsed.getTime())) {
-            return "No disponible";
-        }
-        return parsed.toLocaleDateString();
-    }
-
-    private formatNullableNumber(value: number | null): string {
-        console.log("formatNullableNumber - valor recibido:", value, "Tipo:", typeof value);
-        return value !== null && value !== undefined ? value.toString() : "No especificado";
-    }
-
-    private async getImageBase64(url: string): Promise<string> {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        return new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (typeof reader.result === "string") {
-                    resolve(reader.result);
-                } else {
-                    reject("Error converting image to base64.");
-                }
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
     }
 }
