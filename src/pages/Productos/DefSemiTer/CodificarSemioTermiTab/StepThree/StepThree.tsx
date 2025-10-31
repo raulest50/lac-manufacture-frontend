@@ -1,4 +1,4 @@
-import { ProductoSemiter, ProcesoDiseñado, ProcesoProduccionCompleto } from "../../../types.tsx";
+import { ProductoSemiter, ProcesoDiseñado, ProcesoProduccionCompleto, TIPOS_PRODUCTOS } from "../../../types.tsx";
 import ProcessDesigner from "../../../DefProcesses/CreadorProcesos/ProcessDesigner.tsx";
 import { 
     Button, 
@@ -11,11 +11,14 @@ import {
     Input,
     InputRightElement,
     IconButton,
-    HStack
+    HStack,
+    Box,
+    Text
 } from "@chakra-ui/react";
 import { SearchIcon } from '@chakra-ui/icons';
 import { useState } from "react";
 import AreaPickerGeneric from "../../../../../components/Pickers/AreaPickerGeneric/AreaPickerGeneric.tsx";
+import PackagingTerminadoDefiner from "./PackagingTerminadoDefiner.tsx";
 
 // Interface for AreaProduccion based on the backend model
 interface AreaProduccion {
@@ -23,6 +26,24 @@ interface AreaProduccion {
     nombre: string;
     descripcion: string;
     responsableArea?: any;
+}
+
+// Interface for CasePack
+interface CasePack {
+    id?: number;
+    unitsPerCase: number;
+    ean14?: string;
+    largoCm?: number;
+    anchoCm?: number;
+    altoCm?: number;
+    grossWeightKg?: number;
+    insumosEmpaque: InsumoEmpaque[];
+}
+
+interface InsumoEmpaque {
+    id?: number;
+    material: any;
+    cantidad: number;
 }
 
 interface Props {
@@ -41,6 +62,13 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
     const [isAreaPickerOpen, setIsAreaPickerOpen] = useState(false);
     const [selectedArea, setSelectedArea] = useState<AreaProduccion | null>(null);
 
+    // State for packaging definer
+    const [isPackagingDefinerOpen, setIsPackagingDefinerOpen] = useState(false);
+    const [casePack, setCasePack] = useState<CasePack | null>(null);
+
+    // Check if we're creating a Terminado
+    const isTerminado = semioter2.tipo_producto === TIPOS_PRODUCTOS.terminado;
+
     const handleOpenAreaPicker = () => {
         setIsAreaPickerOpen(true);
     };
@@ -53,13 +81,32 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
         setSelectedArea(area);
     };
 
+    const handleOpenPackagingDefiner = () => {
+        setIsPackagingDefinerOpen(true);
+    };
+
+    const handleClosePackagingDefiner = () => {
+        setIsPackagingDefinerOpen(false);
+    };
+
+    const handleSavePackaging = (newCasePack: CasePack) => {
+        setCasePack(newCasePack);
+    };
+
     const onClickSiguiente = () => {
         const procesoCompleto: ProcesoProduccionCompleto = {
             ...proceso,
             rendimientoTeorico,
             areaProduccion: selectedArea || undefined,
         };
-        setSemioter3({ ...semioter2, procesoProduccionCompleto: procesoCompleto });
+
+        // Add casePack to the semioter3 object if it's a Terminado
+        setSemioter3({ 
+            ...semioter2, 
+            procesoProduccionCompleto: procesoCompleto,
+            casePack: isTerminado ? casePack : undefined
+        });
+
         setActiveStep(3);
     };
 
@@ -100,6 +147,19 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
                         </InputRightElement>
                     </InputGroup>
                 </FormControl>
+
+                {/* Packaging Definer Button - Only visible for Terminado */}
+                {isTerminado && (
+                    <Box>
+                        <FormLabel>Packaging</FormLabel>
+                        <Button
+                            colorScheme={casePack ? "green" : "blue"}
+                            onClick={handleOpenPackagingDefiner}
+                        >
+                            {casePack ? "Packaging Definido" : "Definir Packaging"}
+                        </Button>
+                    </Box>
+                )}
             </HStack>
 
             <ProcessDesigner
@@ -125,7 +185,12 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
                     variant="solid"
                     onClick={onClickSiguiente}
                     flex={2}
-                    isDisabled={!isProcessValid || rendimientoTeorico <= 0 || !selectedArea}  // Disabled if process definition is invalid or no area selected
+                    isDisabled={
+                        !isProcessValid || 
+                        rendimientoTeorico <= 0 || 
+                        !selectedArea || 
+                        (isTerminado && !casePack) // Require casePack for Terminado
+                    }
                 >
                     Siguiente
                 </Button>
@@ -135,6 +200,12 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
                 isOpen={isAreaPickerOpen}
                 onClose={handleCloseAreaPicker}
                 onSelectArea={handleSelectArea}
+            />
+
+            <PackagingTerminadoDefiner
+                isOpen={isPackagingDefinerOpen}
+                onClose={handleClosePackagingDefiner}
+                onSave={handleSavePackaging}
             />
         </Flex>
     );
