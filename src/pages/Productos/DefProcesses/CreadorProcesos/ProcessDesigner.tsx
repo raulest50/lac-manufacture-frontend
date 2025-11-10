@@ -178,7 +178,9 @@ function ProcessDesignerContent({ semioter2, onProcessChange, onValidityChange }
                 data: {
                     label: proceso.nombre,
                     unidadesTiempo: "1", // Default value
-                    tiempo: String(proceso.processTime),
+                    tiempo: String(proceso.processTime), // Keep for backward compatibility
+                    setupTime: String(proceso.setUpTime), // Add setup time
+                    processTime: String(proceso.processTime), // Add explicit process time
                     nombreProceso: proceso.nombre,
                     instrucciones: "", // Este campo podría venir del backend en el futuro
                     descripcionSalida: "",

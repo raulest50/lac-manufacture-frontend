@@ -7,6 +7,7 @@ import { TbArrowsJoin } from "react-icons/tb";
 
 import { BiRename } from "react-icons/bi";
 import { PiClockCountdownFill } from "react-icons/pi";
+import { MdSettings } from "react-icons/md"; // Icon for setup time
 
 const handleStyle = {
     width:"2em",
@@ -23,7 +24,7 @@ export default function ProcesoNode(props: NodeProps) {
             boxShadow={props.selected ? "0 0 10px gold" : ""}
             transition="box-shadow 0.1s ease"
             _hover={props.selected ? { boxShadow: "0 0 10px gold" } : { boxShadow: "0 0 10px blue" }}
-            w={"15em"}
+            w={"17em"}
         >
 
             <Flex
@@ -64,11 +65,21 @@ export default function ProcesoNode(props: NodeProps) {
                         </HStack>
                     )}
 
-                    {String(data.tiempo).trim() !== "" && (
+                    {/* Setup Time Row */}
+                    {String(data.setupTime || "").trim() !== "" && (
+                        <HStack w="full">
+                            <Icon mr="1em" ml="1em" as={MdSettings} w="2em" h="2em" color="orange.500" />
+                            <Text fontWeight="bold">Setup Time: {String(data.setupTime)}</Text>
+                            <Text fontWeight="bold">{ Number(data.unidadesTiempo) === 1 ? "Mins" : "Horas" }</Text>
+                        </HStack>
+                    )}
+
+                    {/* Process Time Row */}
+                    {String(data.processTime || data.tiempo || "").trim() !== "" && (
                         <HStack w="full">
                             <Icon mr="1em" ml="1em" as={PiClockCountdownFill} w="2em" h="2em" color="teal" />
-                            <Text fontWeight="bold">{String(data.tiempo)}</Text>
-                            <Text fontWeight="bold"> { Number(data.unidadesTiempo) === 1 ? "Mins" : "Horas" }</Text>
+                            <Text fontWeight="bold">Process Time: {String(data.processTime || data.tiempo)}</Text>
+                            <Text fontWeight="bold">{ Number(data.unidadesTiempo) === 1 ? "Mins" : "Horas" }</Text>
                         </HStack>
                     )}
                 </VStack>
