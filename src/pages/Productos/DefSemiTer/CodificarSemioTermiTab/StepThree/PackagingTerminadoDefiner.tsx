@@ -102,13 +102,13 @@ const PackagingTerminadoDefiner: React.FC<Props> = ({ isOpen, onClose, onSave })
 
   // Search for packaging materials
   const searchMaterials = async () => {
-    if (!searchTerm.trim()) return;
+    //if (!searchTerm.trim()) return;
     
     setIsSearching(true);
     try {
       const response = await axios.post(endpoints.consulta_productos, {
         search: searchTerm,
-        categories: ["materialDeEmpaque"], // Filter for packaging materials only
+        categories: ["material empaque"], // Filter for packaging materials only
         page: 0,
         size: 10
       });
