@@ -130,11 +130,30 @@ export interface RecursoProduccion {
     activosFijos?: ActivoFijo[];
 }
 
+export enum TimeModelType {
+    CONSTANT = "CONSTANT",
+    THROUGHPUT_RATE = "THROUGHPUT_RATE",
+    PER_UNIT = "PER_UNIT",
+    PER_BATCH = "PER_BATCH"
+}
+
 export interface ProcesoProduccionEntity {
     procesoId?: number;
     nombre: string;
     recursosRequeridos: RecursoProduccion[];
     setUpTime: number;
-    processTime: number;
     nivelAcceso?: number; // Define qué usuarios pueden ver este proceso según su nivel de acceso
+
+    // Nuevo modelo de tiempo
+    model: TimeModelType;
+
+    // Campos específicos para cada modelo
+    constantSeconds?: number;        // Para CONSTANT
+    throughputUnitsPerSec?: number;  // Para THROUGHPUT_RATE
+    secondsPerUnit?: number;         // Para PER_UNIT
+    secondsPerBatch?: number;        // Para PER_BATCH
+    batchSize?: number;              // Para PER_BATCH
+
+    // Campo legacy para compatibilidad con código existente
+    processTime?: number;
 }

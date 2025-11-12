@@ -1,6 +1,6 @@
 
 
-import {Box, Flex, Text, Icon, VStack, HStack} from "@chakra-ui/react";
+import {Box, Flex, Text, Icon, VStack, HStack, Badge} from "@chakra-ui/react";
 import {Handle, Position, NodeProps} from "@xyflow/react";
 
 import { TbArrowsJoin } from "react-icons/tb";
@@ -8,6 +8,7 @@ import { TbArrowsJoin } from "react-icons/tb";
 import { BiRename } from "react-icons/bi";
 import { PiClockCountdownFill } from "react-icons/pi";
 import { MdSettings } from "react-icons/md"; // Icon for setup time
+import { TimeModelType } from "../../../types.tsx";
 
 const handleStyle = {
     width:"2em",
@@ -69,17 +70,54 @@ export default function ProcesoNode(props: NodeProps) {
                     {String(data.setupTime || "").trim() !== "" && (
                         <HStack w="full">
                             <Icon mr="1em" ml="1em" as={MdSettings} w="2em" h="2em" color="orange.500" />
-                            <Text fontWeight="bold">Setup Time: {String(data.setupTime)}</Text>
-                            <Text fontWeight="bold">{ Number(data.unidadesTiempo) === 1 ? "Mins" : "Horas" }</Text>
+                            <Text fontWeight="bold">Setup: {String(data.setupTime)} seg</Text>
                         </HStack>
                     )}
 
-                    {/* Process Time Row */}
-                    {String(data.processTime || data.tiempo || "").trim() !== "" && (
+                    {/* Modelo de Tiempo Row */}
+                    {String(data.model || "").trim() !== "" && (
                         <HStack w="full">
                             <Icon mr="1em" ml="1em" as={PiClockCountdownFill} w="2em" h="2em" color="teal" />
-                            <Text fontWeight="bold">Process Time: {String(data.processTime || data.tiempo)}</Text>
-                            <Text fontWeight="bold">{ Number(data.unidadesTiempo) === 1 ? "Mins" : "Horas" }</Text>
+                            <Text fontWeight="bold">Modelo: </Text>
+                            <Badge colorScheme="teal">{String(data.model)}</Badge>
+                        </HStack>
+                    )}
+
+                    {/* Parámetros específicos según el modelo */}
+                    {data.model === TimeModelType.CONSTANT && data.constantSeconds && (
+                        <HStack w="full" pl="3em">
+                            <Text fontWeight="bold">Tiempo constante: {data.constantSeconds} seg</Text>
+                        </HStack>
+                    )}
+
+                    {data.model === TimeModelType.THROUGHPUT_RATE && data.throughputUnitsPerSec && (
+                        <HStack w="full" pl="3em">
+                            <Text fontWeight="bold">Tasa: {data.throughputUnitsPerSec} u/seg</Text>
+                        </HStack>
+                    )}
+
+                    {data.model === TimeModelType.PER_UNIT && data.secondsPerUnit && (
+                        <HStack w="full" pl="3em">
+                            <Text fontWeight="bold">Tiempo/unidad: {data.secondsPerUnit} seg</Text>
+                        </HStack>
+                    )}
+
+                    {data.model === TimeModelType.PER_BATCH && data.secondsPerBatch && data.batchSize && (
+                        <>
+                            <HStack w="full" pl="3em">
+                                <Text fontWeight="bold">Tiempo/lote: {data.secondsPerBatch} seg</Text>
+                            </HStack>
+                            <HStack w="full" pl="3em">
+                                <Text fontWeight="bold">Tamaño lote: {data.batchSize} u</Text>
+                            </HStack>
+                        </>
+                    )}
+
+                    {/* Backward compatibility for old data */}
+                    {!data.model && (String(data.processTime || data.tiempo || "").trim() !== "") && (
+                        <HStack w="full">
+                            <Icon mr="1em" ml="1em" as={PiClockCountdownFill} w="2em" h="2em" color="teal" />
+                            <Text fontWeight="bold">Process Time: {String(data.processTime || data.tiempo)} seg</Text>
                         </HStack>
                     )}
                 </VStack>

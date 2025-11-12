@@ -19,7 +19,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import MaterialPrimarioNode from "./Nodos/MaterialPrimarioNode.tsx";
 import ProcesoNode from "./Nodos/ProcesoNode.tsx";
-import { ProductoSemiter, ProcesoProduccionEntity, ProcesoDiseñado, ProcesoProduccionNode } from "../../types.tsx";
+import { ProductoSemiter, ProcesoProduccionEntity, ProcesoDiseñado, ProcesoProduccionNode, TimeModelType } from "../../types.tsx";
 import TargetNode from "./Nodos/TargetNode.tsx";
 import { Stat, StatLabel, StatNumber } from "@chakra-ui/icons";
 // Importar el ProcesoProduccionPicker
@@ -178,13 +178,23 @@ function ProcessDesignerContent({ semioter2, onProcessChange, onValidityChange }
                 data: {
                     label: proceso.nombre,
                     unidadesTiempo: "1", // Default value
-                    tiempo: String(proceso.processTime), // Keep for backward compatibility
                     setupTime: String(proceso.setUpTime), // Add setup time
-                    processTime: String(proceso.processTime), // Add explicit process time
                     nombreProceso: proceso.nombre,
                     instrucciones: "", // Este campo podría venir del backend en el futuro
                     descripcionSalida: "",
                     procesoId: proceso.procesoId, // Guardar el ID del proceso seleccionado
+
+                    // Nuevos campos para el modelo de tiempo
+                    model: proceso.model,
+                    constantSeconds: proceso.constantSeconds,
+                    throughputUnitsPerSec: proceso.throughputUnitsPerSec,
+                    secondsPerUnit: proceso.secondsPerUnit,
+                    secondsPerBatch: proceso.secondsPerBatch,
+                    batchSize: proceso.batchSize,
+
+                    // Para compatibilidad con código existente
+                    tiempo: proceso.processTime ? String(proceso.processTime) : "",
+                    processTime: proceso.processTime ? String(proceso.processTime) : "",
                 },
                 position: { 
                     x: 200, 

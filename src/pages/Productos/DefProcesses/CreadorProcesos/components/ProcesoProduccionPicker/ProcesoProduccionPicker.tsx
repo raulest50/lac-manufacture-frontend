@@ -16,12 +16,14 @@ import {
   Th, 
   Thead, 
   Tr,
-  useToast
+  useToast,
+  Tooltip,
+  Badge
 } from '@chakra-ui/react';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import EndPointsURL from '../../../../../../api/EndPointsURL.tsx';
-import {ProcesoProduccionEntity} from '../../../../types.tsx';
+import {ProcesoProduccionEntity, TimeModelType} from '../../../../types.tsx';
 import MyPagination from '../../../../../../components/MyPagination.tsx';
 
 interface Props {
@@ -34,6 +36,46 @@ interface Props {
 export function ProcesoProduccionPicker({isOpen, onClose, onConfirm, alreadySelected}: Props) {
   const endPoints = new EndPointsURL();
   const toast = useToast();
+
+  // Helper function to format time model information
+  const getTimeModelInfo = (proceso: ProcesoProduccionEntity): { label: string, details: string } => {
+    switch (proceso.model) {
+      case TimeModelType.CONSTANT:
+        return {
+          label: 'Constante',
+          details: `${proceso.constantSeconds ?? 0} seg`
+        };
+      case TimeModelType.THROUGHPUT_RATE:
+        return {
+          label: 'Tasa',
+          details: `${proceso.throughputUnitsPerSec ?? 0} u/seg`
+        };
+      case TimeModelType.PER_UNIT:
+        return {
+          label: 'Por Unidad',
+          details: `${proceso.secondsPerUnit ?? 0} seg/u`
+        };
+      case TimeModelType.PER_BATCH:
+        // Verificar que ambos valores existan antes de usarlos
+        if (proceso.secondsPerBatch != null && proceso.batchSize != null) {
+          return {
+            label: 'Por Lote',
+            details: `${proceso.secondsPerBatch} seg/lote(${proceso.batchSize})`
+          };
+        } else {
+          return {
+            label: 'Por Lote',
+            details: 'Valores incompletos'
+          };
+        }
+      default:
+        // For backward compatibility with old data
+        return {
+          label: 'Tiempo',
+          details: `${proceso.processTime ?? 0} seg`
+        };
+    }
+  };
 
   const [searchText, setSearchText] = useState('');
   const [available, setAvailable] = useState<ProcesoProduccionEntity[]>([]);
@@ -141,23 +183,32 @@ export function ProcesoProduccionPicker({isOpen, onClose, onConfirm, alreadySele
                   <Tr>
                     <Th>ID</Th>
                     <Th>Nombre</Th>
-                    <Th>Tiempo de Proceso</Th>
+                    <Th>Modelo de Tiempo</Th>
+                    <Th>Setup Time</Th>
                     <Th>Nivel de Acceso</Th>
                     <Th></Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {available.map(proceso => (
-                    <Tr key={proceso.procesoId}>
-                      <Td>{proceso.procesoId}</Td>
-                      <Td>{proceso.nombre}</Td>
-                      <Td>{proceso.processTime} min</Td>
-                      <Td>{proceso.nivelAcceso !== undefined ? proceso.nivelAcceso : '-'}</Td>
-                      <Td>
-                        <Button size='xs' onClick={() => handleAdd(proceso)}>+</Button>
-                      </Td>
-                    </Tr>
-                  ))}
+                  {available.map(proceso => {
+                    const timeInfo = getTimeModelInfo(proceso);
+                    return (
+                      <Tr key={proceso.procesoId}>
+                        <Td>{proceso.procesoId}</Td>
+                        <Td>{proceso.nombre}</Td>
+                        <Td>
+                          <Tooltip label={timeInfo.details}>
+                            <Badge colorScheme="teal">{timeInfo.label}</Badge>
+                          </Tooltip>
+                        </Td>
+                        <Td>{proceso.setUpTime} seg</Td>
+                        <Td>{proceso.nivelAcceso !== undefined ? proceso.nivelAcceso : '-'}</Td>
+                        <Td>
+                          <Button size='xs' onClick={() => handleAdd(proceso)}>+</Button>
+                        </Td>
+                      </Tr>
+                    );
+                  })}
                 </Tbody>
               </Table>
               {totalPages > 1 && (
@@ -177,29 +228,38 @@ export function ProcesoProduccionPicker({isOpen, onClose, onConfirm, alreadySele
                   <Tr>
                     <Th>ID</Th>
                     <Th>Nombre</Th>
-                    <Th>Tiempo de Proceso</Th>
+                    <Th>Modelo de Tiempo</Th>
+                    <Th>Setup Time</Th>
                     <Th>Nivel de Acceso</Th>
                     <Th></Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {selected.map(proceso => (
-                    <Tr key={proceso.procesoId}>
-                      <Td>{proceso.procesoId}</Td>
-                      <Td>{proceso.nombre}</Td>
-                      <Td>{proceso.processTime} min</Td>
-                      <Td>{proceso.nivelAcceso !== undefined ? proceso.nivelAcceso : '-'}</Td>
-                      <Td>
-                        <Button 
-                          size='xs' 
-                          colorScheme='red' 
-                          onClick={() => handleRemove(proceso)}
-                        >
-                          -
-                        </Button>
-                      </Td>
-                    </Tr>
-                  ))}
+                  {selected.map(proceso => {
+                    const timeInfo = getTimeModelInfo(proceso);
+                    return (
+                      <Tr key={proceso.procesoId}>
+                        <Td>{proceso.procesoId}</Td>
+                        <Td>{proceso.nombre}</Td>
+                        <Td>
+                          <Tooltip label={timeInfo.details}>
+                            <Badge colorScheme="teal">{timeInfo.label}</Badge>
+                          </Tooltip>
+                        </Td>
+                        <Td>{proceso.setUpTime} seg</Td>
+                        <Td>{proceso.nivelAcceso !== undefined ? proceso.nivelAcceso : '-'}</Td>
+                        <Td>
+                          <Button 
+                            size='xs' 
+                            colorScheme='red' 
+                            onClick={() => handleRemove(proceso)}
+                          >
+                            -
+                          </Button>
+                        </Td>
+                      </Tr>
+                    );
+                  })}
                 </Tbody>
               </Table>
             </Box>
