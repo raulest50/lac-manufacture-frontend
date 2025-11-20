@@ -1,7 +1,7 @@
 // ReporteOrdenesCompras.tsx
 import { useState } from "react";
 import { Button, Container, Flex, Select, Spinner } from "@chakra-ui/react";
-import { OrdenCompraMateriales } from "./types";
+import { OrdenCompraMateriales, Proveedor } from "./types";
 import { format } from "date-fns";
 import DateRangePicker from "../../components/DateRangePicker";
 import axios from "axios";
@@ -9,6 +9,8 @@ import EndPointsURL from '../../api/EndPointsURL';
 import ListaOrdenesCompra from "./components/ListaOrdenesCompra";
 import MyPagination from "../../components/MyPagination";
 import { EditarOcmSeleccionada } from "./components/EditarOCMSeleccionada";
+import ProveedorPicker from "./components/ProveedorPicker";
+import ProveedorFilterOCM from "./components/ProveedorFilterOCM";
 
 export default function ReporteOrdenesCompras() {
     const [listaOrdenesCompras, setListaOrdenesCompras] = useState<OrdenCompraMateriales[]>([]);
@@ -20,6 +22,8 @@ export default function ReporteOrdenesCompras() {
     const [loading, setLoading] = useState(false);
     // Nuevo estado para la orden seleccionada para editar
     const [ordenToEdit, setOrdenToEdit] = useState<OrdenCompraMateriales | null>(null);
+    const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);
+    const [isProveedorPickerOpen, setIsProveedorPickerOpen] = useState(false);
 
     const endPoints = new EndPointsURL();
 
@@ -33,6 +37,7 @@ export default function ReporteOrdenesCompras() {
                     estados: estadoOrden_search,
                     page: page,
                     size: 10,
+                    proveedorId: selectedProveedor?.id,
                 },
             });
             const data = response.data;
@@ -71,13 +76,18 @@ export default function ReporteOrdenesCompras() {
                 />
             ) : (
                 <Flex direction="column" p="1em" gap="2">
-                    <Flex direction="row" gap={2} align="center">
+                    <Flex direction="row" gap={2} align="center" flexWrap="wrap">
                         <DateRangePicker
                             date1={date1}
                             setDate1={setDate1}
                             date2={date2}
                             setDate2={setDate2}
                             flex_direction="column"
+                        />
+                        <ProveedorFilterOCM
+                            selectedProveedor={selectedProveedor}
+                            onOpenPicker={() => setIsProveedorPickerOpen(true)}
+                            onClearFilter={() => setSelectedProveedor(null)}
                         />
                         <Select
                             value={estadoOrden_search}
@@ -115,6 +125,11 @@ export default function ReporteOrdenesCompras() {
                     )}
                 </Flex>
             )}
+            <ProveedorPicker
+                isOpen={isProveedorPickerOpen}
+                onClose={() => setIsProveedorPickerOpen(false)}
+                onSelectProveedor={(proveedor) => setSelectedProveedor(proveedor)}
+            />
         </Container>
     );
 }
