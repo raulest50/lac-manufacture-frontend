@@ -26,6 +26,7 @@ interface CancelarOrdenDialogProps {
 const CancelarOrdenDialog: React.FC<CancelarOrdenDialogProps> = ({ isOpen, onClose, orden, onOrderCancelled }) => {
     const [randomCode, setRandomCode] = useState<string>('');
     const [inputCode, setInputCode] = useState<string>('');
+    const [isCancelling, setIsCancelling] = useState<boolean>(false);
     const toast = useToast();
 
 
@@ -41,6 +42,7 @@ const CancelarOrdenDialog: React.FC<CancelarOrdenDialogProps> = ({ isOpen, onClo
     const handleAnularOrden = async () => {
         if (inputCode === randomCode) {
             try {
+                setIsCancelling(true);
                 // Call the backend endpoint to cancel the order.
                 await axios.put(`${EndPointsURL.getDomain()}/compras/orden_compra/${orden.ordenCompraId}/cancel`);
                 toast({
@@ -62,6 +64,8 @@ const CancelarOrdenDialog: React.FC<CancelarOrdenDialogProps> = ({ isOpen, onClo
                     duration: 5000,
                     isClosable: true,
                 });
+            } finally {
+                setIsCancelling(false);
             }
         } else {
             toast({
@@ -92,7 +96,13 @@ const CancelarOrdenDialog: React.FC<CancelarOrdenDialogProps> = ({ isOpen, onClo
                     />
                 </ModalBody>
                 <ModalFooter>
-                    <Button colorScheme="red" mr={3} onClick={handleAnularOrden}>
+                    <Button
+                        colorScheme="red"
+                        mr={3}
+                        onClick={handleAnularOrden}
+                        isLoading={isCancelling}
+                        loadingText="Anulando..."
+                    >
                         Anular Orden
                     </Button>
                     <Button variant="ghost" onClick={onClose}>Atrás</Button>
