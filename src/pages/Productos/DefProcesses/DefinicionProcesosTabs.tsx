@@ -5,6 +5,7 @@ import CrearRecursoProduccion from './CrearRecursoProduccion.tsx';
 import ConsultaRecursosProduccion from './ConsultaRecursosProduccion.tsx';
 import CrearAreaProduccionTab from './CreadorProcesos/CrearAreaProduccionTab.tsx';
 import {my_style_tab} from '../../../styles/styles_general.tsx';
+import {ConsultaProcesosProduccion} from "./ConsultaProcesosProduccion.tsx";
 
 interface Props {
     onBack: () => void;
@@ -19,6 +20,7 @@ export function DefinicionProcesosTabs({onBack}: Props) {
             <Tabs isFitted gap="1em" variant="line">
                 <TabList>
                     <Tab sx={my_style_tab}>Definición de Procesos</Tab>
+                    <Tab sx={my_style_tab}>Consultar Procesos de Produccion</Tab>
                     <Tab sx={my_style_tab}>Crear Recurso Producción</Tab>
                     <Tab sx={my_style_tab}>Consulta Recursos Producción</Tab>
                     <Tab sx={my_style_tab}>Crear Área Producción</Tab>
@@ -26,6 +28,9 @@ export function DefinicionProcesosTabs({onBack}: Props) {
                 <TabPanels>
                     <TabPanel>
                         <DefinicionProcesosTab />
+                    </TabPanel>
+                    <TabPanel>
+                        <ConsultaProcesosProduccion />
                     </TabPanel>
                     <TabPanel>
                         <CrearRecursoProduccion />

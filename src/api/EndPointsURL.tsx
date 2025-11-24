@@ -241,7 +241,7 @@ export default class EndPointsURL{
         // procesos de produccion endpoints
         this.save_proceso_produccion = `${domain}/${procesos_produccion_res}`;
         this.get_procesos_produccion_pag = `${domain}/${procesos_produccion_res}/paginados`;
-        this.update_proceso_produccion = `${domain}/${procesos_produccion_res}/{id}`;
+        this.update_proceso_produccion = `${domain}/${procesos_produccion_res}/update_proc_produccion/{id}`;
 
         // ventas endpoints
         this.create_vendedor = `${domain}/${vendedor_res}/crear_vendedor`;
