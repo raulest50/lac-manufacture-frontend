@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import EndPointsURL from "../../api/EndPointsURL";
 import { useAuth } from "../../context/AuthContext";
+import AjustesInventarioTab from "./AjustesInventario/AjustesInventarioTab";
 
 
 export default function TransaccionesAlmacenPage(){
@@ -49,6 +50,7 @@ export default function TransaccionesAlmacenPage(){
                     <Tab> Ingreso Producto Terminado </Tab>
                     {showDispensacionDirecta && <Tab> Dispensacion Directa </Tab>}
                     {showBackflushDirecto && <Tab> Backflush Directo </Tab>}
+                    <Tab> Ajustes de Inventario </Tab>
                 </TabList>
                 <TabPanels>
 
@@ -75,6 +77,10 @@ export default function TransaccionesAlmacenPage(){
                             <AsistenteBackflushDirecto />
                         </TabPanel>
                     )}
+
+                    <TabPanel>
+                        <AjustesInventarioTab />
+                    </TabPanel>
 
                 </TabPanels>
             </Tabs>
