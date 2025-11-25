@@ -18,9 +18,17 @@ import {
     StepStatus,
     StepTitle,
     Stepper,
+    Table,
+    Tbody,
+    Td,
     Text,
-    useSteps
+    Th,
+    Thead,
+    Tr,
+    useSteps,
+    IconButton
 } from "@chakra-ui/react";
+import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import axios from "axios";
 import MyPagination from "../../../components/MyPagination.tsx";
@@ -54,6 +62,7 @@ export default function AjustesInventarioTab(){
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
+    const [selectedProducts, setSelectedProducts] = useState<Producto[]>([]);
     const pageSize = 10;
 
     const endpoints = new EndPointsURL();
@@ -83,6 +92,22 @@ export default function AjustesInventarioTab(){
 
     const handlePageChange = (newPage: number) => {
         fetchProductos(newPage);
+    };
+
+    const handleAddProduct = (producto: Producto) => {
+        setSelectedProducts((prevSelected) => {
+            if (prevSelected.some((item) => item.productoId === producto.productoId)) {
+                return prevSelected;
+            }
+
+            return [...prevSelected, producto];
+        });
+    };
+
+    const handleRemoveProduct = (productoId: string) => {
+        setSelectedProducts((prevSelected) =>
+            prevSelected.filter((item) => item.productoId !== productoId)
+        );
     };
 
     const {activeStep, setActiveStep} = useSteps({index: 0, count: steps.length});
@@ -194,13 +219,34 @@ export default function AjustesInventarioTab(){
                                     {loading ? (
                                         <Text color={'gray.500'}>Cargando productos...</Text>
                                     ) : productos.length > 0 ? (
-                                        <Stack spacing={2}>
-                                            {productos.map((producto) => (
-                                                <Text key={producto.productoId} color={'gray.700'}>
-                                                    {producto.nombre} ({producto.tipo_producto})
-                                                </Text>
-                                            ))}
-                                        </Stack>
+                                        <Table size={'sm'} variant={'simple'}>
+                                            <Thead>
+                                                <Tr>
+                                                    <Th>ID</Th>
+                                                    <Th>Nombre</Th>
+                                                    <Th>Tipo</Th>
+                                                    <Th textAlign={'center'}>Acciones</Th>
+                                                </Tr>
+                                            </Thead>
+                                            <Tbody>
+                                                {productos.map((producto) => (
+                                                    <Tr key={producto.productoId}>
+                                                        <Td>{producto.productoId}</Td>
+                                                        <Td>{producto.nombre}</Td>
+                                                        <Td textTransform={'capitalize'}>{producto.tipo_producto}</Td>
+                                                        <Td textAlign={'center'}>
+                                                            <IconButton
+                                                                aria-label={'Agregar producto'}
+                                                                icon={<AddIcon />}
+                                                                size={'sm'}
+                                                                variant={'outline'}
+                                                                onClick={() => handleAddProduct(producto)}
+                                                            />
+                                                        </Td>
+                                                    </Tr>
+                                                ))}
+                                            </Tbody>
+                                        </Table>
                                     ) : (
                                         <Text color={'gray.500'}>No hay productos para mostrar.</Text>
                                     )}
@@ -226,7 +272,39 @@ export default function AjustesInventarioTab(){
                             <Text fontSize={'lg'} fontWeight={'semibold'} mb={3}>
                                 Items seleccionados
                             </Text>
-                            <Text color={'gray.500'}>Añade productos para verlos aquí.</Text>
+                            {selectedProducts.length > 0 ? (
+                                <Table size={'sm'} variant={'simple'}>
+                                    <Thead>
+                                        <Tr>
+                                            <Th>ID</Th>
+                                            <Th>Nombre</Th>
+                                            <Th>Tipo</Th>
+                                            <Th textAlign={'center'}>Acciones</Th>
+                                        </Tr>
+                                    </Thead>
+                                    <Tbody>
+                                        {selectedProducts.map((producto) => (
+                                            <Tr key={producto.productoId}>
+                                                <Td>{producto.productoId}</Td>
+                                                <Td>{producto.nombre}</Td>
+                                                <Td textTransform={'capitalize'}>{producto.tipo_producto}</Td>
+                                                <Td textAlign={'center'}>
+                                                    <IconButton
+                                                        aria-label={'Remover producto'}
+                                                        icon={<DeleteIcon />}
+                                                        colorScheme={'red'}
+                                                        size={'sm'}
+                                                        variant={'ghost'}
+                                                        onClick={() => handleRemoveProduct(producto.productoId)}
+                                                    />
+                                                </Td>
+                                            </Tr>
+                                        ))}
+                                    </Tbody>
+                                </Table>
+                            ) : (
+                                <Text color={'gray.500'}>Añade productos para verlos aquí.</Text>
+                            )}
                         </Box>
                     </Flex>
                 </Box>
