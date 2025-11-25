@@ -1,3 +1,14 @@
+/**
+ * Componente: BasicOperationsTabs
+ * 
+ * Ubicación en la navegación:
+ * Productos > Basic
+ * 
+ * Descripción:
+ * Componente principal que gestiona las pestañas de la sección Basic de Productos.
+ * Incluye pestañas para codificar materiales y consultar productos.
+ */
+
 import {useState} from 'react';
 import {Button, Flex, Tab, TabList, TabPanel, TabPanels, Tabs} from '@chakra-ui/react';
 import {FaArrowLeft} from 'react-icons/fa';

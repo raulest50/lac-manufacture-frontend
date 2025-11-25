@@ -1,3 +1,34 @@
+/**
+ * Componente: ProductosPage
+ * 
+ * Ubicación en la navegación:
+ * Productos (módulo principal)
+ * 
+ * Descripción:
+ * Componente principal del módulo de Productos que gestiona la navegación entre las
+ * diferentes secciones: Basic, Definir Terminado/Semiterminado y Definición de Procesos.
+ * 
+ * Estructura de navegación:
+ * - Productos (ProductosPage.tsx)
+ *   ├── Basic (BasicOperationsTabs.tsx)
+ *   │   ├── Codificar Material (CodificarMaterialesTab.tsx)
+ *   │   └── Consulta (InformeProductosTab.tsx)
+ *   │       └── Ver Detalle (DetalleProducto.tsx)
+ *   │
+ *   ├── Definir Terminado/Semiterminado (TerminadosSemiterminadosTabs.tsx)
+ *   │   ├── Codificar Terminado/Semiterminado (CodificarSemioTermiTab.tsx)
+ *   │   ├── Categorías (CategoriasTab.tsx)
+ *   │   └── Modificaciones (InformeProductosTabAdvanced.tsx)
+ *   │       └── Ver Detalle (DetalleProductoAdvanced.tsx)
+ *   │
+ *   └── Definición de Procesos (DefinicionProcesosTabs.tsx)
+ *       ├── Definición de Procesos (DefinicionProcesosTab.tsx)
+ *       ├── Consultar Procesos de Producción (ConsultaProcesosProduccion.tsx)
+ *       ├── Crear Recurso Producción (CrearRecursoProduccion.tsx)
+ *       ├── Consulta Recursos Producción (ConsultaRecursosProduccion.tsx)
+ *       └── Crear Área Producción (CrearAreaProduccionTab.tsx)
+ */
+
 import {useState, useEffect} from 'react';
 import {Container} from '@chakra-ui/react';
 import axios from 'axios';

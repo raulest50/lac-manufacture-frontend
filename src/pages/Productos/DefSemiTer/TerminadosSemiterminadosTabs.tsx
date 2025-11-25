@@ -1,9 +1,22 @@
+/**
+ * Componente: TerminadosSemiterminadosTabs
+ * 
+ * Ubicación en la navegación:
+ * Productos > Definir Terminado/Semiterminado
+ * 
+ * Descripción:
+ * Componente principal que gestiona las pestañas de la sección de Definir Terminado/Semiterminado.
+ * Incluye pestañas para codificar productos, gestionar categorías y realizar modificaciones
+ * a productos existentes (esta última solo disponible para usuarios con nivel de acceso 3 o superior).
+ */
+
 import {useState} from 'react';
 import {Button, Flex, Tab, TabList, TabPanel, TabPanels, Tabs} from '@chakra-ui/react';
 import {FaArrowLeft} from 'react-icons/fa';
 import CodificarSemioTermiTab from './CodificarSemioTermiTab/CodificarSemioTermiTab.tsx';
 import {CategoriasTab} from './CategoriasTab.tsx';
 import InformeProductosTab from '../Basic/InformeProductosTab.tsx';
+import InformeProductosTabAdvanced from './consulta/InformeProductosTabAdvanced.tsx';
 import {my_style_tab} from '../../../styles/styles_general.tsx';
 
 interface Props {
@@ -28,7 +41,10 @@ export function TerminadosSemiterminadosTabs({user, productosAccessLevel, onBack
                     {(user === 'master' || productosAccessLevel >= 2) && (
                         <Tab sx={my_style_tab}>Categorías</Tab>
                     )}
-                    <Tab sx={my_style_tab}>Consulta</Tab>
+                    {/* Nueva pestaña para la versión avanzada */}
+                    {(user === 'master' || productosAccessLevel >= 3) && (
+                        <Tab sx={my_style_tab}>Modificaciones</Tab>
+                    )}
                 </TabList>
 
                 <TabPanels>
@@ -42,9 +58,12 @@ export function TerminadosSemiterminadosTabs({user, productosAccessLevel, onBack
                             <CategoriasTab />
                         </TabPanel>
                     )}
-                    <TabPanel>
-                        <InformeProductosTab />
-                    </TabPanel>
+                    {/* Panel para modificaciones */}
+                    {(user === 'master' || productosAccessLevel >= 3) && (
+                        <TabPanel>
+                            <InformeProductosTabAdvanced />
+                        </TabPanel>
+                    )}
                 </TabPanels>
             </Tabs>
         </Flex>

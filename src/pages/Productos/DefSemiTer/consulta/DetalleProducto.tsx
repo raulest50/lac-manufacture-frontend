@@ -1,3 +1,16 @@
+/**
+ * Componente: DetalleProducto
+ * 
+ * Ubicación en la navegación:
+ * 1. Productos > Basic > Consulta > Ver Detalle (botón en tabla)
+ * 2. Productos > Definir Terminado/Semiterminado > Consulta > Ver Detalle (botón en tabla)
+ * 
+ * Descripción:
+ * Componente que muestra la información detallada de un producto seleccionado.
+ * Se abre al hacer clic en "Ver Detalle" en la tabla de resultados de InformeProductosTab.
+ * Permite edición de ciertos campos si el usuario tiene nivel de acceso adecuado.
+ */
+
 import {
     Flex, Box, Heading, Text, Button, VStack, HStack, 
     Grid, GridItem, Card, CardHeader, CardBody, 
@@ -21,11 +34,6 @@ type Props = {
     setProductoSeleccionado?: (producto: Producto) => void;
     refreshSearch?: () => void;
 };
-
-/**
- * Componente que muestra la información detallada de un producto dado.
- * Permite edición de ciertos campos si el usuario tiene nivel de acceso adecuado.
- */
 export default function DetalleProducto({producto, setEstado, setProductoSeleccionado, refreshSearch}: Props) {
     const [editMode, setEditMode] = useState(false);
     const [productoData, setProductoData] = useState<Producto | Material>({...producto});

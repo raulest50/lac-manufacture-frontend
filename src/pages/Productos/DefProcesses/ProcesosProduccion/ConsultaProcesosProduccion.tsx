@@ -1,3 +1,14 @@
+/**
+ * Componente: ConsultaProcesosProduccion
+ * 
+ * Ubicación en la navegación:
+ * Productos > Definición de Procesos > Consultar Procesos de Producción (pestaña)
+ * 
+ * Descripción:
+ * Componente que permite consultar y gestionar los procesos de producción definidos.
+ * Muestra una tabla con los procesos existentes y permite filtrar, editar y ver detalles.
+ */
+
 import { useState, useEffect } from 'react';
 import {
   Box,

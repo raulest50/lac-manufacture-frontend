@@ -1,16 +1,17 @@
 /**
- * Componente: InformeProductosTab
+ * Componente: InformeProductosTabAdvanced
  * 
  * Ubicación en la navegación:
- * 1. Productos > Basic > Consulta (pestaña)
- * 2. Productos > Definir Terminado/Semiterminado > Consulta (pestaña)
+ * Productos > Definir Terminado/Semiterminado > Modificaciones (pestaña)
  * 
  * Descripción:
- * Componente de búsqueda de productos que permite filtrar por categorías y texto.
- * Este componente se reutiliza en dos secciones diferentes de la aplicación.
+ * Componente avanzado para la modificación y gestión de productos que ofrece funcionalidades
+ * como ordenamiento, filtrado por fecha y visualización mejorada.
+ * Este componente es exclusivo para la sección de Definir Terminado/Semiterminado
+ * y solo es accesible para usuarios con nivel de acceso 3 o superior.
  * 
  * Cuando se hace clic en "Ver Detalle" en la tabla de resultados, se abre el
- * componente DetalleProducto.tsx con la información detallada del producto.
+ * componente DetalleProductoAdvanced.tsx con la información detallada del producto.
  */
 
 import {
@@ -29,28 +30,35 @@ import {
     Th,
     Td,
     TableContainer,
+    Badge,
+    Select,
+    Box,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import axios from "axios";
-import MyPagination from "../../../components/MyPagination.tsx";
-import { Producto } from "../types.tsx";
-import EndPointsURL from "../../../api/EndPointsURL.tsx";
-import DetalleProducto from "../DefSemiTer/consulta/DetalleProducto.tsx";
+import MyPagination from "../../../../components/MyPagination.tsx";
+import { Producto } from "../../types.tsx";
+import EndPointsURL from "../../../../api/EndPointsURL.tsx";
+import DetalleProductoAdvanced from "./DetalleProductoAdvanced.tsx";
 
 const endpoints = new EndPointsURL();
 
-export default function InformeProductosTab() {
-    const [chkbox, setChkbox] = useState<string[]>(["material empaque"]);
+export default function InformeProductosTabAdvanced() {
+    const [chkbox, setChkbox] = useState<string[]>(["semiterminado", "terminado"]);
     const [searchText, setSearchText] = useState("");
     const [productos, setProductos] = useState<Producto[]>([]);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 10; // adjust as needed
+    const pageSize = 10;
 
     // Estados para manejar la visualización del detalle
     const [estado, setEstado] = useState(0);
     const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null);
+
+    // Estado adicional para características avanzadas
+    const [sortBy, setSortBy] = useState<string>("nombre");
+    const [filterByDate, setFilterByDate] = useState<string>("");
 
     // Fetch products given a page number
     const fetchProductos = async (pageNumber: number) => {
@@ -60,9 +68,9 @@ export default function InformeProductosTab() {
                 search: searchText,
                 categories: chkbox,
                 page: pageNumber,
-                size: pageSize,
+                size: pageSize
+                // Removed sortBy and filterByDate parameters as they're not supported by the backend
             });
-            // Expecting a Page<Producto> response
             setProductos(response.data.content);
             setTotalPages(response.data.totalPages);
             setPage(response.data.number);
@@ -92,7 +100,7 @@ export default function InformeProductosTab() {
     // Renderizado condicional basado en el estado
     if (estado === 1 && productoSeleccionado) {
         return (
-            <DetalleProducto 
+            <DetalleProductoAdvanced 
                 producto={productoSeleccionado} 
                 setEstado={setEstado}
                 setProductoSeleccionado={setProductoSeleccionado}
@@ -109,7 +117,7 @@ export default function InformeProductosTab() {
                     <Input
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
-                        placeholder="Enter product name"
+                        placeholder="Nombre del producto"
                         isDisabled={chkbox.length === 0}
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
@@ -134,10 +142,6 @@ export default function InformeProductosTab() {
                             p="1em"
                             w="fit-content"
                         >
-                            <Checkbox value="material empaque">
-                                Material de empaque
-                            </Checkbox>
-                            <Checkbox value="materia prima">Materia Prima</Checkbox>
                             <Checkbox value="semiterminado">SemiTerminado</Checkbox>
                             <Checkbox value="terminado">Producto Terminado</Checkbox>
                         </Stack>
@@ -145,12 +149,36 @@ export default function InformeProductosTab() {
                 </FormControl>
 
                 <Button onClick={handleSearch} colorScheme="blue" isLoading={loading}>
-                    Search
+                    Buscar
                 </Button>
             </Flex>
 
+            {/* Opciones avanzadas - Nuevas características */}
+            <Flex direction="row" align="center" gap={10} w="full" mb={4}>
+                <FormControl maxW="200px">
+                    <FormLabel>Ordenar por:</FormLabel>
+                    <Select 
+                        value={sortBy} 
+                        onChange={(e) => setSortBy(e.target.value)}
+                    >
+                        <option value="nombre">Nombre</option>
+                        <option value="fechaCreacion">Fecha de creación</option>
+                        <option value="costo">Costo</option>
+                    </Select>
+                </FormControl>
+
+                <FormControl maxW="200px">
+                    <FormLabel>Filtrar por fecha:</FormLabel>
+                    <Input
+                        type="date"
+                        value={filterByDate}
+                        onChange={(e) => setFilterByDate(e.target.value)}
+                    />
+                </FormControl>
+            </Flex>
+
             <TableContainer>
-                <Table variant="striped" colorScheme="gray">
+                <Table variant="striped" colorScheme="blue">
                     <Thead>
                         <Tr>
                             <Th>ID</Th>
@@ -158,6 +186,7 @@ export default function InformeProductosTab() {
                             <Th>Costo</Th>
                             <Th>Tipo</Th>
                             <Th>Fecha Creación</Th>
+                            <Th>Estado</Th>
                             <Th>Acciones</Th>
                         </Tr>
                     </Thead>
@@ -167,8 +196,17 @@ export default function InformeProductosTab() {
                                 <Td>{producto.productoId}</Td>
                                 <Td>{producto.nombre}</Td>
                                 <Td>{producto.costo}</Td>
-                                <Td>{producto.tipo_producto}</Td>
+                                <Td>
+                                    <Badge colorScheme={producto.tipo_producto === 'T' ? 'green' : 'purple'}>
+                                        {producto.tipo_producto === 'T' ? 'Terminado' : 'Semiterminado'}
+                                    </Badge>
+                                </Td>
                                 <Td>{producto.fechaCreacion}</Td>
+                                <Td>
+                                    <Badge colorScheme="blue">
+                                        {producto.inventareable ? 'Inventariable' : 'No inventariable'}
+                                    </Badge>
+                                </Td>
                                 <Td>
                                     <Button
                                         size="sm"

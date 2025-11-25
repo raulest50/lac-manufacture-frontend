@@ -40,7 +40,7 @@ export default function SemioterBriefCard({semioter}:props) {
                         <Text pt="2" fontSize="sm">
                             Codigo: {semioter.productoId}
                         </Text>
-                        <Text pt="2" fontSize="sm" noOfLines={calculateNoOfLines(semioter.observaciones)}>
+                        <Text pt="2" fontSize="sm" noOfLines={calculateNoOfLines(semioter.observaciones as string)}>
                             Observaciones: {semioter.observaciones}
                         </Text>
                     </VStack>

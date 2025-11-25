@@ -1,3 +1,15 @@
+/**
+ * Componente: DefinicionProcesosTabs
+ * 
+ * Ubicación en la navegación:
+ * Productos > Definición de Procesos
+ * 
+ * Descripción:
+ * Componente principal que gestiona las pestañas de la sección de Definición de Procesos.
+ * Incluye pestañas para definir procesos, consultar procesos, crear y consultar recursos
+ * de producción, y crear áreas de producción.
+ */
+
 import {Button, Flex, Tab, TabList, TabPanel, TabPanels, Tabs} from '@chakra-ui/react';
 import {FaArrowLeft} from 'react-icons/fa';
 import DefinicionProcesosTab from './ProcesosProduccion/DefinicionProcesosTab.tsx';
