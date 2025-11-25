@@ -1,8 +1,14 @@
 import {
     Box,
     Button,
+    Checkbox,
+    CheckboxGroup,
     Container,
     Flex,
+    FormControl,
+    FormLabel,
+    Input,
+    Stack,
     Step,
     StepDescription,
     StepIcon,
@@ -15,6 +21,11 @@ import {
     Text,
     useSteps
 } from "@chakra-ui/react";
+import { useState } from "react";
+import axios from "axios";
+import MyPagination from "../../../components/MyPagination.tsx";
+import EndPointsURL from "../../../api/EndPointsURL.tsx";
+import { Producto } from "../../Productos/types.tsx";
 
 const steps = [
     {title: "AjusteInvStep_Zero", description: "Selección de productos"},
@@ -37,6 +48,43 @@ const AjusteInvStep_Two = () => (
 const stepComponents = [AjusteInvStep_Zero, AjusteInvStep_One, AjusteInvStep_Two];
 
 export default function AjustesInventarioTab(){
+    const [chkbox, setChkbox] = useState<string[]>(["material empaque"]);
+    const [searchText, setSearchText] = useState("");
+    const [productos, setProductos] = useState<Producto[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const pageSize = 10;
+
+    const endpoints = new EndPointsURL();
+
+    const fetchProductos = async (pageNumber: number) => {
+        setLoading(true);
+        try {
+            const response = await axios.post(endpoints.consulta_productos, {
+                search: searchText,
+                categories: chkbox,
+                page: pageNumber,
+                size: pageSize,
+            });
+            setProductos(response.data.content);
+            setTotalPages(response.data.totalPages);
+            setPage(response.data.number);
+        } catch (error) {
+            console.error("Error searching productos:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = () => {
+        fetchProductos(0);
+    };
+
+    const handlePageChange = (newPage: number) => {
+        fetchProductos(newPage);
+    };
+
     const {activeStep, setActiveStep} = useSteps({index: 0, count: steps.length});
     const CurrentStepComponent = stepComponents[activeStep];
 
@@ -79,7 +127,92 @@ export default function AjustesInventarioTab(){
                             <Text fontSize={'lg'} fontWeight={'semibold'} mb={3}>
                                 Resultados de búsqueda
                             </Text>
-                            <CurrentStepComponent />
+                            <Flex direction={'column'} gap={4}>
+                                <Flex
+                                    direction={{base: 'column', xl: 'row'}}
+                                    align={{xl: 'flex-end'}}
+                                    gap={4}
+                                    w={'full'}
+                                >
+                                    <FormControl flex={1}>
+                                        <FormLabel>Buscar:</FormLabel>
+                                        <Input
+                                            value={searchText}
+                                            onChange={(e) => setSearchText(e.target.value)}
+                                            placeholder={'Ingresa el nombre del producto'}
+                                            isDisabled={chkbox.length === 0}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    handleSearch();
+                                                }
+                                            }}
+                                        />
+                                    </FormControl>
+
+                                    <FormControl flex={1}>
+                                        <FormLabel>Categorías:</FormLabel>
+                                        <CheckboxGroup
+                                            colorScheme={'green'}
+                                            value={chkbox}
+                                            onChange={(values) => setChkbox(values as string[])}
+                                        >
+                                            <Stack
+                                                spacing={[2, 3]}
+                                                direction={'column'}
+                                                border={'1px solid gray'}
+                                                borderRadius={'10px'}
+                                                p={'1em'}
+                                                w={'full'}
+                                            >
+                                                <Checkbox value={'material empaque'}>
+                                                    Material de empaque
+                                                </Checkbox>
+                                                <Checkbox value={'materia prima'}>Materia Prima</Checkbox>
+                                                <Checkbox value={'semiterminado'}>SemiTerminado</Checkbox>
+                                                <Checkbox value={'terminado'}>Producto Terminado</Checkbox>
+                                            </Stack>
+                                        </CheckboxGroup>
+                                    </FormControl>
+                                </Flex>
+
+                                <Flex justifyContent={{base: 'stretch', xl: 'flex-start'}}>
+                                    <Button
+                                        onClick={handleSearch}
+                                        colorScheme={'blue'}
+                                        isLoading={loading}
+                                        w={{base: 'full', xl: 'auto'}}
+                                    >
+                                        Search
+                                    </Button>
+                                </Flex>
+
+                                <Box>
+                                    <CurrentStepComponent />
+                                </Box>
+
+                                <Box>
+                                    {loading ? (
+                                        <Text color={'gray.500'}>Cargando productos...</Text>
+                                    ) : productos.length > 0 ? (
+                                        <Stack spacing={2}>
+                                            {productos.map((producto) => (
+                                                <Text key={producto.productoId} color={'gray.700'}>
+                                                    {producto.nombre} ({producto.tipo_producto})
+                                                </Text>
+                                            ))}
+                                        </Stack>
+                                    ) : (
+                                        <Text color={'gray.500'}>No hay productos para mostrar.</Text>
+                                    )}
+                                </Box>
+
+                                <MyPagination
+                                    page={page}
+                                    totalPages={totalPages}
+                                    loading={loading}
+                                    handlePageChange={handlePageChange}
+                                />
+                            </Flex>
                         </Box>
 
                         <Box
