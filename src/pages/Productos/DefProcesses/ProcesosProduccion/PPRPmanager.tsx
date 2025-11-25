@@ -1,6 +1,6 @@
 import {Box, Button, Flex, Table, Tbody, Td, Th, Thead, Tr, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper} from '@chakra-ui/react';
 import {useState} from 'react';
-import {RecursoProduccion} from '../types.tsx';
+import {RecursoProduccion} from '../../types.tsx';
 import RecursoProduccionPicker from './RecursoProduccionPicker.tsx';
 
 interface Props {

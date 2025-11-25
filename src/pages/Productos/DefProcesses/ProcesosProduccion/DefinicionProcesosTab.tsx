@@ -13,9 +13,9 @@ import {
   Text,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import EndPointsURL from '../../../api/EndPointsURL.tsx';
-import {input_style} from '../../../styles/styles_general.tsx';
-import {RecursoProduccion, ProcesoProduccionEntity, TimeModelType} from '../types.tsx';
+import EndPointsURL from '../../../../api/EndPointsURL.tsx';
+import {input_style} from '../../../../styles/styles_general.tsx';
+import {RecursoProduccion, ProcesoProduccionEntity, TimeModelType} from '../../types.tsx';
 import PPRPmanager from './PPRPmanager.tsx';
 
 function DefinicionProcesosTab() {

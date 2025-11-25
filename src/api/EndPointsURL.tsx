@@ -58,6 +58,8 @@ export default class EndPointsURL{
     public save_proceso_produccion:string;
     public get_procesos_produccion_pag:string;
     public update_proceso_produccion:string;
+    public is_deletable_proceso_produccion:string;
+    public delete_proceso_produccion:string;
 
 
     // compras resource
@@ -242,6 +244,8 @@ export default class EndPointsURL{
         this.save_proceso_produccion = `${domain}/${procesos_produccion_res}`;
         this.get_procesos_produccion_pag = `${domain}/${procesos_produccion_res}/paginados`;
         this.update_proceso_produccion = `${domain}/${procesos_produccion_res}/update_proc_produccion/{id}`;
+        this.is_deletable_proceso_produccion = `${domain}/${procesos_produccion_res}/is-deletable/{id}`;
+        this.delete_proceso_produccion = `${domain}/${procesos_produccion_res}/delete/{id}`;
 
         // ventas endpoints
         this.create_vendedor = `${domain}/${vendedor_res}/crear_vendedor`;

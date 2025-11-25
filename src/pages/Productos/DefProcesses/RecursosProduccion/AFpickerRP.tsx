@@ -1,9 +1,9 @@
 import {Box, Button, Flex, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Table, Tbody, Td, Th, Thead, Tr} from '@chakra-ui/react';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
-import EndPointsURL from '../../../api/EndPointsURL.tsx';
-import {ActivoFijo} from '../../ActivosFijos/types.tsx';
-import MyPagination from '../../../components/MyPagination.tsx';
+import EndPointsURL from '../../../../api/EndPointsURL.tsx';
+import {ActivoFijo} from '../../../ActivosFijos/types.tsx';
+import MyPagination from '../../../../components/MyPagination.tsx';
 
 interface Props {
   isOpen: boolean;

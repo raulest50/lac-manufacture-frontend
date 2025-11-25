@@ -16,10 +16,10 @@ import {
   Heading
 } from '@chakra-ui/react';
 import axios from 'axios';
-import EndPointsURL from '../../../api/EndPointsURL.tsx';
-import { ProcesoProduccionEntity, TimeModelType } from '../types.tsx';
-import MyPagination from '../../../components/MyPagination.tsx';
-import { EditarProcesoModal } from './EditorProcesos/EditarProcesoModal.tsx';
+import EndPointsURL from '../../../../api/EndPointsURL.tsx';
+import { ProcesoProduccionEntity, TimeModelType } from '../../types.tsx';
+import MyPagination from '../../../../components/MyPagination.tsx';
+import { EditarProcesoModal } from './EditarProcesoModal.tsx';
 
 export function ConsultaProcesosProduccion() {
   const endPoints = new EndPointsURL();
@@ -202,11 +202,24 @@ export function ConsultaProcesosProduccion() {
         onClose={() => setIsModalOpen(false)}
         proceso={procesoSeleccionado}
         onSave={(procesoActualizado) => {
-          // Actualizar la lista de procesos con el proceso actualizado
-          setProcesos(procesos.map(p => 
-            p.procesoId === procesoActualizado.procesoId ? procesoActualizado : p
-          ));
-          // Refrescar la lista para asegurar que se muestren los datos actualizados
+          // Check if the process was deleted
+          if ('deleted' in procesoActualizado && procesoActualizado.deleted) {
+            // Remove the deleted process from the list
+            setProcesos(procesos.filter(p => p.procesoId !== procesoActualizado.procesoId));
+            toast({
+              title: 'Proceso eliminado',
+              description: 'El proceso ha sido eliminado de la lista',
+              status: 'info',
+              duration: 3000,
+              isClosable: true,
+            });
+          } else {
+            // Update the process in the list
+            setProcesos(procesos.map(p => 
+              p.procesoId === procesoActualizado.procesoId ? procesoActualizado : p
+            ));
+          }
+          // Refresh the list to ensure updated data is shown
           fetchProcesos(page);
         }}
       />
