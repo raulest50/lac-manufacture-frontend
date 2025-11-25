@@ -67,7 +67,35 @@ export default function AjustesInventarioTab(){
                 </Stepper>
 
                 <Box backgroundColor={'white'} p={4} borderRadius={'md'} boxShadow={'sm'}>
-                    <CurrentStepComponent />
+                    <Flex direction={{base: 'column', lg: 'row'}} gap={4} w={'full'}>
+                        <Box
+                            flex={1}
+                            p={4}
+                            borderWidth={'1px'}
+                            borderRadius={'md'}
+                            borderColor={'gray.200'}
+                            w={'full'}
+                        >
+                            <Text fontSize={'lg'} fontWeight={'semibold'} mb={3}>
+                                Resultados de búsqueda
+                            </Text>
+                            <CurrentStepComponent />
+                        </Box>
+
+                        <Box
+                            flex={1}
+                            p={4}
+                            borderWidth={'1px'}
+                            borderRadius={'md'}
+                            borderColor={'gray.200'}
+                            w={'full'}
+                        >
+                            <Text fontSize={'lg'} fontWeight={'semibold'} mb={3}>
+                                Items seleccionados
+                            </Text>
+                            <Text color={'gray.500'}>Añade productos para verlos aquí.</Text>
+                        </Box>
+                    </Flex>
                 </Box>
 
                 <Flex gap={2} justifyContent={'flex-end'}>
