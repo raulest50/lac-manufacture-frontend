@@ -50,11 +50,25 @@ export default function Step2FillData({
                                     {/* TODO: render stock for producto.productoId when inventory data is provided */}
                                 </Td>
                                 <Td>
-                                    <Input
-                                        type={"number"}
-                                        value={quantities[producto.productoId] ?? ""}
-                                        onChange={(e) => onChangeQuantity(producto.productoId, e.target.value)}
-                                    />
+                                    {(() => {
+                                        const quantityValue = quantities[producto.productoId];
+                                        const isInvalidQuantity =
+                                            quantityValue === undefined ||
+                                            quantityValue === "" ||
+                                            typeof quantityValue !== "number" ||
+                                            Number.isNaN(quantityValue);
+
+                                        return (
+                                            <Input
+                                                type={"number"}
+                                                value={quantityValue ?? ""}
+                                                onChange={(e) =>
+                                                    onChangeQuantity(producto.productoId, e.target.value)
+                                                }
+                                                isInvalid={isInvalidQuantity}
+                                            />
+                                        );
+                                    })()}
                                 </Td>
                             </Tr>
                         ))}

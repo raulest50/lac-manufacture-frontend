@@ -96,9 +96,20 @@ export default function AjustesInventarioTab(){
         setActiveStep((prev) => Math.min(prev + 1, steps.length - 1));
     };
 
+    const goToStart = () => {
+        setActiveStep(0);
+    };
+
     const goToPrevious = () => {
         setActiveStep((prev) => Math.max(prev - 1, 0));
     };
+
+    const areQuantitiesValid =
+        selectedProducts.length > 0 &&
+        selectedProducts.every(({productoId}) => {
+            const quantity = quantities[productoId];
+            return typeof quantity === "number" && !Number.isNaN(quantity);
+        });
 
     const renderStepContent = () => {
         if (activeStep === 0) {
@@ -140,6 +151,7 @@ export default function AjustesInventarioTab(){
 
     const isNextDisabled =
         (activeStep === 0 && selectedProducts.length === 0) ||
+        (activeStep === 1 && !areQuantitiesValid) ||
         activeStep === steps.length - 1;
 
     return (
@@ -168,13 +180,19 @@ export default function AjustesInventarioTab(){
                     {renderStepContent()}
                 </Box>
 
-                <Flex gap={2} justifyContent={'flex-end'}>
-                    <Button onClick={goToPrevious} isDisabled={activeStep === 0} variant={'outline'}>
-                        Anterior
+                <Flex alignItems={'center'} justifyContent={'space-between'} gap={2}>
+                    <Button onClick={goToStart} isDisabled={activeStep === 0} variant={'ghost'}>
+                        Volver al paso inicial
                     </Button>
-                    <Button onClick={goToNext} isDisabled={isNextDisabled} colorScheme={'teal'}>
-                        Siguiente
-                    </Button>
+
+                    <Flex gap={2} justifyContent={'flex-end'}>
+                        <Button onClick={goToPrevious} isDisabled={activeStep === 0} variant={'outline'}>
+                            Anterior
+                        </Button>
+                        <Button onClick={goToNext} isDisabled={isNextDisabled} colorScheme={'teal'}>
+                            Siguiente
+                        </Button>
+                    </Flex>
                 </Flex>
             </Flex>
         </Container>
