@@ -36,6 +36,7 @@ export default function AjustesInventarioTab(){
     const [totalPages, setTotalPages] = useState(1);
     const [selectedProducts, setSelectedProducts] = useState<Producto[]>([]);
     const [quantities, setQuantities] = useState<Record<string, number | "">>({});
+    const [lotNumbers, setLotNumbers] = useState<Record<string, string>>({});
     const [activeStep, setActiveStep] = useState(0);
     const pageSize = 10;
 
@@ -82,6 +83,14 @@ export default function AjustesInventarioTab(){
         setSelectedProducts((prevSelected) =>
             prevSelected.filter((item) => item.productoId !== productoId)
         );
+        setQuantities((prev) => {
+            const {[productoId]: _, ...rest} = prev;
+            return rest;
+        });
+        setLotNumbers((prev) => {
+            const {[productoId]: _, ...rest} = prev;
+            return rest;
+        });
     };
 
     const handleChangeQuantity = (productoId: string, value: string) => {
@@ -89,6 +98,13 @@ export default function AjustesInventarioTab(){
         setQuantities((prev) => ({
             ...prev,
             [productoId]: parsedValue,
+        }));
+    };
+
+    const handleChangeLotNumber = (productoId: string, value: string) => {
+        setLotNumbers((prev) => ({
+            ...prev,
+            [productoId]: value,
         }));
     };
 
@@ -108,7 +124,11 @@ export default function AjustesInventarioTab(){
         selectedProducts.length > 0 &&
         selectedProducts.every(({productoId}) => {
             const quantity = quantities[productoId];
-            return typeof quantity === "number" && !Number.isNaN(quantity);
+            const lotNumber = lotNumbers[productoId]?.trim();
+            const isValidQuantity = typeof quantity === "number" && !Number.isNaN(quantity);
+            const isValidLot = Boolean(lotNumber);
+
+            return isValidQuantity && isValidLot;
         });
 
     const renderStepContent = () => {
@@ -138,6 +158,8 @@ export default function AjustesInventarioTab(){
                     selectedProducts={selectedProducts}
                     quantities={quantities}
                     onChangeQuantity={handleChangeQuantity}
+                    lotNumbers={lotNumbers}
+                    onChangeLotNumber={handleChangeLotNumber}
                 />
             );
         }
