@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import EndPointsURL from "../../api/EndPointsURL.tsx";
 import TerminadoSemiterminadoPicker from "./components/TerminadoSemiterminadoPicker";
 import ProductoFilterCard from "./components/ProductoFilterCard";
+import OrdenProduccionDialogDetalles from "./components/OrdenProduccionDialogDetalles";
 
 const endPoints = new EndPointsURL();
 
@@ -136,6 +137,9 @@ export default function HistorialOrdenes() {
 
     const [selectedProducto, setSelectedProducto] = useState<ProductoWithInsumos | null>(null);
     const [isPickerOpen, setIsPickerOpen] = useState<boolean>(false);
+
+    const [selectedOrden, setSelectedOrden] = useState<OrdenProduccionDTO | null>(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState<boolean>(false);
 
     const productoIdParam = selectedProducto?.producto?.productoId ?? undefined;
 
@@ -296,7 +300,15 @@ export default function HistorialOrdenes() {
                                     <Text fontSize="sm">Depto.: {orden.departamentoOperativo ?? "-"}</Text>
                                 </Td>
                                 <Td textAlign="right">
-                                    <Button size="sm" colorScheme="blue" variant="outline">
+                                    <Button
+                                        size="sm"
+                                        colorScheme="blue"
+                                        variant="outline"
+                                        onClick={() => {
+                                            setSelectedOrden(orden);
+                                            setIsDetailsOpen(true);
+                                        }}
+                                    >
                                         Ver detalles
                                     </Button>
                                 </Td>
@@ -320,6 +332,14 @@ export default function HistorialOrdenes() {
                     setSelectedProducto(producto);
                     setIsPickerOpen(false);
                 }}
+            />
+            <OrdenProduccionDialogDetalles
+                isOpen={isDetailsOpen}
+                onClose={() => {
+                    setIsDetailsOpen(false);
+                    setSelectedOrden(null);
+                }}
+                orden={selectedOrden}
             />
         </Flex>
     );
