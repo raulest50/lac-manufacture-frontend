@@ -15,6 +15,8 @@ interface Step2FillDataProps {
     selectedProducts: Producto[];
     quantities: Record<string, number | "">;
     onChangeQuantity: (productoId: string, value: string) => void;
+    lotNumbers: Record<string, string>;
+    onChangeLotNumber: (productoId: string, value: string) => void;
     // TODO: inject stock values via a dedicated map prop once the inventory API/dataset is available
     // to avoid coupling this component to a specific Producto shape.
 }
@@ -23,6 +25,8 @@ export default function Step2FillData({
     selectedProducts,
     quantities,
     onChangeQuantity,
+    lotNumbers,
+    onChangeLotNumber,
 }: Step2FillDataProps) {
     return (
         <Box p={4} borderWidth={"1px"} borderRadius={"md"} borderColor={"gray.200"} w={"full"}>
@@ -38,6 +42,7 @@ export default function Step2FillData({
                             <Th>Tipo</Th>
                             <Th>Stock actual</Th>
                             <Th>Unidades de ajuste</Th>
+                            <Th>Número de lote</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
@@ -66,6 +71,23 @@ export default function Step2FillData({
                                                     onChangeQuantity(producto.productoId, e.target.value)
                                                 }
                                                 isInvalid={isInvalidQuantity}
+                                            />
+                                        );
+                                    })()}
+                                </Td>
+                                <Td>
+                                    {(() => {
+                                        const lotNumberValue = lotNumbers[producto.productoId] ?? "";
+                                        const isInvalidLotNumber = lotNumberValue.trim() === "";
+
+                                        return (
+                                            <Input
+                                                type={"text"}
+                                                value={lotNumberValue}
+                                                onChange={(e) =>
+                                                    onChangeLotNumber(producto.productoId, e.target.value)
+                                                }
+                                                isInvalid={isInvalidLotNumber}
                                             />
                                         );
                                     })()}
