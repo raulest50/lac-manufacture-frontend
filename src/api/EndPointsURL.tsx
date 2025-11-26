@@ -45,6 +45,8 @@ export default class EndPointsURL{
     public search_ordenes_within_range:string;
     public orden_seguimiento_update_estado:string;
     public orden_produccion_update_estado:string;
+    public is_deletable_orden_produccion: string;
+    public cancel_orden_produccion: string;
     public search_ordenes_by_responsable:string;
     public produccion_terminado_data4pdf: string;
 
@@ -231,6 +233,8 @@ export default class EndPointsURL{
         this.search_ordenes_within_range = `${domain}/${produccion_res}/search_within_range`;
         this.orden_seguimiento_update_estado = `${domain}/${produccion_res}/orden_seguimiento/{id}/update_estado`;
         this.orden_produccion_update_estado = `${domain}/${produccion_res}/orden_produccion/{id}/update_estado`;
+        this.is_deletable_orden_produccion = `${domain}/${produccion_res}/orden_produccion/{id}/is_deletable`;
+        this.cancel_orden_produccion = `${domain}/${produccion_res}/orden_produccion/{id}/cancel`;
         this.search_ordenes_by_responsable = `${domain}/${produccion_res}/ordenes_produccion/responsable/{responsableId}`;
         this.produccion_terminado_data4pdf = `${domain}/${produccion_res}/terminado/{id}/data4pdf`;
 
