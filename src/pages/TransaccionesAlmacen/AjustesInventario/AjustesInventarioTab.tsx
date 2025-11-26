@@ -1,14 +1,8 @@
 import {
     Box,
     Button,
-    Checkbox,
-    CheckboxGroup,
     Container,
     Flex,
-    FormControl,
-    FormLabel,
-    Input,
-    Stack,
     Step,
     StepDescription,
     StepIcon,
@@ -18,22 +12,14 @@ import {
     StepStatus,
     StepTitle,
     Stepper,
-    Table,
-    Tbody,
-    Td,
     Text,
-    Th,
-    Thead,
-    Tr,
     useSteps,
-    IconButton
 } from "@chakra-ui/react";
-import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import axios from "axios";
-import MyPagination from "../../../components/MyPagination.tsx";
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
 import { Producto } from "../../Productos/types.tsx";
+import Step1SelProdAdjInv from "./Step1_SelProd_AdjInv.tsx";
 
 const steps = [
     {title: "AjusteInvStep_Zero", description: "Selección de productos"},
@@ -140,173 +126,25 @@ export default function AjustesInventarioTab(){
                 </Stepper>
 
                 <Box backgroundColor={'white'} p={4} borderRadius={'md'} boxShadow={'sm'}>
-                    <Flex direction={{base: 'column', lg: 'row'}} gap={4} w={'full'}>
-                        <Box
-                            flex={1}
-                            p={4}
-                            borderWidth={'1px'}
-                            borderRadius={'md'}
-                            borderColor={'gray.200'}
-                            w={'full'}
-                        >
-                            <Text fontSize={'lg'} fontWeight={'semibold'} mb={3}>
-                                Resultados de búsqueda
-                            </Text>
-                            <Flex direction={'column'} gap={4}>
-                                <Flex
-                                    direction={{base: 'column', xl: 'row'}}
-                                    align={{xl: 'flex-end'}}
-                                    gap={4}
-                                    w={'full'}
-                                >
-                                    <FormControl flex={1}>
-                                        <FormLabel>Buscar:</FormLabel>
-                                        <Input
-                                            value={searchText}
-                                            onChange={(e) => setSearchText(e.target.value)}
-                                            placeholder={'Ingresa el nombre del producto'}
-                                            isDisabled={chkbox.length === 0}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    handleSearch();
-                                                }
-                                            }}
-                                        />
-                                    </FormControl>
+                    <Box mb={4}>
+                        <CurrentStepComponent />
+                    </Box>
 
-                                    <FormControl flex={1}>
-                                        <FormLabel>Categorías:</FormLabel>
-                                        <CheckboxGroup
-                                            colorScheme={'green'}
-                                            value={chkbox}
-                                            onChange={(values) => setChkbox(values as string[])}
-                                        >
-                                            <Stack
-                                                spacing={[2, 3]}
-                                                direction={'column'}
-                                                border={'1px solid gray'}
-                                                borderRadius={'10px'}
-                                                p={'1em'}
-                                                w={'full'}
-                                            >
-                                                <Checkbox value={'material empaque'}>
-                                                    Material de empaque
-                                                </Checkbox>
-                                                <Checkbox value={'materia prima'}>Materia Prima</Checkbox>
-                                                <Checkbox value={'semiterminado'}>SemiTerminado</Checkbox>
-                                                <Checkbox value={'terminado'}>Producto Terminado</Checkbox>
-                                            </Stack>
-                                        </CheckboxGroup>
-                                    </FormControl>
-                                </Flex>
-
-                                <Flex justifyContent={{base: 'stretch', xl: 'flex-start'}}>
-                                    <Button
-                                        onClick={handleSearch}
-                                        colorScheme={'blue'}
-                                        isLoading={loading}
-                                        w={{base: 'full', xl: 'auto'}}
-                                    >
-                                        Search
-                                    </Button>
-                                </Flex>
-
-                                <Box>
-                                    <CurrentStepComponent />
-                                </Box>
-
-                                <Box>
-                                    {loading ? (
-                                        <Text color={'gray.500'}>Cargando productos...</Text>
-                                    ) : productos.length > 0 ? (
-                                        <Table size={'sm'} variant={'simple'}>
-                                            <Thead>
-                                                <Tr>
-                                                    <Th>ID</Th>
-                                                    <Th>Nombre</Th>
-                                                    <Th>Tipo</Th>
-                                                    <Th textAlign={'center'}>Acciones</Th>
-                                                </Tr>
-                                            </Thead>
-                                            <Tbody>
-                                                {productos.map((producto) => (
-                                                    <Tr key={producto.productoId}>
-                                                        <Td>{producto.productoId}</Td>
-                                                        <Td>{producto.nombre}</Td>
-                                                        <Td textTransform={'capitalize'}>{producto.tipo_producto}</Td>
-                                                        <Td textAlign={'center'}>
-                                                            <IconButton
-                                                                aria-label={'Agregar producto'}
-                                                                icon={<AddIcon />}
-                                                                size={'sm'}
-                                                                variant={'outline'}
-                                                                onClick={() => handleAddProduct(producto)}
-                                                            />
-                                                        </Td>
-                                                    </Tr>
-                                                ))}
-                                            </Tbody>
-                                        </Table>
-                                    ) : (
-                                        <Text color={'gray.500'}>No hay productos para mostrar.</Text>
-                                    )}
-                                </Box>
-
-                                <MyPagination
-                                    page={page}
-                                    totalPages={totalPages}
-                                    loading={loading}
-                                    handlePageChange={handlePageChange}
-                                />
-                            </Flex>
-                        </Box>
-
-                        <Box
-                            flex={1}
-                            p={4}
-                            borderWidth={'1px'}
-                            borderRadius={'md'}
-                            borderColor={'gray.200'}
-                            w={'full'}
-                        >
-                            <Text fontSize={'lg'} fontWeight={'semibold'} mb={3}>
-                                Items seleccionados
-                            </Text>
-                            {selectedProducts.length > 0 ? (
-                                <Table size={'sm'} variant={'simple'}>
-                                    <Thead>
-                                        <Tr>
-                                            <Th>ID</Th>
-                                            <Th>Nombre</Th>
-                                            <Th>Tipo</Th>
-                                            <Th textAlign={'center'}>Acciones</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {selectedProducts.map((producto) => (
-                                            <Tr key={producto.productoId}>
-                                                <Td>{producto.productoId}</Td>
-                                                <Td>{producto.nombre}</Td>
-                                                <Td textTransform={'capitalize'}>{producto.tipo_producto}</Td>
-                                                <Td textAlign={'center'}>
-                                                    <IconButton
-                                                        aria-label={'Remover producto'}
-                                                        icon={<DeleteIcon />}
-                                                        colorScheme={'red'}
-                                                        size={'sm'}
-                                                        variant={'ghost'}
-                                                        onClick={() => handleRemoveProduct(producto.productoId)}
-                                                    />
-                                                </Td>
-                                            </Tr>
-                                        ))}
-                                    </Tbody>
-                                </Table>
-                            ) : (
-                                <Text color={'gray.500'}>Añade productos para verlos aquí.</Text>
-                            )}
-                        </Box>
-                    </Flex>
+                    <Step1SelProdAdjInv
+                        searchText={searchText}
+                        setSearchText={setSearchText}
+                        chkbox={chkbox}
+                        setChkbox={setChkbox}
+                        productos={productos}
+                        loading={loading}
+                        page={page}
+                        totalPages={totalPages}
+                        handleSearch={handleSearch}
+                        handlePageChange={handlePageChange}
+                        handleAddProduct={handleAddProduct}
+                        handleRemoveProduct={handleRemoveProduct}
+                        selectedProducts={selectedProducts}
+                    />
                 </Box>
 
                 <Flex gap={2} justifyContent={'flex-end'}>
