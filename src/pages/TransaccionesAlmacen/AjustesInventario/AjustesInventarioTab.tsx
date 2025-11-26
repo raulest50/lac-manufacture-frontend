@@ -13,33 +13,19 @@ import {
     StepTitle,
     Stepper,
     Text,
-    useSteps,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import axios from "axios";
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
 import { Producto } from "../../Productos/types.tsx";
 import Step1SelProdAdjInv from "./Step1_SelProd_AdjInv.tsx";
+import Step2FillData from "./Step2_FillData.tsx";
 
 const steps = [
     {title: "AjusteInvStep_Zero", description: "Selección de productos"},
     {title: "AjusteInvStep_One", description: "Especificar cantidades"},
     {title: "AjusteInvStep_Two", description: "Enviar"}
 ];
-
-const AjusteInvStep_Zero = () => (
-    <Text>Selecciona los productos que deseas ajustar.</Text>
-);
-
-const AjusteInvStep_One = () => (
-    <Text>Define las cantidades que se actualizarán para cada producto.</Text>
-);
-
-const AjusteInvStep_Two = () => (
-    <Text>Revisa la información y envía el ajuste de inventario.</Text>
-);
-
-const stepComponents = [AjusteInvStep_Zero, AjusteInvStep_One, AjusteInvStep_Two];
 
 export default function AjustesInventarioTab(){
     const [chkbox, setChkbox] = useState<string[]>(["material empaque"]);
@@ -49,6 +35,8 @@ export default function AjustesInventarioTab(){
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [selectedProducts, setSelectedProducts] = useState<Producto[]>([]);
+    const [quantities, setQuantities] = useState<Record<string, number | "">>({});
+    const [activeStep, setActiveStep] = useState(0);
     const pageSize = 10;
 
     const endpoints = new EndPointsURL();
@@ -96,8 +84,13 @@ export default function AjustesInventarioTab(){
         );
     };
 
-    const {activeStep, setActiveStep} = useSteps({index: 0, count: steps.length});
-    const CurrentStepComponent = stepComponents[activeStep];
+    const handleChangeQuantity = (productoId: string, value: string) => {
+        const parsedValue = value === "" ? "" : Number(value);
+        setQuantities((prev) => ({
+            ...prev,
+            [productoId]: parsedValue,
+        }));
+    };
 
     const goToNext = () => {
         setActiveStep((prev) => Math.min(prev + 1, steps.length - 1));
@@ -106,6 +99,48 @@ export default function AjustesInventarioTab(){
     const goToPrevious = () => {
         setActiveStep((prev) => Math.max(prev - 1, 0));
     };
+
+    const renderStepContent = () => {
+        if (activeStep === 0) {
+            return (
+                <Step1SelProdAdjInv
+                    searchText={searchText}
+                    setSearchText={setSearchText}
+                    chkbox={chkbox}
+                    setChkbox={setChkbox}
+                    productos={productos}
+                    loading={loading}
+                    page={page}
+                    totalPages={totalPages}
+                    handleSearch={handleSearch}
+                    handlePageChange={handlePageChange}
+                    handleAddProduct={handleAddProduct}
+                    handleRemoveProduct={handleRemoveProduct}
+                    selectedProducts={selectedProducts}
+                />
+            );
+        }
+
+        if (activeStep === 1) {
+            return (
+                <Step2FillData
+                    selectedProducts={selectedProducts}
+                    quantities={quantities}
+                    onChangeQuantity={handleChangeQuantity}
+                />
+            );
+        }
+
+        return (
+            <Box>
+                <Text>Próximamente podrás revisar y enviar tu ajuste.</Text>
+            </Box>
+        );
+    };
+
+    const isNextDisabled =
+        (activeStep === 0 && selectedProducts.length === 0) ||
+        activeStep === steps.length - 1;
 
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
@@ -127,31 +162,17 @@ export default function AjustesInventarioTab(){
 
                 <Box backgroundColor={'white'} p={4} borderRadius={'md'} boxShadow={'sm'}>
                     <Box mb={4}>
-                        <CurrentStepComponent />
+                        <Text>{steps[activeStep]?.description}</Text>
                     </Box>
 
-                    <Step1SelProdAdjInv
-                        searchText={searchText}
-                        setSearchText={setSearchText}
-                        chkbox={chkbox}
-                        setChkbox={setChkbox}
-                        productos={productos}
-                        loading={loading}
-                        page={page}
-                        totalPages={totalPages}
-                        handleSearch={handleSearch}
-                        handlePageChange={handlePageChange}
-                        handleAddProduct={handleAddProduct}
-                        handleRemoveProduct={handleRemoveProduct}
-                        selectedProducts={selectedProducts}
-                    />
+                    {renderStepContent()}
                 </Box>
 
                 <Flex gap={2} justifyContent={'flex-end'}>
                     <Button onClick={goToPrevious} isDisabled={activeStep === 0} variant={'outline'}>
                         Anterior
                     </Button>
-                    <Button onClick={goToNext} isDisabled={activeStep === steps.length - 1} colorScheme={'teal'}>
+                    <Button onClick={goToNext} isDisabled={isNextDisabled} colorScheme={'teal'}>
                         Siguiente
                     </Button>
                 </Flex>

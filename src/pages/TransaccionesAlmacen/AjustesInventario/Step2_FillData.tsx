@@ -13,7 +13,7 @@ import { Producto } from "../../Productos/types.tsx";
 
 interface Step2FillDataProps {
     selectedProducts: Producto[];
-    quantities: Record<string, string>;
+    quantities: Record<string, number | "">;
     onChangeQuantity: (productoId: string, value: string) => void;
 }
 
