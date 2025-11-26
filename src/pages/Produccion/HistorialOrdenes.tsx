@@ -5,13 +5,18 @@ import {
     Button,
     Flex,
     Select,
-    VStack,
     Spinner,
     Text,
+    Table,
+    TableContainer,
+    Tbody,
+    Td,
+    Th,
+    Thead,
+    Tr,
 } from "@chakra-ui/react";
 import DateRangePicker from "../../components/DateRangePicker";
 import MyPagination from "../../components/MyPagination";
-import OrdenProduccionCard from "./OrdenProduccionCard"; // Adjust the path as needed
 import axios from "axios";
 import { OrdenProduccionDTO, OrdenSeguimientoDTO, ProductoWithInsumos } from "./types"; // Adjust the path as needed
 import { format } from "date-fns";
@@ -252,11 +257,54 @@ export default function HistorialOrdenes() {
             )}
 
             {/* Display List of Ordenes ProduccionPage */}
-            <VStack spacing={4} align="stretch">
-                {ordenes.map((orden) => (
-                    <OrdenProduccionCard key={orden.ordenId} ordenProduccion={orden} />
-                ))}
-            </VStack>
+            <TableContainer>
+                <Table variant="simple">
+                    <Thead>
+                        <Tr>
+                            <Th>ID</Th>
+                            <Th>Producto</Th>
+                            <Th>Fechas</Th>
+                            <Th>Estado</Th>
+                            <Th>Cantidad</Th>
+                            <Th>Pedido</Th>
+                            <Th>Área/Departamento</Th>
+                            <Th textAlign="right">Acciones</Th>
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        {ordenes.map((orden) => (
+                            <Tr key={orden.ordenId}>
+                                <Td>{orden.ordenId}</Td>
+                                <Td>
+                                    <Text fontWeight="medium">{orden.productoNombre || "-"}</Text>
+                                    {orden.productoId && (
+                                        <Text fontSize="sm" color="gray.500">
+                                            ID: {orden.productoId}
+                                        </Text>
+                                    )}
+                                </Td>
+                                <Td>
+                                    <Text fontSize="sm">Inicio: {orden.fechaInicio ?? "-"}</Text>
+                                    <Text fontSize="sm">Lanzamiento: {orden.fechaLanzamiento ?? "-"}</Text>
+                                    <Text fontSize="sm">Fin planificada: {orden.fechaFinalPlanificada ?? "-"}</Text>
+                                </Td>
+                                <Td>{orden.estadoOrden}</Td>
+                                <Td>{orden.cantidadProducir ?? "-"}</Td>
+                                <Td>{orden.numeroPedidoComercial ?? "-"}</Td>
+                                <Td>
+                                    <Text fontSize="sm">Área: {orden.areaOperativa ?? "-"}</Text>
+                                    <Text fontSize="sm">Depto.: {orden.departamentoOperativo ?? "-"}</Text>
+                                </Td>
+                                <Td textAlign="right">
+                                    <Button size="sm" colorScheme="blue" variant="outline">
+                                        Ver detalles
+                                    </Button>
+                                </Td>
+                            </Tr>
+                        ))}
+                    </Tbody>
+                </Table>
+            </TableContainer>
 
             {/* Pagination Component */}
             <MyPagination
