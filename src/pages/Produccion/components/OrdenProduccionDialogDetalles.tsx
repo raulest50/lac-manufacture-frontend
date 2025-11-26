@@ -31,6 +31,7 @@ interface OrdenProduccionDialogDetallesProps {
     isOpen: boolean;
     onClose: () => void;
     orden: OrdenProduccionDTO | null;
+    onCanceled?: () => void;
 }
 
 const formatValue = (value: string | number | null | undefined): string => {
@@ -49,6 +50,7 @@ export default function OrdenProduccionDialogDetalles({
     isOpen,
     onClose,
     orden,
+    onCanceled,
 }: OrdenProduccionDialogDetallesProps) {
     const [isDeletable, setIsDeletable] = useState(false);
     const [randomToken, setRandomToken] = useState("");
@@ -116,6 +118,7 @@ export default function OrdenProduccionDialogDetalles({
                 isClosable: true,
             });
 
+            onCanceled?.();
             handleClose();
         } catch (error) {
             toast({

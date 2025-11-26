@@ -203,6 +203,10 @@ export default function HistorialOrdenes() {
         }
     };
 
+    const refreshCurrentPage = () => {
+        fetchOrdenes(page);
+    };
+
     const handlePageChange = (newPage: number) => {
         if (newPage >= 0 && newPage < totalPages) {
             fetchOrdenes(newPage);
@@ -340,6 +344,7 @@ export default function HistorialOrdenes() {
                     setSelectedOrden(null);
                 }}
                 orden={selectedOrden}
+                onCanceled={refreshCurrentPage}
             />
         </Flex>
     );
