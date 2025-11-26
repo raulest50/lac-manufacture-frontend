@@ -13,9 +13,11 @@ import DateRangePicker from "../../components/DateRangePicker";
 import MyPagination from "../../components/MyPagination";
 import OrdenProduccionCard from "./OrdenProduccionCard"; // Adjust the path as needed
 import axios from "axios";
-import { OrdenProduccionDTO, OrdenSeguimientoDTO } from "./types"; // Adjust the path as needed
+import { OrdenProduccionDTO, OrdenSeguimientoDTO, ProductoWithInsumos } from "./types"; // Adjust the path as needed
 import { format } from "date-fns";
 import EndPointsURL from "../../api/EndPointsURL.tsx";
+import TerminadoSemiterminadoPicker from "./components/TerminadoSemiterminadoPicker";
+import ProductoFilterCard from "./components/ProductoFilterCard";
 
 const endPoints = new EndPointsURL();
 
@@ -127,6 +129,11 @@ export default function HistorialOrdenes() {
     const [size] = useState<number>(5); // You can make this dynamic if needed
     const [totalPages, setTotalPages] = useState<number>(0);
 
+    const [selectedProducto, setSelectedProducto] = useState<ProductoWithInsumos | null>(null);
+    const [isPickerOpen, setIsPickerOpen] = useState<boolean>(false);
+
+    const productoIdParam = selectedProducto?.producto?.productoId ?? undefined;
+
     const handleClickSearch = async () => {
         setLoading(true);
         setError(null);
@@ -138,6 +145,7 @@ export default function HistorialOrdenes() {
                     startDate: `${date1}T00:00:00`, // Adjust the format if needed
                     endDate: `${date2}T23:59:59`, // Adjust the format if needed
                     estadoOrden: searchParamState,
+                    productoId: productoIdParam,
                     page: 0,
                     size: size,
                 },
@@ -166,6 +174,7 @@ export default function HistorialOrdenes() {
                     startDate: `${date1}T00:00:00`, // Adjust the format if needed
                     endDate: `${date2}T23:59:59`, // Adjust the format if needed
                     estadoOrden: searchParamState,
+                    productoId: productoIdParam,
                     page: currentPage,
                     size: size,
                 },
@@ -211,6 +220,13 @@ export default function HistorialOrdenes() {
                     <option value="1">Solo Ordenes Cerradas</option>
                     <option value="2">Todas</option>
                 </Select>
+                <Flex ml={4} flex={1}>
+                    <ProductoFilterCard
+                        selectedProducto={selectedProducto}
+                        onOpenPicker={() => setIsPickerOpen(true)}
+                        onClearFilter={() => setSelectedProducto(null)}
+                    />
+                </Flex>
                 <Button
                     onClick={handleClickSearch}
                     colorScheme={"blue"}
@@ -248,6 +264,14 @@ export default function HistorialOrdenes() {
                 totalPages={totalPages}
                 loading={loading}
                 handlePageChange={handlePageChange}
+            />
+            <TerminadoSemiterminadoPicker
+                isOpen={isPickerOpen}
+                onClose={() => setIsPickerOpen(false)}
+                onConfirm={(producto) => {
+                    setSelectedProducto(producto);
+                    setIsPickerOpen(false);
+                }}
             />
         </Flex>
     );
