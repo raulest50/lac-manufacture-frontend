@@ -275,7 +275,7 @@ export default function HistorialOrdenes() {
                             <Th>Estado</Th>
                             <Th>Cantidad</Th>
                             <Th>Pedido</Th>
-                            <Th>Área/Departamento</Th>
+
                             <Th textAlign="right">Acciones</Th>
                         </Tr>
                     </Thead>
@@ -299,10 +299,7 @@ export default function HistorialOrdenes() {
                                 <Td>{orden.estadoOrden}</Td>
                                 <Td>{orden.cantidadProducir ?? "-"}</Td>
                                 <Td>{orden.numeroPedidoComercial ?? "-"}</Td>
-                                <Td>
-                                    <Text fontSize="sm">Área: {orden.areaOperativa ?? "-"}</Text>
-                                    <Text fontSize="sm">Depto.: {orden.departamentoOperativo ?? "-"}</Text>
-                                </Td>
+                                
                                 <Td textAlign="right">
                                     <Button
                                         size="sm"
