@@ -15,6 +15,8 @@ interface Step2FillDataProps {
     selectedProducts: Producto[];
     quantities: Record<string, number | "">;
     onChangeQuantity: (productoId: string, value: string) => void;
+    // TODO: inject stock values via a dedicated map prop once the inventory API/dataset is available
+    // to avoid coupling this component to a specific Producto shape.
 }
 
 export default function Step2FillData({
@@ -44,7 +46,9 @@ export default function Step2FillData({
                                 <Td>{producto.productoId}</Td>
                                 <Td>{producto.nombre}</Td>
                                 <Td textTransform={"capitalize"}>{producto.tipo_producto}</Td>
-                                <Td></Td>
+                                <Td>
+                                    {/* TODO: render stock for producto.productoId when inventory data is provided */}
+                                </Td>
                                 <Td>
                                     <Input
                                         type={"number"}
