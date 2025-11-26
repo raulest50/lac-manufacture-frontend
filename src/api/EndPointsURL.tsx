@@ -82,6 +82,7 @@ export default class EndPointsURL{
     public get_movimientos_by_producto:string;
     public exportar_movimientos_excel: string;
     public exportar_inventario_excel: string;
+    public save_ajuste_inventario: string;
 
     public save_doc_ingreso_oc: string;
     public backflush_no_planificado: string;
@@ -260,6 +261,7 @@ export default class EndPointsURL{
         this.get_movimientos_by_producto = `${domain}/${movimientos_res}/get_movimientos_by_producto`;
         this.exportar_movimientos_excel = `${domain}/${movimientos_res}/exportar-movimientos-excel`;
         this.exportar_inventario_excel = `${domain}/inventario/exportar-excel`;
+        this.save_ajuste_inventario = `${domain}/${movimientos_res}/ajustes`;
 
         this.save_doc_ingreso_oc = `${domain}/${movimientos_res}/save_doc_ingreso_oc`;
         this.backflush_no_planificado = `${domain}/${movimientos_res}/backflush_no_planificado`;

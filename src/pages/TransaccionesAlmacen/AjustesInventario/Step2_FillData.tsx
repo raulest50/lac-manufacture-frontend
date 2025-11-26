@@ -68,7 +68,8 @@ export default function Step2FillData({
                                                 quantityValue === undefined ||
                                                 quantityValue === "" ||
                                                 typeof quantityValue !== "number" ||
-                                                Number.isNaN(quantityValue);
+                                                Number.isNaN(quantityValue) ||
+                                                quantityValue === 0;
 
                                             return (
                                                 <Input
@@ -85,7 +86,9 @@ export default function Step2FillData({
                                     <Td>
                                         {(() => {
                                             const lotNumberValue = lotNumbers[producto.productoId] ?? "";
-                                            const isInvalidLotNumber = lotNumberValue.trim() === "";
+                                            const trimmedLotNumber = lotNumberValue.trim();
+                                            const isInvalidLotNumber =
+                                                lotNumberValue.length > 0 && trimmedLotNumber === "";
 
                                             return (
                                                 <Input
@@ -94,6 +97,7 @@ export default function Step2FillData({
                                                     onChange={(e) =>
                                                         onChangeLotNumber(producto.productoId, e.target.value)
                                                     }
+                                                    placeholder={"Opcional"}
                                                     isInvalid={isInvalidLotNumber}
                                                 />
                                             );
