@@ -26,7 +26,8 @@ import { useAuth } from "../../../context/AuthContext.tsx";
 const steps = [
     {title: "AjusteInvStep_Zero", description: "Selección de productos"},
     {title: "AjusteInvStep_One", description: "Especificar cantidades"},
-    {title: "AjusteInvStep_Two", description: "Revisar y enviar"}
+    {title: "AjusteInvStep_Two", description: "Revisar y enviar"},
+    {title: "AjusteInvStep_Confirmation", description: "Confirmación"}
 ];
 
 export default function AjustesInventarioTab(){
@@ -43,6 +44,7 @@ export default function AjustesInventarioTab(){
     const [observaciones, setObservaciones] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submissionError, setSubmissionError] = useState<string | null>(null);
+    const [submissionSuccess, setSubmissionSuccess] = useState(false);
     const pageSize = 10;
 
     const endpoints = useMemo(() => new EndPointsURL(), []);
@@ -119,20 +121,34 @@ export default function AjustesInventarioTab(){
         setIsSubmitting(true);
 
         try {
-            const payload = selectedProducts.map((producto) => ({
-                productoId: producto.productoId,
-                nombre: producto.nombre,
-                tipoProducto: producto.tipo_producto,
-                cantidad: quantities[producto.productoId],
-                lote: lotNumbers[producto.productoId],
-            }));
+            const movimientos = selectedProducts.map((producto) => {
+                const cantidad = quantities[producto.productoId];
+                const numeroLote = lotNumbers[producto.productoId]?.trim();
 
-            // TODO: replace with the actual inventory adjustment endpoint when available
-            await axios.post(endpoints.search_transacciones_almacen, {
-                items: payload,
-                observaciones,
-                usuario: user?.username ?? user?.email ?? "",
+                const movimiento: { productoId: string; cantidad: number; numeroLote?: string } = {
+                    productoId: producto.productoId,
+                    cantidad: typeof cantidad === "number" ? cantidad : 0,
+                };
+
+                if (numeroLote) {
+                    movimiento.numeroLote = numeroLote;
+                }
+
+                return movimiento;
             });
+
+            const payload = {
+                movimientos,
+                motivo: "AJUSTE_DE_INVENTARIO",
+                almacen: "GENERAL",
+                usuarioId: user ?? "",
+                ...(observaciones.trim() ? {observaciones: observaciones.trim()} : {}),
+                urlDocSoporte: undefined,
+            };
+
+            await axios.post(endpoints.save_ajuste_inventario, payload);
+            setSubmissionSuccess(true);
+            setActiveStep(steps.length - 1);
         } catch (error) {
             console.error("Error enviando el ajuste de inventario:", error);
             setSubmissionError("No se pudo enviar el ajuste. Intenta nuevamente.");
@@ -146,22 +162,42 @@ export default function AjustesInventarioTab(){
     };
 
     const goToStart = () => {
-        setActiveStep(0);
-        setSubmissionError(null);
+        if (submissionSuccess) {
+            resetFlow();
+        } else {
+            setActiveStep(0);
+            setSubmissionError(null);
+        }
     };
 
     const goToPrevious = () => {
+        if (submissionSuccess) {
+            return;
+        }
+
         setActiveStep((prev) => Math.max(prev - 1, 0));
         setSubmissionError(null);
+    };
+
+    const resetFlow = () => {
+        setSelectedProducts([]);
+        setQuantities({});
+        setLotNumbers({});
+        setObservaciones("");
+        setSubmissionError(null);
+        setSubmissionSuccess(false);
+        setActiveStep(0);
     };
 
     const areQuantitiesValid =
         selectedProducts.length > 0 &&
         selectedProducts.every(({productoId}) => {
             const quantity = quantities[productoId];
-            const lotNumber = lotNumbers[productoId]?.trim();
-            const isValidQuantity = typeof quantity === "number" && !Number.isNaN(quantity);
-            const isValidLot = Boolean(lotNumber);
+            const lotNumber = lotNumbers[productoId] ?? "";
+            const trimmedLotNumber = lotNumber.trim();
+            const isValidQuantity =
+                typeof quantity === "number" && !Number.isNaN(quantity) && quantity !== 0;
+            const isValidLot = !(lotNumber.length > 0 && trimmedLotNumber === "");
 
             return isValidQuantity && isValidLot;
         });
@@ -201,13 +237,33 @@ export default function AjustesInventarioTab(){
             );
         }
 
+        if (activeStep === steps.length - 1) {
+            return (
+                <Flex direction={{ base: "column" }} gap={4}>
+                    <Box p={4} borderWidth={"1px"} borderRadius={"md"} borderColor={"green.200"} w={"full"} bg={"green.50"}>
+                        <Text fontSize={"lg"} fontWeight={"bold"} color={"green.700"}>
+                            Ajuste enviado correctamente
+                        </Text>
+                        <Text mt={2} color={"green.800"}>
+                            El ajuste de inventario se registró. Puedes iniciar un nuevo ajuste cuando lo necesites.
+                        </Text>
+                        <Flex mt={4} justifyContent={{ base: "flex-start", md: "flex-end" }}>
+                            <Button colorScheme={"teal"} onClick={resetFlow}>
+                                Iniciar nuevo ajuste
+                            </Button>
+                        </Flex>
+                    </Box>
+                </Flex>
+            );
+        }
+
         return (
             <Step3SendAjuste
                 selectedProducts={selectedProducts}
                 quantities={quantities}
                 lotNumbers={lotNumbers}
                 observaciones={observaciones}
-                currentUserName={user?.username ?? user?.email ?? user?.uid}
+                currentUserName={user ?? ""}
                 onBack={goToPrevious}
                 onSend={handleSendAdjustment}
                 isSending={isSubmitting}
@@ -219,7 +275,9 @@ export default function AjustesInventarioTab(){
     const isNextDisabled =
         (activeStep === 0 && selectedProducts.length === 0) ||
         (activeStep === 1 && !areQuantitiesValid) ||
-        activeStep === steps.length - 1;
+        activeStep >= steps.length - 2;
+
+    const isPreviousDisabled = activeStep === 0 || submissionSuccess;
 
     return (
         <Container minW={['auto', 'container.lg', 'container.xl']} w={'full'} h={'full'}>
@@ -253,7 +311,7 @@ export default function AjustesInventarioTab(){
                     </Button>
 
                     <Flex gap={2} justifyContent={'flex-end'}>
-                        <Button onClick={goToPrevious} isDisabled={activeStep === 0} variant={'outline'}>
+                        <Button onClick={goToPrevious} isDisabled={isPreviousDisabled} variant={'outline'}>
                             Anterior
                         </Button>
                         <Button onClick={goToNext} isDisabled={isNextDisabled} colorScheme={'teal'}>
