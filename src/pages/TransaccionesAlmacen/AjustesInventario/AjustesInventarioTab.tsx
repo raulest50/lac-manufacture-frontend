@@ -14,17 +14,19 @@ import {
     Stepper,
     Text,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import axios from "axios";
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
 import { Producto } from "../../Productos/types.tsx";
 import Step1SelProdAdjInv from "./Step1_SelProd_AdjInv.tsx";
 import Step2FillData from "./Step2_FillData.tsx";
+import Step3SendAjuste from "./Step3_SendAjuste.tsx";
+import { useAuth } from "../../../context/AuthContext.tsx";
 
 const steps = [
     {title: "AjusteInvStep_Zero", description: "Selección de productos"},
     {title: "AjusteInvStep_One", description: "Especificar cantidades"},
-    {title: "AjusteInvStep_Two", description: "Enviar"}
+    {title: "AjusteInvStep_Two", description: "Revisar y enviar"}
 ];
 
 export default function AjustesInventarioTab(){
@@ -38,9 +40,13 @@ export default function AjustesInventarioTab(){
     const [quantities, setQuantities] = useState<Record<string, number | "">>({});
     const [lotNumbers, setLotNumbers] = useState<Record<string, string>>({});
     const [activeStep, setActiveStep] = useState(0);
+    const [observaciones, setObservaciones] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submissionError, setSubmissionError] = useState<string | null>(null);
     const pageSize = 10;
 
-    const endpoints = new EndPointsURL();
+    const endpoints = useMemo(() => new EndPointsURL(), []);
+    const { user } = useAuth();
 
     const fetchProductos = async (pageNumber: number) => {
         setLoading(true);
@@ -108,16 +114,45 @@ export default function AjustesInventarioTab(){
         }));
     };
 
+    const handleSendAdjustment = async () => {
+        setSubmissionError(null);
+        setIsSubmitting(true);
+
+        try {
+            const payload = selectedProducts.map((producto) => ({
+                productoId: producto.productoId,
+                nombre: producto.nombre,
+                tipoProducto: producto.tipo_producto,
+                cantidad: quantities[producto.productoId],
+                lote: lotNumbers[producto.productoId],
+            }));
+
+            // TODO: replace with the actual inventory adjustment endpoint when available
+            await axios.post(endpoints.search_transacciones_almacen, {
+                items: payload,
+                observaciones,
+                usuario: user?.username ?? user?.email ?? "",
+            });
+        } catch (error) {
+            console.error("Error enviando el ajuste de inventario:", error);
+            setSubmissionError("No se pudo enviar el ajuste. Intenta nuevamente.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     const goToNext = () => {
         setActiveStep((prev) => Math.min(prev + 1, steps.length - 1));
     };
 
     const goToStart = () => {
         setActiveStep(0);
+        setSubmissionError(null);
     };
 
     const goToPrevious = () => {
         setActiveStep((prev) => Math.max(prev - 1, 0));
+        setSubmissionError(null);
     };
 
     const areQuantitiesValid =
@@ -160,14 +195,24 @@ export default function AjustesInventarioTab(){
                     onChangeQuantity={handleChangeQuantity}
                     lotNumbers={lotNumbers}
                     onChangeLotNumber={handleChangeLotNumber}
+                    observaciones={observaciones}
+                    onChangeObservaciones={setObservaciones}
                 />
             );
         }
 
         return (
-            <Box>
-                <Text>Próximamente podrás revisar y enviar tu ajuste.</Text>
-            </Box>
+            <Step3SendAjuste
+                selectedProducts={selectedProducts}
+                quantities={quantities}
+                lotNumbers={lotNumbers}
+                observaciones={observaciones}
+                currentUserName={user?.username ?? user?.email ?? user?.uid}
+                onBack={goToPrevious}
+                onSend={handleSendAdjustment}
+                isSending={isSubmitting}
+                error={submissionError}
+            />
         );
     };
 
