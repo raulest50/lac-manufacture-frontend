@@ -7,6 +7,7 @@ import {
     Divider,
     Flex,
     Heading,
+    Icon,
     Stack,
     Table,
     Tbody,
@@ -16,6 +17,9 @@ import {
     Thead,
     Tr,
 } from "@chakra-ui/react";
+import { keyframes } from "@emotion/react";
+import { ImCheckboxChecked } from "react-icons/im";
+import { RiSave3Fill } from "react-icons/ri";
 import { Producto } from "../../Productos/types.tsx";
 
 interface Step3SendAjusteProps {
@@ -28,6 +32,8 @@ interface Step3SendAjusteProps {
     onSend: () => Promise<void>;
     isSending: boolean;
     error?: string | null;
+    isSuccess?: boolean;
+    onRestart?: () => void;
 }
 
 export default function Step3SendAjuste({
@@ -40,7 +46,54 @@ export default function Step3SendAjuste({
     onSend,
     isSending,
     error,
+    isSuccess = false,
+    onRestart,
 }: Step3SendAjusteProps) {
+    const colorAnimation = keyframes`
+  0% { color: #68D391; }
+  50% { color: #22d3ee; }
+  100% { color: #68D391; }
+`;
+
+    if (isSuccess) {
+        return (
+            <Flex
+                p={"1em"}
+                direction={"column"}
+                backgroundColor={"green.50"}
+                gap={8}
+                alignItems={"center"}
+                textAlign={"center"}
+            >
+                <Flex alignItems={"center"} gap={3}>
+                    <Heading fontFamily={"Comfortaa Variable"} color={"green.800"}>
+                        Ajuste enviado correctamente
+                    </Heading>
+                    <Icon as={ImCheckboxChecked} w={{ base: "2.5em", md: "3em" }} h={{ base: "2.5em", md: "3em" }} color={"green.500"} />
+                </Flex>
+                <Text fontFamily={"Comfortaa Variable"} color={"green.900"}>
+                    El ajuste de inventario se registró. Puedes iniciar un nuevo ajuste cuando lo necesites.
+                </Text>
+
+                <Icon
+                    as={RiSave3Fill}
+                    w={{ base: "8em", md: "10em" }}
+                    h={{ base: "8em", md: "10em" }}
+                    color={"green.400"}
+                    animation={`${colorAnimation} 3s infinite ease-in-out`}
+                />
+
+                <Button
+                    variant={"solid"}
+                    colorScheme={"green"}
+                    onClick={onRestart}
+                >
+                    Iniciar nuevo ajuste
+                </Button>
+            </Flex>
+        );
+    }
+
     const renderObservaciones = () => {
         if (!observaciones || observaciones.trim() === "") {
             return <Text color={"gray.500"}>Sin observaciones adicionales.</Text>;
