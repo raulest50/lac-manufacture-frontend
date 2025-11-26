@@ -237,26 +237,6 @@ export default function AjustesInventarioTab(){
             );
         }
 
-        if (activeStep === steps.length - 1) {
-            return (
-                <Flex direction={{ base: "column" }} gap={4}>
-                    <Box p={4} borderWidth={"1px"} borderRadius={"md"} borderColor={"green.200"} w={"full"} bg={"green.50"}>
-                        <Text fontSize={"lg"} fontWeight={"bold"} color={"green.700"}>
-                            Ajuste enviado correctamente
-                        </Text>
-                        <Text mt={2} color={"green.800"}>
-                            El ajuste de inventario se registró. Puedes iniciar un nuevo ajuste cuando lo necesites.
-                        </Text>
-                        <Flex mt={4} justifyContent={{ base: "flex-start", md: "flex-end" }}>
-                            <Button colorScheme={"teal"} onClick={resetFlow}>
-                                Iniciar nuevo ajuste
-                            </Button>
-                        </Flex>
-                    </Box>
-                </Flex>
-            );
-        }
-
         return (
             <Step3SendAjuste
                 selectedProducts={selectedProducts}
@@ -268,6 +248,8 @@ export default function AjustesInventarioTab(){
                 onSend={handleSendAdjustment}
                 isSending={isSubmitting}
                 error={submissionError}
+                isSuccess={submissionSuccess}
+                onRestart={resetFlow}
             />
         );
     };
