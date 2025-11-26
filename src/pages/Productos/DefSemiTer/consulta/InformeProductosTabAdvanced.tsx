@@ -186,7 +186,6 @@ export default function InformeProductosTabAdvanced() {
                             <Th>Costo</Th>
                             <Th>Tipo</Th>
                             <Th>Fecha Creación</Th>
-                            <Th>Estado</Th>
                             <Th>Acciones</Th>
                         </Tr>
                     </Thead>
@@ -202,11 +201,6 @@ export default function InformeProductosTabAdvanced() {
                                     </Badge>
                                 </Td>
                                 <Td>{producto.fechaCreacion}</Td>
-                                <Td>
-                                    <Badge colorScheme="blue">
-                                        {producto.inventareable ? 'Inventariable' : 'No inventariable'}
-                                    </Badge>
-                                </Td>
                                 <Td>
                                     <Button
                                         size="sm"
