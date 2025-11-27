@@ -17,8 +17,8 @@ interface Step2FillDataProps {
     selectedProducts: Producto[];
     quantities: Record<string, number | "">;
     onChangeQuantity: (productoId: string, value: string) => void;
-    lotNumbers: Record<string, string>;
-    onChangeLotNumber: (productoId: string, value: string) => void;
+    lotIds: Record<string, number | "">;
+    onChangeLotId: (productoId: string, value: string) => void;
     observaciones: string;
     onChangeObservaciones: (value: string) => void;
     // TODO: inject stock values via a dedicated map prop once the inventory API/dataset is available
@@ -29,8 +29,8 @@ export default function Step2FillData({
     selectedProducts,
     quantities,
     onChangeQuantity,
-    lotNumbers,
-    onChangeLotNumber,
+    lotIds,
+    onChangeLotId,
     observaciones,
     onChangeObservaciones,
 }: Step2FillDataProps) {
@@ -49,7 +49,7 @@ export default function Step2FillData({
                                 <Th>Tipo</Th>
                                 <Th>Stock actual</Th>
                                 <Th>Unidades de ajuste</Th>
-                                <Th>Número de lote</Th>
+                                <Th>ID de lote</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -85,20 +85,20 @@ export default function Step2FillData({
                                     </Td>
                                     <Td>
                                         {(() => {
-                                            const lotNumberValue = lotNumbers[producto.productoId] ?? "";
-                                            const trimmedLotNumber = lotNumberValue.trim();
-                                            const isInvalidLotNumber =
-                                                lotNumberValue.length > 0 && trimmedLotNumber === "";
+                                            const lotIdValue = lotIds[producto.productoId] ?? "";
+                                            const isInvalidLotId =
+                                                lotIdValue !== "" &&
+                                                (typeof lotIdValue !== "number" || Number.isNaN(lotIdValue));
 
                                             return (
                                                 <Input
-                                                    type={"text"}
-                                                    value={lotNumberValue}
+                                                    type={"number"}
+                                                    value={lotIdValue}
                                                     onChange={(e) =>
-                                                        onChangeLotNumber(producto.productoId, e.target.value)
+                                                        onChangeLotId(producto.productoId, e.target.value)
                                                     }
                                                     placeholder={"Opcional"}
-                                                    isInvalid={isInvalidLotNumber}
+                                                    isInvalid={isInvalidLotId}
                                                 />
                                             );
                                         })()}
