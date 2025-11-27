@@ -25,7 +25,7 @@ import { Producto } from "../../Productos/types.tsx";
 interface Step3SendAjusteProps {
     selectedProducts: Producto[];
     quantities: Record<string, number | "">;
-    lotNumbers: Record<string, string>;
+    lotIds: Record<string, number | "">;
     observaciones?: string;
     currentUserName?: string;
     onBack: () => void;
@@ -39,7 +39,7 @@ interface Step3SendAjusteProps {
 export default function Step3SendAjuste({
     selectedProducts,
     quantities,
-    lotNumbers,
+    lotIds,
     observaciones,
     currentUserName,
     onBack,
@@ -131,7 +131,7 @@ export default function Step3SendAjuste({
                                 <Th>Nombre</Th>
                                 <Th>Tipo</Th>
                                 <Th isNumeric>Unidades de ajuste</Th>
-                                <Th>Número de lote</Th>
+                                <Th>ID de lote</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -141,7 +141,7 @@ export default function Step3SendAjuste({
                                     <Td>{producto.nombre}</Td>
                                     <Td textTransform={"capitalize"}>{producto.tipo_producto}</Td>
                                     <Td isNumeric>{quantities[producto.productoId]?.toString() ?? ""}</Td>
-                                    <Td>{lotNumbers[producto.productoId]}</Td>
+                                    <Td>{lotIds[producto.productoId]}</Td>
                                 </Tr>
                             ))}
                         </Tbody>

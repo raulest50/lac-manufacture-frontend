@@ -39,7 +39,7 @@ export default function AjustesInventarioTab(){
     const [totalPages, setTotalPages] = useState(1);
     const [selectedProducts, setSelectedProducts] = useState<Producto[]>([]);
     const [quantities, setQuantities] = useState<Record<string, number | "">>({});
-    const [lotNumbers, setLotNumbers] = useState<Record<string, string>>({});
+    const [lotIds, setLotIds] = useState<Record<string, number | "">>({});
     const [activeStep, setActiveStep] = useState(0);
     const [observaciones, setObservaciones] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,7 +95,7 @@ export default function AjustesInventarioTab(){
             const {[productoId]: _, ...rest} = prev;
             return rest;
         });
-        setLotNumbers((prev) => {
+        setLotIds((prev) => {
             const {[productoId]: _, ...rest} = prev;
             return rest;
         });
@@ -109,10 +109,12 @@ export default function AjustesInventarioTab(){
         }));
     };
 
-    const handleChangeLotNumber = (productoId: string, value: string) => {
-        setLotNumbers((prev) => ({
+    const handleChangeLotId = (productoId: string, value: string) => {
+        const parsedValue = value === "" ? "" : Number(value);
+
+        setLotIds((prev) => ({
             ...prev,
-            [productoId]: value,
+            [productoId]: Number.isNaN(parsedValue) ? "" : parsedValue,
         }));
     };
 
@@ -121,26 +123,30 @@ export default function AjustesInventarioTab(){
         setIsSubmitting(true);
 
         try {
-            const movimientos = selectedProducts.map((producto) => {
+            const items = selectedProducts.map((producto) => {
                 const cantidad = quantities[producto.productoId];
-                const numeroLote = lotNumbers[producto.productoId]?.trim();
+                const loteId = lotIds[producto.productoId];
 
-                const movimiento: { productoId: string; cantidad: number; numeroLote?: string } = {
+                const item: {
+                    productoId: number;
+                    cantidad: number;
+                    almacen: string;
+                    loteId?: number;
+                } = {
                     productoId: producto.productoId,
                     cantidad: typeof cantidad === "number" ? cantidad : 0,
+                    almacen: "GENERAL",
                 };
 
-                if (numeroLote) {
-                    movimiento.numeroLote = numeroLote;
+                if (typeof loteId === "number" && !Number.isNaN(loteId)) {
+                    item.loteId = loteId;
                 }
 
-                return movimiento;
+                return item;
             });
 
             const payload = {
-                movimientos,
-                motivo: "AJUSTE_DE_INVENTARIO",
-                almacen: "GENERAL",
+                items,
                 usuarioId: user ?? "",
                 ...(observaciones.trim() ? {observaciones: observaciones.trim()} : {}),
                 urlDocSoporte: undefined,
@@ -182,7 +188,7 @@ export default function AjustesInventarioTab(){
     const resetFlow = () => {
         setSelectedProducts([]);
         setQuantities({});
-        setLotNumbers({});
+        setLotIds({});
         setObservaciones("");
         setSubmissionError(null);
         setSubmissionSuccess(false);
@@ -193,11 +199,10 @@ export default function AjustesInventarioTab(){
         selectedProducts.length > 0 &&
         selectedProducts.every(({productoId}) => {
             const quantity = quantities[productoId];
-            const lotNumber = lotNumbers[productoId] ?? "";
-            const trimmedLotNumber = lotNumber.trim();
+            const lotId = lotIds[productoId];
             const isValidQuantity =
                 typeof quantity === "number" && !Number.isNaN(quantity) && quantity !== 0;
-            const isValidLot = !(lotNumber.length > 0 && trimmedLotNumber === "");
+            const isValidLot = lotId === "" || (typeof lotId === "number" && !Number.isNaN(lotId));
 
             return isValidQuantity && isValidLot;
         });
@@ -229,8 +234,8 @@ export default function AjustesInventarioTab(){
                     selectedProducts={selectedProducts}
                     quantities={quantities}
                     onChangeQuantity={handleChangeQuantity}
-                    lotNumbers={lotNumbers}
-                    onChangeLotNumber={handleChangeLotNumber}
+                    lotIds={lotIds}
+                    onChangeLotId={handleChangeLotId}
                     observaciones={observaciones}
                     onChangeObservaciones={setObservaciones}
                 />
@@ -241,7 +246,7 @@ export default function AjustesInventarioTab(){
             <Step3SendAjuste
                 selectedProducts={selectedProducts}
                 quantities={quantities}
-                lotNumbers={lotNumbers}
+                lotIds={lotIds}
                 observaciones={observaciones}
                 currentUserName={user ?? ""}
                 onBack={goToPrevious}
