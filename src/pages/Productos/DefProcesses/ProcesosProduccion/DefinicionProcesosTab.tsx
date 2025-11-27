@@ -109,7 +109,6 @@ function DefinicionProcesosTab() {
     switch (model) {
       case TimeModelType.CONSTANT:
         proceso.constantSeconds = constantSeconds;
-        proceso.processTime = constantSeconds; // Para compatibilidad
         break;
       case TimeModelType.THROUGHPUT_RATE:
         proceso.throughputUnitsPerSec = throughputUnitsPerSec;

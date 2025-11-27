@@ -77,8 +77,8 @@ export function ConsultaProcesosProduccion() {
         }
       default:
         return {
-          label: 'Tiempo',
-          details: `${proceso.processTime ?? 0} seg`
+          label: 'Sin modelo',
+          details: `${proceso.constantSeconds ?? proceso.secondsPerUnit ?? proceso.secondsPerBatch ?? 0} seg`
         };
     }
   };
