@@ -192,9 +192,6 @@ function ProcessDesignerContent({ semioter2, onProcessChange, onValidityChange }
                     secondsPerBatch: proceso.secondsPerBatch,
                     batchSize: proceso.batchSize,
 
-                    // Para compatibilidad con código existente
-                    tiempo: proceso.processTime ? String(proceso.processTime) : "",
-                    processTime: proceso.processTime ? String(proceso.processTime) : "",
                 },
                 position: { 
                     x: 200, 

@@ -114,10 +114,12 @@ export default function ProcesoNode(props: NodeProps) {
                     )}
 
                     {/* Backward compatibility for old data */}
-                    {!data.model && (String(data.processTime || data.tiempo || "").trim() !== "") && (
+                    {!data.model && (data.constantSeconds || data.secondsPerUnit || data.secondsPerBatch) && (
                         <HStack w="full">
                             <Icon mr="1em" ml="1em" as={PiClockCountdownFill} w="2em" h="2em" color="teal" />
-                            <Text fontWeight="bold">Process Time: {String(data.processTime || data.tiempo)} seg</Text>
+                            <Text fontWeight="bold">
+                                Process Time: {data.constantSeconds || data.secondsPerUnit || data.secondsPerBatch} seg
+                            </Text>
                         </HStack>
                     )}
                 </VStack>

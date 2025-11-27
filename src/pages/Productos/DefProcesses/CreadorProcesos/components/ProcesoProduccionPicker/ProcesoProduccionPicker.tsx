@@ -71,8 +71,8 @@ export function ProcesoProduccionPicker({isOpen, onClose, onConfirm, alreadySele
       default:
         // For backward compatibility with old data
         return {
-          label: 'Tiempo',
-          details: `${proceso.processTime ?? 0} seg`
+          label: 'Sin modelo',
+          details: `${proceso.constantSeconds ?? proceso.secondsPerUnit ?? proceso.secondsPerBatch ?? 0} seg`
         };
     }
   };

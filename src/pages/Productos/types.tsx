@@ -153,7 +153,4 @@ export interface ProcesoProduccionEntity {
     secondsPerUnit?: number;         // Para PER_UNIT
     secondsPerBatch?: number;        // Para PER_BATCH
     batchSize?: number;              // Para PER_BATCH
-
-    // Campo legacy para compatibilidad con código existente
-    processTime?: number;
 }

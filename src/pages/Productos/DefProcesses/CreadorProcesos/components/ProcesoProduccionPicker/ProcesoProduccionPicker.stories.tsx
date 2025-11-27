@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Text, ChakraProvider } from '@chakra-ui/react';
 import axios from 'axios';
 import { ProcesoProduccionPicker } from './ProcesoProduccionPicker';
-import { ProcesoProduccionEntity } from '../../../../types.tsx';
+import { ProcesoProduccionEntity, TimeModelType } from '../../../../types.tsx';
 
 // Mock manual de axios para las historias
 const createAxiosMock = (mockImplementation: any) => {
@@ -36,7 +36,8 @@ const mockProcesos: ProcesoProduccionEntity[] = [
       }
     ],
     setUpTime: 30,
-    processTime: 120,
+    constantSeconds: 120,
+    model: TimeModelType.CONSTANT,
     nivelAcceso: 1
   },
   {
@@ -55,7 +56,8 @@ const mockProcesos: ProcesoProduccionEntity[] = [
       }
     ],
     setUpTime: 15,
-    processTime: 45,
+    model: TimeModelType.THROUGHPUT_RATE,
+    throughputUnitsPerSec: 2,
     nivelAcceso: 2
   },
   {
@@ -74,7 +76,8 @@ const mockProcesos: ProcesoProduccionEntity[] = [
       }
     ],
     setUpTime: 20,
-    processTime: 60,
+    model: TimeModelType.PER_UNIT,
+    secondsPerUnit: 5,
     nivelAcceso: 3
   }
 ];
@@ -125,7 +128,7 @@ export const Default = () => {
             <Text fontWeight="bold">Procesos seleccionados:</Text>
             {selectedProcesos.map(proceso => (
               <Box key={proceso.procesoId} mt={2}>
-                <Text>• {proceso.nombre} - Tiempo: {proceso.processTime} min</Text>
+                <Text>• {proceso.nombre} - Modelo: {proceso.model}</Text>
               </Box>
             ))}
           </Box>
@@ -250,7 +253,8 @@ export const WithPagination = () => {
       }
     ],
     setUpTime: 10 + index,
-    processTime: 30 + index * 2,
+    model: TimeModelType.CONSTANT,
+    constantSeconds: 30 + index * 2,
     nivelAcceso: (index % 3) + 1 // Valores 1, 2, 3 en ciclo
   }));
 
