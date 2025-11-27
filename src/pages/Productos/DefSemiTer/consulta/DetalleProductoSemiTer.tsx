@@ -114,7 +114,7 @@ export default function DetalleProducto({producto, setEstado, setProductoSelecci
 
     // Manejar cambios en los campos editables
     const handleInputChange = (
-        field: keyof (Producto | Material),
+        field: keyof Producto | keyof Material,
         value: string | number | undefined) =>
     {
         setProductoData({

@@ -129,12 +129,12 @@ export default function AjustesInventarioTab(){
 
                 const item: {
                     productoId: number;
-                    cantidad: number;
+                    cantidad: number | "";
                     almacen: string;
                     loteId?: number;
                 } = {
                     productoId: producto.productoId,
-                    cantidad: typeof cantidad === "number" ? cantidad : 0,
+                    cantidad: cantidad,
                     almacen: "GENERAL",
                 };
 
@@ -201,7 +201,7 @@ export default function AjustesInventarioTab(){
             const quantity = quantities[productoId];
             const lotId = lotIds[productoId];
             const isValidQuantity =
-                typeof quantity === "number" && !Number.isNaN(quantity) && quantity !== 0;
+                quantity === "" || (typeof quantity === "number" && !Number.isNaN(quantity));
             const isValidLot = lotId === "" || (typeof lotId === "number" && !Number.isNaN(lotId));
 
             return isValidQuantity && isValidLot;

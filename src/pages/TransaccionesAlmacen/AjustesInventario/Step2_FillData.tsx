@@ -66,10 +66,8 @@ export default function Step2FillData({
                                             const quantityValue = quantities[producto.productoId];
                                             const isInvalidQuantity =
                                                 quantityValue === undefined ||
-                                                quantityValue === "" ||
                                                 typeof quantityValue !== "number" ||
-                                                Number.isNaN(quantityValue) ||
-                                                quantityValue === 0;
+                                                Number.isNaN(quantityValue);
 
                                             return (
                                                 <Input
@@ -86,10 +84,11 @@ export default function Step2FillData({
                                     <Td>
                                         {(() => {
                                             const lotIdValue = lotIds[producto.productoId] ?? "";
+                                            /*
                                             const isInvalidLotId =
                                                 lotIdValue !== "" &&
                                                 (typeof lotIdValue !== "number" || Number.isNaN(lotIdValue));
-
+                                            */
                                             return (
                                                 <Input
                                                     type={"number"}
@@ -98,7 +97,7 @@ export default function Step2FillData({
                                                         onChangeLotId(producto.productoId, e.target.value)
                                                     }
                                                     placeholder={"Opcional"}
-                                                    isInvalid={isInvalidLotId}
+                                                    //isInvalid={isInvalidLotId}
                                                 />
                                             );
                                         })()}

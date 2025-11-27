@@ -35,7 +35,7 @@ import axios from "axios";
 import MyPagination from "../../../components/MyPagination.tsx";
 import { Producto } from "../types.tsx";
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
-import DetalleProducto from "../DefSemiTer/consulta/DetalleProducto.tsx";
+import DetalleProducto from "./componentes/DetalleProducto.tsx";
 
 const endpoints = new EndPointsURL();
 

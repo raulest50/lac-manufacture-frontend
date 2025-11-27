@@ -32,14 +32,13 @@ import {
     TableContainer,
     Badge,
     Select,
-    Box,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import axios from "axios";
 import MyPagination from "../../../../components/MyPagination.tsx";
 import { Producto } from "../../types.tsx";
 import EndPointsURL from "../../../../api/EndPointsURL.tsx";
-import DetalleProductoAdvanced from "./DetalleProductoAdvanced.tsx";
+import DetalleProductoSemiTer from "./DetalleProductoSemiTer.tsx";
 
 const endpoints = new EndPointsURL();
 
@@ -100,7 +99,7 @@ export default function InformeProductosTabAdvanced() {
     // Renderizado condicional basado en el estado
     if (estado === 1 && productoSeleccionado) {
         return (
-            <DetalleProductoAdvanced 
+            <DetalleProductoSemiTer
                 producto={productoSeleccionado} 
                 setEstado={setEstado}
                 setProductoSeleccionado={setProductoSeleccionado}
