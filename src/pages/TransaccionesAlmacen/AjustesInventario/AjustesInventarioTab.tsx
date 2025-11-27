@@ -147,7 +147,7 @@ export default function AjustesInventarioTab(){
 
             const payload = {
                 items,
-                usuarioId: user ?? "",
+                username: user ?? "", // Usando username en lugar de usuarioId para reflejar que se envía el nombre de usuario, no un ID
                 ...(observaciones.trim() ? {observaciones: observaciones.trim()} : {}),
                 urlDocSoporte: undefined,
             };
@@ -199,12 +199,11 @@ export default function AjustesInventarioTab(){
         selectedProducts.length > 0 &&
         selectedProducts.every(({productoId}) => {
             const quantity = quantities[productoId];
-            const lotId = lotIds[productoId];
+            // Ya no verificamos lotId
             const isValidQuantity =
-                quantity === "" || (typeof quantity === "number" && !Number.isNaN(quantity));
-            const isValidLot = lotId === "" || (typeof lotId === "number" && !Number.isNaN(lotId));
+                quantity !== "" && typeof quantity === "number" && !Number.isNaN(quantity);
 
-            return isValidQuantity && isValidLot;
+            return isValidQuantity;
         });
 
     const renderStepContent = () => {

@@ -25,9 +25,19 @@ interface LoginResponse {
     username: string;
 }
 
+/**
+ * IMPORTANTE: En este sistema, el username (nombre de usuario) es único y debe usarse como 
+ * identificador en las integraciones con API en lugar del ID numérico del usuario.
+ * 
+ * Cuando se envían datos a endpoints del backend que requieren identificar al usuario,
+ * use siempre el campo 'username' en lugar de 'usuarioId' para evitar confusiones.
+ * 
+ * El backend está diseñado para buscar usuarios por su nombre de usuario único,
+ * no por un ID numérico, aunque algunos DTOs puedan tener campos llamados 'usuarioId'.
+ */
 // Our AuthContext type
 type AuthContextType = {
-    user: string | null;
+    user: string | null; // Contiene el username (nombre de usuario único), NO un ID numérico
     roles: string[];
     login: (username: string, password: string) => Promise<LoginResponse>;
     logout: () => void;
