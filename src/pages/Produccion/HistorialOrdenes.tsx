@@ -1,6 +1,6 @@
 // src/components/HistorialOrdenesSeguimiento.tsx
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
     Button,
     Flex,
@@ -14,6 +14,8 @@ import {
     Th,
     Thead,
     Tr,
+    Box,
+    useOutsideClick
 } from "@chakra-ui/react";
 import DateRangePicker from "../../components/DateRangePicker";
 import MyPagination from "../../components/MyPagination";
@@ -24,6 +26,7 @@ import EndPointsURL from "../../api/EndPointsURL.tsx";
 import TerminadoSemiterminadoPicker from "./components/TerminadoSemiterminadoPicker";
 import ProductoFilterCard from "./components/ProductoFilterCard";
 import OrdenProduccionDialogDetalles from "./components/OrdenProduccionDialogDetalles";
+import ODPpdfGenerator from "./ODPpdfGenerator";
 
 const endPoints = new EndPointsURL();
 
@@ -121,6 +124,12 @@ const normalizeOrdenProduccion = (orden: any): OrdenProduccionDTO => {
     };
 };
 
+interface ContextMenuState {
+    mouseX: number;
+    mouseY: number;
+    orden: OrdenProduccionDTO;
+}
+
 export default function HistorialOrdenes() {
     const [date1, setDate1] = useState(format(new Date(), "yyyy-MM-dd"));
     const [date2, setDate2] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -140,6 +149,14 @@ export default function HistorialOrdenes() {
 
     const [selectedOrden, setSelectedOrden] = useState<OrdenProduccionDTO | null>(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState<boolean>(false);
+
+    const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+    const contextMenuRef = useRef<HTMLDivElement>(null);
+
+    useOutsideClick({
+        ref: contextMenuRef,
+        handler: () => setContextMenu(null),
+    });
 
     const productoIdParam = selectedProducto?.producto?.productoId ?? undefined;
 
@@ -213,6 +230,23 @@ export default function HistorialOrdenes() {
         }
     };
 
+    const handleContextMenu = (event: React.MouseEvent, orden: OrdenProduccionDTO) => {
+        event.preventDefault();
+        setContextMenu({
+            mouseX: event.clientX,
+            mouseY: event.clientY,
+            orden: orden,
+        });
+    };
+
+    const handleGenerarPDF = async () => {
+        if (contextMenu) {
+            const generator = new ODPpdfGenerator();
+            await generator.downloadPDF(contextMenu.orden);
+        }
+        setContextMenu(null);
+    };
+
     return (
         <Flex direction={"column"} p={4}>
             <Flex direction={"row"} mb={4} align="center">
@@ -281,7 +315,11 @@ export default function HistorialOrdenes() {
                     </Thead>
                     <Tbody>
                         {ordenes.map((orden) => (
-                            <Tr key={orden.ordenId}>
+                            <Tr 
+                                key={orden.ordenId}
+                                onContextMenu={(e) => handleContextMenu(e, orden)}
+                                _hover={{ bg: 'blue.100', cursor: 'pointer' }}
+                            >
                                 <Td>{orden.ordenId}</Td>
                                 <Td>
                                     <Text fontWeight="medium">{orden.productoNombre || "-"}</Text>
@@ -299,7 +337,7 @@ export default function HistorialOrdenes() {
                                 <Td>{orden.estadoOrden}</Td>
                                 <Td>{orden.cantidadProducir ?? "-"}</Td>
                                 <Td>{orden.numeroPedidoComercial ?? "-"}</Td>
-                                
+
                                 <Td textAlign="right">
                                     <Button
                                         size="sm"
@@ -343,6 +381,42 @@ export default function HistorialOrdenes() {
                 orden={selectedOrden}
                 onCanceled={refreshCurrentPage}
             />
+
+            {/* Custom Context Menu */}
+            {contextMenu && (
+                <Box
+                    ref={contextMenuRef}
+                    position="fixed"
+                    top={contextMenu.mouseY}
+                    left={contextMenu.mouseX}
+                    bg="white"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    borderRadius="md"
+                    boxShadow="md"
+                    zIndex={1000}
+                    p={2}
+                >
+                    <Box
+                        p={1}
+                        _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                        onClick={handleGenerarPDF}
+                    >
+                        Generar PDF
+                    </Box>
+                    <Box
+                        p={1}
+                        _hover={{ bg: 'gray.100', cursor: 'pointer' }}
+                        onClick={() => {
+                            setSelectedOrden(contextMenu.orden);
+                            setIsDetailsOpen(true);
+                            setContextMenu(null);
+                        }}
+                    >
+                        Ver detalles
+                    </Box>
+                </Box>
+            )}
         </Flex>
     );
 }
