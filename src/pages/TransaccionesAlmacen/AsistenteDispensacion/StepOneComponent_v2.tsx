@@ -1,0 +1,171 @@
+import {useEffect, useMemo, useState} from 'react';
+import {
+    Box,
+    Button,
+    Flex,
+    Heading,
+    IconButton,
+    Select,
+    Table,
+    Tbody,
+    Td,
+    Text,
+    Th,
+    Thead,
+    Tr,
+    useToast
+} from '@chakra-ui/react';
+import {RepeatIcon} from '@chakra-ui/icons';
+import axios from 'axios';
+import EndPointsURL from '../../../api/EndPointsURL';
+import {DispensacionDTO} from '../types';
+
+interface Props {
+    setActiveStep: (step:number) => void;
+    setDispensacion: (dto: DispensacionDTO) => void;
+}
+
+interface OrdenDispensacionResumen {
+    ordenProduccionId: number;
+    productoNombre?: string;
+    producto?: {nombre?: string};
+    fechaInicio?: string;
+    fechaCreacion?: string;
+    estado?: string | number;
+    estadoOrden?: string | number;
+    items?: DispensacionDTO['items'];
+}
+
+interface PaginatedResponse<T> {
+    content: T[];
+    totalPages: number;
+    totalElements: number;
+    number: number;
+    size: number;
+}
+
+export default function StepOneComponentV2({setActiveStep, setDispensacion}: Props){
+    const toast = useToast();
+    const [ordenes, setOrdenes] = useState<OrdenDispensacionResumen[]>([]);
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [loadingOrden, setLoadingOrden] = useState<number | null>(null);
+
+    const fetchOrdenes = async () => {
+        setLoading(true);
+        try {
+            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion_odp_consulta?page=${page}&size=${size}`;
+            const resp = await axios.get<PaginatedResponse<OrdenDispensacionResumen>>(endpoint, {withCredentials: true});
+            setOrdenes(resp.data.content ?? []);
+            setTotalPages(resp.data.totalPages ?? 0);
+        } catch (err) {
+            toast({title: 'Error al cargar órdenes', description: 'No fue posible obtener las órdenes de producción.', status: 'error', duration: 3000, isClosable: true});
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchOrdenes();
+    }, [page, size]);
+
+    const formatFecha = (fecha?: string) => {
+        if(!fecha) return 'N/A';
+        const parsed = new Date(fecha);
+        return isNaN(parsed.getTime()) ? fecha : parsed.toLocaleString();
+    };
+
+    const formatEstado = (estado?: string | number) => {
+        if(typeof estado === 'number'){
+            if(estado === 0) return 'Abierta';
+            if(estado === 1) return 'En progreso';
+        }
+        return estado ?? 'Desconocido';
+    };
+
+    const handleDispensacion = async (orden: OrdenDispensacionResumen) => {
+        if(!orden.ordenProduccionId){
+            toast({title: 'ID no disponible', description: 'La orden seleccionada no tiene un identificador válido.', status: 'warning', duration: 3000, isClosable: true});
+            return;
+        }
+        setLoadingOrden(orden.ordenProduccionId);
+        try {
+            if(Array.isArray(orden.items)){
+                setDispensacion({ordenProduccionId: orden.ordenProduccionId, items: orden.items});
+                setActiveStep(1);
+                return;
+            }
+            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion/sugerida?ordenProduccionId=${orden.ordenProduccionId}`;
+            const resp = await axios.get<DispensacionDTO>(endpoint, {withCredentials: true});
+            setDispensacion(resp.data);
+            setActiveStep(1);
+        } catch (err) {
+            toast({title: 'Orden no encontrada', description: 'No existe una orden de producción con el id especificado.', status: 'error', duration: 3000, isClosable: true});
+        } finally {
+            setLoadingOrden(null);
+        }
+    };
+
+    const isNextDisabled = useMemo(() => totalPages === 0 || page + 1 >= totalPages, [page, totalPages]);
+
+    return (
+        <Box p='1em' backgroundColor='blue.50'>
+            <Flex align='center' justify='space-between' mb={4} gap={4}>
+                <Heading fontFamily='Comfortaa Variable' size='md'>Órdenes de Producción abiertas/en progreso</Heading>
+                <IconButton aria-label='Refrescar' icon={<RepeatIcon />} onClick={fetchOrdenes} isLoading={loading} colorScheme='teal'/>
+            </Flex>
+            <Box bg='white' borderRadius='md' boxShadow='sm' overflowX='auto'>
+                <Table size='sm'>
+                    <Thead>
+                        <Tr>
+                            <Th>ID</Th>
+                            <Th>Producto</Th>
+                            <Th>Fecha</Th>
+                            <Th>Estado</Th>
+                            <Th textAlign='center'>Acciones</Th>
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        {ordenes.map((orden) => (
+                            <Tr key={orden.ordenProduccionId}>
+                                <Td>{orden.ordenProduccionId}</Td>
+                                <Td>{orden.productoNombre ?? orden.producto?.nombre ?? 'Sin nombre'}</Td>
+                                <Td>{formatFecha(orden.fechaInicio ?? orden.fechaCreacion)}</Td>
+                                <Td>{formatEstado(orden.estado ?? orden.estadoOrden)}</Td>
+                                <Td>
+                                    <Flex justify='center'>
+                                        <Button colorScheme='teal' size='sm' onClick={() => handleDispensacion(orden)} isLoading={loadingOrden === orden.ordenProduccionId}>
+                                            Hacer dispensación
+                                        </Button>
+                                    </Flex>
+                                </Td>
+                            </Tr>
+                        ))}
+                        {ordenes.length === 0 && (
+                            <Tr>
+                                <Td colSpan={5}>
+                                    <Text textAlign='center' py={4}>{loading ? 'Cargando órdenes...' : 'No hay órdenes disponibles.'}</Text>
+                                </Td>
+                            </Tr>
+                        )}
+                    </Tbody>
+                </Table>
+            </Box>
+            <Flex mt={4} justify='space-between' align='center' gap={4}>
+                <Flex align='center' gap={2}>
+                    <Text>Tamaño de página:</Text>
+                    <Select value={size} onChange={(e) => {setPage(0); setSize(parseInt(e.target.value));}} width='80px'>
+                        {[5,10,20,50].map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </Select>
+                </Flex>
+                <Flex align='center' gap={2}>
+                    <Button onClick={() => setPage((p) => Math.max(p - 1, 0))} isDisabled={page === 0 || loading}>Anterior</Button>
+                    <Text>Pagina {totalPages === 0 ? 0 : page + 1} de {totalPages}</Text>
+                    <Button onClick={() => setPage((p) => p + 1)} isDisabled={loading || isNextDisabled}>Siguiente</Button>
+                </Flex>
+            </Flex>
+        </Box>
+    );
+}
