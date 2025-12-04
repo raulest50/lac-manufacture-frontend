@@ -1,6 +1,7 @@
 // ReporteOrdenesCompras.tsx
 import { useState } from "react";
-import { Button, Container, Flex, Select, Spinner } from "@chakra-ui/react";
+import { Button, Container, Flex, Select, Spinner, IconButton, Tooltip } from "@chakra-ui/react";
+import { QuestionIcon } from "@chakra-ui/icons";
 import { OrdenCompraMateriales, Proveedor } from "./types";
 import { format } from "date-fns";
 import DateRangePicker from "../../components/DateRangePicker";
@@ -11,6 +12,7 @@ import MyPagination from "../../components/MyPagination";
 import { EditarOcmSeleccionada } from "./components/EditarOCMSeleccionada";
 import ProveedorPicker from "./components/ProveedorPicker";
 import ProveedorFilterOCM from "./components/ProveedorFilterOCM";
+import ColorLegendModal from "./components/ColorLegendModal";
 
 export default function ReporteOrdenesCompras() {
     const [listaOrdenesCompras, setListaOrdenesCompras] = useState<OrdenCompraMateriales[]>([]);
@@ -24,6 +26,7 @@ export default function ReporteOrdenesCompras() {
     const [ordenToEdit, setOrdenToEdit] = useState<OrdenCompraMateriales | null>(null);
     const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);
     const [isProveedorPickerOpen, setIsProveedorPickerOpen] = useState(false);
+    const [isColorLegendOpen, setIsColorLegendOpen] = useState(false);
 
     const endPoints = new EndPointsURL();
 
@@ -76,7 +79,7 @@ export default function ReporteOrdenesCompras() {
                 />
             ) : (
                 <Flex direction="column" p="1em" gap="2">
-                    <Flex direction="row" gap={2} align="center" flexWrap="wrap">
+                    <Flex direction="row" gap={2} align="center" flexWrap="wrap" position="relative">
                         <DateRangePicker
                             date1={date1}
                             setDate1={setDate1}
@@ -103,6 +106,17 @@ export default function ReporteOrdenesCompras() {
                         <Button variant="solid" colorScheme="teal" onClick={() => onClickBuscar()}>
                             Buscar
                         </Button>
+                        <Tooltip label="Ver convención de colores">
+                            <IconButton
+                                aria-label="Ayuda"
+                                icon={<QuestionIcon />}
+                                size="sm"
+                                variant="outline"
+                                colorScheme="blue"
+                                onClick={() => setIsColorLegendOpen(true)}
+                                ml={2}
+                            />
+                        </Tooltip>
                     </Flex>
 
                     {loading ? (
@@ -129,6 +143,10 @@ export default function ReporteOrdenesCompras() {
                 isOpen={isProveedorPickerOpen}
                 onClose={() => setIsProveedorPickerOpen(false)}
                 onSelectProveedor={(proveedor) => setSelectedProveedor(proveedor)}
+            />
+            <ColorLegendModal 
+                isOpen={isColorLegendOpen} 
+                onClose={() => setIsColorLegendOpen(false)} 
             />
         </Container>
     );

@@ -22,6 +22,24 @@ import ActualizarEstadoOrdenCompraDialog from "./ActualizarEstadoOrdenCompraDial
 // import {ExcelOCGenerator} from "../ExcelOCGenerator.tsx";
 import PdfGenerator from "../pdfGenerator.tsx";
 
+// Función para determinar el color de fondo según el estado de la orden
+const getBackgroundColorByEstado = (estado: number): string => {
+    switch (estado) {
+        case -1: // Cancelada
+            return 'red.200';
+        case 0: // Pendiente liberación
+            return 'yellow.200';
+        case 1: // Pendiente envío a proveedor
+            return 'orange.200';
+        case 2: // Pendiente recepción en almacén
+            return 'blue.200';
+        case 3: // Cerrada exitosamente
+            return 'green.200';
+        default:
+            return 'white';
+    }
+};
+
 interface ListaOrdenesCompraProps {
     ordenes: OrdenCompraMateriales[];
     onClose4Dialogs: (page:number) => void;
@@ -164,6 +182,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
                             <Tr
                                 key={orden.ordenCompraId}
                                 onContextMenu={(e) => handleContextMenu(e, orden)}
+                                bg={getBackgroundColorByEstado(orden.estado)}
                                 _hover={{ bg: 'blue.100', cursor: 'pointer' }}
                             >
                                 <Td>{orden.ordenCompraId}</Td>
