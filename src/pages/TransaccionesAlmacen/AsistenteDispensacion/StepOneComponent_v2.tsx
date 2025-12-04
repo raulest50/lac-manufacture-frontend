@@ -52,11 +52,12 @@ export default function StepOneComponentV2({setActiveStep, setDispensacion}: Pro
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(false);
     const [loadingOrden, setLoadingOrden] = useState<number | null>(null);
+    const endpoints = useMemo(() => new EndPointsURL(), []);
 
     const fetchOrdenes = async () => {
         setLoading(true);
         try {
-            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion_odp_consulta?page=${page}&size=${size}`;
+            const endpoint = `${endpoints.dispensacion_odp_consulta}?page=${page}&size=${size}`;
             const resp = await axios.get<PaginatedResponse<OrdenDispensacionResumen>>(endpoint, {withCredentials: true});
             setOrdenes(resp.data.content ?? []);
             setTotalPages(resp.data.totalPages ?? 0);
