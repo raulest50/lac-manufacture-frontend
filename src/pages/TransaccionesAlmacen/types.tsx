@@ -173,6 +173,26 @@ export interface LoteDispensacion {
     cantidadDisponible: number;
 }
 
+export interface DispensacionFormularioItemDTO {
+    seguimientoId: number;
+    producto: Producto;
+    cantidadSolicitada: number;
+}
+
+export interface DispensacionFormularioLoteDTO {
+    seguimientoId: number;
+    loteId: number;
+    batchNumber: string;
+    cantidadDisponible: number;
+    cantidadSugerida: number;
+}
+
+export interface DispensacionFormularioDTO {
+    ordenProduccionId: number;
+    dispensaciones: DispensacionFormularioItemDTO[];
+    lotesRecomendados: DispensacionFormularioLoteDTO[];
+}
+
 export interface ItemDispensacionDTO {
     seguimientoId: number;
     producto: Producto;
