@@ -26,7 +26,8 @@ interface Props {
 }
 
 interface OrdenDispensacionResumen {
-    ordenProduccionId: number;
+    ordenProduccionId?: number;
+    ordenId?: number;
     productoNombre?: string;
     producto?: {nombre?: string};
     fechaInicio?: string;
@@ -87,18 +88,20 @@ export default function StepOneComponentV2({setActiveStep, setDispensacion}: Pro
     };
 
     const handleDispensacion = async (orden: OrdenDispensacionResumen) => {
-        if(!orden.ordenProduccionId){
+        const ordenId = orden.ordenProduccionId ?? orden.ordenId;
+
+        if(!ordenId){
             toast({title: 'ID no disponible', description: 'La orden seleccionada no tiene un identificador válido.', status: 'warning', duration: 3000, isClosable: true});
             return;
         }
-        setLoadingOrden(orden.ordenProduccionId);
+        setLoadingOrden(ordenId);
         try {
             if(Array.isArray(orden.items)){
-                setDispensacion({ordenProduccionId: orden.ordenProduccionId, items: orden.items});
+                setDispensacion({ordenProduccionId: ordenId, items: orden.items});
                 setActiveStep(1);
                 return;
             }
-            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion/sugerida?ordenProduccionId=${orden.ordenProduccionId}`;
+            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion/sugerida?ordenProduccionId=${ordenId}`;
             const resp = await axios.get<DispensacionDTO>(endpoint, {withCredentials: true});
             setDispensacion(resp.data);
             setActiveStep(1);
@@ -129,21 +132,24 @@ export default function StepOneComponentV2({setActiveStep, setDispensacion}: Pro
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {ordenes.map((orden) => (
-                            <Tr key={orden.ordenProduccionId}>
-                                <Td>{orden.ordenProduccionId}</Td>
-                                <Td>{orden.productoNombre ?? orden.producto?.nombre ?? 'Sin nombre'}</Td>
-                                <Td>{formatFecha(orden.fechaInicio ?? orden.fechaCreacion)}</Td>
-                                <Td>{formatEstado(orden.estado ?? orden.estadoOrden)}</Td>
-                                <Td>
-                                    <Flex justify='center'>
-                                        <Button colorScheme='teal' size='sm' onClick={() => handleDispensacion(orden)} isLoading={loadingOrden === orden.ordenProduccionId}>
-                                            Hacer dispensación
-                                        </Button>
-                                    </Flex>
-                                </Td>
-                            </Tr>
-                        ))}
+                        {ordenes.map((orden, index) => {
+                            const ordenId = orden.ordenProduccionId ?? orden.ordenId;
+                            return (
+                                <Tr key={ordenId ?? `orden-${index}`}>
+                                    <Td>{ordenId ?? 'N/A'}</Td>
+                                    <Td>{orden.productoNombre ?? orden.producto?.nombre ?? 'Sin nombre'}</Td>
+                                    <Td>{formatFecha(orden.fechaInicio ?? orden.fechaCreacion)}</Td>
+                                    <Td>{formatEstado(orden.estado ?? orden.estadoOrden)}</Td>
+                                    <Td>
+                                        <Flex justify='center'>
+                                            <Button colorScheme='teal' size='sm' onClick={() => handleDispensacion(orden)} isLoading={loadingOrden === ordenId}>
+                                                Hacer dispensación
+                                            </Button>
+                                        </Flex>
+                                    </Td>
+                                </Tr>
+                            );
+                        })}
                         {ordenes.length === 0 && (
                             <Tr>
                                 <Td colSpan={5}>
