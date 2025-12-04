@@ -18,7 +18,7 @@ import {
 import {RepeatIcon} from '@chakra-ui/icons';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
-import {DispensacionDTO} from '../types';
+import {DispensacionDTO, DispensacionFormularioDTO} from '../types';
 
 interface Props {
     setActiveStep: (step:number) => void;
@@ -87,6 +87,31 @@ export default function StepOneComponentV2({setActiveStep, setDispensacion}: Pro
         return estado ?? 'Desconocido';
     };
 
+    const mapDispensacionFormulario = (data: DispensacionFormularioDTO): DispensacionDTO => {
+        const dispensaciones = data.dispensaciones ?? [];
+        const lotesRecomendados = data.lotesRecomendados ?? [];
+        const items = dispensaciones.map((dispensacion) => {
+            const loteRecomendado = lotesRecomendados.find((lote) => lote.seguimientoId === dispensacion.seguimientoId);
+
+            return {
+                seguimientoId: dispensacion.seguimientoId,
+                producto: dispensacion.producto,
+                lote: {
+                    loteId: loteRecomendado?.loteId ?? 0,
+                    batchNumber: loteRecomendado?.batchNumber ?? 'N/A',
+                    cantidadDisponible: loteRecomendado?.cantidadDisponible ?? 0,
+                },
+                cantidadSugerida: loteRecomendado?.cantidadSugerida ?? 0,
+                cantidad: loteRecomendado?.cantidadSugerida ?? 0,
+            };
+        });
+
+        return {
+            ordenProduccionId: data.ordenProduccionId,
+            items,
+        };
+    };
+
     const handleDispensacion = async (orden: OrdenDispensacionResumen) => {
         const ordenId = orden.ordenProduccionId ?? orden.ordenId;
 
@@ -104,9 +129,16 @@ export default function StepOneComponentV2({setActiveStep, setDispensacion}: Pro
                 setActiveStep(1);
                 return;
             }
-            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion/sugerida?ordenProduccionId=${ordenId}`;
-            const resp = await axios.get<DispensacionDTO>(endpoint, {withCredentials: true});
-            setDispensacion(resp.data);
+            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion_sugerida?ordenProduccionId=${ordenId}`;
+            const resp = await axios.get<DispensacionFormularioDTO>(endpoint, {withCredentials: true});
+            const dto = mapDispensacionFormulario(resp.data);
+            const hasMissingLotes = dto.items.some((item) => !item.lote.loteId);
+
+            if(hasMissingLotes){
+                toast({title: 'Lote no encontrado', description: 'Algunos materiales no tienen lote recomendado; revise antes de continuar.', status: 'warning', duration: 3000, isClosable: true});
+            }
+
+            setDispensacion(dto);
             setActiveStep(1);
         } catch (err) {
             toast({title: 'Orden no encontrada', description: 'No existe una orden de producción con el id especificado.', status: 'error', duration: 3000, isClosable: true});
