@@ -90,6 +90,9 @@ export default function StepOneComponentV2({setActiveStep, setDispensacion}: Pro
     const handleDispensacion = async (orden: OrdenDispensacionResumen) => {
         const ordenId = orden.ordenProduccionId ?? orden.ordenId;
 
+        console.log("debug Hacer Dispensacion");
+        console.log(orden);
+
         if(!ordenId){
             toast({title: 'ID no disponible', description: 'La orden seleccionada no tiene un identificador válido.', status: 'warning', duration: 3000, isClosable: true});
             return;

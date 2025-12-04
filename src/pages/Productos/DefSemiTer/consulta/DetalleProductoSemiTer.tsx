@@ -34,7 +34,7 @@ type Props = {
     setProductoSeleccionado?: (producto: Producto) => void;
     refreshSearch?: () => void;
 };
-export default function DetalleProducto({producto, setEstado, setProductoSeleccionado, refreshSearch}: Props) {
+export default function DetalleProductoSemiTer({producto, setEstado, setProductoSeleccionado, refreshSearch}: Props) {
     const [editMode, setEditMode] = useState(false);
     const [productoData, setProductoData] = useState<Producto | Material>({...producto});
     const [productosAccessLevel, setProductosAccessLevel] = useState<number>(0);
