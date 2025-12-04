@@ -44,6 +44,7 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
     const endPoints = new EndPointsURL();
     const { user } = useAuth();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+    const { isOpen: isForceDeleteOpen, onOpen: onForceDeleteOpen, onClose: onForceDeleteClose } = useDisclosure();
 
     const handleDeleteProduct = async () => {
         try {
@@ -79,6 +80,66 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
                     isClosable: true,
                 });
             }
+        }
+    };
+
+    const handleForceDeleteProduct = async (): Promise<boolean> => {
+        try {
+            const url = endPoints.force_delete_semiter.replace('{productoId}', producto.productoId);
+            const response = await axios.delete(url);
+            const data = response.data || {};
+            const successMessage = data.message || data.reason || 'El producto se eliminó correctamente.';
+            const movimientos = data.deletedMovimientos ?? 0;
+            const ordenesProduccion = data.deletedOrdenesProduccion ?? 0;
+            const insumos = data.deletedInsumos ?? 0;
+
+            toast({
+                title: 'Producto eliminado',
+                description: `${successMessage} Movimientos eliminados: ${movimientos}. Órdenes de producción eliminadas: ${ordenesProduccion}. Insumos eliminados: ${insumos}.`,
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+            });
+
+            setEstado(0);
+            if (typeof refreshSearch === 'function') {
+                refreshSearch();
+            }
+            return true;
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+                const description = data?.message || data?.reason || 'Ocurrió un error al eliminar el producto.';
+                let title = 'Error al eliminar el producto';
+                let statusToast: 'error' | 'warning' = 'error';
+
+                if (status === 404) {
+                    title = 'Producto no encontrado';
+                    statusToast = 'warning';
+                } else if (status === 409) {
+                    title = 'No se puede eliminar el producto';
+                    statusToast = 'warning';
+                } else if (status === 500) {
+                    title = 'Error interno del servidor';
+                }
+
+                toast({
+                    title,
+                    description,
+                    status: statusToast,
+                    duration: 5000,
+                    isClosable: true,
+                });
+            } else {
+                toast({
+                    title: 'Error al eliminar el producto',
+                    description: 'Ocurrió un error inesperado al eliminar el producto.',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }
+            return false;
         }
     };
 
@@ -442,10 +503,22 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
                     )}
                 </CardBody>
             </Card>
+            {!editMode && !isMaterial && (
+                <Flex justifyContent="flex-end" mt={4}>
+                    <Button colorScheme="red" onClick={onForceDeleteOpen}>
+                        Eliminar producto
+                    </Button>
+                </Flex>
+            )}
             <DeleteProductoDialog
                 isOpen={isDeleteOpen}
                 onClose={onDeleteClose}
                 onConfirm={handleDeleteProduct}
+            />
+            <DeleteProductoDialog
+                isOpen={isForceDeleteOpen}
+                onClose={onForceDeleteClose}
+                onConfirm={handleForceDeleteProduct}
             />
         </Box>
     );
