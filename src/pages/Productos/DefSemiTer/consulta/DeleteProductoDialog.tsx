@@ -20,23 +20,37 @@ interface DeleteProductoDialogProps {
 export default function DeleteProductoDialog({ isOpen, onClose, onConfirm }: DeleteProductoDialogProps) {
     const [randomCode, setRandomCode] = useState('');
     const [inputCode, setInputCode] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleClose = () => {
+        setIsLoading(false);
+        onClose();
+    };
 
     useEffect(() => {
         if (isOpen) {
             setRandomCode(Math.floor(1000 + Math.random() * 9000).toString());
             setInputCode('');
+        } else {
+            setIsLoading(false);
         }
     }, [isOpen]);
 
     const handleConfirm = async () => {
-        const shouldClose = await onConfirm();
-        if (shouldClose !== false) {
-            onClose();
+        setIsLoading(true);
+        try {
+            const shouldClose = await onConfirm();
+            if (shouldClose !== false) {
+                handleClose();
+                return;
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={handleClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Confirmar Eliminación</ModalHeader>
@@ -49,6 +63,7 @@ export default function DeleteProductoDialog({ isOpen, onClose, onConfirm }: Del
                         placeholder="Ingrese el código aquí"
                         value={inputCode}
                         onChange={(e) => setInputCode(e.target.value)}
+                        isDisabled={isLoading}
                     />
                 </ModalBody>
                 <ModalFooter>
@@ -56,11 +71,14 @@ export default function DeleteProductoDialog({ isOpen, onClose, onConfirm }: Del
                         colorScheme="red"
                         mr={3}
                         onClick={handleConfirm}
-                        isDisabled={inputCode !== randomCode}
+                        isDisabled={inputCode !== randomCode || isLoading}
+                        isLoading={isLoading}
                     >
                         Eliminar
                     </Button>
-                    <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+                    <Button variant="ghost" onClick={handleClose} isDisabled={isLoading}>
+                        Cancelar
+                    </Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
