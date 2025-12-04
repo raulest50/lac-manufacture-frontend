@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 interface DeleteProductoDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm: () => Promise<void> | void;
+    onConfirm: () => Promise<boolean | void> | boolean | void;
 }
 
 export default function DeleteProductoDialog({ isOpen, onClose, onConfirm }: DeleteProductoDialogProps) {
@@ -29,8 +29,10 @@ export default function DeleteProductoDialog({ isOpen, onClose, onConfirm }: Del
     }, [isOpen]);
 
     const handleConfirm = async () => {
-        await onConfirm();
-        onClose();
+        const shouldClose = await onConfirm();
+        if (shouldClose !== false) {
+            onClose();
+        }
     };
 
     return (

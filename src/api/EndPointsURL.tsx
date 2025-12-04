@@ -6,6 +6,7 @@ export default class EndPointsURL{
     public search_semi:string;
     public save_producto:string;
     public update_producto:string;
+    public force_delete_semiter: string;
     public insumos_with_stock:string;
     public search_semiytermi:string;
 
@@ -173,6 +174,7 @@ export default class EndPointsURL{
         const domain = this.domain;
 
         const productos_res = 'productos';
+        const semiter_res = 'api/semiter';
         const proveedores_res = 'proveedores';
         const compras_res = 'compras';
         const produccion_res = 'produccion';
@@ -192,6 +194,7 @@ export default class EndPointsURL{
         this.search_semi = `${domain}/${productos_res}/search_semi`;
         this.save_producto = `${domain}/${productos_res}/save`;
         this.update_producto = `${domain}/${productos_res}/{productoId}`;
+        this.force_delete_semiter = `${domain}/${semiter_res}/force_deletion/{productoId}`;
         this.insumos_with_stock = `${domain}/${productos_res}/{id}/insumos_with_stock`;
         this.search_semiytermi = `${domain}/${productos_res}/search_semiytermi`;
         this.search_p4_receta_v2 = `${domain}/${productos_res}/search_p4_receta_v2`;
