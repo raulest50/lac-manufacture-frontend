@@ -2,6 +2,7 @@ import {Box, Container, Flex, StepDescription, StepNumber, StepSeparator, StepSt
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from '@chakra-ui/icons';
 import {useState} from 'react';
 import StepOneComponent from './StepOneComponent';
+import StepOneComponentV2 from './StepOneComponent_v2';
 import StepTwoComponent from './StepTwoComponent';
 import StepThreeComponent from './StepThreeComponent';
 import {DispensacionDTO} from '../types';
@@ -18,7 +19,10 @@ export function AsistenteDispensacion(){
 
     const renderStep = () => {
         if(activeStep===0){
-            return <StepOneComponent setActiveStep={setActiveStep} setDispensacion={setDispensacion}/>;
+            const useStepOneV2 = true;
+            return useStepOneV2
+                ? <StepOneComponentV2 setActiveStep={setActiveStep} setDispensacion={setDispensacion}/>
+                : <StepOneComponent setActiveStep={setActiveStep} setDispensacion={setDispensacion}/>;
         }
         if(activeStep===1){
             return <StepTwoComponent setActiveStep={setActiveStep} dispensacion={dispensacion} setDispensacion={setDispensacion}/>;
