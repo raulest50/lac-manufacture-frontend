@@ -49,6 +49,7 @@ export default class EndPointsURL{
     public cancel_orden_produccion: string;
     public search_ordenes_by_responsable:string;
     public produccion_terminado_data4pdf: string;
+    public dispensacion_odp_consulta: string;
 
     // recursos de produccion
     public save_recurso_produccion:string;
@@ -238,6 +239,7 @@ export default class EndPointsURL{
         this.cancel_orden_produccion = `${domain}/${produccion_res}/orden_produccion/{id}/cancel`;
         this.search_ordenes_by_responsable = `${domain}/${produccion_res}/ordenes_produccion/responsable/{responsableId}`;
         this.produccion_terminado_data4pdf = `${domain}/${produccion_res}/terminado/{id}/data4pdf`;
+        this.dispensacion_odp_consulta = `${domain}/${produccion_res}/dispensacion_odp_consulta`;
 
         // recursos de produccion endpoints
         this.save_recurso_produccion = `${domain}/${recursos_produccion_res}`;
