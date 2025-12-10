@@ -10,10 +10,10 @@ import {
     useSteps,
 } from "@chakra-ui/react";
 import {Step, StepIcon, StepIndicator, Stepper, StepTitle} from "@chakra-ui/icons";
-import StepZeroComponent from "./StepZeroComponent";
 import {useState} from "react";
 import {IngresoOCM_DTA, OrdenCompra} from "../types";
 import StepOneComponent from "./StepOneComponent";
+import StepOneComponent_v2 from "./StepOneComponent_v2";
 import StepTwoComponent from "./StepTwoComponent";
 import StepThreeComponent from "./StepThreeComponent";
 import StepFourComponent from "./StepFourComponent";
@@ -42,7 +42,7 @@ export default function AsistenteIngresoMercancia() {
     function ConditionalRenderStep() {
         if (activeStep === 0) { // identificar la orden de compra
             return(
-                <StepZeroComponent setActiveStep={setActiveStep} setSelectedOrder={setSelectedOrder} />
+                <StepOneComponent_v2 setActiveStep={setActiveStep} setSelectedOrder={setSelectedOrder} />
             );
         }
         if (activeStep === 1) { // verificar cantidades en el pedido
