@@ -32,6 +32,11 @@ interface PageResponse<T> {
     content?: T[];
 }
 
+const buildConsultaEndpoint = () => {
+    const domain = EndPointsURL.getDomain();
+    return `${domain}/movimientos/consulta_ocm_pendientes`;
+};
+
 export default function StepOneComponent_v2({
     setActiveStep,
     setSelectedOrder,
