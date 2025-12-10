@@ -18,7 +18,7 @@ import {
     useToast, useDisclosure,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import {Material, Producto} from "../../types.tsx";
+import {Insumo, Material, Producto} from "../../types.tsx";
 import { ArrowBackIcon, EditIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 import EndPointsURL from "../../../../api/EndPointsURL.tsx";
@@ -27,6 +27,9 @@ import {IVA_VALUES} from "../../types.tsx";
 
 import {Authority} from "../../../../api/global_types.tsx";
 import DeleteProductoDialog from './DeleteProductoDialog.tsx';
+import InsumoListCard from './InsumoListCard.tsx';
+
+type ProductoDetalle = (Producto | Material) & { insumos?: Insumo[] };
 
 type Props = {
     producto: Producto;
@@ -36,10 +39,11 @@ type Props = {
 };
 export default function DetalleProductoSemiTer({producto, setEstado, setProductoSeleccionado, refreshSearch}: Props) {
     const [editMode, setEditMode] = useState(false);
-    const [productoData, setProductoData] = useState<Producto | Material>({...producto});
+    const [productoData, setProductoData] = useState<ProductoDetalle>({...producto});
     const [productosAccessLevel, setProductosAccessLevel] = useState<number>(0);
     const [isFormValid, setIsFormValid] = useState<boolean>(true);
     const [hasChanges, setHasChanges] = useState<boolean>(false);
+    const [isLoadingDetalle, setIsLoadingDetalle] = useState<boolean>(false);
     const toast = useToast();
     const endPoints = new EndPointsURL();
     const { user } = useAuth();
@@ -175,7 +179,7 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
 
     // Manejar cambios en los campos editables
     const handleInputChange = (
-        field: keyof Producto | keyof Material,
+        field: keyof ProductoDetalle,
         value: string | number | undefined) =>
     {
         setProductoData({
@@ -183,6 +187,52 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
             [field]: value
         });
     };
+
+    // Cargar detalles cuando faltan los insumos en productos semiterminados o terminados
+    useEffect(() => {
+        const isSemiOTerminado = producto.tipo_producto === 'S' || producto.tipo_producto === 'T';
+        const hasInsumos = Array.isArray(productoData.insumos) && productoData.insumos.length > 0;
+
+        if (!isSemiOTerminado || hasInsumos) {
+            return;
+        }
+
+        let isMounted = true;
+        const fetchDetalleProducto = async () => {
+            setIsLoadingDetalle(true);
+            try {
+                const url = endPoints.update_producto.replace('{productoId}', producto.productoId);
+                const response = await axios.get(url);
+                if (isMounted) {
+                    setProductoData(response.data);
+                }
+            } catch (error) {
+                if (!isMounted) return;
+
+                const description = axios.isAxiosError(error)
+                    ? error.response?.data?.message || 'No se pudo obtener el detalle del producto.'
+                    : 'No se pudo obtener el detalle del producto.';
+
+                toast({
+                    title: 'Error al cargar detalle',
+                    description,
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                });
+            } finally {
+                if (isMounted) {
+                    setIsLoadingDetalle(false);
+                }
+            }
+        };
+
+        fetchDetalleProducto();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [endPoints.update_producto, producto.productoId, producto.tipo_producto, productoData.insumos, toast]);
 
     // Validar datos antes de guardar
     const validateData = (showToast: boolean = true): boolean => {
@@ -317,6 +367,7 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
 
     // Determinar si es un material (tipo_producto === 'M')
     const isMaterial = producto.tipo_producto === 'M';
+    const isSemiOTerminado = producto.tipo_producto === 'S' || producto.tipo_producto === 'T';
 
     // Mapear tipo de producto a texto legible
     const getTipoProductoText = (tipo: string): string => {
@@ -483,6 +534,32 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
                     </Grid>
                 </CardBody>
             </Card>
+
+            {isSemiOTerminado && (
+                <Card mb={5} variant="outline" boxShadow="md">
+                    <CardHeader bg="blue.50">
+                        <Heading size="md">Insumos</Heading>
+                        <Text color="gray.600">
+                            Las cantidades corresponden a una unidad del {producto.tipo_producto === 'S' ? 'semiterminado' : 'terminado'} ({producto.tipoUnidades}).
+                        </Text>
+                        {Array.isArray(productoData.insumos) && productoData.insumos.some((insumo) => {
+                            const nestedInsumos = (insumo as unknown as { insumos?: Insumo[] }).insumos ?? (insumo.producto as ProductoDetalle | undefined)?.insumos;
+                            return Array.isArray(nestedInsumos) && nestedInsumos.length > 0;
+                        }) && (
+                            <Text color="gray.600" fontSize="sm" mt={1}>
+                                Usa la opción "Ver insumos" para explorar cantidades anidadas.
+                            </Text>
+                        )}
+                    </CardHeader>
+                    <CardBody>
+                        {isLoadingDetalle ? (
+                            <Text color="gray.600">Cargando insumos...</Text>
+                        ) : (
+                            <InsumoListCard insumos={productoData.insumos ?? []} titulo="Insumos" />
+                        )}
+                    </CardBody>
+                </Card>
+            )}
 
             <Card variant="outline" boxShadow="md">
                 <CardHeader bg="blue.50">
