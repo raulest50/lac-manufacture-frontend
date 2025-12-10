@@ -1,18 +1,7 @@
-import {
-    Accordion,
-    AccordionButton,
-    AccordionIcon,
-    AccordionItem,
-    AccordionPanel,
-    Badge,
-    Box,
-    Card,
-    CardBody,
-    Heading,
-    Stack,
-    StackDivider,
-    Text,
-} from '@chakra-ui/react';
+import {ChevronDownIcon, ChevronRightIcon} from '@chakra-ui/icons';
+import {Badge, Box, Heading, IconButton, Table, Tbody, Td, Text, Th, Thead, Tr} from '@chakra-ui/react';
+import {useState} from 'react';
+import type {ReactNode} from 'react';
 import type {Insumo} from '../../types.tsx';
 
 type Props = {
@@ -43,7 +32,16 @@ const tipoBadge = (tipo?: string) => {
     }
 };
 
-function InsumoCard({ insumo, nivelActual }: { insumo: Insumo; nivelActual: number }) {
+function InsumoRow({
+    insumo,
+    nivelActual,
+    renderSubRows,
+}: {
+    insumo: Insumo;
+    nivelActual: number;
+    renderSubRows: (subInsumos: Insumo[], nivel: number) => ReactNode;
+}) {
+    const [isExpanded, setIsExpanded] = useState(false);
     const producto = insumo.producto as ProductoConInsumos;
     const badge = tipoBadge(producto?.tipo_producto);
     const subInsumos = (insumo as unknown as { insumos?: Insumo[] }).insumos ?? producto?.insumos;
@@ -51,55 +49,71 @@ function InsumoCard({ insumo, nivelActual }: { insumo: Insumo; nivelActual: numb
     const isMaterial = producto?.tipo_producto === 'M';
 
     return (
-        <Card variant="outline" shadow="sm" ml={nivelActual * 4} borderColor="gray.200">
-            <CardBody>
-                <Stack spacing={3}>
-                    <Stack direction="row" justify="space-between" align="center">
+        <>
+            <Tr>
+                <Td>
+                    <Box pl={nivelActual * 4} display="flex" alignItems="center" gap={2}>
+                        {hasSubInsumos && !isMaterial && (
+                            <IconButton
+                                aria-label={isExpanded ? 'Ocultar insumos' : 'Ver insumos'}
+                                icon={isExpanded ? <ChevronDownIcon /> : <ChevronRightIcon />}
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setIsExpanded(!isExpanded)}
+                            />
+                        )}
                         <Box>
                             <Heading size="sm">{producto?.nombre ?? 'Producto sin nombre'}</Heading>
                             <Text fontSize="sm" color="gray.600">ID: {producto?.productoId ?? 'N/D'}</Text>
                         </Box>
-                        <Badge colorScheme={badge.colorScheme}>{badge.label}</Badge>
-                    </Stack>
+                    </Box>
+                </Td>
+                <Td>{producto?.productoId ?? 'N/D'}</Td>
+                <Td>
+                    <Badge colorScheme={badge.colorScheme}>{badge.label}</Badge>
+                </Td>
+                <Td fontWeight="semibold">
+                    {formatCantidad(insumo.cantidadRequerida)} {producto?.tipoUnidades ?? ''}
+                </Td>
+            </Tr>
 
-                    <Text fontWeight="medium">
-                        Cantidad requerida:{' '}
-                        <Text as="span" fontWeight="semibold">
-                            {formatCantidad(insumo.cantidadRequerida)} {producto?.tipoUnidades ?? ''}
-                        </Text>
-                    </Text>
+            {hasSubInsumos && !isMaterial && isExpanded && (
+                <Tr>
+                    <Td colSpan={4} p={0}>
+                        <Box pl={(nivelActual + 1) * 4} py={2}>
+                            <Table size="sm" variant="simple">
+                                <Tbody>{renderSubRows(subInsumos ?? [], nivelActual + 1)}</Tbody>
+                            </Table>
+                        </Box>
+                    </Td>
+                </Tr>
+            )}
 
-                    {hasSubInsumos && !isMaterial && (
-                        <Accordion allowToggle>
-                            <AccordionItem border="none">
-                                <h2>
-                                    <AccordionButton px={0}>
-                                        <Box as="span" flex="1" textAlign="left" fontWeight="semibold">
-                                            Ver insumos
-                                        </Box>
-                                        <AccordionIcon />
-                                    </AccordionButton>
-                                </h2>
-                                <AccordionPanel pb={2} pl={2}>
-                                    <InsumoListCard insumos={subInsumos} nivel={nivelActual + 1} />
-                                </AccordionPanel>
-                            </AccordionItem>
-                        </Accordion>
-                    )}
-
-                    {!hasSubInsumos && !isMaterial && (
-                        <Text fontSize="sm" color="gray.500">
+            {!hasSubInsumos && !isMaterial && (
+                <Tr>
+                    <Td colSpan={4} p={0}>
+                        <Text color="gray.500" pl={nivelActual * 4} py={2}>
                             Sin insumos definidos para este producto.
                         </Text>
-                    )}
-                </Stack>
-            </CardBody>
-        </Card>
+                    </Td>
+                </Tr>
+            )}
+        </>
     );
 }
 
 export default function InsumoListCard({ insumos, nivel = 0, titulo }: Props) {
     const lista = Array.isArray(insumos) ? insumos : [];
+
+    const renderRows = (insumosList: Insumo[], nivelActual: number): ReactNode =>
+        insumosList.map((insumo, index) => (
+            <InsumoRow
+                key={`${insumo.producto?.productoId ?? index}-${index}`}
+                insumo={insumo}
+                nivelActual={nivelActual}
+                renderSubRows={renderRows}
+            />
+        ));
 
     return (
         <Box>
@@ -114,11 +128,17 @@ export default function InsumoListCard({ insumos, nivel = 0, titulo }: Props) {
                     Sin insumos para mostrar.
                 </Text>
             ) : (
-                <Stack spacing={3} divider={<StackDivider borderColor="gray.100" />}>
-                    {lista.map((insumo, index) => (
-                        <InsumoCard key={`${insumo.producto?.productoId ?? index}-${index}`} insumo={insumo} nivelActual={nivel} />
-                    ))}
-                </Stack>
+                <Table variant="simple">
+                    <Thead>
+                        <Tr>
+                            <Th>Producto</Th>
+                            <Th>ID</Th>
+                            <Th>Tipo</Th>
+                            <Th>Cantidad requerida</Th>
+                        </Tr>
+                    </Thead>
+                    <Tbody>{renderRows(lista, nivel)}</Tbody>
+                </Table>
             )}
         </Box>
     );
