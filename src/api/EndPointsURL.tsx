@@ -92,6 +92,9 @@ export default class EndPointsURL{
     public dispensacion_no_planificada: string;
     public recomendar_lotes_multiple: string;
 
+    // ingresos almacen resource
+    public consulta_ocm_pendientes: string;
+
 
 
     // user resources (solo autenticacion)
@@ -179,6 +182,7 @@ export default class EndPointsURL{
         const compras_res = 'compras';
         const produccion_res = 'produccion';
         const movimientos_res = 'movimientos';
+        const ingresos_almacen_res = 'ingresos_almacen';
         //const ventas_res = 'ventas';
         const vendedor_res = 'vendedor';
         const contabilidad_res = 'api/contabilidad';
@@ -272,6 +276,9 @@ export default class EndPointsURL{
         this.backflush_no_planificado = `${domain}/${movimientos_res}/backflush_no_planificado`;
         this.dispensacion_no_planificada = `${domain}/${movimientos_res}/dispensacion-no-planificada`;
         this.recomendar_lotes_multiple = `${domain}/${movimientos_res}/recomendar-lotes-multiple`;
+
+        // ingresos almacen endpoints
+        this.consulta_ocm_pendientes = `${domain}/${ingresos_almacen_res}/consulta_ocm_pendientes`;
 
         // user endpoints
         this.whoami = `${domain}/${auth_res}/whoami`;

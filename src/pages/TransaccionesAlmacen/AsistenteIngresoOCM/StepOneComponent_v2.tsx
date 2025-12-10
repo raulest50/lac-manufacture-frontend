@@ -3,6 +3,9 @@ import {
     Button,
     Flex,
     Heading,
+    Input,
+    FormControl,
+    FormLabel,
     Table,
     Tbody,
     Td,
@@ -12,9 +15,6 @@ import {
     useDisclosure,
     useToast,
     VStack,
-    Input,
-    FormControl,
-    FormLabel,
 } from "@chakra-ui/react";
 import axios from "axios";
 import {useEffect, useMemo, useState} from "react";
@@ -28,6 +28,10 @@ interface StepOneComponentProps {
     setSelectedOrder: (orden: OrdenCompra) => void;
 }
 
+interface PageResponse<T> {
+    content?: T[];
+}
+
 const buildConsultaEndpoint = () => {
     const domain = EndPointsURL.getDomain();
     return `${domain}/movimientos/consulta_ocm_pendientes`;
@@ -38,6 +42,7 @@ export default function StepOneComponent_v2({
     setSelectedOrder,
 }: StepOneComponentProps) {
     const toast = useToast();
+    const endpoints = useMemo(() => new EndPointsURL(), []);
     const [isLoading, setIsLoading] = useState(false);
     const [proveedor, setProveedor] = useState<Proveedor | null>(null);
     const [fechaInicio, setFechaInicio] = useState<string>("");
@@ -49,16 +54,16 @@ export default function StepOneComponent_v2({
     const fetchOrdenesPendientes = async () => {
         setIsLoading(true);
         try {
-            const endpoint = buildConsultaEndpoint();
-            const response = await axios.get<OrdenCompra[]>(endpoint, {
-                params: {
-                    proveedorId: proveedor?.id,
-                    fechaInicio: fechaInicio || undefined,
-                    fechaFin: fechaFin || undefined,
-                },
+            const filter = {
+                proveedorId: proveedor?.id ?? null,
+                fechaInicio: fechaInicio || null,
+                fechaFin: fechaFin || null,
+            };
+
+            const response = await axios.post<PageResponse<OrdenCompra>>(endpoints.consulta_ocm_pendientes, filter, {
                 withCredentials: true,
             });
-            setOrdenes(response.data || []);
+            setOrdenes(response.data?.content || []);
         } catch (error: any) {
             console.error("Error fetching órdenes pendientes", error);
             toast({
@@ -112,22 +117,24 @@ export default function StepOneComponent_v2({
                         onClearFilter={() => setProveedor(null)}
                     />
 
-                    <FormControl minW="220px">
-                        <FormLabel>Fecha inicial</FormLabel>
-                        <Input
-                            type="date"
-                            value={fechaInicio}
-                            onChange={(e) => setFechaInicio(e.target.value)}
-                        />
-                    </FormControl>
-                    <FormControl minW="220px">
-                        <FormLabel>Fecha final</FormLabel>
-                        <Input
-                            type="date"
-                            value={fechaFin}
-                            onChange={(e) => setFechaFin(e.target.value)}
-                        />
-                    </FormControl>
+                    <VStack spacing={2} alignItems="stretch">
+                        <FormControl minW="220px">
+                            <FormLabel>Fecha inicial</FormLabel>
+                            <Input
+                                type="date"
+                                value={fechaInicio}
+                                onChange={(e) => setFechaInicio(e.target.value)}
+                            />
+                        </FormControl>
+                        <FormControl minW="220px">
+                            <FormLabel>Fecha final</FormLabel>
+                            <Input
+                                type="date"
+                                value={fechaFin}
+                                onChange={(e) => setFechaFin(e.target.value)}
+                            />
+                        </FormControl>
+                    </VStack>
 
                     <Button
                         colorScheme="teal"
