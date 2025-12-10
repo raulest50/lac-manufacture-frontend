@@ -51,13 +51,19 @@ export default function StepOneComponent_v2({
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
+    const serializeDate = (date: string, endOfDay = false) => {
+        if (!date) return null;
+        const timeSuffix = endOfDay ? "T23:59:59" : "T00:00:00";
+        return `${date}${timeSuffix}`;
+    };
+
     const fetchOrdenesPendientes = async () => {
         setIsLoading(true);
         try {
             const filter = {
                 proveedorId: proveedor?.id ?? null,
-                fechaInicio: fechaInicio || null,
-                fechaFin: fechaFin || null,
+                fechaInicio: serializeDate(fechaInicio),
+                fechaFin: serializeDate(fechaFin, true),
             };
 
             const response = await axios.post<PageResponse<OrdenCompra>>(endpoints.consulta_ocm_pendientes, filter, {
