@@ -7,6 +7,7 @@ export default class EndPointsURL{
     public save_producto:string;
     public update_producto:string;
     public force_delete_semiter: string;
+    public mod_mnfacturing_semiter: string;
     public insumos_with_stock:string;
     public search_semiytermi:string;
 
@@ -199,6 +200,7 @@ export default class EndPointsURL{
         this.save_producto = `${domain}/${productos_res}/save`;
         this.update_producto = `${domain}/${productos_res}/{productoId}`;
         this.force_delete_semiter = `${domain}/${semiter_res}/force_deletion/{productoId}`;
+        this.mod_mnfacturing_semiter = `${domain}/${semiter_res}/mod_mnfacturing_semiter`;
         this.insumos_with_stock = `${domain}/${productos_res}/{id}/insumos_with_stock`;
         this.search_semiytermi = `${domain}/${productos_res}/search_semiytermi`;
         this.search_p4_receta_v2 = `${domain}/${productos_res}/search_p4_receta_v2`;
