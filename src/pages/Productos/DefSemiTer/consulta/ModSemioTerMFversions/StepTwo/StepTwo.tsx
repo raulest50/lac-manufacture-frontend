@@ -19,6 +19,12 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => 
     const [selectedInsumos, setSelectedInsumos] = useState<Insumo[]>([]);
     const [costo, setCosto] = useState(0);
 
+    useEffect(() => {
+        if (semioter?.insumos && semioter.insumos.length > 0) {
+            setSelectedInsumos(cloneDeep(semioter.insumos));
+        }
+    }, [semioter]);
+
     // Update total cost whenever selectedInsumos changes
     useEffect(() => {
         const totalCost = selectedInsumos.reduce(
