@@ -368,6 +368,7 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
     // Determinar si es un material (tipo_producto === 'M')
     const isMaterial = producto.tipo_producto === 'M';
     const isSemiOTerminado = producto.tipo_producto === 'S' || producto.tipo_producto === 'T';
+    const canUseWizard = canEdit && isSemiOTerminado && !editMode;
 
     // Mapear tipo de producto a texto legible
     const getTipoProductoText = (tipo: string): string => {
@@ -386,53 +387,76 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
         return 'No especificado';
     };
 
+    const handleOpenWizard = () => {
+        if (typeof setProductoSeleccionado === 'function') {
+            setProductoSeleccionado({ ...productoData });
+        }
+        setEstado(2);
+    };
+
+    const renderActionButtons = () => {
+        if (editMode) {
+            return (
+                <HStack>
+                    {isMaterial && (
+                        <Button colorScheme="red" onClick={onDeleteOpen}>
+                            Eliminar
+                        </Button>
+                    )}
+                    <Button
+                        colorScheme="red"
+                        variant="outline"
+                        onClick={() => {
+                            setEditMode(false);
+                            setProductoData({...producto});
+                        }}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        colorScheme="green"
+                        onClick={handleSaveChanges}
+                        isDisabled={!isFormValid || !hasChanges}
+                    >
+                        Guardar
+                    </Button>
+                </HStack>
+            );
+        }
+
+        return (
+            <HStack>
+                {canUseWizard && (
+                    <Button colorScheme="teal" onClick={handleOpenWizard}>
+                        Modificar Semi/Terminado
+                    </Button>
+                )}
+                {canEdit && (
+                    <Button
+                        leftIcon={<EditIcon />}
+                        colorScheme="green"
+                        onClick={() => setEditMode(true)}
+                    >
+                        Editar
+                    </Button>
+                )}
+            </HStack>
+        );
+    };
+
     return (
         <Box p={5} bg="white" borderRadius="md" boxShadow="base">
             <Flex justifyContent="space-between" alignItems="center" mb={5}>
-                <Button 
-                    leftIcon={<ArrowBackIcon />} 
-                    colorScheme="blue" 
+                <Button
+                    leftIcon={<ArrowBackIcon />}
+                    colorScheme="blue"
                     variant="outline"
                     onClick={handleBack}
                 >
                     Regresar
                 </Button>
                 <Heading size="lg">Detalle del Producto</Heading>
-                {canEdit && !editMode && (
-                    <Button 
-                        leftIcon={<EditIcon />} 
-                        colorScheme="green" 
-                        onClick={() => setEditMode(true)}
-                    >
-                        Editar
-                    </Button>
-                )}
-                {editMode && (
-                    <HStack>
-                        {isMaterial && (
-                            <Button colorScheme="red" onClick={onDeleteOpen}>
-                                Eliminar
-                            </Button>
-                        )}
-                        <Button
-                            colorScheme="red"
-                            variant="outline"
-                            onClick={() => {
-                                setEditMode(false);
-                                setProductoData({...producto});
-                            }}
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            colorScheme="green"
-                            onClick={handleSaveChanges}
-                            isDisabled={!isFormValid || !hasChanges}
-                        >
-                            Guardar
-                        </Button>
-                    </HStack>
-                )}
+                {renderActionButtons()}
             </Flex>
 
             <Card mb={5} variant="outline" boxShadow="md">
