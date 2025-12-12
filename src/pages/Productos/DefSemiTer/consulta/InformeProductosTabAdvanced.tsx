@@ -39,6 +39,7 @@ import MyPagination from "../../../../components/MyPagination.tsx";
 import { Producto } from "../../types.tsx";
 import EndPointsURL from "../../../../api/EndPointsURL.tsx";
 import DetalleProductoSemiTer from "./DetalleProductoSemiTer.tsx";
+import ModSemiTerMFWizard from "./ModSemiTerMFWizard.tsx";
 
 const endpoints = new EndPointsURL();
 
@@ -96,11 +97,27 @@ export default function InformeProductosTabAdvanced() {
         setEstado(1);
     };
 
+    const handleReturnToList = () => {
+        setEstado(0);
+        setProductoSeleccionado(null);
+        handleSearch();
+    };
+
     // Renderizado condicional basado en el estado
+    if (estado === 2 && productoSeleccionado) {
+        return (
+            <ModSemiTerMFWizard
+                producto={productoSeleccionado}
+                onClose={handleReturnToList}
+                refreshSearch={handleSearch}
+            />
+        );
+    }
+
     if (estado === 1 && productoSeleccionado) {
         return (
             <DetalleProductoSemiTer
-                producto={productoSeleccionado} 
+                producto={productoSeleccionado}
                 setEstado={setEstado}
                 setProductoSeleccionado={setProductoSeleccionado}
                 refreshSearch={handleSearch}
