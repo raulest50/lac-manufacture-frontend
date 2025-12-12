@@ -16,7 +16,7 @@ import {
     Text
 } from "@chakra-ui/react";
 import { SearchIcon } from '@chakra-ui/icons';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AreaPickerGeneric from "../../../../../components/Pickers/AreaPickerGeneric/AreaPickerGeneric.tsx";
 import PackagingTerminadoDefiner from "./PackagingTerminadoDefiner.tsx";
 
@@ -68,6 +68,20 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
 
     // Check if we're creating a Terminado
     const isTerminado = semioter2.tipo_producto === TIPOS_PRODUCTOS.terminado;
+
+    useEffect(() => {
+        const procesoCompleto = semioter2.procesoProduccionCompleto as ProcesoProduccionCompleto & { areaProduccion?: AreaProduccion };
+        if (procesoCompleto) {
+            setProceso({ procesosProduccion: procesoCompleto.procesosProduccion ?? [] });
+            setRendimientoTeorico(procesoCompleto.rendimientoTeorico ?? 0);
+            setSelectedArea(procesoCompleto.areaProduccion ?? null);
+        }
+
+        const productoConCasePack = semioter2 as ProductoSemiter & { casePack?: CasePack };
+        if (productoConCasePack.casePack) {
+            setCasePack(productoConCasePack.casePack);
+        }
+    }, [semioter2]);
 
     const handleOpenAreaPicker = () => {
         setIsAreaPickerOpen(true);
