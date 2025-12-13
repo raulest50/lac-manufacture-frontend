@@ -88,23 +88,6 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => 
         );
     };
 
-    const handleUpdateCosto = (productoId: string, nuevoCosto: number) => {
-        setSelectedInsumos((prev) =>
-            prev.map((insumo) =>
-                insumo.producto.productoId === productoId
-                    ? {
-                        ...insumo,
-                        producto: {
-                            ...insumo.producto,
-                            costo: nuevoCosto,
-                        },
-                        subtotal: nuevoCosto * insumo.cantidadRequerida,
-                    }
-                    : insumo
-            )
-        );
-    };
-
     // Function to remove an insumo from the selection
     const handleRemoveInsumo = (productoId: string) => {
         setSelectedInsumos((prev) =>
@@ -156,7 +139,6 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => 
                     <BandejaSeleccion
                         selectedInsumos={selectedInsumos}
                         onUpdateCantidad={handleUpdateCantidad}
-                        onUpdateCosto={handleUpdateCosto}
                         onRemoveInsumo={handleRemoveInsumo}
                     />
                 </VStack>
