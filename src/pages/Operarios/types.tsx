@@ -1,6 +1,8 @@
 
 
-// src/models/types.ts
+// Path: src/pages/Operarios/types.tsx
+// Used in: src/pages/Operarios/OrdenProduccionCard.tsx; src/pages/Operarios/WorkLoad.tsx
+// Summary: DTOs for órdenes de producción y seguimiento que se muestran en cards y cargas de trabajo.
 
 export interface OrdenSeguimientoDTO {
     seguimientoId: number;

@@ -1,3 +1,6 @@
+// Path: src/pages/Proveedores/types.tsx
+// Used in: src/pages/Proveedores/CodificarProveedor.tsx; src/pages/Proveedores/consultar/*; src/pages/Compras/types.tsx; src/pages/TransaccionesAlmacen/types.tsx
+// Summary: Definiciones de proveedor y contacto usadas en formularios y búsquedas de proveedores.
 export interface Contacto {
     fullName: string;
     cargo: string;

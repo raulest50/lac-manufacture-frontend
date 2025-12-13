@@ -1,3 +1,6 @@
+// Path: src/pages/PagosProveedores/types.tsx
+// Used in: src/pages/PagosProveedores/BuscarTranOcmAsentar.tsx
+// Summary: Tipos para pagos de proveedores y estados de transacción usados en el asistente de asentamiento.
 // Types for PagosProveedores module
 
 // Enum for payment status

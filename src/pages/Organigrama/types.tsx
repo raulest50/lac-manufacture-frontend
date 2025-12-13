@@ -1,3 +1,6 @@
+// Path: src/pages/Organigrama/types.tsx
+// Used in: src/pages/Organigrama/OrganigramaPage.tsx; src/pages/Organigrama/components/EditCargoDialog.tsx; src/pages/Organigrama/components/CargoNode.tsx; src/pages/Organigrama/components/OrganizationChart.tsx
+// Summary: Tipos para cargos y niveles de acceso utilizados en la visualización y edición del organigrama.
 // Nivel de acceso del usuario
 export enum AccessLevel {
   VIEW = 1,  // Solo visualización

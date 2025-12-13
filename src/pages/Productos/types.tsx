@@ -1,3 +1,6 @@
+// Path: src/pages/Productos/types.tsx
+// Used in: src/pages/Productos/Basic/*; src/pages/Productos/DefProcesses/*; src/pages/Productos/DefSemiTer/*; src/pages/TransaccionesAlmacen/AjustesInventario/*; src/pages/Produccion/types.tsx y componentes relacionados
+// Summary: Tipos y constantes para productos, insumos y procesos productivos reutilizados en codificación, consultas y planeación.
 
 export const TIPOS_PRODUCTOS = {materiaPrima: "M", semiTerminado:"S", terminado:"T"};
 export const UNIDADES = {L:"L", KG:"KG", U:"U", G:"G"};

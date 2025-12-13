@@ -1,3 +1,6 @@
+// Path: src/pages/Personal/types.tsx
+// Used in: src/pages/Personal/IncorporarPersonal.tsx; src/pages/Personal/ConsultaDePersonal.tsx; src/pages/Personal/ListaIntegrantes.tsx
+// Summary: Tipos y helpers para integrantes de personal y su documentación transaccional.
 
 export interface DocTranDePersonal {
     id?: number;  // opcional porque es auto-generado

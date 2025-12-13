@@ -1,4 +1,6 @@
-// src/models/types.ts
+// Path: src/pages/Stock/types.tsx
+// Used in: src/pages/Stock/ListaProductos.tsx; src/pages/Stock/Inventario.tsx
+// Summary: Tipos básicos de producto y stock para inventarios y listados de almacén.
 
 export interface Producto {
     productoId: number;
