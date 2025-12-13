@@ -17,8 +17,8 @@ import {
     ListItem,
 } from "@chakra-ui/react";
 import axios from "axios";
-import EndPointsURL from "../../../../../api/EndPointsURL.tsx";
-import { ProductoSemiter, TIPOS_PRODUCTOS, ProcesoProduccionNode } from "../../../types.tsx";
+import EndPointsURL from "../../../../../../api/EndPointsURL.tsx";
+import {ProductoSemiter, TIPOS_PRODUCTOS, ProcesoProduccionNode} from "../../../../types.tsx";
 
 interface Props {
     setActiveStep: (step: number) => void;

@@ -1,5 +1,5 @@
-import { ProductoSemiter, ProcesoDiseñado, ProcesoProduccionCompleto, TIPOS_PRODUCTOS } from "../../../types.tsx";
-import ProcessDesigner from "../../../DefProcesses/CreadorProcesos/ProcessDesigner.tsx";
+import {ProductoSemiter, ProcesoDiseñado, ProcesoProduccionCompleto, TIPOS_PRODUCTOS} from "../../../../types.tsx";
+import ProcessDesigner from "../../../../DefProcesses/CreadorProcesos/ProcessDesigner.tsx";
 import { 
     Button, 
     Flex, 
@@ -12,12 +12,11 @@ import {
     InputRightElement,
     IconButton,
     HStack,
-    Box,
-    Text
+    Box
 } from "@chakra-ui/react";
 import { SearchIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from "react";
-import AreaPickerGeneric from "../../../../../components/Pickers/AreaPickerGeneric/AreaPickerGeneric.tsx";
+import AreaPickerGeneric from "../../../../../../components/Pickers/AreaPickerGeneric/AreaPickerGeneric.tsx";
 import PackagingTerminadoDefiner from "./PackagingTerminadoDefiner.tsx";
 
 // Interface for AreaProduccion based on the backend model

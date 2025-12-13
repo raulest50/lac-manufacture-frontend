@@ -32,7 +32,7 @@ import {
   useToast
 } from "@chakra-ui/react";
 import { SearchIcon, DeleteIcon } from "@chakra-ui/icons";
-import EndPointsURL from "../../../../../api/EndPointsURL";
+import EndPointsURL from "../../../../../../api/EndPointsURL";
 
 // Interfaces based on backend models
 interface CasePack {

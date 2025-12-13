@@ -1,6 +1,6 @@
 // BandejaBusqueda.tsx
 import React, { useState } from "react";
-import { Producto, TIPOS_PRODUCTOS } from "../../../types.tsx";
+import { Producto, TIPOS_PRODUCTOS } from "../../../../types.tsx";
 import {
     Box,
     Button,
@@ -12,9 +12,9 @@ import {
     Spinner,
 } from "@chakra-ui/react";
 import axios from "axios";
-import EndPointsURL from "../../../../../api/EndPointsURL.tsx";
+import EndPointsURL from "../../../../../../api/EndPointsURL.tsx";
 import ItemBandejaBusqueda from "./ItemBandejaBusqueda.tsx";
-import MyPagination from "../../../../../components/MyPagination.tsx";
+import MyPagination from "../../../../../../components/MyPagination.tsx";
 
 const endPoints = new EndPointsURL();
 
