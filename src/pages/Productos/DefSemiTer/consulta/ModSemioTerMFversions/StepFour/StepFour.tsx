@@ -34,11 +34,11 @@ export default function StepFour({ setActiveStep, semioter3, onReset }: Props) {
     const handleGuardar = async () => {
         try {
             setLoading(true);
-            // Agregar este console.log para imprimir el payload completo
-            console.log('Payload enviado al backend para producto terminado/semiterminado:', JSON.stringify(semioter3, null, 2));
-            await axios.post(endPoints.save_producto, semioter3);
+            const payload = { ...semioter3, productoId: semioter3.productoId };
+            console.log('Payload enviado al backend para producto terminado/semiterminado:', JSON.stringify(payload, null, 2));
+            await axios.put(endPoints.mod_mnfacturing_semiter, payload);
             toast({
-                title: "Producto guardado",
+                title: "Producto actualizado",
                 status: "success",
                 duration: 3000,
                 isClosable: true,
@@ -63,7 +63,7 @@ export default function StepFour({ setActiveStep, semioter3, onReset }: Props) {
 
     return (
         <Flex direction="column" align="center" gap={4} w="full">
-            <Heading size="md">Resumen del Producto</Heading>
+            <Heading size="md">Resumen de la modificación</Heading>
             <Box w="full" bg="gray.50" p={4} borderRadius="md" maxH="300px" overflowY="auto">
                 <VStack align="start" spacing={4} w="full">
                     <VStack align="start" w="full" spacing={1}>
@@ -119,10 +119,10 @@ export default function StepFour({ setActiveStep, semioter3, onReset }: Props) {
             </Box>
             <Flex gap={10}>
                 <Button variant="solid" colorScheme="yellow" onClick={handleAtras} isDisabled={loading}>
-                    Atras
+                    Volver al proceso
                 </Button>
                 <Button variant="solid" colorScheme="teal" onClick={handleGuardar} isLoading={loading}>
-                    Guardar
+                    Guardar modificación
                 </Button>
             </Flex>
         </Flex>

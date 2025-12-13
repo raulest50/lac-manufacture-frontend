@@ -11,12 +11,14 @@ import ItemBandejaSeleccion from "./ItemBandejaSeleccion.tsx";
 interface BandejaSeleccionProps {
     selectedInsumos: Insumo[];
     onUpdateCantidad: (productoId: string, newCantidad: number) => void;
+    onUpdateCosto: (productoId: string, newCosto: number) => void;
     onRemoveInsumo: (productoId: string) => void;
 }
 
 const BandejaSeleccion: React.FC<BandejaSeleccionProps> = ({
                                                                selectedInsumos,
                                                                onUpdateCantidad,
+                                                               onUpdateCosto,
                                                                onRemoveInsumo,
                                                            }) => {
     return (
@@ -29,12 +31,13 @@ const BandejaSeleccion: React.FC<BandejaSeleccionProps> = ({
             ) : (
                 <Flex direction="column" gap={4}>
                     {selectedInsumos.map((insumo) => (
-                        <ItemBandejaSeleccion
-                            key={insumo.producto.productoId}
-                            insumo={insumo}
-                            onUpdateCantidad={onUpdateCantidad}
-                            onRemoveInsumo={onRemoveInsumo}
-                        />
+                            <ItemBandejaSeleccion
+                                key={insumo.producto.productoId}
+                                insumo={insumo}
+                                onUpdateCantidad={onUpdateCantidad}
+                                onUpdateCosto={onUpdateCosto}
+                                onRemoveInsumo={onRemoveInsumo}
+                            />
                     ))}
                 </Flex>
             )}

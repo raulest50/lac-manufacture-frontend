@@ -63,9 +63,10 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSave: (casePack: CasePack) => void;
+  initialCasePack?: CasePack | null;
 }
 
-const PackagingTerminadoDefiner: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
+const PackagingTerminadoDefiner: React.FC<Props> = ({ isOpen, onClose, onSave, initialCasePack }) => {
   const endpoints = new EndPointsURL();
   const toast = useToast();
 
@@ -74,6 +75,12 @@ const PackagingTerminadoDefiner: React.FC<Props> = ({ isOpen, onClose, onSave })
     unitsPerCase: 0,
     insumosEmpaque: []
   });
+
+  useEffect(() => {
+    if (initialCasePack) {
+      setCasePack(initialCasePack);
+    }
+  }, [initialCasePack]);
 
   // State for validation errors
   const [errors, setErrors] = useState({
