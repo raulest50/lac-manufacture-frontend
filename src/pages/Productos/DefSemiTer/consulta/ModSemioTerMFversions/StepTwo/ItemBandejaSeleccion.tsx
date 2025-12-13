@@ -28,14 +28,12 @@ import { metaPorTipo } from "./meta";
 interface ItemBandejaSeleccionProps {
     insumo: Insumo;
     onUpdateCantidad: (productoId: string, newCantidad: number) => void;
-    onUpdateCosto: (productoId: string, newCosto: number) => void;
     onRemoveInsumo: (productoId: string) => void;
 }
 
 const ItemBandejaSeleccion: React.FC<ItemBandejaSeleccionProps> = ({
                                                                        insumo,
                                                                        onUpdateCantidad,
-                                                                       onUpdateCosto,
                                                                        onRemoveInsumo,
                                                                    }) => {
     const { producto } = insumo;
@@ -108,28 +106,6 @@ const ItemBandejaSeleccion: React.FC<ItemBandejaSeleccionProps> = ({
 
                 {/* Cantidad */}
                 <HStack align="center" spacing={2}>
-                    <Tooltip label="Costo unitario" hasArrow>
-                        <NumberInput
-                            size="sm"
-                            min={0}
-                            step={50}
-                            value={producto.costo}
-                            onChange={(_vStr, vNum) =>
-                                onUpdateCosto(
-                                    producto.productoId,
-                                    Number.isFinite(vNum) ? vNum : 0
-                                )
-                            }
-                            w="110px"
-                        >
-                            <NumberInputField />
-                            <NumberInputStepper>
-                                <NumberIncrementStepper />
-                                <NumberDecrementStepper />
-                            </NumberInputStepper>
-                        </NumberInput>
-                    </Tooltip>
-
                     <Tooltip label="Cantidad requerida" hasArrow>
                         <NumberInput
                             size="sm"
