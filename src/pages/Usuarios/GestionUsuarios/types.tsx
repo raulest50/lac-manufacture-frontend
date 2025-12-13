@@ -1,4 +1,6 @@
-// src/pages/Usuarios/types.tsx
+// Path: src/pages/Usuarios/GestionUsuarios/types.tsx
+// Used in: src/App.tsx; src/pages/Home.tsx; src/pages/Usuarios/InfoNiveles.tsx; src/pages/Productos/DefProcesses/CreadorProcesos/CrearAreaProduccionTab.tsx; src/api/ModulesNotifications.tsx; src/context/NotificationsContext.tsx; src/components/Pickers/UserPickerGeneric/UserPickerGeneric.tsx; src/components/Pickers/UserPickerGeneric/UserPickerGeneric.stories.tsx; src/pages/Ventas/TabsContent/CrearVendedor.tsx
+// Summary: Tipos compartidos para usuarios, roles y módulos usados en navegación, notificaciones y pickers de usuario.
 
 
 export interface Role {

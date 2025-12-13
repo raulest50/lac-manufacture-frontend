@@ -1,3 +1,6 @@
+// Path: src/pages/Compras/types.tsx
+// Used in: src/pages/Compras/ExcelOCGenerator.tsx; src/pages/Compras/ReporteOrdenesCompras.tsx; src/pages/Compras/CrearOCM.tsx; src/pages/Compras/pdfGenerator.tsx; src/pages/Compras/components/*; src/pages/ActivosFijos/types.tsx; src/pages/ActivosFijos/OC/CrearOC_AF.tsx; src/utils/formatters.tsx
+// Summary: Modelos de proveedor, materiales y órdenes de compra reutilizados en flujos de compras y activos fijos.
 // ./types.tsx
 import {Contacto} from "../Proveedores/types.tsx";
 

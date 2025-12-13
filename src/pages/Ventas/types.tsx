@@ -1,4 +1,6 @@
-// src/pages/Ventas/types.tsx
+// Path: src/pages/Ventas/types.tsx
+// Used in: (sin referencias actuales)
+// Summary: Estructuras para entidades de ventas que pueden alimentar formularios y reportes comerciales.
 
 export interface Venta {
     id: number;

@@ -1,3 +1,6 @@
+// Path: src/pages/ActivosFijos/types.tsx
+// Used in: src/pages/ActivosFijos/OC/*; src/pages/ActivosFijos/Incorporacion/*; src/pages/ActivosFijos/Reportes/*; src/pages/Productos/DefProcesses/RecursosProduccion/*; src/pages/Compras/pdfGenerator.tsx
+// Summary: Tipos para activos fijos, órdenes de compra de activos y parametrización de depreciación usados en flujos de incorporación y reporting.
 import {Proveedor} from "../Compras/types.tsx";
 
 export const TIPO_INCORPORACION = {

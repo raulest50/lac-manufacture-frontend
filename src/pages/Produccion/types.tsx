@@ -1,4 +1,7 @@
 
+// Path: src/pages/Produccion/types.tsx
+// Used in: src/pages/Produccion/HistorialOrdenes.tsx; src/pages/Produccion/CrearOrdenes.tsx; src/pages/Produccion/ODPpdfGenerator.tsx; src/pages/Produccion/components/*; src/pages/Produccion/components/PlaneacionProduccion.tsx
+// Summary: Tipos para planeación y seguimiento de órdenes de producción, incluyendo insumos y productos con stock.
 // src/models/types.ts
 
 import {Node, ProcesoNode} from "../Productos/types.tsx";

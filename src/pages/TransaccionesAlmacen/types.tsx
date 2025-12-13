@@ -1,3 +1,6 @@
+// Path: src/pages/TransaccionesAlmacen/types.tsx
+// Used in: src/pages/TransaccionesAlmacen/AsistenteDispensacion/*; src/pages/TransaccionesAlmacen/AsistenteDispensacionDirecta/*; src/pages/TransaccionesAlmacen/AsistenteIngresoOCM/*; src/pages/TransaccionesAlmacen/AjustesInventario/*; src/pages/TransaccionesAlmacen/AsistenteBackflushDirecto/*; src/pages/TransaccionesAlmacen/components/MateriaPrimaPicker.tsx; src/pages/TransaccionesAlmacen/AsistenteBackflushDirecto/TerminadoPicker.tsx
+// Summary: Tipos para dispensaciones, ingresos, ajustes de inventario y movimientos de almacén.
 // RecibirMercancia/types.tsx
 import {Contacto} from "../Proveedores/types";
 

@@ -1,3 +1,6 @@
+// Path: src/pages/Contabilidad/types.tsx
+// Used in: src/pages/Contabilidad/cuentas/CatalogoCuentas.tsx; src/pages/Contabilidad/cuentas/DetalleAsientosCuenta.tsx
+// Summary: Enumeraciones y DTOs contables para cuentas y asientos usados en vistas de catálogo y detalle.
 // Types for Contabilidad module
 
 // Enum for account types
