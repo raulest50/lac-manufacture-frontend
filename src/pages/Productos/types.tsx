@@ -109,7 +109,36 @@ export interface ProductoSemiter {
     procesoProduccionCompleto?: ProcesoProduccionCompleto; // se determina a la hora de definir el proceso - step 3
     categoria?: Categoria; // solo se usa para terminado, por ello es opcional
     inventareable?: boolean; // true para terminados, false para semiterminados
+    casePack?: CasePack;
 }
+
+export interface CasePack {
+    id?: number;
+
+    /** Número de unidades EACH por caja (CASE). Ej: 24 */
+    unitsPerCase: number;
+
+    /** ITF-14 / EAN-14 del CASE */
+    ean14?: string;
+
+    /** Dimensiones del CASE (útiles para WMS / envíos) */
+    largoCm?: number;
+    anchoCm?: number;
+    altoCm?: number;
+
+    /** Peso bruto del CASE */
+    grossWeightKg?: number;
+
+    /**
+     * Indica si el despacho por defecto es por caja
+     * (no fuerza lógica de negocio)
+     */
+    defaultForShipping?: boolean;
+
+    /** Insumos de empaque asociados al CASE */
+    insumosEmpaque?: Insumo[];
+}
+
 
 export interface Categoria{
      categoriaId: number;

@@ -51,7 +51,7 @@ interface Props {
     setSemioter3: (semioter3: ProductoSemiter) => void;
 }
 
-export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Props) {
+export default function StepThree_ModProdMF({ setActiveStep, semioter2, setSemioter3 }: Props) {
     // Local state to store whether the process definition is valid.
     const [isProcessValid, setIsProcessValid] = useState(false);
     const [rendimientoTeorico, setRendimientoTeorico] = useState<number>(0);

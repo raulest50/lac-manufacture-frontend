@@ -14,7 +14,7 @@ interface Props {
     setSemioter2: (semioter: ProductoSemiter) => void;
 }
 
-const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => {
+const StepTwo_ModProdMF: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => {
     const toast = useToast();
     const [selectedInsumos, setSelectedInsumos] = useState<Insumo[]>([]);
     const [costo, setCosto] = useState(0);
@@ -165,4 +165,4 @@ const StepTwo: React.FC<Props> = ({ setActiveStep, semioter, setSemioter2 }) => 
     );
 };
 
-export default StepTwo;
+export default StepTwo_ModProdMF;

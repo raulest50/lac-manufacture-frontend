@@ -1,9 +1,9 @@
 import { Box, Container, Flex, StepDescription, StepNumber, StepSeparator, StepStatus, useSteps } from "@chakra-ui/react";
 import { Step, StepIcon, StepIndicator, Stepper, StepTitle } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
-import StepTwo from "./StepTwo/StepTwo.tsx";
-import StepThree from "./StepThree/StepThree.tsx";
-import StepFour from "./StepFour/StepFour.tsx";
+import StepTwo_ModProdMF from "./StepTwo/StepTwo_ModProdMF.tsx";
+import StepThree_ModProdMF from "./StepThree/StepThree_ModProdMF.tsx";
+import StepFour_ModProdMF from "./StepFour/StepFour_ModProdMF.tsx";
 import { ProductoSemiter } from "../../types.tsx";
 
 interface ModificarSemiTerMFWizardProps {
@@ -42,13 +42,13 @@ export default function ModificarSemiTerMFWizard({ producto }: ModificarSemiTerM
 
     function ConditionalRenderStep() {
         if (activeStep === 0 || activeStep === 1) {
-            return <StepTwo setActiveStep={setActiveStep} semioter={semioter2 ?? semioter!} setSemioter2={setSemioter2} />;
+            return <StepTwo_ModProdMF setActiveStep={setActiveStep} semioter={semioter2 ?? semioter!} setSemioter2={setSemioter2} />;
         }
         if (activeStep === 2) {
-            return <StepThree setActiveStep={setActiveStep} semioter2={semioter2!} setSemioter3={setSemioter3} />;
+            return <StepThree_ModProdMF setActiveStep={setActiveStep} semioter2={semioter2!} setSemioter3={setSemioter3} />;
         }
         if (activeStep === 3) {
-            return <StepFour setActiveStep={setActiveStep} semioter3={semioter3!} onReset={handleReset} />;
+            return <StepFour_ModProdMF setActiveStep={setActiveStep} semioter3={semioter3!} onReset={handleReset} />;
         }
     }
 
