@@ -19,7 +19,7 @@ interface StepZeroComponentProps {
     setSelectedOrder: (orden: OrdenCompra) => void;
 }
 
-export default function StepZeroComponent({
+export default function StepZeroComponent_v1({
                                               setActiveStep,
                                               setSelectedOrder,
                                           }: StepZeroComponentProps) {

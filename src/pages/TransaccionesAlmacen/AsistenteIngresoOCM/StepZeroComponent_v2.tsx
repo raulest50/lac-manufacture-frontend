@@ -32,12 +32,8 @@ interface PageResponse<T> {
     content?: T[];
 }
 
-const buildConsultaEndpoint = () => {
-    const domain = EndPointsURL.getDomain();
-    return `${domain}/movimientos/consulta_ocm_pendientes`;
-};
 
-export default function StepOneComponent_v2({
+export default function StepZeroComponent_v2({
     setActiveStep,
     setSelectedOrder,
 }: StepOneComponentProps) {
@@ -65,6 +61,9 @@ export default function StepOneComponent_v2({
                 fechaInicio: serializeDate(fechaInicio),
                 fechaFin: serializeDate(fechaFin, true),
             };
+
+            console.log("debugging filter: ");
+            console.log(filter);
 
             const response = await axios.post<PageResponse<OrdenCompra>>(endpoints.consulta_ocm_pendientes, filter, {
                 withCredentials: true,
