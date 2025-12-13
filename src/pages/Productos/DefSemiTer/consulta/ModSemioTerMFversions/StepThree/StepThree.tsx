@@ -72,14 +72,18 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
     useEffect(() => {
         const procesoCompleto = semioter2.procesoProduccionCompleto as ProcesoProduccionCompleto & { areaProduccion?: AreaProduccion };
         if (procesoCompleto) {
-            setProceso({ procesosProduccion: procesoCompleto.procesosProduccion ?? [] });
+            const procesos = procesoCompleto.procesosProduccion ?? [];
+            setProceso({ procesosProduccion: procesos });
             setRendimientoTeorico(procesoCompleto.rendimientoTeorico ?? 0);
             setSelectedArea(procesoCompleto.areaProduccion ?? null);
+            setIsProcessValid(procesos.length > 0);
         }
 
         const productoConCasePack = semioter2 as ProductoSemiter & { casePack?: CasePack };
         if (productoConCasePack.casePack) {
             setCasePack(productoConCasePack.casePack);
+        } else {
+            setCasePack(null);
         }
     }, [semioter2]);
 
@@ -191,7 +195,7 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
                 pl="2em"
             >
                 <Button colorScheme="yellow" variant="solid" onClick={onClickAtras} flex={2}>
-                    Atras
+                    Volver a insumos
                 </Button>
 
                 <Button
@@ -200,13 +204,13 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
                     onClick={onClickSiguiente}
                     flex={2}
                     isDisabled={
-                        !isProcessValid || 
-                        rendimientoTeorico <= 0 || 
-                        !selectedArea || 
+                        !isProcessValid ||
+                        rendimientoTeorico <= 0 ||
+                        !selectedArea ||
                         (isTerminado && !casePack) // Require casePack for Terminado
                     }
                 >
-                    Siguiente
+                    Continuar con confirmación
                 </Button>
             </Flex>
 
@@ -220,6 +224,7 @@ export default function StepThree({ setActiveStep, semioter2, setSemioter3 }: Pr
                 isOpen={isPackagingDefinerOpen}
                 onClose={handleClosePackagingDefiner}
                 onSave={handleSavePackaging}
+                initialCasePack={casePack}
             />
         </Flex>
     );

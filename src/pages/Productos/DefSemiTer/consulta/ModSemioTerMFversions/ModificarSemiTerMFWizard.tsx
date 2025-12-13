@@ -11,10 +11,10 @@ interface ModificarSemiTerMFWizardProps {
 }
 
 const steps = [
-    { title: 'Primero', description: 'Definir Producto' },
-    { title: 'Segundo', description: 'Definir Insumos' },
-    { title: 'Tercero', description: 'Definir Proceso de Produccion' },
-    { title: 'Cuarto', description: 'Confirmación' },
+    { title: 'Primero', description: 'Revisar producto original' },
+    { title: 'Segundo', description: 'Modificar insumos' },
+    { title: 'Tercero', description: 'Ajustar proceso y packaging' },
+    { title: 'Cuarto', description: 'Confirmar modificación' },
 ];
 
 export default function ModificarSemiTerMFWizard({ producto }: ModificarSemiTerMFWizardProps) {
@@ -42,7 +42,7 @@ export default function ModificarSemiTerMFWizard({ producto }: ModificarSemiTerM
 
     function ConditionalRenderStep() {
         if (activeStep === 0 || activeStep === 1) {
-            return <StepTwo setActiveStep={setActiveStep} semioter={semioter!} setSemioter2={setSemioter2} />;
+            return <StepTwo setActiveStep={setActiveStep} semioter={semioter2 ?? semioter!} setSemioter2={setSemioter2} />;
         }
         if (activeStep === 2) {
             return <StepThree setActiveStep={setActiveStep} semioter2={semioter2!} setSemioter3={setSemioter3} />;
