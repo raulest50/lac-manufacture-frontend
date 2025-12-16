@@ -68,7 +68,19 @@ export default function StepZeroComponent_v2({
             const response = await axios.post<PageResponse<OrdenCompra>>(endpoints.consulta_ocm_pendientes, filter, {
                 withCredentials: true,
             });
-            setOrdenes(response.data?.content || []);
+            const ordenesPendientes = response.data?.content || [];
+
+            if (ordenesPendientes.length === 0) {
+                toast({
+                    title: "No se encontraron órdenes",
+                    description: "No hay órdenes que coincidan con el filtro seleccionado.",
+                    status: "info",
+                    duration: 4000,
+                    isClosable: true,
+                });
+            }
+
+            setOrdenes(ordenesPendientes);
         } catch (error: any) {
             console.error("Error fetching órdenes pendientes", error);
             toast({
