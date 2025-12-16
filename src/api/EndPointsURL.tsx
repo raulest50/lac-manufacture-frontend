@@ -280,7 +280,7 @@ export default class EndPointsURL{
         this.recomendar_lotes_multiple = `${domain}/${movimientos_res}/recomendar-lotes-multiple`;
 
         // ingresos almacen endpoints
-        this.consulta_ocm_pendientes = `${domain}/${ingresos_almacen_res}/consulta_ocm_pendientes`;
+        this.consulta_ocm_pendientes = `${domain}/${ingresos_almacen_res}/ocms_pendientes_ingreso`;
 
         // user endpoints
         this.whoami = `${domain}/${auth_res}/whoami`;

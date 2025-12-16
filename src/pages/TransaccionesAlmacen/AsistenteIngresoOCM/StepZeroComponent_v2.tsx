@@ -17,7 +17,7 @@ import {
     VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
-import {useEffect, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import ProveedorFilterOCM from "../../Compras/components/ProveedorFilterOCM";
 import ProveedorPicker from "../../Compras/components/ProveedorPicker";
 import EndPointsURL from "../../../api/EndPointsURL";
@@ -28,9 +28,6 @@ interface StepOneComponentProps {
     setSelectedOrder: (orden: OrdenCompra) => void;
 }
 
-interface PageResponse<T> {
-    content?: T[];
-}
 
 
 export default function StepZeroComponent_v2({
@@ -60,19 +57,20 @@ export default function StepZeroComponent_v2({
     const fetchOrdenesPendientes = async () => {
         setIsLoading(true);
         try {
-            const filter = {
-                proveedorId: proveedor?.id ?? null,
-                fechaInicio: serializeDate(fechaInicio),
-                fechaFin: serializeDate(fechaFin, true),
-            };
-
-            console.log("debugging filter: ");
-            console.log(filter);
-
-            const response = await axios.post<PageResponse<OrdenCompra>>(endpoints.consulta_ocm_pendientes, filter, {
-                withCredentials: true,
-            });
-            const ordenesPendientes = response.data?.content || [];
+            const response = await axios.get<OrdenCompra[]>(
+                endpoints.consulta_ocm_pendientes,
+                {
+                    withCredentials: true,
+                    params: {
+                        page: 0,
+                        size: 10,
+                        fechaInicio: serializeDate(fechaInicio),
+                        fechaFin: serializeDate(fechaFin, true),
+                        proveedorId: proveedor?.id ?? undefined,
+                    },
+                }
+            );
+            const ordenesPendientes = response.data || [];
 
             if (ordenesPendientes.length === 0) {
                 toast({
@@ -99,10 +97,6 @@ export default function StepZeroComponent_v2({
         }
     };
 
-    useEffect(() => {
-        fetchOrdenesPendientes();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const onRegistrarIngreso = (orden: OrdenCompra) => {
         setSelectedOrder(orden);

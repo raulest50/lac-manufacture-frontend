@@ -36,7 +36,7 @@ export default function StepFour_ModProdMF({ setActiveStep, semioter3, onReset }
             setLoading(true);
             const payload = { ...semioter3, productoId: semioter3.productoId };
             console.log('Payload enviado al backend para producto terminado/semiterminado:', JSON.stringify(payload, null, 2));
-            await axios.put(endPoints.mod_mnfacturing_semiter, payload);
+            await axios.post(endPoints.mod_mnfacturing_semiter, payload);
             toast({
                 title: "Producto actualizado",
                 status: "success",

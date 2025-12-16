@@ -428,7 +428,7 @@ export default function DetalleProductoSemiTer({producto, setEstado, setProducto
             <HStack>
                 {canUseWizard && (
                     <Button colorScheme="teal" onClick={handleOpenWizard}>
-                        Modificar Semi/Terminado
+                        Modificar Insumos y Proceso de Produccion
                     </Button>
                 )}
                 {canEdit && (
