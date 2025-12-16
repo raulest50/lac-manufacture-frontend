@@ -41,8 +41,12 @@ export default function StepZeroComponent_v2({
     const endpoints = useMemo(() => new EndPointsURL(), []);
     const [isLoading, setIsLoading] = useState(false);
     const [proveedor, setProveedor] = useState<Proveedor | null>(null);
-    const [fechaInicio, setFechaInicio] = useState<string>("");
-    const [fechaFin, setFechaFin] = useState<string>("");
+    const [fechaInicio, setFechaInicio] = useState<string>(() => {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        return yesterday.toISOString().split("T")[0];
+    });
+    const [fechaFin, setFechaFin] = useState<string>(() => new Date().toISOString().split("T")[0]);
     const [ordenes, setOrdenes] = useState<OrdenCompra[]>([]);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
