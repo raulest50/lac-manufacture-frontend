@@ -158,6 +158,7 @@ export interface TransaccionAlmacen{
     tipoEntidadCausante: TipoEntidadCausante;
     idEntidadCausante: string;
     observaciones: string;
+    estadoContable?: 'PENDIENTE' | 'CONTABILIZADA' | 'NO_APLICA'; // Agregar este campo si no existe
 }
 
 export interface IngresoOCM_DTA{

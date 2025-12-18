@@ -117,7 +117,12 @@ export default function StepThreeComponent({
                         </Flex>
                         <Divider my={2} />
                         <Text fontWeight="bold">Información del Lote:</Text>
-                        <Text>Fecha de Fabricación: {new Date(movimiento.lote.productionDate).toLocaleDateString()}</Text>
+                        {movimiento.lote.batchNumber && (
+                            <Text>Batch Number: {movimiento.lote.batchNumber}</Text>
+                        )}
+                        {movimiento.lote.productionDate && (
+                            <Text>Fecha de Fabricación: {new Date(movimiento.lote.productionDate).toLocaleDateString()}</Text>
+                        )}
                         <Text>Fecha de Vencimiento: {new Date(movimiento.lote.expirationDate).toLocaleDateString()}</Text>
                     </Box>
                 ))}

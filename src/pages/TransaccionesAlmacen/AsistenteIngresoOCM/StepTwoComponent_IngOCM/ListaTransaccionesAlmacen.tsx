@@ -1,0 +1,188 @@
+import { useState, useEffect, useMemo } from 'react';
+import {
+    Box,
+    Flex,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    Text,
+    Heading,
+    Spinner,
+    useToast,
+} from '@chakra-ui/react';
+import axios from 'axios';
+
+import { TransaccionAlmacen } from '../../types';
+import EndPointsURL from "../../../../api/EndPointsURL.tsx";
+
+interface ListaTransaccionesAlmacenProps {
+    ordenCompraId: number | undefined;
+}
+
+export function ListaTransaccionesAlmacen({ ordenCompraId }: ListaTransaccionesAlmacenProps) {
+    const [transacciones, setTransacciones] = useState<TransaccionAlmacen[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const toast = useToast();
+    const endpoints = useMemo(() => new EndPointsURL(), []);
+
+    useEffect(() => {
+        if (!ordenCompraId) {
+            setTransacciones([]);
+            return;
+        }
+
+        const fetchTransacciones = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await axios.get<TransaccionAlmacen[]>(
+                    endpoints.consulta_transacciones_ocm,
+                    {
+                        withCredentials: true,
+                        params: {
+                            page: 0,
+                            size: 100,
+                            ordenCompraId: ordenCompraId,
+                        },
+                    }
+                );
+                setTransacciones(response.data || []);
+            } catch (error: any) {
+                console.error('Error fetching transacciones:', error);
+                const errorMessage = error.response?.data?.message || 
+                    error.message || 
+                    'No se pudieron cargar las transacciones';
+                setError(errorMessage);
+                
+                // Si el endpoint no está implementado (405), mostrar mensaje informativo
+                if (error.response?.status === 405) {
+                    toast({
+                        title: 'Funcionalidad no disponible',
+                        description: 'El endpoint para consultar transacciones aún no está implementado en el backend.',
+                        status: 'info',
+                        duration: 5000,
+                        isClosable: true,
+                    });
+                } else {
+                    toast({
+                        title: 'Error al cargar transacciones',
+                        description: errorMessage,
+                        status: 'error',
+                        duration: 4000,
+                        isClosable: true,
+                    });
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTransacciones();
+    }, [ordenCompraId, endpoints, toast]);
+
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return '-';
+        try {
+            return new Date(dateString).toLocaleDateString('es-CO', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+        } catch {
+            return dateString;
+        }
+    };
+
+    if (!ordenCompraId) {
+        return null;
+    }
+
+    return (
+        <Flex direction="column" gap={4} mt={6} w="full">
+            <Heading size="md" fontFamily="Comfortaa Variable">
+                Transacciones de Almacén Registradas
+            </Heading>
+
+            {loading ? (
+                <Flex justify="center" align="center" p={8}>
+                    <Spinner size="xl" color="teal.500" />
+                </Flex>
+            ) : error ? (
+                <Box p={4} bg="red.50" borderRadius="md">
+                    <Text color="red.600">{error}</Text>
+                </Box>
+            ) : transacciones.length === 0 ? (
+                <Box p={4} bg="gray.50" borderRadius="md">
+                    <Text color="gray.600" textAlign="center">
+                        No se han registrado transacciones de almacén para esta orden de compra.
+                    </Text>
+                </Box>
+            ) : (
+                <Box w="full" bg="white" borderRadius="md" boxShadow="sm" overflowX="auto">
+                    <Table size="sm" variant="simple">
+                        <Thead bg="gray.50">
+                            <Tr>
+                                <Th>ID Transacción</Th>
+                                <Th>Fecha</Th>
+                                <Th># Movimientos</Th>
+                                <Th>Estado Contable</Th>
+                                <Th>Observaciones</Th>
+                            </Tr>
+                        </Thead>
+                        <Tbody>
+                            {transacciones.map((transaccion) => (
+                                <Tr key={transaccion.transaccionId}>
+                                    <Td fontWeight="semibold">
+                                        {transaccion.transaccionId}
+                                    </Td>
+                                    <Td>{formatDate(transaccion.fechaTransaccion)}</Td>
+                                    <Td>{transaccion.movimientosTransaccion?.length || 0}</Td>
+                                    <Td>
+                                        <Text
+                                            fontSize="xs"
+                                            px={2}
+                                            py={1}
+                                            borderRadius="md"
+                                            display="inline-block"
+                                            bg={
+                                                transaccion.estadoContable === 'CONTABILIZADA'
+                                                    ? 'green.100'
+                                                    : transaccion.estadoContable === 'PENDIENTE'
+                                                    ? 'yellow.100'
+                                                    : 'gray.100'
+                                            }
+                                            color={
+                                                transaccion.estadoContable === 'CONTABILIZADA'
+                                                    ? 'green.800'
+                                                    : transaccion.estadoContable === 'PENDIENTE'
+                                                    ? 'yellow.800'
+                                                    : 'gray.800'
+                                            }
+                                        >
+                                            {transaccion.estadoContable || 'N/A'}
+                                        </Text>
+                                    </Td>
+                                    <Td>
+                                        <Text
+                                            fontSize="sm"
+                                            noOfLines={2}
+                                            maxW="300px"
+                                        >
+                                            {transaccion.observaciones || '-'}
+                                        </Text>
+                                    </Td>
+                                </Tr>
+                            ))}
+                        </Tbody>
+                    </Table>
+                </Box>
+            )}
+        </Flex>
+    );
+}

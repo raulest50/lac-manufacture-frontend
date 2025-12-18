@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import {IngresoOCM_DTA, OrdenCompra} from "../types";
+import {IngresoOCM_DTA, OrdenCompra} from "../../types.tsx";
 import {
     Button,
     Divider,
@@ -15,7 +15,7 @@ import { FaFolderOpen } from "react-icons/fa";
 import { FaFileCircleQuestion } from "react-icons/fa6";
 import { FaFileCircleCheck } from "react-icons/fa6";
 
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../../../context/AuthContext.tsx';
 
 interface StepTwoComponentProps {
     setActiveStep: (step: number) => void;

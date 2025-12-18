@@ -14,7 +14,7 @@ import {useState} from "react";
 import {IngresoOCM_DTA, OrdenCompra} from "../types";
 import StepOneComponent from "./StepOneComponent";
 import StepZeroComponent_v2 from "./StepZeroComponent_v2.tsx";
-import StepTwoComponent from "./StepTwoComponent";
+import StepTwoComponent from "./StepTwoComponent_IngOCM/StepTwoComponent.tsx";
 import StepThreeComponent from "./StepThreeComponent";
 import StepFourComponent from "./StepFourComponent";
 

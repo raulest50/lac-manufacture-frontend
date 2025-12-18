@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import {
-    Card, 
-    CardHeader, 
-    CardBody, 
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
     Heading, 
     Text, 
     Flex, 
@@ -13,9 +16,11 @@ import {
     Input, 
     Box,
     Badge,
-    useToast
+    useToast,
+    Collapse,
+    Checkbox
 } from '@chakra-ui/react';
-import { AddIcon, MinusIcon } from '@chakra-ui/icons';
+import { AddIcon, MinusIcon, ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { ItemOrdenCompra, Lote, Movimiento, TipoMovimiento, Almacen } from '../../types.tsx';
 
 interface LoteConCantidad extends Lote {
@@ -25,22 +30,33 @@ interface LoteConCantidad extends Lote {
 interface Props {
     item: ItemOrdenCompra;
     onMovimientosChange: (movimientos: Movimiento[]) => void;
+    onExcludedChange?: (excluded: boolean) => void;
+    isExcluded?: boolean;
 }
 
-export function CardIngresoMaterial({ item, onMovimientosChange }: Props) {
+export function CardIngresoMaterial({ item, onMovimientosChange, onExcludedChange, isExcluded = false }: Props) {
     const toast = useToast();
     const [lotes, setLotes] = useState<LoteConCantidad[]>([
         {
+            batchNumber: '',
             productionDate: '',
             expirationDate: '',
             cantidad: item.cantidad
         }
     ]);
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [excluded, setExcluded] = useState(isExcluded);
 
     const MAX_LOTES = 3;
 
-    // Actualizar los movimientos cuando cambian los lotes
+    // Actualizar los movimientos cuando cambian los lotes o el estado de exclusión
     useEffect(() => {
+        // Si el material está excluido, no generar movimientos
+        if (excluded) {
+            onMovimientosChange([]);
+            return;
+        }
+
         const movimientos: Movimiento[] = lotes
             .filter(lote => lote.cantidad > 0 && lote.expirationDate)
             .map(lote => ({
@@ -49,6 +65,7 @@ export function CardIngresoMaterial({ item, onMovimientosChange }: Props) {
                 tipoMovimiento: TipoMovimiento.COMPRA,
                 almacen: Almacen.GENERAL,
                 lote: {
+                    batchNumber: lote.batchNumber || undefined,
                     productionDate: lote.productionDate,
                     expirationDate: lote.expirationDate
                 },
@@ -56,7 +73,43 @@ export function CardIngresoMaterial({ item, onMovimientosChange }: Props) {
             }));
 
         onMovimientosChange(movimientos);
-    }, [lotes, item, onMovimientosChange]);
+    }, [lotes, item, onMovimientosChange, excluded]);
+
+    // Notificar al padre cuando cambia el estado de exclusión
+    useEffect(() => {
+        if (onExcludedChange) {
+            onExcludedChange(excluded);
+        }
+    }, [excluded, onExcludedChange]);
+
+    // Sincronizar con prop externa
+    useEffect(() => {
+        setExcluded(isExcluded);
+    }, [isExcluded]);
+
+    const handleExcludedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newExcluded = e.target.checked;
+        setExcluded(newExcluded);
+        
+        // Si se marca como excluido, colapsar y limpiar lotes
+        if (newExcluded) {
+            setIsExpanded(false);
+            setLotes([{
+                batchNumber: '',
+                productionDate: '',
+                expirationDate: '',
+                cantidad: 0
+            }]);
+        } else {
+            // Si se desmarca, restaurar lote inicial
+            setLotes([{
+                batchNumber: '',
+                productionDate: '',
+                expirationDate: '',
+                cantidad: item.cantidad
+            }]);
+        }
+    };
 
     const handleAddLote = () => {
         if (lotes.length >= MAX_LOTES) {
@@ -71,6 +124,7 @@ export function CardIngresoMaterial({ item, onMovimientosChange }: Props) {
         }
 
         setLotes([...lotes, {
+            batchNumber: '',
             productionDate: '',
             expirationDate: '',
             cantidad: 0
@@ -104,90 +158,153 @@ export function CardIngresoMaterial({ item, onMovimientosChange }: Props) {
     };
 
     const totalCantidad = lotes.reduce((sum, lote) => sum + lote.cantidad, 0);
-    const isValid = totalCantidad <= item.cantidad && totalCantidad > 0;
+    const isValid = excluded || (totalCantidad <= item.cantidad && totalCantidad > 0);
 
     return (
-        <Card mb={4} variant="elevated" borderWidth={!isValid ? "2px" : "1px"} borderColor={!isValid ? "red.500" : "gray.200"}>
-            <CardHeader bg="teal.50">
-                <Flex justifyContent="space-between" alignItems="center">
-                    <Box>
-                        <Heading size="md">{item.material.nombre}</Heading>
-                        <Text>ID: {item.material.productoId}</Text>
-                    </Box>
-                    <Box>
-                        <Badge colorScheme={isValid ? "green" : "red"}>
-                            {totalCantidad} / {item.cantidad} {item.material.tipoUnidades}
+        <>
+            <Tr bg={!isValid && !excluded ? "red.50" : excluded ? "gray.100" : "white"}>
+                <Td>
+                    <Flex align="center" gap={2}>
+                        <Checkbox
+                            isChecked={excluded}
+                            onChange={handleExcludedChange}
+                            colorScheme="red"
+                        />
+                        <Text fontWeight="semibold" as={excluded ? "s" : undefined} color={excluded ? "gray.500" : undefined}>
+                            {item.material.nombre}
+                        </Text>
+                    </Flex>
+                </Td>
+                <Td>{item.material.productoId}</Td>
+                <Td>{item.cantidad} {item.material.tipoUnidades}</Td>
+                <Td>
+                    {excluded ? (
+                        <Badge colorScheme="gray" fontSize="md">
+                            Excluido
                         </Badge>
-                    </Box>
-                </Flex>
-            </CardHeader>
-
-            <CardBody>
-                <Text mb={4}>
-                    Ingrese la información de los lotes para este material. Puede agregar hasta {MAX_LOTES} lotes.
-                </Text>
-
-                {lotes.map((lote, index) => (
-                    <Box key={index} mb={4} p={3} borderWidth="1px" borderRadius="md">
-                        <Flex justifyContent="space-between" alignItems="center" mb={2}>
-                            <Heading size="sm">Lote #{index + 1}</Heading>
-                            <IconButton
-                                aria-label="Eliminar lote"
-                                icon={<MinusIcon />}
-                                size="sm"
-                                colorScheme="red"
-                                onClick={() => handleRemoveLote(index)}
-                            />
-                        </Flex>
-
-                        <FormControl mb={2}>
-                            <FormLabel>Fecha de Fabricación (opcional)</FormLabel>
-                            <Input 
-                                type="date" 
-                                value={lote.productionDate}
-                                onChange={(e) => handleLoteChange(index, 'productionDate', e.target.value)}
-                            />
-                        </FormControl>
-
-                        <FormControl mb={2}>
-                            <FormLabel>Fecha de Vencimiento</FormLabel>
-                            <Input 
-                                type="date" 
-                                value={lote.expirationDate}
-                                onChange={(e) => handleLoteChange(index, 'expirationDate', e.target.value)}
-                            />
-                        </FormControl>
-
-                        <FormControl>
-                            <FormLabel>Cantidad</FormLabel>
-                            <Input 
-                                type="number" 
-                                value={lote.cantidad}
-                                onChange={(e) => handleLoteChange(index, 'cantidad', parseInt(e.target.value) || 0)}
-                                min={0}
-                                max={item.cantidad}
-                            />
-                        </FormControl>
-                    </Box>
-                ))}
-
-                <Button 
-                    leftIcon={<AddIcon />} 
-                    colorScheme="teal" 
-                    variant="outline" 
-                    onClick={handleAddLote}
-                    isDisabled={lotes.length >= MAX_LOTES}
-                    mt={2}
-                >
-                    Agregar Lote
-                </Button>
-
-                {!isValid && (
-                    <Text color="red.500" mt={2}>
-                        La suma de las cantidades debe ser mayor a 0 y no debe exceder {item.cantidad}.
-                    </Text>
-                )}
-            </CardBody>
-        </Card>
+                    ) : (
+                        <Badge colorScheme={isValid ? "green" : "red"} fontSize="md">
+                            {totalCantidad} {item.material.tipoUnidades}
+                        </Badge>
+                    )}
+                </Td>
+                <Td>
+                    {excluded ? (
+                        <Badge colorScheme="gray">
+                            No recibido
+                        </Badge>
+                    ) : (
+                        <Badge colorScheme={isValid ? "green" : "orange"}>
+                            {isValid ? "Válido" : "Pendiente"}
+                        </Badge>
+                    )}
+                </Td>
+                <Td textAlign="center">
+                    {!excluded && (
+                        <IconButton
+                            aria-label={isExpanded ? "Ocultar lotes" : "Mostrar lotes"}
+                            icon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                            size="sm"
+                            onClick={() => setIsExpanded(!isExpanded)}
+                        />
+                    )}
+                </Td>
+            </Tr>
+            {!excluded && (
+                <Tr>
+                    <Td colSpan={6} p={0}>
+                        <Collapse in={isExpanded} animateOpacity>
+                        <Box p={4} bg="gray.50">
+                            <Flex justifyContent="space-between" alignItems="center" mb={4}>
+                                <Text fontWeight="semibold">Lotes del Material</Text>
+                                <Button
+                                    leftIcon={<AddIcon />}
+                                    colorScheme="teal"
+                                    size="sm"
+                                    onClick={handleAddLote}
+                                    isDisabled={lotes.length >= MAX_LOTES}
+                                >
+                                    Agregar Lote
+                                </Button>
+                            </Flex>
+                            
+                            <Table size="sm" variant="simple" bg="white">
+                                <Thead>
+                                    <Tr>
+                                        <Th>Lote #</Th>
+                                        <Th>Batch Number</Th>
+                                        <Th>Fecha Fabricación</Th>
+                                        <Th>Fecha Vencimiento</Th>
+                                        <Th>Cantidad</Th>
+                                        <Th textAlign="center">Acciones</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {lotes.map((lote, index) => (
+                                        <Tr key={index}>
+                                            <Td fontWeight="semibold">{index + 1}</Td>
+                                            <Td>
+                                                <Input
+                                                    type="text"
+                                                    size="sm"
+                                                    value={lote.batchNumber || ''}
+                                                    onChange={(e) => handleLoteChange(index, 'batchNumber', e.target.value)}
+                                                    placeholder="Opcional"
+                                                />
+                                            </Td>
+                                            <Td>
+                                                <Input
+                                                    type="date"
+                                                    size="sm"
+                                                    value={lote.productionDate || ''}
+                                                    onChange={(e) => handleLoteChange(index, 'productionDate', e.target.value)}
+                                                />
+                                            </Td>
+                                            <Td>
+                                                <Input
+                                                    type="date"
+                                                    size="sm"
+                                                    value={lote.expirationDate || ''}
+                                                    onChange={(e) => handleLoteChange(index, 'expirationDate', e.target.value)}
+                                                    isRequired
+                                                />
+                                            </Td>
+                                            <Td>
+                                                <Input
+                                                    type="number"
+                                                    size="sm"
+                                                    value={lote.cantidad}
+                                                    onChange={(e) => handleLoteChange(index, 'cantidad', parseInt(e.target.value) || 0)}
+                                                    min={0}
+                                                    max={item.cantidad}
+                                                    w="100px"
+                                                />
+                                            </Td>
+                                            <Td textAlign="center">
+                                                <IconButton
+                                                    aria-label="Eliminar lote"
+                                                    icon={<MinusIcon />}
+                                                    size="sm"
+                                                    colorScheme="red"
+                                                    onClick={() => handleRemoveLote(index)}
+                                                    isDisabled={lotes.length <= 1}
+                                                />
+                                            </Td>
+                                        </Tr>
+                                    ))}
+                                </Tbody>
+                            </Table>
+                            
+                            {!isValid && (
+                                <Text color="red.500" mt={2} fontSize="sm">
+                                    La suma de las cantidades debe ser mayor a 0 y no debe exceder {item.cantidad}.
+                                </Text>
+                            )}
+                        </Box>
+                    </Collapse>
+                </Td>
+            </Tr>
+            )}
+        </>
     );
 }

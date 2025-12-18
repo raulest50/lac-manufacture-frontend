@@ -95,6 +95,7 @@ export default class EndPointsURL{
 
     // ingresos almacen resource
     public consulta_ocm_pendientes: string;
+    public consulta_transacciones_ocm: string;
 
 
 
@@ -281,6 +282,7 @@ export default class EndPointsURL{
 
         // ingresos almacen endpoints
         this.consulta_ocm_pendientes = `${domain}/${ingresos_almacen_res}/ocms_pendientes_ingreso`;
+        this.consulta_transacciones_ocm = `${domain}/${ingresos_almacen_res}/consultar_transin_de_ocm`;
 
         // user endpoints
         this.whoami = `${domain}/${auth_res}/whoami`;
