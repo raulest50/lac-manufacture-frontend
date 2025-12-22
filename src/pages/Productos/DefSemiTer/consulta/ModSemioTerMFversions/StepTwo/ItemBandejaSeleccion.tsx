@@ -10,11 +10,6 @@ import {
     IconButton,
     Tooltip,
     Badge,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    NumberIncrementStepper,
-    NumberDecrementStepper,
     useColorModeValue,
 } from "@chakra-ui/react";
 import { Insumo } from "../../../types.tsx";
@@ -24,6 +19,7 @@ import { FiMinus } from "react-icons/fi";
 
 // Shared helpers
 import { metaPorTipo } from "./meta";
+import CustomDecimalInput from "../../../../../../components/CustomDecimalInput/CustomDecimalInput.tsx";
 
 interface ItemBandejaSeleccionProps {
     insumo: Insumo;
@@ -107,26 +103,16 @@ const ItemBandejaSeleccion: React.FC<ItemBandejaSeleccionProps> = ({
                 {/* Cantidad */}
                 <HStack align="center" spacing={2}>
                     <Tooltip label="Cantidad requerida" hasArrow>
-                        <NumberInput
-                            size="sm"
-                            min={0}
-                            step={0.0001}
+                        <CustomDecimalInput
                             value={insumo.cantidadRequerida}
-                            onChange={(_vStr, vNum) =>
-                                // Nota: el tipo de productoId en props es string, que coincide con la definición en Producto.
-                                onUpdateCantidad(
-                                    producto.productoId,
-                                    Number.isFinite(vNum) ? vNum : 0
-                                )
+                            onChange={(newCantidad) =>
+                                onUpdateCantidad(producto.productoId, newCantidad)
                             }
+                            min={0}
+                            size="sm"
+                            placeholder="0.0000"
                             w="88px"
-                        >
-                            <NumberInputField />
-                            <NumberInputStepper>
-                                <NumberIncrementStepper />
-                                <NumberDecrementStepper />
-                            </NumberInputStepper>
-                        </NumberInput>
+                        />
                     </Tooltip>
 
                     {/* Quitar */}

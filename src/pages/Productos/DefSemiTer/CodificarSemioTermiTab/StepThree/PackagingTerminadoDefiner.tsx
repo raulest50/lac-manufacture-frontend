@@ -33,6 +33,7 @@ import {
 } from "@chakra-ui/react";
 import { SearchIcon, DeleteIcon } from "@chakra-ui/icons";
 import EndPointsURL from "../../../../../api/EndPointsURL";
+import CustomDecimalInput from "../../../../../components/CustomDecimalInput/CustomDecimalInput.tsx";
 
 // Interfaces based on backend models
 interface CasePack {
@@ -287,16 +288,14 @@ const PackagingTerminadoDefiner: React.FC<Props> = ({ isOpen, onClose, onSave })
                           <Td>{insumo.material.nombre}</Td>
                           <Td>{insumo.material.tipoUnidades}</Td>
                           <Td>
-                            <NumberInput
-                              min={0.1}
-                              step={0.1}
+                            <CustomDecimalInput
                               value={insumo.cantidad}
-                              onChange={(_, value) => updateQuantity(index, value)}
+                              onChange={(newCantidad) => updateQuantity(index, newCantidad)}
+                              min={0.1}
+                              maxDecimals={1}
                               size="sm"
                               w="80px"
-                            >
-                              <NumberInputField />
-                            </NumberInput>
+                            />
                           </Td>
                           <Td>
                             <IconButton

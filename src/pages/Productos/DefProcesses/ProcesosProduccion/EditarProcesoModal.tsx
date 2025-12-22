@@ -27,6 +27,7 @@ import {
 import axios from 'axios';
 import EndPointsURL from '../../../../api/EndPointsURL.tsx';
 import { ProcesoProduccionEntity, TimeModelType, RecursoProduccion } from '../../types.tsx';
+import CustomDecimalInput from '../../../../components/CustomDecimalInput/CustomDecimalInput.tsx';
 
 interface EditarProcesoModalProps {
   isOpen: boolean;
@@ -269,15 +270,12 @@ export function EditarProcesoModal({ isOpen, onClose, proceso, onSave }: EditarP
                 {procesoEditado.model === TimeModelType.THROUGHPUT_RATE && (
                   <FormControl isRequired>
                     <FormLabel>Tasa de Producción (unidades/segundo)</FormLabel>
-                    <NumberInput 
+                    <CustomDecimalInput
                       min={0}
-                      step={0.01}
-                      precision={2}
+                      maxDecimals={2}
                       value={procesoEditado.throughputUnitsPerSec || 0}
-                      onChange={(_, value) => handleNumberChange('throughputUnitsPerSec', value)}
-                    >
-                      <NumberInputField />
-                    </NumberInput>
+                      onChange={(value) => handleNumberChange('throughputUnitsPerSec', value)}
+                    />
                   </FormControl>
                 )}
 
