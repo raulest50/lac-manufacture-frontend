@@ -7,6 +7,14 @@ import StepTwoComponent from './StepTwoComponent';
 import StepThreeComponent from './StepThreeComponent';
 import {DispensacionDTO} from '../types';
 
+interface InsumoDesglosadoDTO {
+    productoId: string;
+    productoNombre: string;
+    cantidadTotalRequerida: number;
+    tipoUnidades: string;
+    tipoProducto: string;
+}
+
 const steps = [
     {title:'Primero', description:'Identificar Orden'},
     {title:'Segundo', description:'Editar Dispensación'},
@@ -16,16 +24,29 @@ const steps = [
 export function AsistenteDispensacion(){
     const {activeStep, setActiveStep} = useSteps({index:0, count:steps.length});
     const [dispensacion, setDispensacion] = useState<DispensacionDTO | null>(null);
+    const [insumosDesglosados, setInsumosDesglosados] = useState<InsumoDesglosadoDTO[]>([]);
+    const [ordenProduccionId, setOrdenProduccionId] = useState<number | null>(null);
 
     const renderStep = () => {
         if(activeStep===0){
             const useStepOneV2 = true;
             return useStepOneV2
-                ? <StepOneComponentV2 setActiveStep={setActiveStep} setDispensacion={setDispensacion}/>
+                ? <StepOneComponentV2 
+                    setActiveStep={setActiveStep} 
+                    setDispensacion={setDispensacion}
+                    setInsumosDesglosados={setInsumosDesglosados}
+                    setOrdenProduccionId={setOrdenProduccionId}
+                />
                 : <StepOneComponent setActiveStep={setActiveStep} setDispensacion={setDispensacion}/>;
         }
         if(activeStep===1){
-            return <StepTwoComponent setActiveStep={setActiveStep} dispensacion={dispensacion} setDispensacion={setDispensacion}/>;
+            return <StepTwoComponent 
+                setActiveStep={setActiveStep} 
+                dispensacion={dispensacion} 
+                setDispensacion={setDispensacion}
+                insumosDesglosados={insumosDesglosados}
+                ordenProduccionId={ordenProduccionId}
+            />;
         }
         if(activeStep===2){
             return <StepThreeComponent setActiveStep={setActiveStep} dispensacion={dispensacion}/>;

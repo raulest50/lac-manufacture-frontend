@@ -80,7 +80,7 @@ export default class EndPointsURL{
     public create_vendedor: string;
     public search_vendedor: string;
 
-    // movimientos resource
+    // movimientos resource - TRANSACCIONES DE ALMANCEN
     public search_products_with_stock:string;
     public get_movimientos_by_producto:string;
     public exportar_movimientos_excel: string;
@@ -90,13 +90,16 @@ export default class EndPointsURL{
     public save_doc_ingreso_oc: string;
     public backflush_no_planificado: string;
 
-    public dispensacion_no_planificada: string;
-    public recomendar_lotes_multiple: string;
-
     // ingresos almacen resource
     public consulta_ocm_pendientes: string;
     public consulta_transacciones_ocm: string;
 
+    // salidas de almacen (dispensacion)
+    public dispensacion_no_planificada: string;
+    public recomendar_lotes_multiple: string;
+
+    public listar_lotes_de_producto:string;
+    public insumos_desglosados_orden: string;
 
 
     // user resources (solo autenticacion)
@@ -185,6 +188,7 @@ export default class EndPointsURL{
         const produccion_res = 'produccion';
         const movimientos_res = 'movimientos';
         const ingresos_almacen_res = 'ingresos_almacen';
+        const salidas_almacen_res = 'salidas_almacen';
         //const ventas_res = 'ventas';
         const vendedor_res = 'vendedor';
         const contabilidad_res = 'api/contabilidad';
@@ -277,12 +281,20 @@ export default class EndPointsURL{
 
         this.save_doc_ingreso_oc = `${domain}/${movimientos_res}/save_doc_ingreso_oc`;
         this.backflush_no_planificado = `${domain}/${movimientos_res}/backflush_no_planificado`;
-        this.dispensacion_no_planificada = `${domain}/${movimientos_res}/dispensacion-no-planificada`;
-        this.recomendar_lotes_multiple = `${domain}/${movimientos_res}/recomendar-lotes-multiple`;
+
 
         // ingresos almacen endpoints
         this.consulta_ocm_pendientes = `${domain}/${ingresos_almacen_res}/ocms_pendientes_ingreso`;
         this.consulta_transacciones_ocm = `${domain}/${ingresos_almacen_res}/consultar_transin_de_ocm`;
+
+
+        // salidas de almacen (dispensacion)
+        this.dispensacion_no_planificada = `${domain}/${movimientos_res}/dispensacion-no-planificada`;
+        this.recomendar_lotes_multiple = `${domain}/${movimientos_res}/recomendar-lotes-multiple`;
+
+        this.listar_lotes_de_producto = `${domain}/${salidas_almacen_res}/lotes-disponibles`;
+        this.insumos_desglosados_orden = `${domain}/${salidas_almacen_res}/orden-produccion/{ordenProduccionId}/insumos-desglosados`;
+
 
         // user endpoints
         this.whoami = `${domain}/${auth_res}/whoami`;

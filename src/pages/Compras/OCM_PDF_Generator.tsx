@@ -19,7 +19,7 @@ interface jsPDFWithAutoTable extends jsPDF {
     lastAutoTable?: AutoTableProperties;
 }
 
-export default class PdfGenerator {
+export default class OCM_PDF_Generator {
     /**
      * Generates the PDF file for the given OrdenCompra-Materiales (OCM) and triggers its download.
      * @param orden the order data to populate the PDF with.

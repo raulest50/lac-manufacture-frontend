@@ -64,7 +64,7 @@ type Data4PDFResponse = {
     areasProduccion?: AreaProduccion[];
 };
 
-export default class ODPpdfGenerator {
+export default class ODP_PDF_Generator {
     private readonly endPoints = new EndPointsURL();
     private readonly defaultUnidad = "KG";
 
@@ -303,8 +303,8 @@ export default class ODPpdfGenerator {
         const materials = Array.isArray((resp as any).materials) ? (resp as any).materials : [];
         const semis = Array.isArray((resp as any).semiterminados) ? (resp as any).semiterminados : [];
 
-        const rootMaterials = materials.map((m, i) => this.normalizeMaterial(m, i));
-        const rootSemis = semis.map((s, i) => this.normalizeSemiTopLevel(s, i));
+        const rootMaterials = materials.map((m: Data4PDFInsumoResponse, i: number) => this.normalizeMaterial(m, i));
+        const rootSemis = semis.map((s: Data4PDFInsumoResponse, i: number) => this.normalizeSemiTopLevel(s, i));
 
         const tree = [...rootMaterials, ...rootSemis];
         console.log("Árbol construido (materials + semis top-level purgados):", tree);

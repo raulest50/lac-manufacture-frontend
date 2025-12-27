@@ -1,5 +1,5 @@
 import MyHeader from "../../components/MyHeader";
-import {Container, Tabs, TabList, TabPanels, Tab, TabPanel} from "@chakra-ui/react";
+import {Container, Tabs, TabList, TabPanels, Tab, TabPanel, Text} from "@chakra-ui/react";
 import AsistenteIngresoMercancia from "./AsistenteIngresoOCM/AsistenteIngresoMercancia";
 import {AsistenteDispensacion} from "./AsistenteDispensacion/AsistenteDispensacion.tsx";
 import {AsistenteDispensacionDirecta} from "./AsistenteDispensacionDirecta/AsistenteDispensacionDirecta.tsx";
@@ -63,7 +63,7 @@ export default function TransaccionesAlmacenPage(){
                     </TabPanel>
 
                     <TabPanel>
-                        <AsistenteIngresoMercancia />
+                        <Text> Pendiente implementacion </Text>
                     </TabPanel>
 
                     {showDispensacionDirecta && (

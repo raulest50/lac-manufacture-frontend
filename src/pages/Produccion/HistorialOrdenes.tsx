@@ -26,7 +26,7 @@ import EndPointsURL from "../../api/EndPointsURL.tsx";
 import TerminadoSemiterminadoPicker from "./components/TerminadoSemiterminadoPicker";
 import ProductoFilterCard from "./components/ProductoFilterCard";
 import OrdenProduccionDialogDetalles from "./components/OrdenProduccionDialogDetalles";
-import ODPpdfGenerator from "./ODPpdfGenerator";
+import ODP_PDF_Generator from "./ODP_PDF_Generator.tsx";
 
 const endPoints = new EndPointsURL();
 
@@ -241,7 +241,7 @@ export default function HistorialOrdenes() {
 
     const handleGenerarPDF = async () => {
         if (contextMenu) {
-            const generator = new ODPpdfGenerator();
+            const generator = new ODP_PDF_Generator();
             await generator.downloadPDF(contextMenu.orden);
         }
         setContextMenu(null);

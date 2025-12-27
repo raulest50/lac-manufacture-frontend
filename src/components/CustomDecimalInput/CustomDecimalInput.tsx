@@ -65,7 +65,7 @@ const CustomDecimalInput: React.FC<CustomDecimalInputProps> = ({
     // Función para validar y filtrar la entrada (solo números y punto decimal)
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
-        
+
         // Permitir campo vacío si allowEmpty es true
         if (allowEmpty && newValue === "") {
             setInputValue("");
@@ -83,13 +83,19 @@ const CustomDecimalInput: React.FC<CustomDecimalInputProps> = ({
                 }
             }
             setInputValue(newValue);
+
+            // Añadir esta sección para actualizar en tiempo real
+            const numValue = parseFloat(newValue);
+            if (Number.isFinite(numValue) && numValue > min) {
+                onChange(numValue);
+            }
         }
     };
 
     // Validar y actualizar el valor numérico cuando el campo pierde el foco
     const handleBlur = () => {
         const trimmed = inputValue.trim();
-        
+
         // Si está vacío y allowEmpty es true, mantenerlo vacío
         if (allowEmpty && (trimmed === "" || trimmed === ".")) {
             setInputValue("");
@@ -105,7 +111,7 @@ const CustomDecimalInput: React.FC<CustomDecimalInputProps> = ({
         }
 
         const numValue = parseFloat(trimmed);
-        
+
         // Si es un número válido y cumple con el mínimo
         if (Number.isFinite(numValue) && numValue > min) {
             onChange(numValue);
@@ -145,4 +151,5 @@ const CustomDecimalInput: React.FC<CustomDecimalInputProps> = ({
 };
 
 export default CustomDecimalInput;
+
 

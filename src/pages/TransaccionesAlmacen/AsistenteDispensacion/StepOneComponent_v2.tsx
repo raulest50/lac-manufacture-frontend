@@ -20,9 +20,19 @@ import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
 import {DispensacionDTO, DispensacionFormularioDTO} from '../types';
 
+interface InsumoDesglosadoDTO {
+    productoId: string;
+    productoNombre: string;
+    cantidadTotalRequerida: number;
+    tipoUnidades: string;
+    tipoProducto: string;
+}
+
 interface Props {
     setActiveStep: (step:number) => void;
     setDispensacion: (dto: DispensacionDTO) => void;
+    setInsumosDesglosados?: (insumos: InsumoDesglosadoDTO[]) => void;
+    setOrdenProduccionId?: (id: number) => void;
 }
 
 interface OrdenDispensacionResumen {
@@ -45,7 +55,7 @@ interface PaginatedResponse<T> {
     size: number;
 }
 
-export default function StepOneComponentV2({setActiveStep, setDispensacion}: Props){
+export default function StepOneComponentV2({setActiveStep, setDispensacion, setInsumosDesglosados, setOrdenProduccionId}: Props){
     const toast = useToast();
     const [ordenes, setOrdenes] = useState<OrdenDispensacionResumen[]>([]);
     const [page, setPage] = useState(0);
@@ -124,24 +134,26 @@ export default function StepOneComponentV2({setActiveStep, setDispensacion}: Pro
         }
         setLoadingOrden(ordenId);
         try {
-            if(Array.isArray(orden.items)){
-                setDispensacion({ordenProduccionId: ordenId, items: orden.items});
-                setActiveStep(1);
-                return;
+            // Llamar al nuevo endpoint para obtener insumos desglosados
+            const endpoint = endpoints.insumos_desglosados_orden.replace('{ordenProduccionId}', ordenId.toString());
+            const resp = await axios.get<InsumoDesglosadoDTO[]>(endpoint, {withCredentials: true});
+            
+            // Almacenar los insumos desglosados y el ID de la orden
+            if(setInsumosDesglosados) {
+                setInsumosDesglosados(resp.data);
             }
-            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion_sugerida?ordenProduccionId=${ordenId}`;
-            const resp = await axios.get<DispensacionFormularioDTO>(endpoint, {withCredentials: true});
-            const dto = mapDispensacionFormulario(resp.data);
-            const hasMissingLotes = dto.items.some((item) => !item.lote.loteId);
-
-            if(hasMissingLotes){
-                toast({title: 'Lote no encontrado', description: 'Algunos materiales no tienen lote recomendado; revise antes de continuar.', status: 'warning', duration: 3000, isClosable: true});
+            if(setOrdenProduccionId) {
+                setOrdenProduccionId(ordenId);
             }
-
-            setDispensacion(dto);
+            
+            // También mantener compatibilidad con el sistema anterior si es necesario
+            // Por ahora, crear un DispensacionDTO vacío para mantener la estructura
+            setDispensacion({ordenProduccionId: ordenId, items: []});
+            
             setActiveStep(1);
         } catch (err) {
-            toast({title: 'Orden no encontrada', description: 'No existe una orden de producción con el id especificado.', status: 'error', duration: 3000, isClosable: true});
+            console.error('Error fetching insumos desglosados:', err);
+            toast({title: 'Error al cargar insumos', description: 'No fue posible obtener la lista de materiales necesarios.', status: 'error', duration: 3000, isClosable: true});
         } finally {
             setLoadingOrden(null);
         }

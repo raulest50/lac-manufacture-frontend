@@ -20,7 +20,7 @@ import { formatCOP } from '../../../utils/formatters';
 import CancelarOrdenDialog from './CancelarOrdenDialog';
 import ActualizarEstadoOrdenCompraDialog from "./ActualizarEstadoOrdenCompraDialog.tsx";
 // import {ExcelOCGenerator} from "../ExcelOCGenerator.tsx";
-import PdfGenerator from "../pdfGenerator.tsx";
+import OCM_PDF_Generator from "../OCM_PDF_Generator.tsx";
 
 // Función para determinar el color de fondo según el estado de la orden
 const getBackgroundColorByEstado = (estado: number): string => {
@@ -126,7 +126,7 @@ const ListaOrdenesCompra: React.FC<ListaOrdenesCompraProps> = ({ ordenes, onClos
         if (contextMenu) {
             // const generator = new ExcelOCGenerator();
             // await generator.downloadExcel(contextMenu.orden as OrdenCompra);
-            const generator = new PdfGenerator();
+            const generator = new OCM_PDF_Generator();
             await generator.downloadPDF_OCM(contextMenu.orden as OrdenCompraMateriales);
         }
         setContextMenu(null);

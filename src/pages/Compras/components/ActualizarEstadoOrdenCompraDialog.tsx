@@ -24,7 +24,7 @@ import {
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
 import { OrdenCompraMateriales, getEstadoText, getCondicionPagoText, getCantidadCorrectaText, TipoEnvio } from '../types';
-import PdfGenerator from "../pdfGenerator.tsx";
+import OCM_PDF_Generator from "../OCM_PDF_Generator.tsx";
 
 interface ActualizarEstadoOrdenCompraDialogProps {
     isOpen: boolean;
@@ -124,7 +124,7 @@ const ActualizarEstadoOrdenCompraDialog: React.FC<ActualizarEstadoOrdenCompraDia
 
             let OCMpdf: Blob|null = null;
             if(newEstado === 2){ // se adjunta OCM en pdf format para enviar como adjunto a proveedor
-                const generator = new PdfGenerator();
+                const generator = new OCM_PDF_Generator();
                 OCMpdf = await generator.getOCMpdf_Blob(orden);
                 formData.append(
                     'OCMpdf',
