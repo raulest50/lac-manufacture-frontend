@@ -74,6 +74,7 @@ export default class EndPointsURL{
 
     public save_orden_compra: string;
     public update_orden_compra: string;
+    public close_orden_compra: string;
 
 
     // vendedor resource
@@ -93,12 +94,15 @@ export default class EndPointsURL{
     // ingresos almacen resource
     public consulta_ocm_pendientes: string;
     public consulta_transacciones_ocm: string;
+    public movimientos_transaccion: string;
+    public consolidado_materiales_ocm: string;
 
     // salidas de almacen (dispensacion)
     public dispensacion_no_planificada: string;
     public recomendar_lotes_multiple: string;
 
     public listar_lotes_de_producto:string;
+    public lotes_disponibles_paginados: string;
     public insumos_desglosados_orden: string;
 
 
@@ -243,6 +247,7 @@ export default class EndPointsURL{
         this.save_orden_compra = `${domain}/${compras_res}/save_orden_compra`;
         this.search_ordenc_date_estado = `${domain}/${compras_res}/search_ordenes_by_date_estado`;
         this.update_orden_compra = `${domain}/${compras_res}/update_orden_compra`;
+        this.close_orden_compra = `${domain}/${compras_res}/orden_compra/{ordenCompraId}/close`;
 
         // produccion endpoints
         this.save_produccion = `${domain}/${produccion_res}/save`;
@@ -286,13 +291,16 @@ export default class EndPointsURL{
         // ingresos almacen endpoints
         this.consulta_ocm_pendientes = `${domain}/${ingresos_almacen_res}/ocms_pendientes_ingreso`;
         this.consulta_transacciones_ocm = `${domain}/${ingresos_almacen_res}/consultar_transin_de_ocm`;
+        this.movimientos_transaccion = `${domain}/${ingresos_almacen_res}/transaccion/{transaccionId}/movimientos`;
+        this.consolidado_materiales_ocm = `${domain}/${ingresos_almacen_res}/ocm/{ordenCompraId}/consolidado-materiales`;
 
 
         // salidas de almacen (dispensacion)
-        this.dispensacion_no_planificada = `${domain}/${movimientos_res}/dispensacion-no-planificada`;
-        this.recomendar_lotes_multiple = `${domain}/${movimientos_res}/recomendar-lotes-multiple`;
+        this.dispensacion_no_planificada = `${domain}/${salidas_almacen_res}/dispensacion-no-planificada`;
+        this.recomendar_lotes_multiple = `${domain}/${salidas_almacen_res}/recomendar-lotes-multiple`;
 
         this.listar_lotes_de_producto = `${domain}/${salidas_almacen_res}/lotes-disponibles`;
+        this.lotes_disponibles_paginados = `${domain}/${salidas_almacen_res}/lotes-disponibles-paginados`;
         this.insumos_desglosados_orden = `${domain}/${salidas_almacen_res}/orden-produccion/{ordenProduccionId}/insumos-desglosados`;
 
 

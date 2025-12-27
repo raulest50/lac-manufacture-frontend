@@ -107,6 +107,22 @@ export interface OrdenCompra {
      *  3: cerrada con éxito
      */
     estado: number;
+    /**
+     * Porcentaje estimado de materiales recibidos para esta orden de compra.
+     * Calculado dinámicamente por el backend cuando se consultan OCMs pendientes.
+     * 
+     * Valores posibles:
+     * - undefined/null: No se ha calculado (cuando se obtiene de otros endpoints)
+     * - 0.0: No se ha recibido nada
+     * - 0.0 a 100.0: Porcentaje de recepción normal
+     * - > 100.0: Se ha recibido más de lo ordenado (caso válido)
+     * 
+     * Solo está disponible cuando se consulta a través de:
+     * GET /ingresos_almacen/ocms_pendientes_ingreso
+     * 
+     * @see StepZeroComponent_v2.tsx - Componente que usa este campo
+     */
+    porcentajeRecibido?: number;
 }
 
 
@@ -240,4 +256,61 @@ export interface DispensacionNoPlanificadaDTO {
     observaciones: string;
     usuarioId: number;
     items: DispensacionNoPlanificadaItemDTO[];
+}
+
+// ===== Insumos Desglosados y Selección de Lotes =====
+
+export interface LoteSeleccionado {
+    loteId: number;
+    batchNumber: string;
+    cantidad: number; // Cantidad a tomar de este lote
+    cantidadDisponible: number; // Cantidad disponible en el lote
+    productionDate?: string | null;
+    expirationDate?: string | null;
+}
+
+export interface InsumoDesglosado {
+    productoId: string;
+    productoNombre: string;
+    cantidadTotalRequerida: number;
+    tipoUnidades: string;
+    tipoProducto: string;
+    lotesSeleccionados?: LoteSeleccionado[];
+}
+
+// ===== Movimientos y Consolidado OCM =====
+
+export interface MovimientoDetalle {
+    movimientoId: number;
+    productoId: string;
+    productoNombre: string;
+    tipoUnidades: string;
+    cantidad: number;
+    batchNumber?: string;
+    productionDate?: string;
+    expirationDate?: string;
+    tipoMovimiento: string;
+    almacen: string;
+    fechaMovimiento: string;
+}
+
+export interface LoteConsolidado {
+    batchNumber?: string;
+    cantidad: number;
+    expirationDate?: string;
+    transaccionId: number;
+}
+
+export interface MaterialConsolidado {
+    productoId: string;
+    productoNombre: string;
+    tipoUnidades: string;
+    cantidadTotal: number;
+    lotes: LoteConsolidado[];
+}
+
+export interface ConsolidadoOCMResponse {
+    ordenCompraId: number;
+    materiales: MaterialConsolidado[];
+    totalTransacciones: number;
 }

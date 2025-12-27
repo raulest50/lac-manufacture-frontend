@@ -15,7 +15,11 @@ import {
     useDisclosure,
     useToast,
     VStack,
+    IconButton,
+    HStack,
+    Tooltip,
 } from "@chakra-ui/react";
+import { RepeatIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import {useMemo, useState} from "react";
 import ProveedorFilterOCM from "../../Compras/components/ProveedorFilterOCM";
@@ -45,6 +49,8 @@ export default function StepZeroComponent_v2({
     });
     const [fechaFin, setFechaFin] = useState<string>(() => new Date().toISOString().split("T")[0]);
     const [ordenes, setOrdenes] = useState<OrdenCompra[]>([]);
+    // Estado para controlar si se muestra precio total o porcentaje recibido
+    const [mostrarPorcentaje, setMostrarPorcentaje] = useState(false);
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -103,20 +109,39 @@ export default function StepZeroComponent_v2({
         setActiveStep(1);
     };
 
+    /**
+     * Renderiza el valor de la celda según el modo de visualización:
+     * - Si mostrarPorcentaje es true: muestra el porcentaje recibido (ej: "75.5%")
+     * - Si mostrarPorcentaje es false: muestra el precio total formateado como moneda
+     */
+    const renderCellValue = (orden: OrdenCompra) => {
+        if (mostrarPorcentaje) {
+            // Mostrar porcentaje de entrega recibido
+            const porcentaje = orden.porcentajeRecibido;
+            if (porcentaje === undefined || porcentaje === null) {
+                return "N/A";
+            }
+            return `${porcentaje.toFixed(1)}%`;
+        } else {
+            // Mostrar precio total de la orden
+            return orden.totalPagar?.toLocaleString("es-CO", { style: "currency", currency: "COP" }) || "N/A";
+        }
+    };
+
     const tableRows = useMemo(() => ordenes.map((orden) => (
         <Tr key={orden.ordenCompraId}>
             <Td>{orden.ordenCompraId}</Td>
             <Td>{orden.proveedor?.nombre}</Td>
             <Td>{orden.fechaEmision ? new Date(orden.fechaEmision).toLocaleDateString() : ""}</Td>
             <Td>{orden.fechaVencimiento ? new Date(orden.fechaVencimiento).toLocaleDateString() : ""}</Td>
-            <Td>{orden.totalPagar?.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</Td>
+            <Td>{renderCellValue(orden)}</Td>
             <Td textAlign="center">
                 <Button size="sm" colorScheme="teal" onClick={() => onRegistrarIngreso(orden)}>
-                    Registrar Ingreso
+                    Gestionar
                 </Button>
             </Td>
         </Tr>
-    )), [ordenes]);
+    )), [ordenes, mostrarPorcentaje]); // Incluir mostrarPorcentaje en las dependencias
 
     return (
         <Box p="1em" bg="blue.50">
@@ -127,7 +152,7 @@ export default function StepZeroComponent_v2({
 
                 <Flex gap={4} wrap="wrap" alignItems="flex-end">
                     <ProveedorFilterOCM
-                        selectedProveedor={proveedor}
+                        selectedProveedor={proveedor as import("../../Compras/types").Proveedor | null}
                         onOpenPicker={onOpen}
                         onClearFilter={() => setProveedor(null)}
                     />
@@ -168,7 +193,24 @@ export default function StepZeroComponent_v2({
                                 <Th>Proveedor</Th>
                                 <Th>Fecha emisión</Th>
                                 <Th>Fecha vencimiento</Th>
-                                <Th>Total</Th>
+                                <Th>
+                                    <HStack spacing={2} justify="space-between" width="100%">
+                                        <span>{mostrarPorcentaje ? "Porcentaje recibido" : "Total"}</span>
+                                        <Tooltip 
+                                            label={mostrarPorcentaje ? "Mostrar precio total" : "Mostrar porcentaje recibido"}
+                                            placement="top"
+                                        >
+                                            <IconButton
+                                                aria-label={mostrarPorcentaje ? "Mostrar precio total" : "Mostrar porcentaje recibido"}
+                                                icon={<RepeatIcon />}
+                                                size="xs"
+                                                variant="ghost"
+                                                onClick={() => setMostrarPorcentaje(!mostrarPorcentaje)}
+                                                colorScheme="teal"
+                                            />
+                                        </Tooltip>
+                                    </HStack>
+                                </Th>
                                 <Th textAlign="center">Acciones</Th>
                             </Tr>
                         </Thead>

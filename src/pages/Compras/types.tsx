@@ -111,6 +111,20 @@ export interface OrdenCompraMateriales {
     estado: number;
     divisas?: DIVISAS;  // COP or USD
     trm?: number;       // Exchange rate
+    /**
+     * Porcentaje estimado de materiales recibidos para esta orden de compra.
+     * Calculado dinámicamente por el backend cuando se consultan OCMs pendientes.
+     * 
+     * Valores posibles:
+     * - undefined/null: No se ha calculado (cuando se obtiene de otros endpoints)
+     * - 0.0: No se ha recibido nada
+     * - 0.0 a 100.0: Porcentaje de recepción normal
+     * - > 100.0: Se ha recibido más de lo ordenado (caso válido)
+     * 
+     * Solo está disponible cuando se consulta a través de:
+     * GET /ingresos_almacen/ocms_pendientes_ingreso
+     */
+    porcentajeRecibido?: number;
 }
 
 

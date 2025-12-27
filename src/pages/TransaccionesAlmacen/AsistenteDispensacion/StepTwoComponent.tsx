@@ -11,25 +11,50 @@ import {
     Thead,
     Tr
 } from '@chakra-ui/react';
-import {DispensacionDTO} from '../types';
-
-interface InsumoDesglosadoDTO {
-    productoId: string;
-    productoNombre: string;
-    cantidadTotalRequerida: number;
-    tipoUnidades: string;
-    tipoProducto: string;
-}
+import {useState} from 'react';
+import {DispensacionDTO, InsumoDesglosado, LoteSeleccionado} from '../types';
+import {LotePickerDispensacion} from './AsistenteDispensacionComponents/LotePickerDispensacion';
 
 interface Props {
     setActiveStep: (step:number)=>void;
     dispensacion: DispensacionDTO | null;
     setDispensacion: (dto: DispensacionDTO) => void;
-    insumosDesglosados?: InsumoDesglosadoDTO[];
+    insumosDesglosados?: InsumoDesglosado[];
     ordenProduccionId?: number | null;
 }
 
 export default function StepTwoComponent({setActiveStep, dispensacion, setDispensacion, insumosDesglosados, ordenProduccionId}: Props){
+    // Estado para lotes seleccionados por material (key: productoId)
+    const [lotesPorMaterial, setLotesPorMaterial] = useState<Map<string, LoteSeleccionado[]>>(new Map());
+    const [modalAbierto, setModalAbierto] = useState<{productoId: string; productoNombre: string; cantidadRequerida: number} | null>(null);
+
+    const handleAbrirModal = (insumo: InsumoDesglosado) => {
+        setModalAbierto({
+            productoId: insumo.productoId,
+            productoNombre: insumo.productoNombre,
+            cantidadRequerida: insumo.cantidadTotalRequerida
+        });
+    };
+
+    const handleCerrarModal = () => {
+        setModalAbierto(null);
+    };
+
+    const handleAceptarLotes = (productoId: string, lotes: LoteSeleccionado[]) => {
+        const nuevoMap = new Map(lotesPorMaterial);
+        nuevoMap.set(productoId, lotes);
+        setLotesPorMaterial(nuevoMap);
+    };
+
+    const formatDate = (date: string | null | undefined): string => {
+        if (!date) return 'N/A';
+        try {
+            return new Date(date).toLocaleDateString('es-ES');
+        } catch {
+            return 'N/A';
+        }
+    };
+
     // Si hay insumos desglosados, mostrar esos; sino, usar el sistema anterior
     if(insumosDesglosados && insumosDesglosados.length > 0) {
         return (
@@ -47,7 +72,7 @@ export default function StepTwoComponent({setActiveStep, dispensacion, setDispen
                                     <Th>Nombre</Th>
                                     <Th>Cantidad Requerida</Th>
                                     <Th>Unidad</Th>
-                                    <Th>Tipo</Th>
+                                    <Th>Acción</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -58,15 +83,44 @@ export default function StepTwoComponent({setActiveStep, dispensacion, setDispen
                                         </Td>
                                     </Tr>
                                 ) : (
-                                    insumosDesglosados.map((insumo, idx) => (
-                                        <Tr key={insumo.productoId || idx}>
-                                            <Td>{insumo.productoId}</Td>
-                                            <Td>{insumo.productoNombre}</Td>
-                                            <Td>{insumo.cantidadTotalRequerida.toFixed(2)}</Td>
-                                            <Td>{insumo.tipoUnidades}</Td>
-                                            <Td>{insumo.tipoProducto}</Td>
-                                        </Tr>
-                                    ))
+                                    insumosDesglosados.map((insumo, idx) => {
+                                        const lotesSeleccionados = lotesPorMaterial.get(insumo.productoId) || [];
+                                        return (
+                                            <>
+                                                <Tr key={insumo.productoId || idx}>
+                                                    <Td>{insumo.productoId}</Td>
+                                                    <Td>{insumo.productoNombre}</Td>
+                                                    <Td>{insumo.cantidadTotalRequerida.toFixed(2)}</Td>
+                                                    <Td>{insumo.tipoUnidades}</Td>
+                                                    <Td>
+                                                        <Button
+                                                            size='sm'
+                                                            colorScheme='teal'
+                                                            onClick={() => handleAbrirModal(insumo)}
+                                                        >
+                                                            Definir Lotes
+                                                        </Button>
+                                                    </Td>
+                                                </Tr>
+                                                {/* Subrows para mostrar lotes seleccionados */}
+                                                {lotesSeleccionados.length > 0 && lotesSeleccionados.map((lote, loteIdx) => (
+                                                    <Tr key={`${insumo.productoId}-lote-${lote.loteId}`} bg='gray.50'>
+                                                        <Td></Td>
+                                                        <Td pl={8} fontSize='xs' color='gray.600'>
+                                                            └─ Lote: {lote.batchNumber}
+                                                        </Td>
+                                                        <Td fontSize='xs' color='gray.600'>
+                                                            {lote.cantidad.toFixed(2)}
+                                                        </Td>
+                                                        <Td fontSize='xs' color='gray.600'>
+                                                            {formatDate(lote.expirationDate)}
+                                                        </Td>
+                                                        <Td></Td>
+                                                    </Tr>
+                                                ))}
+                                            </>
+                                        );
+                                    })
                                 )}
                             </Tbody>
                         </Table>
@@ -76,6 +130,18 @@ export default function StepTwoComponent({setActiveStep, dispensacion, setDispen
                         <Button flex='1' colorScheme='teal' onClick={()=>setActiveStep(2)}>Continuar</Button>
                     </Flex>
                 </Flex>
+
+                {/* Modal para seleccionar lotes */}
+                {modalAbierto && (
+                    <LotePickerDispensacion
+                        isOpen={true}
+                        onClose={handleCerrarModal}
+                        onAccept={(lotes) => handleAceptarLotes(modalAbierto.productoId, lotes)}
+                        productoId={modalAbierto.productoId}
+                        productoNombre={modalAbierto.productoNombre}
+                        cantidadRequerida={modalAbierto.cantidadRequerida}
+                    />
+                )}
             </Box>
         );
     }

@@ -18,20 +18,12 @@ import {
 import {RepeatIcon} from '@chakra-ui/icons';
 import axios from 'axios';
 import EndPointsURL from '../../../api/EndPointsURL';
-import {DispensacionDTO, DispensacionFormularioDTO} from '../types';
-
-interface InsumoDesglosadoDTO {
-    productoId: string;
-    productoNombre: string;
-    cantidadTotalRequerida: number;
-    tipoUnidades: string;
-    tipoProducto: string;
-}
+import {DispensacionDTO, DispensacionFormularioDTO, InsumoDesglosado} from '../types';
 
 interface Props {
     setActiveStep: (step:number) => void;
     setDispensacion: (dto: DispensacionDTO) => void;
-    setInsumosDesglosados?: (insumos: InsumoDesglosadoDTO[]) => void;
+    setInsumosDesglosados?: (insumos: InsumoDesglosado[]) => void;
     setOrdenProduccionId?: (id: number) => void;
 }
 
@@ -136,7 +128,7 @@ export default function StepOneComponentV2({setActiveStep, setDispensacion, setI
         try {
             // Llamar al nuevo endpoint para obtener insumos desglosados
             const endpoint = endpoints.insumos_desglosados_orden.replace('{ordenProduccionId}', ordenId.toString());
-            const resp = await axios.get<InsumoDesglosadoDTO[]>(endpoint, {withCredentials: true});
+            const resp = await axios.get<InsumoDesglosado[]>(endpoint, {withCredentials: true});
             
             // Almacenar los insumos desglosados y el ID de la orden
             if(setInsumosDesglosados) {

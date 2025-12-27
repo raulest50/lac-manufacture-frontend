@@ -12,10 +12,14 @@ import {
     Heading,
     Spinner,
     useToast,
+    Collapse,
+    IconButton,
+    Badge,
 } from '@chakra-ui/react';
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import axios from 'axios';
 
-import { TransaccionAlmacen } from '../../types';
+import { TransaccionAlmacen, MovimientoDetalle } from '../../types';
 import EndPointsURL from "../../../../api/EndPointsURL.tsx";
 
 interface ListaTransaccionesAlmacenProps {
@@ -26,6 +30,9 @@ export function ListaTransaccionesAlmacen({ ordenCompraId }: ListaTransaccionesA
     const [transacciones, setTransacciones] = useState<TransaccionAlmacen[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [expandedTransacciones, setExpandedTransacciones] = useState<Set<number>>(new Set());
+    const [movimientosPorTransaccion, setMovimientosPorTransaccion] = useState<Map<number, MovimientoDetalle[]>>(new Map());
+    const [loadingMovimientos, setLoadingMovimientos] = useState<Set<number>>(new Set());
     const toast = useToast();
     const endpoints = useMemo(() => new EndPointsURL(), []);
 
@@ -99,6 +106,66 @@ export function ListaTransaccionesAlmacen({ ordenCompraId }: ListaTransaccionesA
         }
     };
 
+    const formatDateShort = (dateString?: string) => {
+        if (!dateString) return '-';
+        try {
+            return new Date(dateString).toLocaleDateString('es-CO');
+        } catch {
+            return dateString;
+        }
+    };
+
+    const toggleTransaccion = async (transaccionId: number) => {
+        const isExpanded = expandedTransacciones.has(transaccionId);
+        
+        if (isExpanded) {
+            // Colapsar
+            setExpandedTransacciones(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(transaccionId);
+                return newSet;
+            });
+        } else {
+            // Expandir - cargar movimientos si no están cargados
+            setExpandedTransacciones(prev => new Set(prev).add(transaccionId));
+            
+            if (!movimientosPorTransaccion.has(transaccionId)) {
+                await fetchMovimientosPorTransaccion(transaccionId);
+            }
+        }
+    };
+
+    const fetchMovimientosPorTransaccion = async (transaccionId: number) => {
+        setLoadingMovimientos(prev => new Set(prev).add(transaccionId));
+        try {
+            const url = endpoints.movimientos_transaccion.replace('{transaccionId}', String(transaccionId));
+            const response = await axios.get<MovimientoDetalle[]>(url, {
+                withCredentials: true
+            });
+            
+            setMovimientosPorTransaccion(prev => {
+                const newMap = new Map(prev);
+                newMap.set(transaccionId, response.data || []);
+                return newMap;
+            });
+        } catch (error: any) {
+            console.error('Error fetching movimientos:', error);
+            toast({
+                title: 'Error al cargar movimientos',
+                description: 'No se pudieron cargar los movimientos de la transacción',
+                status: 'error',
+                duration: 3000,
+                isClosable: true
+            });
+        } finally {
+            setLoadingMovimientos(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(transaccionId);
+                return newSet;
+            });
+        }
+    };
+
     if (!ordenCompraId) {
         return null;
     }
@@ -133,52 +200,135 @@ export function ListaTransaccionesAlmacen({ ordenCompraId }: ListaTransaccionesA
                                 <Th># Movimientos</Th>
                                 <Th>Estado Contable</Th>
                                 <Th>Observaciones</Th>
+                                <Th textAlign="center">Acción</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {transacciones.map((transaccion) => (
-                                <Tr key={transaccion.transaccionId}>
-                                    <Td fontWeight="semibold">
-                                        {transaccion.transaccionId}
-                                    </Td>
-                                    <Td>{formatDate(transaccion.fechaTransaccion)}</Td>
-                                    <Td>{transaccion.movimientosTransaccion?.length || 0}</Td>
-                                    <Td>
-                                        <Text
-                                            fontSize="xs"
-                                            px={2}
-                                            py={1}
-                                            borderRadius="md"
-                                            display="inline-block"
-                                            bg={
-                                                transaccion.estadoContable === 'CONTABILIZADA'
-                                                    ? 'green.100'
-                                                    : transaccion.estadoContable === 'PENDIENTE'
-                                                    ? 'yellow.100'
-                                                    : 'gray.100'
-                                            }
-                                            color={
-                                                transaccion.estadoContable === 'CONTABILIZADA'
-                                                    ? 'green.800'
-                                                    : transaccion.estadoContable === 'PENDIENTE'
-                                                    ? 'yellow.800'
-                                                    : 'gray.800'
-                                            }
-                                        >
-                                            {transaccion.estadoContable || 'N/A'}
-                                        </Text>
-                                    </Td>
-                                    <Td>
-                                        <Text
-                                            fontSize="sm"
-                                            noOfLines={2}
-                                            maxW="300px"
-                                        >
-                                            {transaccion.observaciones || '-'}
-                                        </Text>
-                                    </Td>
-                                </Tr>
-                            ))}
+                            {transacciones.map((transaccion) => {
+                                const transaccionId = transaccion.transaccionId || 0;
+                                const isExpanded = expandedTransacciones.has(transaccionId);
+                                const movimientos = movimientosPorTransaccion.get(transaccionId) || [];
+                                const isLoadingMov = loadingMovimientos.has(transaccionId);
+                                
+                                return (
+                                    <>
+                                        <Tr key={transaccionId}>
+                                            <Td fontWeight="semibold">
+                                                {transaccionId}
+                                            </Td>
+                                            <Td>{formatDate(transaccion.fechaTransaccion)}</Td>
+                                            <Td>{transaccion.movimientosTransaccion?.length || 0}</Td>
+                                            <Td>
+                                                <Text
+                                                    fontSize="xs"
+                                                    px={2}
+                                                    py={1}
+                                                    borderRadius="md"
+                                                    display="inline-block"
+                                                    bg={
+                                                        transaccion.estadoContable === 'CONTABILIZADA'
+                                                            ? 'green.100'
+                                                            : transaccion.estadoContable === 'PENDIENTE'
+                                                            ? 'yellow.100'
+                                                            : 'gray.100'
+                                                    }
+                                                    color={
+                                                        transaccion.estadoContable === 'CONTABILIZADA'
+                                                            ? 'green.800'
+                                                            : transaccion.estadoContable === 'PENDIENTE'
+                                                            ? 'yellow.800'
+                                                            : 'gray.800'
+                                                    }
+                                                >
+                                                    {transaccion.estadoContable || 'N/A'}
+                                                </Text>
+                                            </Td>
+                                            <Td>
+                                                <Text
+                                                    fontSize="sm"
+                                                    noOfLines={2}
+                                                    maxW="300px"
+                                                >
+                                                    {transaccion.observaciones || '-'}
+                                                </Text>
+                                            </Td>
+                                            <Td textAlign="center">
+                                                <IconButton
+                                                    aria-label={isExpanded ? "Ocultar detalles" : "Mostrar detalles"}
+                                                    icon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => toggleTransaccion(transaccionId)}
+                                                    isLoading={isLoadingMov}
+                                                />
+                                            </Td>
+                                        </Tr>
+                                        {isExpanded && (
+                                            <Tr>
+                                                <Td colSpan={6} p={0}>
+                                                    <Collapse in={isExpanded} animateOpacity>
+                                                        <Box p={4} bg="gray.50" borderTopWidth="1px">
+                                                            {isLoadingMov ? (
+                                                                <Flex justify="center" align="center" py={4}>
+                                                                    <Spinner size="md" />
+                                                                </Flex>
+                                                            ) : movimientos.length === 0 ? (
+                                                                <Text fontSize="sm" color="gray.600" textAlign="center" py={4}>
+                                                                    No hay movimientos registrados para esta transacción
+                                                                </Text>
+                                                            ) : (
+                                                                <>
+                                                                    <Text fontWeight="bold" mb={3} fontSize="sm">
+                                                                        Materiales Recibidos en esta Transacción
+                                                                    </Text>
+                                                                    <Table size="sm" variant="simple" bg="white">
+                                                                        <Thead>
+                                                                            <Tr>
+                                                                                <Th>Material</Th>
+                                                                                <Th>ID Producto</Th>
+                                                                                <Th>Lote (Batch)</Th>
+                                                                                <Th>Cantidad</Th>
+                                                                                <Th>Fecha Vencimiento</Th>
+                                                                            </Tr>
+                                                                        </Thead>
+                                                                        <Tbody>
+                                                                            {movimientos.map((movimiento, idx) => (
+                                                                                <Tr key={movimiento.movimientoId || idx}>
+                                                                                    <Td>{movimiento.productoNombre || '-'}</Td>
+                                                                                    <Td>{movimiento.productoId || '-'}</Td>
+                                                                                    <Td>
+                                                                                        {movimiento.batchNumber ? (
+                                                                                            <Badge colorScheme="teal" fontSize="xs">
+                                                                                                {movimiento.batchNumber}
+                                                                                            </Badge>
+                                                                                        ) : (
+                                                                                            <Badge colorScheme="gray" fontSize="xs">
+                                                                                                Sin lote
+                                                                                            </Badge>
+                                                                                        )}
+                                                                                    </Td>
+                                                                                    <Td>
+                                                                                        {movimiento.cantidad} {movimiento.tipoUnidades || ''}
+                                                                                    </Td>
+                                                                                    <Td>
+                                                                                        {movimiento.expirationDate 
+                                                                                            ? formatDateShort(movimiento.expirationDate)
+                                                                                            : '-'}
+                                                                                    </Td>
+                                                                                </Tr>
+                                                                            ))}
+                                                                        </Tbody>
+                                                                    </Table>
+                                                                </>
+                                                            )}
+                                                        </Box>
+                                                    </Collapse>
+                                                </Td>
+                                            </Tr>
+                                        )}
+                                    </>
+                                );
+                            })}
                         </Tbody>
                     </Table>
                 </Box>

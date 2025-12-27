@@ -28,7 +28,7 @@ export default function StepOneComponent({setActiveStep, setDispensacion}: Props
             return;
         }
         try{
-            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion/sugerida?ordenProduccionId=${opId}`;
+            const endpoint = `${EndPointsURL.getDomain()}/salidas_almacen/formulario_dispensacion_sugerida?ordenProduccionId=${opId}`;
             const resp = await axios.get<DispensacionDTO>(endpoint,{withCredentials:true});
             setDispensacion(resp.data);
             setActiveStep(1);

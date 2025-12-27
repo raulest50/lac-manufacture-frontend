@@ -43,7 +43,8 @@ export default function StepTwoComponent({items, setItems, setViewMode}: Props){
                 usuarioId: parseInt(user ?? '0'),
                 items: items.map(it=>({productoId: it.material.productoId.toString(), cantidad: it.cantidad, loteId: it.loteId ?? undefined}))
             };
-            const endpoint = `${EndPointsURL.getDomain()}/movimientos/dispensacion-no-planificada`;
+            const endpoints = new EndPointsURL();
+            const endpoint = endpoints.dispensacion_no_planificada;
             await axios.post(endpoint, dto, {withCredentials:true});
             toast({title:'Dispensación registrada', status:'success', duration:3000, isClosable:true});
             setViewMode(0);

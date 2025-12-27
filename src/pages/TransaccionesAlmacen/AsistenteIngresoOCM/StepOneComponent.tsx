@@ -14,11 +14,17 @@ import {
     Tbody,
     Tr,
     Th,
+    HStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { OrdenCompra, ItemOrdenCompra, IngresoOCM_DTA, TipoEntidadCausante, Movimiento } from "../types";
+import { useEffect, useState, useMemo } from "react";
+import { OrdenCompra, ItemOrdenCompra, IngresoOCM_DTA, TipoEntidadCausante, Movimiento, TransaccionAlmacen } from "../types";
 import { CardIngresoMaterial } from "./componentes/CardIngresoMaterial";
 import { ListaTransaccionesAlmacen } from "./StepTwoComponent_IngOCM/ListaTransaccionesAlmacen";
+import { ListaMaterialesIngresoDesgloce } from "./StepTwoComponent_IngOCM/ListaMaterialesIngresoDesgloce";
+import { CerrarOrdenDialog } from "./StepTwoComponent_IngOCM/CerrarOrdenDialog";
+import { useDisclosure } from "@chakra-ui/react";
+import axios from "axios";
+import EndPointsURL from "../../../api/EndPointsURL";
 
 interface StepOneComponentProps {
     setActiveStep: (step: number) => void;
@@ -32,6 +38,8 @@ export default function StepOneComponent({
     setIngresoOCM_DTA,
 }: StepOneComponentProps) {
     const toast = useToast();
+    const endpoints = useMemo(() => new EndPointsURL(), []);
+    const { isOpen: isDialogOpen, onOpen: onDialogOpen, onClose: onDialogClose } = useDisclosure();
 
     // Token management
     const [token, setToken] = useState<string>("");
@@ -42,6 +50,53 @@ export default function StepOneComponent({
 
     // Materiales excluidos de la recepción
     const [materialesExcluidos, setMaterialesExcluidos] = useState<{[key: number]: boolean}>({});
+
+    // Estado para transacciones (entregas parciales)
+    const [transacciones, setTransacciones] = useState<TransaccionAlmacen[]>([]);
+    const [loadingTransacciones, setLoadingTransacciones] = useState(false);
+
+    // Consultar transacciones cuando cambia la orden
+    useEffect(() => {
+        if (!orden?.ordenCompraId) {
+            setTransacciones([]);
+            return;
+        }
+
+        const fetchTransacciones = async () => {
+            setLoadingTransacciones(true);
+            try {
+                const response = await axios.get<TransaccionAlmacen[]>(
+                    endpoints.consulta_transacciones_ocm,
+                    {
+                        withCredentials: true,
+                        params: {
+                            page: 0,
+                            size: 100,
+                            ordenCompraId: orden.ordenCompraId,
+                        },
+                    }
+                );
+                setTransacciones(response.data || []);
+            } catch (error: any) {
+                console.error('Error fetching transacciones:', error);
+                // Si el endpoint no está disponible (405), simplemente no mostrar transacciones
+                if (error.response?.status !== 405) {
+                    toast({
+                        title: 'Error al cargar transacciones',
+                        description: 'No se pudieron cargar las transacciones de almacén.',
+                        status: 'warning',
+                        duration: 3000,
+                        isClosable: true,
+                    });
+                }
+                setTransacciones([]);
+            } finally {
+                setLoadingTransacciones(false);
+            }
+        };
+
+        fetchTransacciones();
+    }, [orden?.ordenCompraId, endpoints, toast]);
 
     // Initialize token whenever `orden` changes
     useEffect(() => {
@@ -251,6 +306,9 @@ export default function StepOneComponent({
                 {/* Lista de transacciones de almacén */}
                 <ListaTransaccionesAlmacen ordenCompraId={orden.ordenCompraId} />
 
+                {/* Consolidado de materiales recibidos */}
+                <ListaMaterialesIngresoDesgloce ordenCompraId={orden.ordenCompraId} />
+
                 {/* Token Input */}
                 <FormControl w="40%" isRequired>
                     <FormLabel>Token de verificación</FormLabel>
@@ -266,18 +324,39 @@ export default function StepOneComponent({
                     Token: <strong>{token}</strong>
                 </Text>
 
-                {/* Continuar */}
+                {/* Continuar y Cerrar Orden */}
                 <Flex w="40%">
-                    <Button
-                        colorScheme="teal"
-                        w="full"
-                        isDisabled={!movimientosValidos()}
-                        onClick={onClickContinuar}
-                    >
-                        Continuar
-                    </Button>
+                    <HStack spacing={4} w="full">
+                        <Button
+                            colorScheme="teal"
+                            flex="1"
+                            isDisabled={!movimientosValidos()}
+                            onClick={onClickContinuar}
+                        >
+                            Continuar
+                        </Button>
+                        {/* Botón Cerrar Orden - solo se muestra si hay al menos una entrega parcial */}
+                        {transacciones.length > 0 && (
+                            <Button
+                                colorScheme="red"
+                                variant="outline"
+                                onClick={onDialogOpen}
+                                isDisabled={loadingTransacciones}
+                            >
+                                Cerrar Orden
+                            </Button>
+                        )}
+                    </HStack>
                 </Flex>
             </Flex>
+
+            {/* Modal para cerrar orden */}
+            <CerrarOrdenDialog
+                isOpen={isDialogOpen}
+                onClose={onDialogClose}
+                orden={orden}
+                setActiveStep={setActiveStep}
+            />
         </Box>
     );
 }

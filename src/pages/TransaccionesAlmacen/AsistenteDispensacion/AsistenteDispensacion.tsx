@@ -5,15 +5,7 @@ import StepOneComponent from './StepOneComponent';
 import StepOneComponentV2 from './StepOneComponent_v2';
 import StepTwoComponent from './StepTwoComponent';
 import StepThreeComponent from './StepThreeComponent';
-import {DispensacionDTO} from '../types';
-
-interface InsumoDesglosadoDTO {
-    productoId: string;
-    productoNombre: string;
-    cantidadTotalRequerida: number;
-    tipoUnidades: string;
-    tipoProducto: string;
-}
+import {DispensacionDTO, InsumoDesglosado} from '../types';
 
 const steps = [
     {title:'Primero', description:'Identificar Orden'},
@@ -24,7 +16,7 @@ const steps = [
 export function AsistenteDispensacion(){
     const {activeStep, setActiveStep} = useSteps({index:0, count:steps.length});
     const [dispensacion, setDispensacion] = useState<DispensacionDTO | null>(null);
-    const [insumosDesglosados, setInsumosDesglosados] = useState<InsumoDesglosadoDTO[]>([]);
+    const [insumosDesglosados, setInsumosDesglosados] = useState<InsumoDesglosado[]>([]);
     const [ordenProduccionId, setOrdenProduccionId] = useState<number | null>(null);
 
     const renderStep = () => {

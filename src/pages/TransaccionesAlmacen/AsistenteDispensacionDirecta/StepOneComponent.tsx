@@ -40,7 +40,8 @@ export default function StepOneComponent({setViewMode, setDispensacion}: Props){
         }
         try{
             const reqItems = items.map(it=>({productoId: it.material.productoId.toString(), cantidad: it.cantidad}));
-            const endpoint = `${EndPointsURL.getDomain()}/movimientos/recomendar-lotes-multiple`;
+            const endpoints = new EndPointsURL();
+            const endpoint = endpoints.recomendar_lotes_multiple;
             const resp = await axios.post<DispensacionNoPlanificadaDTO>(endpoint, {items: reqItems}, {withCredentials:true});
             const matMap = new Map(items.map(it=>[it.material.productoId.toString(), it.material]));
             const detalle: DispensacionDirectaDetalleItem[] = resp.data.items.map(it=>({
