@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, CheckboxGroup, Flex, IconButton, Input, Stack, Table, Text, Field } from "@chakra-ui/react";
+import { Box, Button, Checkbox, CheckboxGroup, Flex, IconButton, Input, Stack, Table, Text, Field, Fieldset } from "@chakra-ui/react";
 import MyPagination from "../../../components/MyPagination.tsx";
 import { Producto } from "../../Productos/types.tsx";
 import { LuPlus, LuTrash2 } from 'react-icons/lu';
@@ -69,13 +69,14 @@ export default function AjustesInventarioStep0SelectProducts({
                             />
                         </Field.Root>
 
-                        <Field.Root flex={1}>
-                            <Field.Label>Categorías:</Field.Label>
+                        <Fieldset.Root flex={1}>
                             <CheckboxGroup
+                                name="categories"
                                 colorPalette={"green"}
                                 value={chkbox}
                                 onValueChange={(values) => setChkbox(values as string[])}
                             >
+                                <Fieldset.Legend>Categorías:</Fieldset.Legend>
                                 <Stack
                                     gap={[2, 3]}
                                     direction={"column"}
@@ -91,7 +92,7 @@ export default function AjustesInventarioStep0SelectProducts({
                                     <Checkbox.Root value={"terminado"}><Checkbox.HiddenInput /><Checkbox.Control><Checkbox.Indicator /></Checkbox.Control><Checkbox.Label>Producto Terminado</Checkbox.Label></Checkbox.Root>
                                 </Stack>
                             </CheckboxGroup>
-                        </Field.Root>
+                        </Fieldset.Root>
                     </Flex>
 
                     <Flex justifyContent={{ base: "stretch", xl: "flex-start" }}>
