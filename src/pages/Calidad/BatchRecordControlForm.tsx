@@ -15,10 +15,8 @@ import {
 import { useAppToast } from "@/components/ui/use-app-toast";
 import { useEffect, useState } from "react";
 import { extractApiError, guardarEjecucion, prepararEjecucion } from "./calidadApi";
-import {
-    buildDraftNumericControlGroup,
-    ControlProcesoNumericChart,
-} from "./charts/ControlProcesoNumericCharts";
+import { ControlProcesoNumericChart } from "./charts/ControlProcesoNumericCharts";
+import { buildDraftNumericControlGroup } from "./charts/controlProcesoNumericData";
 import type {
     BatchRecordEtapaControl,
     CaracteristicaResponse,

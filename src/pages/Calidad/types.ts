@@ -1,3 +1,10 @@
+import type {
+    BatchRecordDetail,
+    BatchRecordSolicitudReapertura,
+    EstadoBatchRecord,
+    EstadoCalidadLote,
+} from "../Produccion/BatchRecords/types";
+
 export type EstadoControlProcesoPlantilla = "BORRADOR" | "VIGENTE" | "RETIRADA";
 export type TipoCaracteristicaControlProceso = "NUMERICA" | "BOOLEANA";
 export type ResultadoControlProceso = "CONFORME" | "NO_CONFORME";
@@ -132,25 +139,52 @@ export interface PageResponse<T> {
     size: number;
 }
 
+export interface ResumenControlesBatchRecord {
+    batchRecordId: number;
+    total: number;
+    pendientes: number;
+    conformes: number;
+    noConformes: number;
+    aceptadosPorDesviacion: number;
+    porRevalidar: number;
+    desviacionesAbiertas: number;
+}
+
+export interface BloqueoControlBatchRecord {
+    controlRequeridoId: number;
+    planCodigo: string;
+    planNombre: string;
+    ambito: "PROCESO" | "CALIDAD";
+    estado: "PENDIENTE" | "CONFORME" | "NO_CONFORME" | "ACEPTADO_POR_DESVIACION" | "POR_REVALIDAR";
+    puntoExigencia: "INFORMATIVO" | "CIERRE_ETAPA" | "ENVIO_CALIDAD" | "LIBERACION";
+    mensaje: string;
+}
+
 export interface BatchRecordQualityInboxItem {
     batchRecordId: number;
     codigo: string;
-    estado: string;
-    ordenProduccionId: number;
+    estado: EstadoBatchRecord;
+    ordenProduccionId?: number | null;
+    ordenFabricacionId?: number | null;
     loteId: number;
     lote: string;
-    estadoCalidadLote: string;
+    estadoCalidadLote: EstadoCalidadLote;
     productoId: string;
     productoNombre: string;
-    cantidadObtenida: number;
+    cantidadObtenida: number | null;
     unidadMedida: string;
-    enviadoRevisionEn: string;
+    enviadoRevisionEn?: string | null;
+    cicloRevisionActual: number;
+    estadoCicloRevision?: "EN_REVISION" | "DEVUELTO_PRODUCCION" | "LIBERADO" | "RECHAZADO" | "MIGRADO_INCOMPLETO" | null;
+    origenCicloRevision?: "ENVIO_INICIAL" | "REENVIO" | "REENVIO_TRAS_REAPERTURA" | null;
     controlesRequeridos: number;
     controlesConformes: number;
     controlesPendientes: number;
     desviacionesAbiertas: number;
+    resumenControles: ResumenControlesBatchRecord;
     puedeLiberar: boolean;
     bloqueos: string[];
+    bloqueosControl: BloqueoControlBatchRecord[];
 }
 
 export interface BatchRecordEtapaControl {
@@ -167,8 +201,35 @@ export interface BatchRecordEtapaControl {
     pendiente: boolean;
 }
 
+export interface BatchRecordControlRevision {
+    requisitoId: number;
+    planCodigo: string;
+    planNombre: string;
+    versionNumero: number;
+    ambito: "PROCESO" | "CALIDAD";
+    estado: "PENDIENTE" | "CONFORME" | "NO_CONFORME" | "ACEPTADO_POR_DESVIACION" | "POR_REVALIDAR";
+    origen: "BATCH_RECORD" | "INDEPENDIENTE" | "LEGACY";
+    puntoAplicacion: "LOTE_FINAL" | "SALIDA_OPERACION";
+    momento: "DURANTE_FABRICACION" | "REVISION_FINAL";
+    puntoExigencia: "INFORMATIVO" | "CIERRE_ETAPA" | "ENVIO_CALIDAD" | "LIBERACION";
+    etapaId?: number | null;
+    etapaNombre?: string | null;
+    areaId?: number | null;
+    areaNombre?: string | null;
+    requiereRepeticion: boolean;
+    requiereRevalidacion: boolean;
+    ultimaEjecucionId?: number | null;
+    ultimaEjecucionResultado?: ResultadoControlProceso | null;
+    ultimaEjecucionFecha?: string | null;
+    ultimaEjecucionUsuario?: string | null;
+    legacyEjecucionId?: number | null;
+}
+
+export type SolicitudReaperturaRechazo = BatchRecordSolicitudReapertura;
+
 export interface BatchRecordQualityReviewDetail {
-    expediente: import("../Produccion/BatchRecords/types").BatchRecordDetail;
+    expediente: BatchRecordDetail;
     evaluacion: BatchRecordQualityInboxItem;
+    controlesProceso: BatchRecordControlRevision[];
     controles: BatchRecordEtapaControl[];
 }

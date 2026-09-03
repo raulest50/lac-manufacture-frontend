@@ -14,10 +14,10 @@ export function useAccesosReady() {
 }
 
 export function useAccessSnapshot(): AccessSnapshot {
-    const { moduloAccesos, isMasterLike, isAreaResponsable, areaResponsable } = useAuth();
+    const { user, moduloAccesos, isMasterLike, isAreaResponsable, areaResponsable } = useAuth();
     return useMemo(
-        () => ({ moduloAccesos, isMasterLike, isAreaResponsable, areaResponsable }),
-        [moduloAccesos, isMasterLike, isAreaResponsable, areaResponsable]
+        () => ({ username: user, moduloAccesos, isMasterLike, isAreaResponsable, areaResponsable }),
+        [user, moduloAccesos, isMasterLike, isAreaResponsable, areaResponsable]
     );
 }
 

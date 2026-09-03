@@ -123,7 +123,15 @@ export default function OrdenesFabricacionTab() {
         }
     };
 
-    useEffect(() => { void cargar(); }, []);
+    useEffect(() => {
+        let mounted = true;
+        setLoading(true);
+        buscarOrdenesFabricacion("", 0)
+            .then((next) => mounted && setPage(next))
+            .catch((error) => mounted && toast({ title: "No fue posible consultar las OF", description: apiError(error), status: "error" }))
+            .finally(() => mounted && setLoading(false));
+        return () => { mounted = false; };
+    }, [toast]);
 
     const buscarSemis = async () => {
         try {

@@ -20,9 +20,13 @@ export const TABS_BY_MODULO: Record<Modulo, TabDefinition[]> = {
         tab("APROBACION_MPS_WEEK", "Aprobación del MPS"),
         tab("CREAR_ODP_MANUALMENTE", "Nueva ODP"),
         tab("CREAR_ORDEN_FABRICACION", "Órdenes de fabricación", 2),
+        tab("PLANES_CONTROL_PROCESO", "Planes de control de proceso", 3),
+        tab("REGISTRAR_CONTROL_PROCESO", "Registro de controles de proceso", 2),
+        tab("DESVIACIONES_CONTROL_PROCESO", "Desviaciones de proceso", 2),
+        tab("HISTORIAL_CONTROL_PROCESO", "Historial de controles de proceso", 1),
         tab("MONITOREAR_AREAS_OPERATIVAS", "Monitoreo operativo"),
         tab("HISTORIAL", "Historial de ODP"),
-        tab("CONSULTAR_BATCH_RECORD", "Expedientes digitales", 1),
+        tab("CONSULTAR_BATCH_RECORD", "Expedientes digitales", 2),
         tab("PARAMETROS_POR_CATEGORIA", "Parámetros y rutas"),
     ],
     [Modulo.STOCK]: [
@@ -95,9 +99,10 @@ export const TABS_BY_MODULO: Record<Modulo, TabDefinition[]> = {
         tab("MISION_VISION", "Mision y Vision"),
     ],
     [Modulo.CALIDAD]: [
-        tab("VERSIONADO_CONTROL_PROCESO", "Versionado Control de Proceso"),
-        tab("DILIGENCIAR_CONTROL_PROCESO", "Diligenciar Control de Proceso"),
-        tab("HISTORIAL_CONTROL_PROCESO", "Historial Control de Proceso"),
+        tab("PLANES_CONTROL_CALIDAD", "Planes de control de calidad", 3),
+        tab("REGISTRAR_CONTROL_CALIDAD", "Registro de ensayos", 2),
+        tab("DESVIACIONES_CONTROL_CALIDAD", "Desviaciones de calidad", 3),
+        tab("HISTORIAL_CONTROL_CALIDAD", "Historial de ensayos", 1),
         tab("REVISION_LIBERACION_LOTES", "Revision y Liberacion de Lotes", 3),
     ],
     [Modulo.PAGOS_PROVEEDORES]: [

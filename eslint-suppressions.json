@@ -162,11 +162,6 @@
       "count": 8
     }
   },
-  "src/pages/Bintelligence/InformeProduccionAreasSection.tsx": {
-    "react-hooks/exhaustive-deps": {
-      "count": 2
-    }
-  },
   "src/pages/Clientes/CodificarCliente.tsx": {
     "@typescript-eslint/no-explicit-any": {
       "count": 1

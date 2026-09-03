@@ -19,10 +19,8 @@ import {
     searchLotesProduccion,
 } from "./calidadApi";
 import CalidadAreaOperativaPicker from "./CalidadAreaOperativaPicker";
-import {
-    buildDraftNumericControlGroup,
-    ControlProcesoNumericChart,
-} from "./charts/ControlProcesoNumericCharts";
+import { ControlProcesoNumericChart } from "./charts/ControlProcesoNumericCharts";
+import { buildDraftNumericControlGroup } from "./charts/controlProcesoNumericData";
 import type {
     AreaOperativaOption,
     CaracteristicaResponse,

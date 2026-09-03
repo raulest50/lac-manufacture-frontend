@@ -1,86 +1,102 @@
-import { Alert, Container, Tabs } from "@chakra-ui/react";
-import MyHeader from "../../components/MyHeader";
-import { my_style_tab } from "../../styles/styles_general";
-import { useAccessSnapshot } from "../../auth/usePermissions";
-import { getExactTabNivel, tabAccessRule } from "../../auth/accessHelpers";
+import { Container } from "@chakra-ui/react";
+import { useMemo } from "react";
+
+import { getExactTabNivel } from "../../auth/accessHelpers";
 import type { AccessRule } from "../../auth/accessModel";
-import { Modulo } from "../Usuarios/GestionUsuarios/types";
-import VersionadoControlProcesoTab from "./VersionadoControlProcesoTab";
-import DiligenciarControlProcesoTab from "./DiligenciarControlProcesoTab";
-import HistorialControlProcesoTab from "./HistorialControlProcesoTab";
-import LiberacionLotesTab from "./LiberacionLotesTab";
-import { useMasterDirectives } from "../../context/MasterDirectivesContext";
+import { useAccessSnapshot } from "../../auth/usePermissions";
+import ModuleGroupedTabs, { type ModuleTabGroup } from "../../components/ModuleGroupedTabs";
+import MyHeader from "../../components/MyHeader";
 import {
     BATCH_RECORD_WORKFLOW_ENABLED_DEFAULT,
     MASTER_DIRECTIVE_KEYS,
 } from "../../context/masterDirectiveConstants";
+import { useMasterDirectives } from "../../context/MasterDirectivesContext";
+import { Modulo } from "../Usuarios/GestionUsuarios/types";
+import {
+    DesviacionesControlCalidadTab,
+    HistorialControlesCalidadTab,
+    PendientesControlCalidadTab,
+    PlanesControlCalidadTab,
+} from "./ControlCalidad/ControlCalidadTabs";
+import LiberacionLotesTab from "./LiberacionLotesTab";
 
-import type { JSX } from "react";
+const exactQualityTabAccessRule = (tabId: string, includeSuperMaster = true): AccessRule => (
+    (snapshot) => (includeSuperMaster && snapshot.username?.toLowerCase() === "super_master") || (getExactTabNivel(
+        snapshot.moduloAccesos,
+        Modulo.CALIDAD,
+        tabId,
+    ) ?? 0) >= 1
+);
 
 export default function CalidadPage() {
     const access = useAccessSnapshot();
     const { loading: directivesLoading, getBooleanDirective } = useMasterDirectives();
-    const batchRecordWorkflowEnabled = !directivesLoading && getBooleanDirective(
+    const workflowEnabled = !directivesLoading && getBooleanDirective(
         MASTER_DIRECTIVE_KEYS.BATCH_RECORD_WORKFLOW_ENABLED,
         BATCH_RECORD_WORKFLOW_ENABLED_DEFAULT,
     );
 
-    const tabs: Array<{ key: string; label: string; render: () => JSX.Element; accesoValido: AccessRule }> = [
+    const groups = useMemo<ModuleTabGroup[]>(() => [
         {
-            key: "versionado-control-proceso",
-            label: "Versionado Control de Proceso",
-            render: () => <VersionadoControlProcesoTab />,
-            accesoValido: tabAccessRule(Modulo.CALIDAD, "VERSIONADO_CONTROL_PROCESO", 1),
-        },
-        {
-            key: "diligenciar-control-proceso",
-            label: "Diligenciar Control de Proceso",
-            render: () => <DiligenciarControlProcesoTab />,
-            accesoValido: tabAccessRule(Modulo.CALIDAD, "DILIGENCIAR_CONTROL_PROCESO", 1),
-        },
-        {
-            key: "historial-control-proceso",
-            label: "Historial Control de Proceso",
-            render: () => <HistorialControlProcesoTab />,
-            accesoValido: tabAccessRule(Modulo.CALIDAD, "HISTORIAL_CONTROL_PROCESO", 1),
+            key: "control-calidad",
+            label: "Control de calidad",
+            tabs: [
+                {
+                    key: "planes-calidad",
+                    label: "Planes de ensayo",
+                    render: () => <PlanesControlCalidadTab />,
+                    accessRule: exactQualityTabAccessRule("PLANES_CONTROL_CALIDAD"),
+                },
+                {
+                    key: "pendientes-calidad",
+                    label: "Ensayos pendientes",
+                    render: () => <PendientesControlCalidadTab />,
+                    accessRule: exactQualityTabAccessRule("REGISTRAR_CONTROL_CALIDAD", false),
+                },
+                {
+                    key: "desviaciones-calidad",
+                    label: "Desviaciones",
+                    render: () => <DesviacionesControlCalidadTab />,
+                    accessRule: exactQualityTabAccessRule("DESVIACIONES_CONTROL_CALIDAD", false),
+                },
+                {
+                    key: "historial-calidad",
+                    label: "Historial de ensayos",
+                    render: () => <HistorialControlesCalidadTab />,
+                    accessRule: exactQualityTabAccessRule("HISTORIAL_CONTROL_CALIDAD", false),
+                },
+            ],
         },
         {
             key: "liberacion-lotes",
-            label: "Revisión y Liberación de Lotes",
-            render: () => <LiberacionLotesTab />,
-            accesoValido: (snapshot) => (getExactTabNivel(
-                snapshot.moduloAccesos,
-                Modulo.CALIDAD,
-                "REVISION_LIBERACION_LOTES",
-            ) ?? 0) >= 1,
+            label: "Liberación de lotes",
+            tabs: [
+                {
+                    key: "revision-liberacion",
+                    label: "Revisión y liberación",
+                    render: () => <LiberacionLotesTab workflowEnabled={workflowEnabled} />,
+                    // La visibilidad conserva el permiso explícito; ser master-like no concede decisiones GxP.
+                    accessRule: exactQualityTabAccessRule("REVISION_LIBERACION_LOTES", false),
+                },
+            ],
         },
-    ];
-
-    const visibleTabs = tabs.filter((tab) =>
-        tab.accesoValido(access)
-        && (tab.key !== "liberacion-lotes" || batchRecordWorkflowEnabled)
-    );
+    ], [workflowEnabled]);
 
     return (
-        <Container minW={["auto", "container.lg", "container.xl"]} w="full" h="full">
+        <Container
+            w="full"
+            maxW={{ base: "100%", xl: "container.xl", "2xl": "container.2xl" }}
+            px={{ base: 2, md: 4, xl: 6 }}
+            mx="auto"
+            h="full"
+        >
             <MyHeader title="Calidad" />
-            {visibleTabs.length === 0 ? (
-                <Alert.Root status="warning">
-                    <Alert.Indicator />
-                    No tiene tabs habilitados para este modulo.
-                </Alert.Root>
-            ) : (
-                <Tabs.Root defaultValue={visibleTabs[0]?.key}>
-                    <Tabs.List>
-                        {visibleTabs.map((tab) => (
-                            <Tabs.Trigger key={tab.key} value={tab.key} css={my_style_tab}>{tab.label}</Tabs.Trigger>
-                        ))}
-                    </Tabs.List>
-                    {visibleTabs.map((tab) => (
-                        <Tabs.Content key={tab.key} value={tab.key}>{tab.render()}</Tabs.Content>
-                    ))}
-                </Tabs.Root>
-            )}
+            <ModuleGroupedTabs
+                groups={groups}
+                access={access}
+                ariaLabel="Secciones de Calidad"
+                emptyMessage="No tienes opciones de Calidad habilitadas."
+            />
         </Container>
     );
 }

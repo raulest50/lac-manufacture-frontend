@@ -123,6 +123,7 @@ export async function detalleEjecucion(id: number): Promise<EjecucionDetalleResp
 }
 
 export async function buscarBatchRecordsCalidad(params: {
+    scope?: "pendientes" | "archivo";
     search?: string;
     page?: number;
     size?: number;
@@ -157,10 +158,40 @@ export async function decidirBatchRecordCalidad(
     id: number,
     decision: DecisionCalidadBatchRecord,
     motivo: string,
+    alcance: {
+        etapaIds?: number[];
+        requisitoIds?: number[];
+        seccionesDocumentales?: string[];
+    } = {},
 ): Promise<BatchRecordQualityReviewDetail> {
     const response = await axios.post<BatchRecordQualityReviewDetail>(
-        `${endpoints.calidad_batch_records}/${id}/decision`,
-        { decision, motivo },
+        `${endpoints.calidad_batch_records}/${id}/decisiones`,
+        { decision, motivo, ...alcance },
+        axiosOptions,
+    );
+    return response.data;
+}
+
+export async function solicitarReaperturaBatchRecord(
+    id: number,
+    request: { motivo: string; evidencia: string; alcance: string },
+): Promise<BatchRecordQualityReviewDetail> {
+    const response = await axios.post<BatchRecordQualityReviewDetail>(
+        `${endpoints.calidad_batch_records}/${id}/reaperturas`,
+        request,
+        axiosOptions,
+    );
+    return response.data;
+}
+
+export async function aprobarReaperturaBatchRecord(
+    id: number,
+    solicitudId: number,
+    motivo: string,
+): Promise<BatchRecordQualityReviewDetail> {
+    const response = await axios.post<BatchRecordQualityReviewDetail>(
+        `${endpoints.calidad_batch_records}/${id}/reaperturas/${solicitudId}/aprobar`,
+        { motivo },
         axiosOptions,
     );
     return response.data;

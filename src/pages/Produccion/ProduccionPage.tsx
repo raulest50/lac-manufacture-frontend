@@ -1,7 +1,7 @@
-import { useMemo, useState, type JSX } from "react";
-import { Box, Container, Tabs, Text } from "@chakra-ui/react";
+import { Container } from "@chakra-ui/react";
 
 import MyHeader from "../../components/MyHeader.tsx";
+import ModuleGroupedTabs, { type ModuleTabGroup } from "../../components/ModuleGroupedTabs.tsx";
 import { getExactTabNivel, tabAccessRule } from "../../auth/accessHelpers.ts";
 import type { AccessRule } from "../../auth/accessModel.ts";
 import { useAccessSnapshot } from "../../auth/usePermissions";
@@ -15,34 +15,28 @@ import AprobacionMPSWeekTab from "./ProgProdSemanalTab/AprobacionMPSWeekTab.tsx"
 import ProgramacionProduccionSemanalTab from "./ProgProdSemanalTab/ProgramacionProduccionSemanalTab.tsx";
 import BatchRecordsTab from "./BatchRecords/BatchRecordsTab.tsx";
 import OrdenesFabricacionTab from "./OrdenesFabricacion/OrdenesFabricacionTab.tsx";
+import {
+    DesviacionesControlProcesoTab,
+    HistorialControlesProcesoTab,
+    PendientesControlProcesoTab,
+    PlanesControlProcesoTab,
+} from "./ControlProcesos/ControlProcesosTabs.tsx";
 
-type ProductionTab = {
-    key: string;
-    label: string;
-    render: () => JSX.Element;
-    accesoValido: AccessRule;
-    flushContent?: boolean;
-};
-
-type ProductionGroup = {
-    key: string;
-    label: string;
-    tabs: ProductionTab[];
-};
-
-type VisibleProductionGroup = Omit<ProductionGroup, "tabs"> & {
-    tabs: ProductionTab[];
-};
-
-const exactProductionTabAccessRule = (tabId: string, minLevel = 1): AccessRule => (
-    (snapshot) => snapshot.isMasterLike || (getExactTabNivel(
+const exactProductionTabAccessRule = (tabId: string, minLevel = 1, superMasterOnlyBypass = false): AccessRule => (
+    (snapshot) => (superMasterOnlyBypass
+        ? snapshot.username?.toLowerCase() === "super_master"
+        : snapshot.isMasterLike) || (getExactTabNivel(
         snapshot.moduloAccesos,
         Modulo.PRODUCCION,
         tabId,
     ) ?? 0) >= minLevel
 );
 
-const PRODUCTION_GROUPS: ProductionGroup[] = [
+const strictProductionTabAccessRule = (tabId: string, minLevel = 1): AccessRule => (
+    (snapshot) => (getExactTabNivel(snapshot.moduloAccesos, Modulo.PRODUCCION, tabId) ?? 0) >= minLevel
+);
+
+const PRODUCTION_GROUPS: ModuleTabGroup[] = [
     {
         key: "planificacion-produccion",
         label: "Planificación de producción",
@@ -51,21 +45,21 @@ const PRODUCTION_GROUPS: ProductionGroup[] = [
                 key: "planeacion",
                 label: "Planificación mensual",
                 render: () => <PlaneacionProduccionTab />,
-                accesoValido: tabAccessRule(Modulo.PRODUCCION, "PLANEACION_PRODUCCION", 1),
+                accessRule: tabAccessRule(Modulo.PRODUCCION, "PLANEACION_PRODUCCION", 1),
                 flushContent: true,
             },
             {
                 key: "programacion",
                 label: "Programación semanal",
                 render: () => <ProgramacionProduccionSemanalTab />,
-                accesoValido: tabAccessRule(Modulo.PRODUCCION, "PROGRAMACION_PRODUCCION", 1),
+                accessRule: tabAccessRule(Modulo.PRODUCCION, "PROGRAMACION_PRODUCCION", 1),
                 flushContent: true,
             },
             {
                 key: "aprobacion-mps",
                 label: "Aprobación del MPS",
                 render: () => <AprobacionMPSWeekTab />,
-                accesoValido: tabAccessRule(Modulo.PRODUCCION, "APROBACION_MPS_WEEK", 1),
+                accessRule: tabAccessRule(Modulo.PRODUCCION, "APROBACION_MPS_WEEK", 1),
                 flushContent: true,
             },
         ],
@@ -78,13 +72,43 @@ const PRODUCTION_GROUPS: ProductionGroup[] = [
                 key: "crear-odp",
                 label: "Nueva ODP",
                 render: () => <CrearOrdenesProduccionTab />,
-                accesoValido: tabAccessRule(Modulo.PRODUCCION, "CREAR_ODP_MANUALMENTE", 1),
+                accessRule: tabAccessRule(Modulo.PRODUCCION, "CREAR_ODP_MANUALMENTE", 1),
             },
             {
                 key: "ordenes-fabricacion",
                 label: "Órdenes de fabricación",
                 render: () => <OrdenesFabricacionTab />,
-                accesoValido: exactProductionTabAccessRule("CREAR_ORDEN_FABRICACION"),
+                accessRule: exactProductionTabAccessRule("CREAR_ORDEN_FABRICACION"),
+            },
+        ],
+    },
+    {
+        key: "control-procesos",
+        label: "Control de procesos",
+        tabs: [
+            {
+                key: "planes-control-proceso",
+                label: "Planes de control",
+                render: () => <PlanesControlProcesoTab />,
+                accessRule: exactProductionTabAccessRule("PLANES_CONTROL_PROCESO", 1, true),
+            },
+            {
+                key: "pendientes-control-proceso",
+                label: "Controles pendientes",
+                render: () => <PendientesControlProcesoTab />,
+                accessRule: strictProductionTabAccessRule("REGISTRAR_CONTROL_PROCESO"),
+            },
+            {
+                key: "desviaciones-control-proceso",
+                label: "Desviaciones",
+                render: () => <DesviacionesControlProcesoTab />,
+                accessRule: strictProductionTabAccessRule("DESVIACIONES_CONTROL_PROCESO"),
+            },
+            {
+                key: "historial-control-proceso",
+                label: "Historial",
+                render: () => <HistorialControlesProcesoTab />,
+                accessRule: strictProductionTabAccessRule("HISTORIAL_CONTROL_PROCESO"),
             },
         ],
     },
@@ -96,19 +120,19 @@ const PRODUCTION_GROUPS: ProductionGroup[] = [
                 key: "monitorear-areas-operativas",
                 label: "Monitoreo operativo",
                 render: () => <MonitorearAreasOperativasTab />,
-                accesoValido: tabAccessRule(Modulo.PRODUCCION, "MONITOREAR_AREAS_OPERATIVAS", 1),
+                accessRule: tabAccessRule(Modulo.PRODUCCION, "MONITOREAR_AREAS_OPERATIVAS", 1),
             },
             {
                 key: "historial",
                 label: "Historial de ODP",
                 render: () => <HistorialOrdenesTab />,
-                accesoValido: tabAccessRule(Modulo.PRODUCCION, "HISTORIAL", 1),
+                accessRule: tabAccessRule(Modulo.PRODUCCION, "HISTORIAL", 1),
             },
             {
                 key: "batch-records",
                 label: "Expedientes digitales",
                 render: () => <BatchRecordsTab />,
-                accesoValido: exactProductionTabAccessRule("CONSULTAR_BATCH_RECORD"),
+                accessRule: exactProductionTabAccessRule("CONSULTAR_BATCH_RECORD"),
             },
         ],
     },
@@ -120,7 +144,7 @@ const PRODUCTION_GROUPS: ProductionGroup[] = [
                 key: "parametros-categoria",
                 label: "Parámetros y rutas",
                 render: () => <ConfParamsCategoria />,
-                accesoValido: tabAccessRule(Modulo.PRODUCCION, "PARAMETROS_POR_CATEGORIA", 3),
+                accessRule: tabAccessRule(Modulo.PRODUCCION, "PARAMETROS_POR_CATEGORIA", 3),
             },
         ],
     },
@@ -128,38 +152,6 @@ const PRODUCTION_GROUPS: ProductionGroup[] = [
 
 export default function ProduccionPage() {
     const access = useAccessSnapshot();
-    const [selectedGroupKey, setSelectedGroupKey] = useState("");
-    const [selectedTabByGroup, setSelectedTabByGroup] = useState<Record<string, string>>({});
-
-    const visibleGroups = useMemo<VisibleProductionGroup[]>(() => (
-        PRODUCTION_GROUPS
-            .map((group) => ({
-                ...group,
-                tabs: group.tabs.filter((tab) => tab.accesoValido(access)),
-            }))
-            .filter((group) => group.tabs.length > 0)
-    ), [access]);
-
-    const activeGroup = visibleGroups.find((group) => group.key === selectedGroupKey)
-        ?? visibleGroups[0];
-
-    const activeTabKeyFor = (group: VisibleProductionGroup): string => {
-        const requestedTabKey = selectedTabByGroup[group.key];
-        return group.tabs.some((tab) => tab.key === requestedTabKey)
-            ? requestedTabKey
-            : group.tabs[0].key;
-    };
-
-    const handleGroupChange = ({ value }: { value: string }) => {
-        if (visibleGroups.some((group) => group.key === value)) {
-            setSelectedGroupKey(value);
-        }
-    };
-
-    const handleTabChange = (group: VisibleProductionGroup, value: string) => {
-        if (!group.tabs.some((tab) => tab.key === value)) return;
-        setSelectedTabByGroup((current) => ({ ...current, [group.key]: value }));
-    };
 
     return (
         <Container
@@ -170,90 +162,7 @@ export default function ProduccionPage() {
             h="full"
         >
             <MyHeader title="Dirección Técnica y de Planta" />
-
-            {!activeGroup ? (
-                <Text py={8}>No tienes acceso a ninguna opción de este módulo.</Text>
-            ) : (
-                <Tabs.Root
-                    value={activeGroup.key}
-                    onValueChange={handleGroupChange}
-                    variant="enclosed"
-                    colorPalette="teal"
-                    lazyMount={false}
-                    unmountOnExit={false}
-                >
-                    <Box overflowX="auto" pb={2}>
-                        <Tabs.List minW="max-content" aria-label="Secciones de Producción">
-                            {visibleGroups.map((group) => (
-                                <Tabs.Trigger
-                                    key={group.key}
-                                    value={group.key}
-                                    flexShrink={0}
-                                    whiteSpace="nowrap"
-                                    fontWeight="semibold"
-                                    fontSize={{ base: "sm", md: "md" }}
-                                    px={{ base: 3, md: 5 }}
-                                >
-                                    {group.label}
-                                </Tabs.Trigger>
-                            ))}
-                        </Tabs.List>
-                    </Box>
-
-                    <Tabs.ContentGroup>
-                        {visibleGroups.map((group) => (
-                            <Tabs.Content key={group.key} value={group.key} px={0} pb={0}>
-                                <Tabs.Root
-                                    value={activeTabKeyFor(group)}
-                                    onValueChange={({ value }) => handleTabChange(group, value)}
-                                    variant="line"
-                                    colorPalette="teal"
-                                    lazyMount={false}
-                                    unmountOnExit={false}
-                                >
-                                    <Box overflowX="auto" pb={1}>
-                                        <Tabs.List
-                                            minW="max-content"
-                                            aria-label={`Opciones de ${group.label}`}
-                                        >
-                                            {group.tabs.map((tab) => (
-                                                <Tabs.Trigger
-                                                    key={tab.key}
-                                                    value={tab.key}
-                                                    flexShrink={0}
-                                                    whiteSpace="nowrap"
-                                                    fontSize={{ base: "sm", md: "md" }}
-                                                    px={{ base: 3, md: 4 }}
-                                                >
-                                                    {tab.label}
-                                                </Tabs.Trigger>
-                                            ))}
-                                        </Tabs.List>
-                                    </Box>
-
-                                    <Tabs.ContentGroup>
-                                        {group.tabs.map((tab) => (
-                                            <Tabs.Content
-                                                key={tab.key}
-                                                value={tab.key}
-                                                p={tab.flushContent ? 0 : { base: 2, md: 4 }}
-                                            >
-                                                {tab.flushContent ? (
-                                                    <Box w="full" minW={0}>
-                                                        {tab.render()}
-                                                    </Box>
-                                                ) : (
-                                                    tab.render()
-                                                )}
-                                            </Tabs.Content>
-                                        ))}
-                                    </Tabs.ContentGroup>
-                                </Tabs.Root>
-                            </Tabs.Content>
-                        ))}
-                    </Tabs.ContentGroup>
-                </Tabs.Root>
-            )}
+            <ModuleGroupedTabs groups={PRODUCTION_GROUPS} access={access} ariaLabel="Secciones de Producción" />
         </Container>
     );
 }
