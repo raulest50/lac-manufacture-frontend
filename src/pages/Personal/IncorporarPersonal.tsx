@@ -9,6 +9,7 @@ import {
     Box,
     Container,
     Field,
+    Heading,
 } from '@chakra-ui/react';
 import { useAppToast } from "@/components/ui/use-app-toast";
 import axios, { AxiosError } from 'axios';
@@ -262,7 +263,7 @@ export function IncorporarPersonal() {
                     {/* Personal Information Section */}
                     <Grid templateColumns={['1fr', 'repeat(2, 1fr)']} gap={4} p="1em" boxShadow="base">
                         <GridItem colSpan={[1, 2]}>
-                            <Field.Label fontSize="lg" fontWeight="bold">Información Personal</Field.Label>
+                            <Heading as="h2" fontSize="lg" fontWeight="bold">Información Personal</Heading>
                         </GridItem>
 
                         <GridItem>
@@ -388,7 +389,7 @@ export function IncorporarPersonal() {
                     {/* Work Information Section */}
                     <Grid templateColumns={['1fr', 'repeat(2, 1fr)']} gap={4} p="1em" boxShadow="base">
                         <GridItem colSpan={[1, 2]}>
-                            <Field.Label fontSize="lg" fontWeight="bold">Información Laboral</Field.Label>
+                            <Heading as="h2" fontSize="lg" fontWeight="bold">Información Laboral</Heading>
                         </GridItem>
 
                         <GridItem>
@@ -467,7 +468,7 @@ export function IncorporarPersonal() {
 
                     <Grid templateColumns={['1fr', 'repeat(2, 1fr)']} gap={4} p="1em" boxShadow="base">
                         <GridItem colSpan={[1, 2]}>
-                            <Field.Label fontSize="lg" fontWeight="bold">Información Bancaria</Field.Label>
+                            <Heading as="h2" fontSize="lg" fontWeight="bold">Información Bancaria</Heading>
                         </GridItem>
 
                         <GridItem>
