@@ -23,6 +23,8 @@ import { FaFileUpload } from "react-icons/fa";
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
 import {IVA_VALUES} from "../types.tsx"
 
+const MAX_FICHA_TECNICA_SIZE_BYTES = 10 * 1024 * 1024;
+
 function CodificarMaterialesTab() {
     const [nombre, setNombre] = useState('');
     const [observaciones, setObservaciones] = useState('');
@@ -135,6 +137,16 @@ function CodificarMaterialesTab() {
             });
             return false;
         }
+        if (selectedFile && selectedFile.size > MAX_FICHA_TECNICA_SIZE_BYTES) {
+            toast({
+                title: "Validation Error",
+                description: "La ficha tecnica no puede superar 10 MB.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return false;
+        }
         const pr = Number(puntoReordenStr);
         if (inventareable
             && (puntoReordenStr.trim() === '' || !Number.isFinite(pr) || (pr !== -1 && pr < 0))) {
@@ -166,6 +178,16 @@ function CodificarMaterialesTab() {
                 toast({
                     title: "File Error",
                     description: "El archivo debe ser un PDF.",
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                });
+                setSelectedFile(null);
+                setUrl_ftecnica('');
+            } else if (file.size > MAX_FICHA_TECNICA_SIZE_BYTES) {
+                toast({
+                    title: "File Error",
+                    description: "La ficha tecnica no puede superar 10 MB.",
                     status: "error",
                     duration: 3000,
                     isClosable: true,

@@ -25,7 +25,6 @@ export interface Producto {
 }
 
 export interface Material extends Producto {
-    fichaTecnicaUrl?: string;
     tipoMaterial?: number;
     puntoReorden?: number;
     consumoDirecto?: boolean;

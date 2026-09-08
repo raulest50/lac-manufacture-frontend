@@ -44,6 +44,7 @@ import DeleteProductoDialog from '../../DefSemiTer/consulta/DeleteProductoDialog
 import { Modulo } from '../../../Usuarios/GestionUsuarios/types.tsx';
 import { useModuleAccessLevel } from '../../../../auth/usePermissions';
 import { LuArrowLeft, LuPencil } from 'react-icons/lu';
+import FichaTecnicaMaterialCard from './FichaTecnicaMaterialCard';
 
 function isValidPuntoReorden(pr: number | undefined): boolean {
     if (pr === undefined) return false;
@@ -485,7 +486,7 @@ export default function DetalleProducto({producto, setEstado, setProductoSelecci
                     <Text color="app.textMuted">ID: {producto.productoId}</Text>
                 </Card.Header>
                 <Card.Body>
-                    <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+                    <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
                         <GridItem>
                             <VStack align="start" gap={3}>
                                 <Box>
@@ -656,6 +657,8 @@ export default function DetalleProducto({producto, setEstado, setProductoSelecci
                     </Grid>
                 </Card.Body>
             </Card.Root>
+
+            {isMaterial && <FichaTecnicaMaterialCard productoId={producto.productoId} />}
 
             <Card.Root variant="outline" boxShadow="md">
                 <Card.Header bg="app.stepperBlue">
