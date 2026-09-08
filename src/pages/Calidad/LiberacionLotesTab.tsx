@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-import { getExactTabNivel } from "../../auth/accessHelpers";
+import { effectiveExactTabNivelFromSnapshot } from "../../auth/accessHelpers";
 import { useAccessSnapshot } from "../../auth/usePermissions";
 import { useAppToast } from "../../components/ui/use-app-toast";
 import ControlExecutionForm from "../../features/controles/ControlExecutionForm";
@@ -85,9 +85,9 @@ function toggleText(current: string[], id: string, checked: boolean) {
 export default function LiberacionLotesTab({ workflowEnabled }: LiberacionLotesTabProps) {
     const toast = useAppToast();
     const access = useAccessSnapshot();
-    const decisionLevel = getExactTabNivel(access.moduloAccesos, Modulo.CALIDAD, "REVISION_LIBERACION_LOTES") ?? 0;
-    const registerLevel = getExactTabNivel(access.moduloAccesos, Modulo.CALIDAD, "REGISTRAR_CONTROL_CALIDAD") ?? 0;
-    const historyLevel = getExactTabNivel(access.moduloAccesos, Modulo.CALIDAD, "HISTORIAL_CONTROL_CALIDAD") ?? 0;
+    const decisionLevel = effectiveExactTabNivelFromSnapshot(access, Modulo.CALIDAD, "REVISION_LIBERACION_LOTES");
+    const registerLevel = effectiveExactTabNivelFromSnapshot(access, Modulo.CALIDAD, "REGISTRAR_CONTROL_CALIDAD");
+    const historyLevel = effectiveExactTabNivelFromSnapshot(access, Modulo.CALIDAD, "HISTORIAL_CONTROL_CALIDAD");
     const [scope, setScope] = useState<InboxScope>(workflowEnabled ? "pendientes" : "archivo");
     const [search, setSearch] = useState("");
     const [page, setPage] = useState<PageResponse<BatchRecordQualityInboxItem> | null>(null);

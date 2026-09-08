@@ -3,21 +3,21 @@ import HistorialControlTab from "../../../features/controles/HistorialControlTab
 import PendientesControlTab from "../../../features/controles/PendientesControlTab";
 import PlanesControlTab from "../../../features/controles/PlanesControlTab";
 import { qualityControlApi } from "../../../features/controles/api";
-import { useControlPermission, useExactControlPermission } from "../../../features/controles/useControlPermission";
+import { useMasterLikeExactControlPermission } from "../../../features/controles/useControlPermission";
 import { Modulo } from "../../Usuarios/GestionUsuarios/types";
 
 export function PlanesControlCalidadTab() {
-    const { nivel } = useControlPermission(Modulo.CALIDAD, "PLANES_CONTROL_CALIDAD");
+    const { nivel } = useMasterLikeExactControlPermission(Modulo.CALIDAD, "PLANES_CONTROL_CALIDAD");
     return <PlanesControlTab api={qualityControlApi} nivel={nivel} />;
 }
 
 export function PendientesControlCalidadTab() {
-    const { nivel } = useExactControlPermission(Modulo.CALIDAD, "REGISTRAR_CONTROL_CALIDAD");
+    const { nivel } = useMasterLikeExactControlPermission(Modulo.CALIDAD, "REGISTRAR_CONTROL_CALIDAD");
     return <PendientesControlTab api={qualityControlApi} nivel={nivel} />;
 }
 
 export function DesviacionesControlCalidadTab() {
-    const { nivel } = useExactControlPermission(Modulo.CALIDAD, "DESVIACIONES_CONTROL_CALIDAD");
+    const { nivel } = useMasterLikeExactControlPermission(Modulo.CALIDAD, "DESVIACIONES_CONTROL_CALIDAD");
     return <DesviacionesControlTab api={qualityControlApi} nivel={nivel} />;
 }
 

@@ -1,8 +1,7 @@
 import { Container } from "@chakra-ui/react";
 import { useMemo } from "react";
 
-import { getExactTabNivel } from "../../auth/accessHelpers";
-import type { AccessRule } from "../../auth/accessModel";
+import { exactTabAccessRuleWithMasterBypass } from "../../auth/accessHelpers";
 import { useAccessSnapshot } from "../../auth/usePermissions";
 import ModuleGroupedTabs, { type ModuleTabGroup } from "../../components/ModuleGroupedTabs";
 import MyHeader from "../../components/MyHeader";
@@ -19,14 +18,6 @@ import {
     PlanesControlCalidadTab,
 } from "./ControlCalidad/ControlCalidadTabs";
 import LiberacionLotesTab from "./LiberacionLotesTab";
-
-const exactQualityTabAccessRule = (tabId: string, includeSuperMaster = true): AccessRule => (
-    (snapshot) => (includeSuperMaster && snapshot.username?.toLowerCase() === "super_master") || (getExactTabNivel(
-        snapshot.moduloAccesos,
-        Modulo.CALIDAD,
-        tabId,
-    ) ?? 0) >= 1
-);
 
 export default function CalidadPage() {
     const access = useAccessSnapshot();
@@ -45,25 +36,25 @@ export default function CalidadPage() {
                     key: "planes-calidad",
                     label: "Planes de ensayo",
                     render: () => <PlanesControlCalidadTab />,
-                    accessRule: exactQualityTabAccessRule("PLANES_CONTROL_CALIDAD"),
+                    accessRule: exactTabAccessRuleWithMasterBypass(Modulo.CALIDAD, "PLANES_CONTROL_CALIDAD"),
                 },
                 {
                     key: "pendientes-calidad",
                     label: "Ensayos pendientes",
                     render: () => <PendientesControlCalidadTab />,
-                    accessRule: exactQualityTabAccessRule("REGISTRAR_CONTROL_CALIDAD", false),
+                    accessRule: exactTabAccessRuleWithMasterBypass(Modulo.CALIDAD, "REGISTRAR_CONTROL_CALIDAD"),
                 },
                 {
                     key: "desviaciones-calidad",
                     label: "Desviaciones",
                     render: () => <DesviacionesControlCalidadTab />,
-                    accessRule: exactQualityTabAccessRule("DESVIACIONES_CONTROL_CALIDAD", false),
+                    accessRule: exactTabAccessRuleWithMasterBypass(Modulo.CALIDAD, "DESVIACIONES_CONTROL_CALIDAD"),
                 },
                 {
                     key: "historial-calidad",
                     label: "Historial de ensayos",
                     render: () => <HistorialControlesCalidadTab />,
-                    accessRule: exactQualityTabAccessRule("HISTORIAL_CONTROL_CALIDAD", false),
+                    accessRule: exactTabAccessRuleWithMasterBypass(Modulo.CALIDAD, "HISTORIAL_CONTROL_CALIDAD"),
                 },
             ],
         },
@@ -75,8 +66,7 @@ export default function CalidadPage() {
                     key: "revision-liberacion",
                     label: "Revisión y liberación",
                     render: () => <LiberacionLotesTab workflowEnabled={workflowEnabled} />,
-                    // La visibilidad conserva el permiso explícito; ser master-like no concede decisiones GxP.
-                    accessRule: exactQualityTabAccessRule("REVISION_LIBERACION_LOTES", false),
+                    accessRule: exactTabAccessRuleWithMasterBypass(Modulo.CALIDAD, "REVISION_LIBERACION_LOTES"),
                 },
             ],
         },

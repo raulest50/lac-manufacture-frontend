@@ -102,6 +102,28 @@ export function effectiveTabNivel(
     return getTabNivel(moduloAccesos, modulo, tabId) ?? 0;
 }
 
+/**
+ * Conserva permisos exactos para usuarios ordinarios, pero concede el nivel
+ * efectivo máximo a las identidades especiales reconocidas por el backend.
+ */
+export function effectiveExactTabNivel(
+    isMasterLike: boolean,
+    moduloAccesos: ModuloAccesoFE[] | null | undefined,
+    modulo: Modulo,
+    tabId: string
+): number {
+    if (isMasterLike) return MASTER_EFFECTIVE_NIVEL;
+    return getExactTabNivel(moduloAccesos, modulo, tabId) ?? 0;
+}
+
+export function effectiveExactTabNivelFromSnapshot(
+    access: AccessSnapshot,
+    modulo: Modulo,
+    tabId: string
+): number {
+    return effectiveExactTabNivel(access.isMasterLike, access.moduloAccesos, modulo, tabId);
+}
+
 export function canAccessTabFromSnapshot(
     access: AccessSnapshot,
     modulo: Modulo,
@@ -118,4 +140,12 @@ export function moduleAccessRule(modulo: Modulo, minLevel: number = 1): AccessRu
 
 export function tabAccessRule(modulo: Modulo, tabId: string, minLevel: number = 1): AccessRule {
     return (access) => canAccessTabFromSnapshot(access, modulo, tabId, minLevel);
+}
+
+export function exactTabAccessRuleWithMasterBypass(
+    modulo: Modulo,
+    tabId: string,
+    minLevel: number = 1
+): AccessRule {
+    return (access) => effectiveExactTabNivelFromSnapshot(access, modulo, tabId) >= minLevel;
 }
