@@ -315,9 +315,6 @@
   "src/pages/Produccion/HistorialOrdenesTab/OrdenProduccionDialogDetalles.tsx": {
     "@typescript-eslint/no-unused-vars": {
       "count": 2
-    },
-    "react-hooks/exhaustive-deps": {
-      "count": 1
     }
   },
   "src/pages/Produccion/MonitorearAreasOperativasTab.tsx": {

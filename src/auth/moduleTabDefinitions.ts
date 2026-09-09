@@ -1,116 +1,26 @@
+import {
+    ACCESS_DOCUMENTATION_CATALOG,
+    maxDocumentedLevel,
+} from "../pages/Usuarios/GestionUsuarios/access-help/accessDocumentationCatalog.ts";
 import { Modulo } from "../pages/Usuarios/GestionUsuarios/types.tsx";
 
 export type TabDefinition = { tabId: string; label: string; maxNivel: number };
 
-function tab(tabId: string, label: string, maxNivel: number = 4): TabDefinition {
-    return { tabId, label, maxNivel };
-}
-
-/** Debe coincidir con MapaAccesos en el backend */
-export const TABS_BY_MODULO: Record<Modulo, TabDefinition[]> = {
-    [Modulo.USUARIOS]: [
-        tab("GESTION_USUARIOS", "Gestion de Usuarios"),
-        tab("INFO_NIVELES", "Info Niveles de Acceso"),
-        tab("NOTIFICACIONES", "Notificaciones"),
-    ],
-    [Modulo.PRODUCTOS]: [tab("MAIN", "General")],
-    [Modulo.PRODUCCION]: [
-        tab("PLANEACION_PRODUCCION", "Planificación mensual"),
-        tab("PROGRAMACION_PRODUCCION", "Programación semanal"),
-        tab("APROBACION_MPS_WEEK", "Aprobación del MPS"),
-        tab("CREAR_ODP_MANUALMENTE", "Nueva ODP"),
-        tab("CREAR_ORDEN_FABRICACION", "Órdenes de fabricación", 2),
-        tab("PLANES_CONTROL_PROCESO", "Planes de control de proceso", 3),
-        tab("REGISTRAR_CONTROL_PROCESO", "Registro de controles de proceso", 2),
-        tab("DESVIACIONES_CONTROL_PROCESO", "Desviaciones de proceso", 2),
-        tab("HISTORIAL_CONTROL_PROCESO", "Historial de controles de proceso", 1),
-        tab("MONITOREAR_AREAS_OPERATIVAS", "Monitoreo operativo"),
-        tab("HISTORIAL", "Historial de ODP"),
-        tab("CONSULTAR_BATCH_RECORD", "Expedientes digitales", 2),
-        tab("PARAMETROS_POR_CATEGORIA", "Parámetros y rutas"),
-    ],
-    [Modulo.STOCK]: [
-        tab("CONSOLIDADO", "Consolidado"),
-        tab("KARDEX", "Kardex"),
-        tab("HISTORIAL_TRANSACCIONES_ALMACEN", "Historial Transacciones de Almacen"),
-    ],
-    [Modulo.PROVEEDORES]: [
-        tab("CODIFICAR_PROVEEDOR", "Codificar Proveedor"),
-        tab("CONSULTAR_PROVEEDORES", "Consultar Proveedores"),
-    ],
-    [Modulo.COMPRAS]: [
-        tab("CREAR_OCM", "Crear OC-M"),
-        tab("REPORTES_ORDENES_COMPRA", "Reportes Ordenes de Compra"),
-    ],
-    [Modulo.SEGUIMIENTO_PRODUCCION]: [
-        tab("CREAR_AREA_PRODUCCION", "Crear Area de Produccion"),
-        tab("CONSULTA_AREAS_OPERATIVAS", "Consulta Areas Operativas"),
-    ],
-    [Modulo.CLIENTES]: [
-        tab("REGISTRAR_CLIENTE", "Registrar Cliente"),
-        tab("CONSULTAR_CLIENTES", "Consultar Clientes"),
-    ],
-    [Modulo.VENTAS]: [
-        tab("CREAR_VENTA", "Crear Venta"),
-        tab("HISTORIAL_VENTAS", "Historial de Ventas"),
-        tab("REPORTES", "Reportes"),
-        tab("CREAR_VENDEDOR_NUEVO", "Crear vendedor nuevo"),
-    ],
-    [Modulo.TRANSACCIONES_ALMACEN]: [
-        tab("INGRESO_OCM", "Ingreso OCM"),
-        tab("HACER_DISPENSACION", "Hacer Dispensacion"),
-        tab("DISPENSACION_V2", "Dispensacion v2"),
-        tab("HISTORIAL_DISPENSACIONES", "Historial Dispensaciones"),
-        tab("INGRESO_PRODUCTO_TERMINADO", "Ingreso Producto Terminado"),
-        tab("GESTION_AVERIAS", "Gestion Averias"),
-        tab("AJUSTES_INVENTARIO", "Ajustes de Inventario"),
-    ],
-    [Modulo.ACTIVOS]: [
-        tab("INCORPORACION", "Incorporacion"),
-        tab("CREAR_OC_AF", "Crear OC-AF"),
-        tab("REPORTES_OC_AF", "Reportes OC-AF"),
-        tab("REPORTES_ACTIVOS_FIJOS", "Reportes Activos Fijos"),
-    ],
-    [Modulo.CONTABILIDAD]: [tab("MAIN", "General")],
-    [Modulo.PERSONAL_PLANTA]: [
-        tab("INCORPORACION", "Incorporacion"),
-        tab("CONSULTA", "Consulta"),
-    ],
-    [Modulo.BINTELLIGENCE]: [
-        tab("INFORMES_DIARIOS", "Informes Diarios"),
-        tab("INFORMES_GLOBALES", "Informes Globales"),
-        tab("SERIES_TIEMPO_PROYECCIONES", "Series De Tiempo y Proyecciones"),
-        tab("PERSONAL", "Personal"),
-        tab("APROVISIONAMIENTO", "Aprovisionamiento"),
-    ],
-    [Modulo.OPERACIONES_CRITICAS_BD]: [
-        tab("CARGAS_MASIVAS", "Cargas Masivas"),
-        tab("ELIMINACIONES_FORZADAS", "Eliminaciones Forzadas"),
-        tab("EXPORTACION_DATOS", "Exportacion Datos"),
-    ],
-    [Modulo.ADMINISTRACION_ALERTAS]: [tab("MAIN", "General")],
-    [Modulo.ADMINISTRACION_GLOBAL]: [
-        tab("IDENTIDAD_LEGAL", "Identidad Legal"),
-        tab("JORNADA_LABORAL", "Jornada Laboral"),
-    ],
-    [Modulo.MASTER_DIRECTIVES]: [tab("MAIN", "General")],
-    [Modulo.ORGANIGRAMA]: [
-        tab("ORGANIGRAMA", "Organigrama"),
-        tab("MISION_VISION", "Mision y Vision"),
-    ],
-    [Modulo.CALIDAD]: [
-        tab("PLANES_CONTROL_CALIDAD", "Planes de control de calidad", 3),
-        tab("REGISTRAR_CONTROL_CALIDAD", "Registro de ensayos", 2),
-        tab("DESVIACIONES_CONTROL_CALIDAD", "Desviaciones de calidad", 3),
-        tab("HISTORIAL_CONTROL_CALIDAD", "Historial de ensayos", 1),
-        tab("REVISION_LIBERACION_LOTES", "Revision y Liberacion de Lotes", 3),
-    ],
-    [Modulo.PAGOS_PROVEEDORES]: [
-        tab("ASENTAR_TRANSACCIONES_ALMACEN", "Asentar Transacciones Almacen"),
-        tab("FACTURAS_VENCIDAS", "Facturas Vencidas"),
-    ],
-};
+/**
+ * Catálogo estructural derivado de la documentación de accesos.
+ * Los identificadores deben continuar coincidiendo con MapaAccesos en el backend.
+ */
+export const TABS_BY_MODULO: Record<Modulo, TabDefinition[]> = Object.fromEntries(
+    Object.values(Modulo).map((modulo) => [
+        modulo,
+        ACCESS_DOCUMENTATION_CATALOG[modulo].tabs.map((tab) => ({
+            tabId: tab.tabId,
+            label: tab.label,
+            maxNivel: maxDocumentedLevel(tab),
+        })),
+    ]),
+) as Record<Modulo, TabDefinition[]>;
 
 export function tabsForModule(modulo: Modulo): TabDefinition[] {
-    return TABS_BY_MODULO[modulo] ?? [tab("MAIN", "General")];
+    return TABS_BY_MODULO[modulo] ?? [];
 }

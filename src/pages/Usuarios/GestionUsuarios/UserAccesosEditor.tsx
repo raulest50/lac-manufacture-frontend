@@ -20,6 +20,7 @@ import {
     Portal,
 } from "@chakra-ui/react";
 import { useAppToast } from "@/components/ui/use-app-toast";
+import { Tooltip } from "@/components/ui/tooltip";
 import axios from "axios";
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
 import { fetchUserAssignmentStatus, type UserAssignmentStatus } from "../../../api/userAssignmentStatus.ts";
@@ -35,7 +36,8 @@ import {
     serializeDraft,
     type AccessDraft,
 } from "./userAccesosEditorModel.ts";
-import { LuChevronDown, LuChevronRight } from 'react-icons/lu';
+import AccessHelpDialog, { type AccessHelpTarget } from "./access-help/AccessHelpDialog.tsx";
+import { LuChevronDown, LuChevronRight, LuCircleHelp } from 'react-icons/lu';
 
 type Props = {
     user: User;
@@ -51,6 +53,7 @@ export default function UserAccesosEditor({ user, onBack, onSaved }: Props) {
     const toast = useAppToast();
     const discardDialog = useDisclosure();
     const cancelRef = useRef<HTMLButtonElement | null>(null);
+    const helpTriggerRef = useRef<HTMLButtonElement | null>(null);
     const endPoints = useMemo(() => new EndPointsURL(), []);
     const { user: authUsername, refreshAccesos } = useAuth();
 
@@ -65,6 +68,7 @@ export default function UserAccesosEditor({ user, onBack, onSaved }: Props) {
     const [loadingUser, setLoadingUser] = useState(true);
     const [assignmentStatus, setAssignmentStatus] = useState<UserAssignmentStatus | null>(null);
     const [saving, setSaving] = useState(false);
+    const [helpTarget, setHelpTarget] = useState<AccessHelpTarget | null>(null);
 
     const modules = useMemo(() => Object.values(Modulo), []);
 
@@ -113,6 +117,11 @@ export default function UserAccesosEditor({ user, onBack, onSaved }: Props) {
 
     const toggleExpanded = (modulo: Modulo) => {
         setExpandedModules((prev) => ({ ...prev, [modulo]: !prev[modulo] }));
+    };
+
+    const openHelp = (target: AccessHelpTarget, trigger: HTMLButtonElement) => {
+        helpTriggerRef.current = trigger;
+        setHelpTarget(target);
     };
 
     const setModuleEnabled = (modulo: Modulo, enabled: boolean) => {
@@ -259,12 +268,34 @@ export default function UserAccesosEditor({ user, onBack, onSaved }: Props) {
             <Grid templateColumns={{ base: "1fr", xl: "minmax(0, 1.7fr) minmax(320px, 1fr)" }} gap={6}>
                 <GridItem>
                     <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg="app.surface">
-                        <Box px={4} py={3} borderBottomWidth="1px" bg="app.surfaceSubtle">
-                            <Text fontWeight="semibold">Matriz de accesos</Text>
-                            <Text fontSize="sm" color="app.textMuted">
-                                Activa modulos, despliega sus tabs y asigna el nivel por tab.
-                            </Text>
-                        </Box>
+                        <Flex
+                            px={4}
+                            py={3}
+                            borderBottomWidth="1px"
+                            bg="app.surfaceSubtle"
+                            justify="space-between"
+                            align="center"
+                            gap={3}
+                        >
+                            <Box>
+                                <Text fontWeight="semibold">Matriz de accesos</Text>
+                                <Text fontSize="sm" color="app.textMuted">
+                                    Activa modulos, despliega sus tabs y asigna el nivel por tab.
+                                </Text>
+                            </Box>
+                            <Tooltip content="Cómo asignar accesos y entender sus niveles" showArrow>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    flexShrink={0}
+                                    aria-label="Cómo asignar accesos"
+                                    onClick={(event) => openHelp({ kind: "general" }, event.currentTarget)}
+                                >
+                                    <LuCircleHelp />
+                                    <Text as="span" display={{ base: "none", sm: "inline" }}>Cómo asignar accesos</Text>
+                                </Button>
+                            </Tooltip>
+                        </Flex>
 
                         {loadingUser ? (
                             <Flex align="center" justify="center" minH="220px" gap={3}>
@@ -306,7 +337,22 @@ export default function UserAccesosEditor({ user, onBack, onSaved }: Props) {
                                                                         toggleExpanded(modulo);
                                                                     }}>{isExpanded ? <LuChevronDown /> : <LuChevronRight />}</IconButton>
                                                                 <Box>
-                                                                    <Text fontWeight="semibold">{moduleLabel(modulo)}</Text>
+                                                                    <HStack gap={1} align="center">
+                                                                        <Text fontWeight="semibold">{moduleLabel(modulo)}</Text>
+                                                                        <Tooltip content={`Ver ayuda de ${moduleLabel(modulo)}`} showArrow>
+                                                                            <IconButton
+                                                                                aria-label={`Ver ayuda del módulo ${moduleLabel(modulo)}`}
+                                                                                size="xs"
+                                                                                variant="ghost"
+                                                                                onClick={(event) => {
+                                                                                    event.stopPropagation();
+                                                                                    openHelp({ kind: "module", modulo }, event.currentTarget);
+                                                                                }}
+                                                                            >
+                                                                                <LuCircleHelp />
+                                                                            </IconButton>
+                                                                        </Tooltip>
+                                                                    </HStack>
                                                                     <HStack gap={2}>
                                                                         <Badge colorPalette={activeTabs > 0 ? "green" : "gray"}>
                                                                             {activeTabs} tabs activas
@@ -344,12 +390,29 @@ export default function UserAccesosEditor({ user, onBack, onSaved }: Props) {
                                                             return (
                                                                 <Table.Row key={`${modulo}-${tab.tabId}`} bg="app.surface">
                                                                     <Table.Cell pl={14}>
-                                                                        <Box>
-                                                                            <Text fontSize="sm">{tab.label}</Text>
-                                                                            <Text fontSize="xs" color="app.textSubtle">
-                                                                                {tab.tabId}
-                                                                            </Text>
-                                                                        </Box>
+                                                                        <HStack gap={1} align="flex-start">
+                                                                            <Box>
+                                                                                <Text fontSize="sm">{tab.label}</Text>
+                                                                                <Text fontSize="xs" color="app.textSubtle">
+                                                                                    {tab.tabId}
+                                                                                </Text>
+                                                                            </Box>
+                                                                            <Tooltip content={`Ver niveles de ${tab.label}`} showArrow>
+                                                                                <IconButton
+                                                                                    aria-label={`Ver ayuda de niveles para ${tab.label}`}
+                                                                                    size="xs"
+                                                                                    variant="ghost"
+                                                                                    onClick={(event) => openHelp({
+                                                                                        kind: "tab",
+                                                                                        modulo,
+                                                                                        tabId: tab.tabId,
+                                                                                        selectedLevel: tabRow.enabled ? tabRow.nivel : undefined,
+                                                                                    }, event.currentTarget)}
+                                                                                >
+                                                                                    <LuCircleHelp />
+                                                                                </IconButton>
+                                                                            </Tooltip>
+                                                                        </HStack>
                                                                     </Table.Cell>
                                                                     <Table.Cell>
                                                                         <Switch.Root
@@ -455,6 +518,13 @@ export default function UserAccesosEditor({ user, onBack, onSaved }: Props) {
                     </Box>
                 </GridItem>
             </Grid>
+
+            <AccessHelpDialog
+                open={helpTarget != null}
+                target={helpTarget}
+                onClose={() => setHelpTarget(null)}
+                finalFocusRef={helpTriggerRef}
+            />
 
             <Dialog.Root
                 open={discardDialog.open}

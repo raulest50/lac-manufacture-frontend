@@ -1,530 +1,203 @@
-import { useEffect, useState } from "react";
-import { useColorModeValue } from "../../components/ui/color-mode";
+import { useMemo, useState } from "react";
 import {
-  Accordion,
-  Alert,
-  Box,
-  Code,
-  Flex,
-  Heading,
-  Input,
-  InputGroup,
-  Tag,
-  Text,
-  Separator,
-  Icon,
+    Accordion,
+    Alert,
+    Badge,
+    Box,
+    Flex,
+    Heading,
+    Icon,
+    Input,
+    InputGroup,
+    Text,
+    VStack,
 } from "@chakra-ui/react";
-import { Modulo } from "./GestionUsuarios/types";
-import { LuSearch } from 'react-icons/lu';
+import { LuSearch } from "react-icons/lu";
+import AccessLevelCards from "./GestionUsuarios/access-help/AccessLevelCards.tsx";
+import {
+    ACCESS_DOCUMENTATION_MODULES,
+    maxDocumentedLevel,
+    type AccessModuleDocumentation,
+} from "./GestionUsuarios/access-help/accessDocumentationCatalog.ts";
 
-interface ModuleLevel {
-  level: number;
-  description: string;
+function normalize(value: string): string {
+    return value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
 }
 
-interface ModuleDoc {
-  title: string;
-  description: string;
-  implementationDetails: boolean;
-  implementationCode?: string;
-  levels: ModuleLevel[];
+function tabSearchText(moduleDocumentation: AccessModuleDocumentation, tabIndex: number): string {
+    const tab = moduleDocumentation.tabs[tabIndex];
+    return normalize([
+        tab.tabId,
+        tab.label,
+        tab.resumen,
+        ...(tab.condiciones ?? []),
+        ...(tab.observaciones ?? []),
+        ...tab.niveles.flatMap((item) => [
+            `nivel ${item.nivel}`,
+            item.titulo,
+            ...item.permite,
+            ...(item.noIncluye ?? []),
+        ]),
+    ].join(" "));
 }
 
-type ModuleDocsType = {
-  [key in Modulo]: ModuleDoc;
-};
-
-const moduleDocs: ModuleDocsType = {
-  [Modulo.USUARIOS]: {
-    title: "Modulo de Usuarios",
-    description: "Gestion de usuarios y asignacion de accesos",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Visualizacion de usuarios existentes." },
-      { level: 2, description: "Creacion y modificacion de usuarios." },
-      { level: 3, description: "Gestion completa de usuarios y sus accesos." },
-    ],
-  },
-  [Modulo.PRODUCTOS]: {
-    title: "Modulo de Productos",
-    description: "Gestion del catalogo de productos",
-    implementationDetails: true,
-    implementationCode: `
-import { useAccessSnapshot } from "../../../auth/usePermissions";
-import { moduleAccessRule } from "../../../auth/accessHelpers";
-import { Modulo } from "../../Usuarios/GestionUsuarios/types";
-
-const access = useAccessSnapshot();
-
-const tabs = [
-  {
-    label: "Codificar Material",
-    accesoValido: moduleAccessRule(Modulo.PRODUCTOS, 2),
-  },
-  {
-    label: "Consulta",
-    accesoValido: moduleAccessRule(Modulo.PRODUCTOS, 1),
-  },
-];
-
-const visibleTabs = tabs.filter((tab) => tab.accesoValido(access));`,
-    levels: [
-      { level: 1, description: 'Solo permite acceder a "Consulta" para visualizar productos existentes.' },
-      { level: 2, description: "Permite acceder a tabs de creacion y mantenimiento del modulo." },
-      { level: 3, description: "Acceso completo a todas las funcionalidades del modulo." },
-    ],
-  },
-  [Modulo.PRODUCCION]: {
-    title: "Modulo de Produccion",
-    description: "Gestion de ordenes de produccion, planeacion mensual, programacion semanal, procesos productivos y monitoreo de areas operativas",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Visualizacion de informacion de produccion." },
-      { level: 2, description: "Creacion y modificacion de ordenes de produccion." },
-      { level: 3, description: "Gestion completa del proceso productivo." },
-    ],
-  },
-  [Modulo.STOCK]: {
-    title: "Modulo de Stock",
-    description: "Gestion de inventario y existencias",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Visualizacion de niveles de stock." },
-      { level: 2, description: "Registro de movimientos de inventario." },
-      { level: 3, description: "Control total del inventario." },
-    ],
-  },
-  [Modulo.PROVEEDORES]: {
-    title: "Modulo de Proveedores",
-    description: "Gestion de proveedores y sus catalogos",
-    implementationDetails: true,
-    implementationCode: `
-import { useAccessSnapshot } from "../../auth/usePermissions";
-import { moduleAccessRule } from "../../auth/accessHelpers";
-import { Modulo } from "../Usuarios/GestionUsuarios/types";
-
-const access = useAccessSnapshot();
-
-const tabs = [
-  {
-    label: "Codificar Proveedor",
-    accesoValido: moduleAccessRule(Modulo.PROVEEDORES, 2),
-  },
-  {
-    label: "Consultar Proveedores",
-    accesoValido: moduleAccessRule(Modulo.PROVEEDORES, 1),
-  },
-];
-
-const visibleTabs = tabs.filter((tab) => tab.accesoValido(access));`,
-    levels: [
-      { level: 1, description: 'Solo permite acceder a "Consultar Proveedores".' },
-      { level: 2, description: 'Permite acceder tambien a "Codificar Proveedor".' },
-      { level: 3, description: "Acceso completo a todas las funcionalidades del modulo." },
-    ],
-  },
-  [Modulo.COMPRAS]: {
-    title: "Modulo de Compras",
-    description: "Gestion de ordenes de compra y adquisiciones",
-    implementationDetails: true,
-    implementationCode: `
-import { effectiveMaxNivelForModule } from "../../auth/accessHelpers";
-import { useAuth } from "../../context/AuthContext";
-import { Modulo } from "../Usuarios/GestionUsuarios/types";
-
-const { moduloAccesos, isMasterLike } = useAuth();
-const comprasAccessLevel = effectiveMaxNivelForModule(
-  isMasterLike,
-  moduloAccesos,
-  Modulo.COMPRAS
-);
-
-{comprasAccessLevel >= 2 && (
-  <Box onClick={handleActualizarOrden}>
-    Actualizar Estado de la Orden
-  </Box>
-)}`,
-    levels: [
-      { level: 1, description: "Permite crear y visualizar ordenes de compra." },
-      { level: 2, description: "Incluye nivel 1 y permite cancelar, liberar y enviar ordenes." },
-    ],
-  },
-  [Modulo.SEGUIMIENTO_PRODUCCION]: {
-    title: "Modulo de Gestion de Areas Operativas",
-    description: "Gestion y configuracion de areas operativas de produccion",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Visualizacion de areas operativas." },
-      { level: 2, description: "Creacion y edicion de areas operativas." },
-      { level: 3, description: "Control total de areas operativas." },
-    ],
-  },
-  [Modulo.CLIENTES]: {
-    title: "Modulo de Clientes",
-    description: "Gestion de clientes y relaciones comerciales",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Consulta de clientes existentes." },
-      { level: 2, description: "Creacion y actualizacion de clientes." },
-      { level: 3, description: "Acceso completo al modulo." },
-    ],
-  },
-  [Modulo.VENTAS]: {
-    title: "Modulo de Ventas",
-    description: "Gestion integral de operaciones y reportes de ventas",
-    implementationDetails: true,
-    implementationCode: `
-import { useAccessSnapshot } from "../../auth/usePermissions";
-import { moduleAccessRule } from "../../auth/accessHelpers";
-import { Modulo } from "../Usuarios/GestionUsuarios/types";
-
-const access = useAccessSnapshot();
-
-const tabs = [
-  { label: "Crear Venta", accesoValido: moduleAccessRule(Modulo.VENTAS, 1) },
-  { label: "Historial de Ventas", accesoValido: moduleAccessRule(Modulo.VENTAS, 1) },
-  { label: "Reportes", accesoValido: moduleAccessRule(Modulo.VENTAS, 1) },
-  { label: "Crear vendedor nuevo", accesoValido: moduleAccessRule(Modulo.VENTAS, 3) },
-];
-
-const visibleTabs = tabs.filter((tab) => tab.accesoValido(access));`,
-    levels: [
-      { level: 1, description: "Permite consultar la informacion de ventas existentes." },
-      { level: 2, description: "Permite gestionar ventas estandar y revisar reportes." },
-      { level: 3, description: "Incluye niveles 1 y 2 y puede crear un nuevo vendedor." },
-    ],
-  },
-  [Modulo.TRANSACCIONES_ALMACEN]: {
-    title: "Modulo de Transacciones de Almacen",
-    description: "Gestion de movimientos y transacciones en almacen",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Visualizacion de transacciones." },
-      { level: 2, description: "Registro de entradas y salidas." },
-      { level: 3, description: "Control total de operaciones de almacen." },
-    ],
-  },
-  [Modulo.ACTIVOS]: {
-    title: "Modulo de Activos Fijos",
-    description: "Gestion de activos fijos y equipamiento",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Visualizacion de activos." },
-      { level: 2, description: "Nivel 1 + crear ordenes de compra para activos fijos." },
-      { level: 3, description: "Nivel 1 + 2 + dar ingreso a activos fijos." },
-      { level: 4, description: "Control total de activos fijos y equipamiento." },
-    ],
-  },
-  [Modulo.CONTABILIDAD]: {
-    title: "Modulo de Contabilidad",
-    description: "Gestion contable y financiera",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Visualizacion de informacion contable." },
-      { level: 2, description: "Registro de asientos contables." },
-      { level: 3, description: "Control total de la gestion contable." },
-    ],
-  },
-  [Modulo.PERSONAL_PLANTA]: {
-    title: "Modulo de Personal de Planta",
-    description: "Gestion del personal operativo",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Visualizacion de informacion del personal." },
-      { level: 2, description: "Registro y modificacion de informacion del personal." },
-      { level: 3, description: "Control total de la gestion de personal." },
-    ],
-  },
-  [Modulo.BINTELLIGENCE]: {
-    title: "Modulo de Business Intelligence",
-    description: "Analisis de datos, reportes avanzados y herramientas para aprovisionamiento basado en datos",
-    implementationDetails: true,
-    implementationCode: `
-const tabs = [
-  { label: "Informes Diarios", accesoValido: tabAccessRule(Modulo.BINTELLIGENCE, "INFORMES_DIARIOS", 1) },
-  { label: "Informes Globales", accesoValido: tabAccessRule(Modulo.BINTELLIGENCE, "INFORMES_GLOBALES", 1) },
-  { label: "Series De Tiempo y Proyecciones", accesoValido: tabAccessRule(Modulo.BINTELLIGENCE, "SERIES_TIEMPO_PROYECCIONES", 1) },
-  { label: "Personal", accesoValido: tabAccessRule(Modulo.BINTELLIGENCE, "PERSONAL", 1) },
-  { label: "Aprovisionamiento", accesoValido: moduleAccessRule(Modulo.BINTELLIGENCE, 1) },
-];
-
-const canSaveFromBi = biAccessLevel >= 3;`,
-    levels: [
-      { level: 1, description: "Visualizacion de reportes BI y analisis de aprovisionamiento." },
-      { level: 2, description: "Uso ampliado del modulo para exploracion y seguimiento analitico." },
-      { level: 3, description: "Acceso total a herramientas BI, incluyendo guardado de punto de reorden desde la interfaz de aprovisionamiento." },
-    ],
-  },
-  [Modulo.OPERACIONES_CRITICAS_BD]: {
-    title: "Modulo de Operaciones Criticas en BD",
-    description: "Herramientas operativas sensibles protegidas por reglas especiales y flags adicionales",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Acceso a las tabs habilitadas del modulo, sujeto a flags de super master." },
-      { level: 2, description: "Reservado para futuras distinciones finas dentro del modulo." },
-      { level: 3, description: "Acceso total del modulo, manteniendo el requisito extra de usuario master-like." },
-    ],
-  },
-  [Modulo.ADMINISTRACION_ALERTAS]: {
-    title: "Modulo de Administracion de Alertas",
-    description: "Gestion de notificaciones y alertas del sistema",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Visualizacion de alertas." },
-      { level: 2, description: "Configuracion de alertas." },
-      { level: 3, description: "Administracion completa del sistema de alertas." },
-    ],
-  },
-  [Modulo.ADMINISTRACION_GLOBAL]: {
-    title: "Modulo de Administracion Global",
-    description: "Parametrizaciones transversales de la aplicacion",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Consulta de identidad legal, logo documental, jornada laboral vigente e historiales." },
-      { level: 2, description: "Creacion de nuevas versiones vigentes de identidad legal, logo documental y jornada laboral." },
-      { level: 3, description: "Control total de parametrizaciones globales." },
-    ],
-  },
-  [Modulo.ORGANIGRAMA]: {
-    title: "Modulo de Organigrama",
-    description: "Gestion de estructura organizacional e identidad corporativa por tab",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Consulta del tab asignado y, para Mision y Vision, acceso al historial." },
-      { level: 2, description: "Edicion del tab asignado: cargos y relaciones, o nuevas versiones de Mision, Vision y Valores." },
-      { level: 3, description: "Mantiene las capacidades de edicion sobre el tab asignado." },
-    ],
-  },
-  [Modulo.CALIDAD]: {
-    title: "Modulo de Calidad",
-    description: "Gestion de plantillas, diligenciamiento e historial de controles de proceso",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Acceso al tab asignado para consultar o registrar controles de proceso." },
-      { level: 2, description: "Gestion operativa del tab asignado, segun permisos configurados por usuario." },
-      { level: 3, description: "Control total de las operaciones habilitadas en el tab asignado." },
-    ],
-  },
-  [Modulo.PAGOS_PROVEEDORES]: {
-    title: "Modulo de Pagos a Proveedores",
-    description: "Gestion de pagos y conciliaciones con proveedores",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Consulta de pagos existentes." },
-      { level: 2, description: "Registro y actualizacion de pagos." },
-      { level: 3, description: "Control total del modulo." },
-    ],
-  },
-  [Modulo.MASTER_DIRECTIVES]: {
-    title: "Modulo de Master Directives",
-    description: "Configuracion avanzada para super_master y master cuando la directiva lo habilite",
-    implementationDetails: false,
-    levels: [
-      { level: 1, description: "Acceso base al modulo, ademas restringido por la regla especial de Directivas Super Master." },
-      { level: 2, description: "Reservado para futuras capacidades adicionales." },
-      { level: 3, description: "Control total del modulo, manteniendo la restriccion especial." },
-    ],
-  },
-};
+function DocumentationList({ title, items }: { title: string; items?: readonly string[] }) {
+    if (!items?.length) return null;
+    return (
+        <Box>
+            <Text fontSize="sm" fontWeight="semibold" mb={1}>{title}</Text>
+            <Box as="ul" ps={5} color="app.textMuted">
+                {items.map((item) => <Text as="li" key={item} fontSize="sm" mb={1}>{item}</Text>)}
+            </Box>
+        </Box>
+    );
+}
 
 export default function InfoNiveles() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredModules, setFilteredModules] = useState<Modulo[]>(Object.keys(moduleDocs) as Modulo[]);
-  const accordionExpandedColor = useColorModeValue("blue.700", "blue.200");
+    const [searchTerm, setSearchTerm] = useState("");
+    const filteredModules = useMemo(() => {
+        const query = normalize(searchTerm.trim());
+        if (!query) return ACCESS_DOCUMENTATION_MODULES;
 
-  useEffect(() => {
-    if (searchTerm) {
-      const filtered = (Object.keys(moduleDocs) as Modulo[]).filter(
-        (key) =>
-          key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          moduleDocs[key].title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          moduleDocs[key].description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredModules(filtered);
-      return;
-    }
+        return ACCESS_DOCUMENTATION_MODULES.flatMap((moduleDocumentation) => {
+            const moduleMatches = normalize([
+                moduleDocumentation.modulo,
+                moduleDocumentation.label,
+                moduleDocumentation.resumen,
+                ...(moduleDocumentation.condiciones ?? []),
+            ].join(" ")).includes(query);
 
-    setFilteredModules(Object.keys(moduleDocs) as Modulo[]);
-  }, [searchTerm]);
+            const matchingTabs = moduleMatches
+                ? moduleDocumentation.tabs
+                : moduleDocumentation.tabs.filter((_, index) => tabSearchText(moduleDocumentation, index).includes(query));
 
-  return (
-    <Box p={4}>
-      <Flex justifyContent="space-between" alignItems="center" mb={4}>
-        <Heading size="md">Documentacion de Niveles de Acceso</Heading>
-        <Tag.Root size="md" colorPalette="blue" borderRadius="full" px={3}>
-          <Tag.Label>{Object.keys(moduleDocs).length} modulos</Tag.Label>
-        </Tag.Root>
-      </Flex>
+            return matchingTabs.length > 0
+                ? [{ ...moduleDocumentation, tabs: matchingTabs }]
+                : [];
+        });
+    }, [searchTerm]);
 
-      <Alert.Root
-        status="info"
-        mb={4}
-        variant='subtle'
-        borderRadius="md"
-        borderStartWidth='3px'
-        borderStartColor='colorPalette.solid'>
-        <Alert.Indicator alignSelf="flex-start" mt={1} />
-        <Box width="100%">
-          <Heading size="sm" mb={2} textAlign="left">
-            Informacion General
-          </Heading>
-          <Text mb={3} textAlign="left">
-            El sistema usa niveles de acceso por modulo y la UI toma como fuente de verdad el snapshot de
-            <Code mx={1}>GET /api/auth/me</Code>.
-          </Text>
-          <Flex direction="column" gap={2} ml={2} mb={3}>
-            <Flex align="center">
-              <Tag.Root size="sm" colorPalette="green" mr={2} minW="60px" justifyContent="center">
-                Nivel 1
-              </Tag.Root>
-              <Text>Acceso basico</Text>
-            </Flex>
-            <Flex align="center">
-              <Tag.Root size="sm" colorPalette="blue" mr={2} minW="60px" justifyContent="center">
-                Nivel 2
-              </Tag.Root>
-              <Text>Consulta y creacion o modificacion</Text>
-            </Flex>
-            <Flex align="center">
-              <Tag.Root size="sm" colorPalette="purple" mr={2} minW="60px" justifyContent="center">
-                Nivel 3
-              </Tag.Root>
-              <Text>Acceso completo del modulo</Text>
-            </Flex>
-          </Flex>
-          <Text textAlign="left">
-            Los usuarios master-like tienen bypass completo sobre las reglas declarativas de acceso.
-          </Text>
-        </Box>
-      </Alert.Root>
-
-      <InputGroup
-        mb={6}
-        startElement={<Icon as={LuSearch} color="gray.300" />}
-        startElementProps={{ pointerEvents: "none" }}
-      >
-        <Input
-          placeholder="Buscar modulo por nombre o descripcion..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          size="md"
-          variant="subtle"
-          _hover={{ bg: "app.rowHoverStrong" }}
-          _focus={{ bg: "app.surface", borderColor: "blue.500" }}
-        />
-      </InputGroup>
-
-      {filteredModules.length === 0 && (
-        <Alert.Root status="info" mb={4}>
-          <Alert.Indicator />
-          No se encontraron modulos que coincidan con la busqueda.
-        </Alert.Root>
-      )}
-
-      <Accordion.Root multiple>
-        {filteredModules.map((moduleKey) => (
-          <Accordion.Item key={moduleKey} mb={2} borderWidth="1px" borderRadius="md" value={moduleKey}>
-            <h2>
-              <Accordion.ItemTrigger _expanded={{ bg: "app.rowActiveBlue", color: accordionExpandedColor }}>
-                <Box flex="1" textAlign="left">
-                  <Flex alignItems="center">
-                    <Text fontWeight="bold" mr={2}>
-                      {moduleDocs[moduleKey].title}
+    return (
+        <Box p={4}>
+            <Flex justify="space-between" align={{ base: "flex-start", sm: "center" }} gap={3} wrap="wrap" mb={4}>
+                <Box>
+                    <Heading size="md">Documentación de niveles de acceso</Heading>
+                    <Text fontSize="sm" color="app.textMuted" mt={1}>
+                        Consulta el alcance actual de cada módulo, pestaña y nivel configurable.
                     </Text>
-                    <Tag.Root size="sm" colorPalette="gray" borderRadius="full">
-                      <Tag.Label>{moduleDocs[moduleKey].levels.length} niveles</Tag.Label>
-                    </Tag.Root>
-                  </Flex>
                 </Box>
-                <Accordion.ItemIndicator />
-              </Accordion.ItemTrigger>
-            </h2>
-            <Accordion.ItemContent pb={4}><Accordion.ItemBody>
-                <Text mb={4}>{moduleDocs[moduleKey].description}</Text>
+                <Badge colorPalette="blue" borderRadius="full" px={3} py={1}>
+                    {ACCESS_DOCUMENTATION_MODULES.length} módulos
+                </Badge>
+            </Flex>
 
-                <Heading size="sm" mb={3}>
-                  Niveles de Acceso:
-                </Heading>
-                <Box borderLeft="2px solid" borderColor="app.border" pl={4} mb={4}>
-                  {moduleDocs[moduleKey].levels.map((level) => (
-                    <Box
-                      key={level.level}
-                      mb={3}
-                      p={3}
-                      bg="app.surfaceSubtle"
-                      borderRadius="md"
-                      borderLeft="4px solid"
-                      borderLeftColor={getLevelColor(level.level)}
-                      boxShadow="sm"
-                      transition="all 0.2s"
-                      _hover={{ boxShadow: "md" }}
-                    >
-                      <Flex align="center">
-                        <Tag.Root size="md" colorPalette={getColorSchemeForLevel(level.level)} mr={3}>
-                          <Tag.Label>Nivel {level.level}</Tag.Label>
-                        </Tag.Root>
-                        <Text>{level.description}</Text>
-                      </Flex>
-                    </Box>
-                  ))}
+            <Alert.Root status="info" mb={4} variant="subtle" borderRadius="md">
+                <Alert.Indicator alignSelf="flex-start" mt={1} />
+                <Box>
+                    <Alert.Title>Cada pestaña tiene su propia escala</Alert.Title>
+                    <Alert.Description>
+                        No existe una definición general para los niveles 1, 2, 3 o 4. Revisa la pestaña concreta:
+                        un nivel superior solo añade privilegios cuando su descripción lo indica expresamente.
+                    </Alert.Description>
                 </Box>
+            </Alert.Root>
 
-                {moduleDocs[moduleKey].implementationDetails && (
-                  <>
-                    <Separator my={4} />
-                    <Heading size="sm" mb={2}>
-                      Implementacion:
-                    </Heading>
-                    <Box bg="app.surfaceSubtle" p={3} borderRadius="md" overflowX="auto">
-                      <Code display="block" whiteSpace="pre" p={2}>
-                        {moduleDocs[moduleKey].implementationCode}
-                      </Code>
-                    </Box>
-                  </>
-                )}
+            <InputGroup
+                mb={6}
+                startElement={<Icon as={LuSearch} color="app.textSubtle" />}
+                startElementProps={{ pointerEvents: "none" }}
+            >
+                <Input
+                    aria-label="Buscar en la documentación de accesos"
+                    placeholder="Buscar módulo, pestaña, operación, condición o nivel..."
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    variant="subtle"
+                    _hover={{ bg: "app.rowHoverStrong" }}
+                    _focus={{ bg: "app.surface", borderColor: "blue.500" }}
+                />
+            </InputGroup>
 
-                <Separator my={4} />
+            {filteredModules.length === 0 ? (
+                <Alert.Root status="info">
+                    <Alert.Indicator />
+                    No se encontraron módulos o pestañas que coincidan con la búsqueda.
+                </Alert.Root>
+            ) : (
+                <Accordion.Root multiple>
+                    {filteredModules.map((moduleDocumentation) => (
+                        <Accordion.Item
+                            key={moduleDocumentation.modulo}
+                            value={moduleDocumentation.modulo}
+                            mb={3}
+                            borderWidth="1px"
+                            borderRadius="md"
+                            overflow="hidden"
+                        >
+                            <h2>
+                                <Accordion.ItemTrigger px={4} py={3} _expanded={{ bg: "app.rowActiveBlue" }}>
+                                    <Box flex="1" textAlign="left">
+                                        <Flex align="center" gap={2} wrap="wrap">
+                                            <Text fontWeight="bold">{moduleDocumentation.label}</Text>
+                                            <Badge colorPalette="gray">
+                                                {moduleDocumentation.tabs.length} {moduleDocumentation.tabs.length === 1 ? "pestaña" : "pestañas"}
+                                            </Badge>
+                                        </Flex>
+                                        <Text fontSize="sm" color="app.textMuted" mt={1}>
+                                            {moduleDocumentation.resumen}
+                                        </Text>
+                                    </Box>
+                                    <Accordion.ItemIndicator />
+                                </Accordion.ItemTrigger>
+                            </h2>
+                            <Accordion.ItemContent>
+                                <Accordion.ItemBody p={{ base: 3, md: 4 }}>
+                                    <VStack align="stretch" gap={5}>
+                                        <DocumentationList title="Reglas comunes del módulo" items={moduleDocumentation.condiciones} />
 
-                <Box mt={2}>
-                  <Text fontSize="sm" color="app.textMuted">
-                    Nota: los niveles son acumulativos. Un usuario con nivel superior conserva los permisos de
-                    los niveles anteriores.
-                  </Text>
-                </Box>
-              </Accordion.ItemBody></Accordion.ItemContent>
-          </Accordion.Item>
-        ))}
-      </Accordion.Root>
-    </Box>
-  );
-}
-
-function getColorSchemeForLevel(level: number): string {
-  switch (level) {
-    case 1:
-      return "green";
-    case 2:
-      return "blue";
-    case 3:
-      return "purple";
-    case 4:
-      return "orange";
-    default:
-      return "gray";
-  }
-}
-
-function getLevelColor(level: number): string {
-  switch (level) {
-    case 1:
-      return "green.500";
-    case 2:
-      return "blue.500";
-    case 3:
-      return "purple.500";
-    case 4:
-      return "orange.500";
-    default:
-      return "gray.500";
-  }
+                                        {moduleDocumentation.tabs.map((tabDocumentation) => (
+                                            <Box
+                                                key={tabDocumentation.tabId}
+                                                borderWidth="1px"
+                                                borderRadius="lg"
+                                                p={{ base: 3, md: 4 }}
+                                                bg="app.surface"
+                                            >
+                                                <Flex
+                                                    justify="space-between"
+                                                    align={{ base: "flex-start", sm: "center" }}
+                                                    direction={{ base: "column", sm: "row" }}
+                                                    gap={2}
+                                                    mb={2}
+                                                >
+                                                    <Box>
+                                                        <Heading as="h3" size="sm">{tabDocumentation.label}</Heading>
+                                                        <Text fontSize="xs" color="app.textSubtle">{tabDocumentation.tabId}</Text>
+                                                    </Box>
+                                                    <Badge colorPalette="blue">
+                                                        {tabDocumentation.niveles.length === 1
+                                                            ? `Nivel ${tabDocumentation.niveles[0].nivel}`
+                                                            : `Niveles 1–${maxDocumentedLevel(tabDocumentation)}`}
+                                                    </Badge>
+                                                </Flex>
+                                                <Text color="app.textMuted" mb={4}>{tabDocumentation.resumen}</Text>
+                                                <VStack align="stretch" gap={3} mb={4}>
+                                                    <DocumentationList title="Condiciones" items={tabDocumentation.condiciones} />
+                                                    <DocumentationList title="Observaciones" items={tabDocumentation.observaciones} />
+                                                </VStack>
+                                                <AccessLevelCards niveles={tabDocumentation.niveles} />
+                                            </Box>
+                                        ))}
+                                    </VStack>
+                                </Accordion.ItemBody>
+                            </Accordion.ItemContent>
+                        </Accordion.Item>
+                    ))}
+                </Accordion.Root>
+            )}
+        </Box>
+    );
 }
