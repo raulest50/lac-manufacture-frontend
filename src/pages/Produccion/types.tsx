@@ -102,6 +102,9 @@ export interface OrdenProduccionDTO {
     fechaInicio: string | null; // ISO date string or null when unavailable
     fechaLanzamiento: string | null;
     fechaFinalPlanificada: string | null;
+    canceladaEn?: string | null;
+    canceladaPorUsername?: string | null;
+    canceladaPorNombreCompleto?: string | null;
     estadoOrden: number; // 0: en produccion, 1: terminada
     politicaDispensacionInicio?: string | null;
     fechaAplicacionPoliticaDispensacion?: string | null;

@@ -13,9 +13,12 @@ import {
     Portal,
 } from "@chakra-ui/react";
 import { useAppToast } from "@/components/ui/use-app-toast";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { effectiveExactTabNivelFromSnapshot } from "../../../auth/accessHelpers.ts";
+import { useAccessSnapshot } from "../../../auth/usePermissions.ts";
 import EndPointsURL from "../../../api/EndPointsURL.tsx";
+import { Modulo } from "../../Usuarios/GestionUsuarios/types.tsx";
 import { OrdenProduccionDTO } from "../types.tsx";
 import {
     getEstadoDispensacionMaterialesColor,
@@ -90,25 +93,45 @@ export default function OrdenProduccionDialogDetalles({
     orden,
     onCanceled,
 }: OrdenProduccionDialogDetallesProps) {
-    const [isDeletable, setIsDeletable] = useState(false);
+    const [isCancelable, setIsCancelable] = useState(false);
     const [randomToken, setRandomToken] = useState("");
     const [inputToken, setInputToken] = useState("");
     const [cancelLoading, setCancelLoading] = useState(false);
 
     const toast = useAppToast();
     const endPoints = useMemo(() => new EndPointsURL(), []);
+    const access = useAccessSnapshot();
+    const canCancelOrders = useMemo(
+        () => effectiveExactTabNivelFromSnapshot(access, Modulo.PRODUCCION, "HISTORIAL") >= 2,
+        [access]
+    );
+
+    const checkIfCancelable = useCallback(async (ordenId: number) => {
+        try {
+            const url = endPoints.is_deletable_orden_produccion.replace("{id}", ordenId.toString());
+            const response = await axios.get(url);
+            setIsCancelable(response.data.cancelable === true);
+        } catch (error) {
+            setIsCancelable(false);
+        }
+    }, [endPoints]);
 
     useEffect(() => {
         if (isOpen && orden) {
-            const token = Math.floor(1000 + Math.random() * 9000).toString();
-            setRandomToken(token);
+            setIsCancelable(false);
             setInputToken("");
-            checkIfDeletable(orden.ordenId);
+            if (canCancelOrders && orden.estadoOrden === 0) {
+                const token = Math.floor(1000 + Math.random() * 9000).toString();
+                setRandomToken(token);
+                void checkIfCancelable(orden.ordenId);
+            } else {
+                setRandomToken("");
+            }
         }
-    }, [isOpen, orden]);
+    }, [canCancelOrders, checkIfCancelable, isOpen, orden]);
 
     const resetState = () => {
-        setIsDeletable(false);
+        setIsCancelable(false);
         setRandomToken("");
         setInputToken("");
         setCancelLoading(false);
@@ -119,18 +142,8 @@ export default function OrdenProduccionDialogDetalles({
         onClose();
     };
 
-    const checkIfDeletable = async (ordenId: number) => {
-        try {
-            const url = endPoints.is_deletable_orden_produccion.replace("{id}", ordenId.toString());
-            const response = await axios.get(url);
-            setIsDeletable(response.data.deletable === true);
-        } catch (error) {
-            setIsDeletable(false);
-        }
-    };
-
     const handleCancel = async () => {
-        if (!orden) return;
+        if (!orden || cancelLoading || !canCancelOrders) return;
 
         if (inputToken !== randomToken) {
             toast({
@@ -216,6 +229,38 @@ export default function OrdenProduccionDialogDetalles({
                                     <Text fontSize="sm">Fin planificada: {formatDateTimeValue(orden.fechaFinalPlanificada)}</Text>
                                 </Box>
 
+                                {orden.estadoOrden === -1 && (
+                                    <Box as="section" aria-labelledby={`cancelacion-orden-${orden.ordenId}`}>
+                                        <Text id={`cancelacion-orden-${orden.ordenId}`} fontWeight="bold">
+                                            {"Cancelaci\u00F3n"}
+                                        </Text>
+                                        {orden.canceladaEn
+                                            && orden.canceladaPorUsername
+                                            && orden.canceladaPorNombreCompleto ? (
+                                            <>
+                                                <Text fontSize="sm">
+                                                    Cancelada por: {orden.canceladaPorNombreCompleto}
+                                                    {orden.canceladaPorNombreCompleto === orden.canceladaPorUsername
+                                                        ? ""
+                                                        : ` (${orden.canceladaPorUsername})`}
+                                                </Text>
+                                                <Text fontSize="sm">
+                                                    Fecha de cancelación: {formatDateTimeValue(orden.canceladaEn)}
+                                                </Text>
+                                            </>
+                                        ) : (
+                                            <Alert.Root status="info" mt={2}>
+                                                <Alert.Indicator />
+                                                <Alert.Content>
+                                                    <Alert.Description>
+                                                        Información de cancelación no disponible para este registro histórico.
+                                                    </Alert.Description>
+                                                </Alert.Content>
+                                            </Alert.Root>
+                                        )}
+                                    </Box>
+                                )}
+
                                 <Box>
                                     <Text fontWeight="bold">{"Informaci\u00F3n de Producci\u00F3n"}</Text>
                                     <Text fontSize="sm">Cantidad a producir: {formatValue(orden.cantidadProducir)}</Text>
@@ -251,7 +296,7 @@ export default function OrdenProduccionDialogDetalles({
                                     <Text whiteSpace="pre-wrap">{formatValue(orden.observaciones)}</Text>
                                 </Box>
 
-                                {isDeletable && (
+                                {isCancelable && canCancelOrders && (
                                     <Box>
                                         <Text fontWeight="bold" mb={3} color="red.500">
                                             {"Cancelar orden de producci\u00F3n"}
@@ -279,7 +324,7 @@ export default function OrdenProduccionDialogDetalles({
                                                 onClick={handleCancel}
                                                 loading={cancelLoading}
                                                 loadingText="Cancelando..."
-                                                disabled={inputToken !== randomToken}
+                                                disabled={cancelLoading || inputToken !== randomToken}
                                             >
                                                 {"Cancelar orden de producci\u00F3n"}
                                             </Button>
