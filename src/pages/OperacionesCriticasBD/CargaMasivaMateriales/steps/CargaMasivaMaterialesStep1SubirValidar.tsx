@@ -181,7 +181,9 @@ export default function CargaMasivaMaterialesStep1SubirValidar({
                     tipo_unidades,
                     cantidad_unidad,
                     stock_minimo,
-                    ficha_tecnica_url: getCellStr(row, 9),
+                    // Columna heredada: se conserva en el Excel, pero no se asocia
+                    // ninguna ruta documental durante la carga masiva.
+                    ficha_tecnica_url: "",
                     tipo_material,
                     punto_reorden: getCellNum(row, 11),
                 });

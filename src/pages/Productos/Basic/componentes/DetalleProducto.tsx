@@ -658,7 +658,9 @@ export default function DetalleProducto({producto, setEstado, setProductoSelecci
                 </Card.Body>
             </Card.Root>
 
-            {isMaterial && <FichaTecnicaMaterialCard productoId={producto.productoId} />}
+            {isMaterial && (
+                <FichaTecnicaMaterialCard productoId={producto.productoId} canManage={canEdit} />
+            )}
 
             <Card.Root variant="outline" boxShadow="md">
                 <Card.Header bg="app.stepperBlue">

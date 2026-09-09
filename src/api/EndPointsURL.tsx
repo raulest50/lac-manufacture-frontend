@@ -32,6 +32,8 @@ export default class EndPointsURL{
     public save_mprima_v2: string;
     public producto_ficha_tecnica_metadata: string;
     public producto_ficha_tecnica: string;
+    public producto_ficha_tecnica_versiones: string;
+    public producto_ficha_tecnica_version_archivo: string;
 
     public search_p4_receta_v2: string;
 
@@ -724,6 +726,8 @@ export default class EndPointsURL{
         this.save_mprima_v2 = `${domain}/${productos_res}/save_mprima_v2`;
         this.producto_ficha_tecnica_metadata = `${domain}/${productos_res}/{productoId}/ficha-tecnica/metadata`;
         this.producto_ficha_tecnica = `${domain}/${productos_res}/{productoId}/ficha-tecnica`;
+        this.producto_ficha_tecnica_versiones = `${domain}/${productos_res}/{productoId}/ficha-tecnica/versiones`;
+        this.producto_ficha_tecnica_version_archivo = `${domain}/${productos_res}/{productoId}/ficha-tecnica/versiones/{versionId}/archivo`;
 
         this.search_terminado_byname = `${domain}/${productos_res}/search_terminados`;
         this.search_terminados_picker = `${domain}/${productos_res}/search_terminados_picker`;

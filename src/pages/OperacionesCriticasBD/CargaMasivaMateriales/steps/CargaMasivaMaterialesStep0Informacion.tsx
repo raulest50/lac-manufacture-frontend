@@ -107,7 +107,8 @@ export default function CargaMasivaMaterialesStep0Informacion({ setActiveStep }:
                     <strong>Obligatorios:</strong> producto_id, nombre, costo, iva_percentual (0, 5 o 19), tipo_unidades (L, KG o U), cantidad_unidad, tipo_material (1 = Materia Prima, 2 = Material de Empaque).
                 </Text>
                 <Text>
-                    <strong>Opcionales:</strong> observaciones, stock_minimo, ficha_tecnica_url, punto_reorden (-1 para ignorar alertas).
+                    <strong>Opcionales:</strong> observaciones, stock_minimo y punto_reorden (-1 para ignorar alertas).
+                    La columna ficha_tecnica_url se conserva por compatibilidad, pero su contenido se ignora.
                 </Text>
 
                 <Text fontWeight="semibold" mt={2}>
